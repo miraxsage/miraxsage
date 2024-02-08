@@ -1,5 +1,7 @@
 import { Box, alpha, lighten, useTheme } from "@mui/material";
 import TopMenu from "./TopMenu";
+import BottomBar from "./BottomBar";
+import AsideMenu from "./AsideMenu";
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -35,10 +37,14 @@ export default function Layout({ children }: LayoutProps) {
                         ? lighten(glowColor, 0.1)
                         : theme.palette.divider,
                 }}
-                className="border rounded-xl w-full h-full overflow-hidden"
+                className="border rounded-xl w-full h-full overflow-hidden flex flex-col"
             >
                 <TopMenu />
-                {children}
+                <div className="flex-grow flex">
+                    <AsideMenu />
+                    <div className="flex-grow">{children}</div>
+                </div>
+                <BottomBar />
             </Box>
         </Box>
     );

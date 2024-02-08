@@ -29,6 +29,7 @@ declare module "@mui/material/styles" {
     interface ThemeOptions {
         breakpoints?: {
             ["2xl"]: number;
+            ["3xl"]: number;
         };
     }
 }
@@ -50,6 +51,7 @@ const basicTheme = {
             lg: 1024,
             xl: 1280,
             "2xl": 1536,
+            "3xl": 1820,
         },
     },
     components: {
@@ -163,8 +165,11 @@ function App() {
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <Box
-                    sx={{ backgroundColor: "bg.dark" }}
-                    className={`h-0 w-full min-h-dvh flex justify-center items-center`}
+                    sx={{
+                        backgroundColor: "bg.dark",
+                        minHeight: "calc(max(640px, 100dvh))",
+                    }}
+                    className={`h-0 w-full flex justify-center items-center`}
                 >
                     <Layout>
                         <div className="">Мираксейдж</div>

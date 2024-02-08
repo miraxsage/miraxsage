@@ -1,21 +1,32 @@
-import { Box, Tab, Tabs, lighten, useTheme } from "@mui/material";
+import { Box, Tab, Tabs, Theme, alpha, lighten, useTheme } from "@mui/material";
 import { motion } from "framer-motion";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import classes from "classnames";
 import { areEqualShallow } from "@/utilities/Common";
 
 export interface AccentedTabsProps {
-    mode?: "full" | "squeezed";
+    mode?: "full" | "squeezed" | "icons";
+    orientation?: "horizontal" | "vertical";
     children: AccentedTabProp[];
     underline?: boolean;
 }
-export interface AccentedTabProp {
-    title: string;
-    icon?: ReactNode;
-}
+export type AccentedTabProp =
+    | {
+          title: string;
+          icon: ReactNode;
+      }
+    | {
+          title?: string;
+          icon: ReactNode;
+      }
+    | {
+          title: string;
+          icon?: ReactNode;
+      };
 
 export default function AccentedTabs({
     mode = "full",
+    orientation = "horizontal",
     underline = true,
     children,
 }: AccentedTabsProps) {
@@ -26,7 +37,9 @@ export default function AccentedTabs({
 
     const [hoverIndicator, setHoverIndicator] = useState({
         left: 0,
+        top: 0,
         width: 0,
+        height: 0,
         hovered: false,
         initial: true,
     });
@@ -39,6 +52,8 @@ export default function AccentedTabs({
         const newHoverIndicatorState = {
             left: tabBox.left - menuBox.left,
             width: tabBox.width,
+            top: tabBox.top - menuBox.top,
+            height: tabBox.height,
             hovered: true,
             initial: hoverIndicator.initial
                 ? hoverIndicator.hovered
@@ -74,19 +89,52 @@ export default function AccentedTabs({
         window.addEventListener("resize", onResize);
         return () => window.removeEventListener("resize", onResize);
     }, []);
-    const generateTab = (label: string, icon: ReactNode, id: number) => {
+    const generateTab = (
+        label: string | undefined,
+        icon: ReactNode,
+        id: number,
+        theme: Theme
+    ) => {
         const active = id == tab;
         const fullMode = mode == "full";
-        const iconMaxSize = active || !fullMode ? "30px" : "0";
-        const iconMRight = active || fullMode ? "8px" : "0";
+        const iconMaxSize =
+            active || !fullMode || orientation == "vertical" ? "30px" : "0";
+        const iconMRight =
+            orientation == "vertical" ? 0 : active || fullMode ? "8px" : "0";
         const labelMaxSize = fullMode ? "100%" : active ? "100%" : "0";
         return (
             <Tab
                 sx={{
-                    color: !active && !fullMode ? "#aeadb2" : null,
-                    minHeight: "48px",
+                    ...(orientation == "horizontal"
+                        ? {
+                              borderRightWidth: "1px",
+                              borderRightStyle: "solid",
+                              borderRightColor: "divider",
+                          }
+                        : {
+                              borderBottomWidth: "1px",
+                              borderBottomStyle: "solid",
+                              borderBottomColor: "divider",
+                          }),
+                    color: lighten(theme.palette.divider, 0.25),
                     maxWidth: active || fullMode ? "360px" : "65px",
-                    minWidth: active || fullMode ? "90px" : "65px",
+                    minWidth:
+                        orientation == "vertical"
+                            ? "0"
+                            : active || fullMode
+                            ? "90px"
+                            : "65px",
+                    minHeight: "55px",
+                    padding:
+                        orientation == "vertical" ? "12px 18px" : "12px 22px",
+                    transition: "color 0.3s, background 0.2s ease-in-out 0.1s",
+                    "&:hover": {
+                        backgroundColor: alpha(theme.palette.divider, 0.05),
+                        color: theme.palette.contrast.main,
+                    },
+                    "&.Mui-selected": {
+                        color: theme.palette.contrast.light,
+                    },
                 }}
                 label={
                     <motion.div
@@ -141,40 +189,41 @@ export default function AccentedTabs({
             <Tabs
                 ref={tabsRef}
                 className="mb-[-1px]"
+                orientation={orientation}
                 value={tab}
                 onChange={setActiveTab}
                 sx={{
-                    "& .MuiTab-root.Mui-selected:hover::before": {
-                        content: '""',
-                        width: "50%",
-                        position: "absolute",
-                        left: 0,
-                        bottom: 0,
-                        height: "2px",
-                        background: theme.palette.secondary.main,
-                    },
-                    "& .MuiTab-root": {
-                        minHeight: "55px",
-                        borderRightWidth: "1px",
-                        borderRightStyle: "solid",
-                        borderRightColor: "divider",
-                        padding: "12px 22px",
-                        transition: "color 0.3s",
-                        color: lighten(theme.palette.divider, 0.25),
-                    },
-                    "& .MuiTab-root.Mui-selected": {
-                        color: theme.palette.contrast.light,
-                    },
-                    "& .MuiTab-root::after": {
-                        content: '""',
-                        width: "0",
-                        position: "absolute",
-                        bottom: 0,
-                        height: "2px",
-                        background: theme.palette.primary.main,
-                    },
+                    ...(orientation == "horizontal"
+                        ? {
+                              "& .MuiTab-root.Mui-selected:hover::before": {
+                                  content: '""',
+                                  width: "50%",
+                                  position: "absolute",
+                                  left: 0,
+                                  bottom: 0,
+                                  height: "2px",
+                                  background: theme.palette.secondary.main,
+                              },
+                              "& .MuiTab-root::after": {
+                                  content: '""',
+                                  position: "absolute",
+                                  bottom: 0,
+                                  width: 0,
+                                  background: theme.palette.primary.main,
+                              },
+                          }
+                        : {
+                              "& .MuiTab-root::after": {
+                                  content: '""',
+                                  position: "absolute",
+                                  right: 0,
+                                  height: 0,
+                                  background: theme.palette.primary.main,
+                              },
+                          }),
                     "& .MuiTab-root.Mui-selected::after": {
-                        width: "100%",
+                        width: orientation == "horizontal" ? "100%" : "2px",
+                        height: orientation == "vertical" ? "100%" : "2px",
                         transition: "all 0.2s",
                         transitionDelay: "0.15s",
                     },
@@ -184,13 +233,26 @@ export default function AccentedTabs({
                 }}
             >
                 {children.map((item, i) =>
-                    generateTab(item.title, item.icon, i + 1)
+                    generateTab(item.title, item.icon, i + 1, theme)
                 )}
                 <motion.div
-                    className="absolute bottom-0 h-[2px]"
+                    className={classes(
+                        "absolute flex items-center justify-center",
+                        {
+                            "bottom-0 h-[2px]": orientation == "horizontal",
+                            "right-0 w-[2px]": orientation == "vertical",
+                        }
+                    )}
                     animate={{
-                        left: hoverIndicator.left,
-                        width: hoverIndicator.width + "px",
+                        ...(orientation == "horizontal"
+                            ? {
+                                  left: hoverIndicator.left,
+                                  width: hoverIndicator.width + "px",
+                              }
+                            : {
+                                  top: hoverIndicator.top,
+                                  height: hoverIndicator.height + "px",
+                              }),
                     }}
                     transition={{
                         duration: hoverIndicator.initial ? 0 : 0.3,
@@ -198,10 +260,23 @@ export default function AccentedTabs({
                     }}
                 >
                     <motion.div
-                        className="m-auto h-full"
+                        className={classes({
+                            "h-full": orientation == "horizontal",
+                            "w-full": orientation == "vertical",
+                        })}
                         style={{ background: theme.palette.secondary.main }}
                         animate={{
-                            width: hoverIndicator.hovered ? "100%" : "0%",
+                            ...(orientation == "horizontal"
+                                ? {
+                                      width: hoverIndicator.hovered
+                                          ? "100%"
+                                          : "0%",
+                                  }
+                                : {
+                                      height: hoverIndicator.hovered
+                                          ? "100%"
+                                          : "0%",
+                                  }),
                         }}
                         transition={{ duration: 0.2 }}
                     />
