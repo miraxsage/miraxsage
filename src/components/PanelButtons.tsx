@@ -54,7 +54,7 @@ export const HorizontalPanelButton: React.FC<{
                         sx={{ backgroundColor: "divider" }}
                         className={classes("w-px", {
                             "h-full": dividerSize == "full",
-                            "h-2/4": dividerSize == "squeezed",
+                            "h-1/2": dividerSize == "squeezed",
                         })}
                     ></Box>
                 </div>

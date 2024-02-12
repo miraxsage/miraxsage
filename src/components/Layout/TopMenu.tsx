@@ -1,5 +1,5 @@
 import AccentedTabs from "@/components/AccentedTabs";
-import { HorizontalPanelButton } from "@/components/PanelButton";
+import { HorizontalPanelButton } from "@/components/PanelButtons";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Box, darken, useTheme } from "@mui/material";
 

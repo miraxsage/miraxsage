@@ -1,5 +1,5 @@
 import { Box, darken, useTheme } from "@mui/material";
-import { HorizontalPanelButton } from "../PanelButton";
+import { HorizontalPanelButton } from "../PanelButtons";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
 import VKIcon from "../Icons/VKIcon";

@@ -1,8 +1,22 @@
-import { Box, Tab, Tabs, Theme, alpha, lighten, useTheme } from "@mui/material";
+import {
+    Box,
+    ExtendButtonBase,
+    Tab,
+    TabTypeMap,
+    Tabs,
+    Theme,
+    alpha,
+    lighten,
+    useTheme,
+} from "@mui/material";
 import { motion } from "framer-motion";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import classes from "classnames";
 import { areEqualShallow } from "@/utilities/Common";
+import {
+    AddTypeToField,
+    AtLeastOneImportantFieldFromGiven,
+} from "@/types/Common";
 
 export interface AccentedTabsProps {
     mode?: "full" | "squeezed" | "icons";
@@ -10,19 +24,22 @@ export interface AccentedTabsProps {
     children: AccentedTabProp[];
     underline?: boolean;
 }
-export type AccentedTabProp =
-    | {
-          title: string;
-          icon: ReactNode;
-      }
-    | {
-          title?: string;
-          icon: ReactNode;
-      }
-    | {
-          title: string;
-          icon?: ReactNode;
-      };
+export type AccentedTabProp = AtLeastOneImportantFieldFromGiven<
+    {
+        title: string;
+        icon: Exclude<
+            ReactNode | ((hovered: boolean) => ReactNode),
+            null | undefined
+        >;
+        onClick?: () => void;
+        notTogglable?: boolean;
+    },
+    "title" | "icon"
+>;
+
+const IdentifiedTab: ExtendButtonBase<
+    TabTypeMap<{ "data-tab-id"?: number | string }>
+> = Tab;
 
 export default function AccentedTabs({
     mode = "full",
@@ -35,21 +52,33 @@ export default function AccentedTabs({
     const [tab, setTab] = useState(1);
     const tabsRef = useRef<HTMLDivElement | null>(null);
 
-    const [hoverIndicator, setHoverIndicator] = useState({
+    const defaultHoverIndicatorState = {
+        id: 0,
         left: 0,
         top: 0,
         width: 0,
         height: 0,
         hovered: false,
         initial: true,
-    });
-    const updateHoverIndicator = (tabElement?: Element) => {
+    };
+
+    type HoverIndicatorState = AddTypeToField<
+        typeof defaultHoverIndicatorState,
+        "id",
+        string
+    >;
+
+    const [hoverIndicator, setHoverIndicator] = useState<HoverIndicatorState>(
+        defaultHoverIndicatorState
+    );
+    const updateHoverIndicator = (tabElement: Element, id: string | number) => {
         if (!tabElement) return;
         const menu = tabElement.closest(".anim-tabs_container");
         if (!menu) throw new Error("Anchored menu is not found");
         const tabBox = tabElement.getBoundingClientRect();
         const menuBox = menu?.getBoundingClientRect();
-        const newHoverIndicatorState = {
+        const newHoverIndicatorState: HoverIndicatorState = {
+            id,
             left: tabBox.left - menuBox.left,
             width: tabBox.width,
             top: tabBox.top - menuBox.top,
@@ -65,16 +94,27 @@ export default function AccentedTabs({
             setHoverIndicator(newHoverIndicatorState);
     };
     const onTabMouseOut = () => {
-        setHoverIndicator({ ...hoverIndicator, hovered: false, initial: true });
+        setHoverIndicator({
+            ...hoverIndicator,
+            id: 0,
+            hovered: false,
+            initial: true,
+        });
     };
     useEffect(() => {
         requestAnimationFrame(() => {
             const hoveredTab =
                 tabsRef.current?.querySelector(".MuiTab-root:hover") ??
                 undefined;
-            updateHoverIndicator(hoveredTab);
+            hoveredTab &&
+                updateHoverIndicator(
+                    hoveredTab,
+                    hoveredTab.getAttribute("data-tab-id") ?? 0
+                );
         });
     });
+
+    // hide hover indicator white window resizing
     const [tabIndicatorHidden, setTabIndicatorHidden] = useState(false);
     useEffect(() => {
         let defrozeTimeoutId: NodeJS.Timeout | null = null;
@@ -89,21 +129,23 @@ export default function AccentedTabs({
         window.addEventListener("resize", onResize);
         return () => window.removeEventListener("resize", onResize);
     }, []);
+
     const generateTab = (
-        label: string | undefined,
-        icon: ReactNode,
+        { title, icon }: AccentedTabProp,
         id: number,
         theme: Theme
     ) => {
         const active = id == tab;
+        const hovered = id == hoverIndicator.id;
         const fullMode = mode == "full";
         const iconMaxSize =
             active || !fullMode || orientation == "vertical" ? "30px" : "0";
         const iconMRight =
             orientation == "vertical" ? 0 : active || fullMode ? "8px" : "0";
-        const labelMaxSize = fullMode ? "100%" : active ? "100%" : "0";
+        const titleMaxSize = fullMode ? "100%" : active ? "100%" : "0";
         return (
-            <Tab
+            <IdentifiedTab
+                data-tab-id={id}
                 sx={{
                     ...(orientation == "horizontal"
                         ? {
@@ -111,11 +153,7 @@ export default function AccentedTabs({
                               borderRightStyle: "solid",
                               borderRightColor: "divider",
                           }
-                        : {
-                              borderBottomWidth: "1px",
-                              borderBottomStyle: "solid",
-                              borderBottomColor: "divider",
-                          }),
+                        : {}),
                     color: lighten(theme.palette.divider, 0.25),
                     maxWidth: active || fullMode ? "360px" : "65px",
                     minWidth:
@@ -140,10 +178,10 @@ export default function AccentedTabs({
                     <motion.div
                         className="overflow-hidden whitespace-nowrap"
                         initial={{ maxWidth: "100%" }}
-                        animate={{ maxWidth: labelMaxSize }}
+                        animate={{ maxWidth: titleMaxSize }}
                         transition={{ duration: 0.2 }}
                     >
-                        {label}
+                        {title}
                     </motion.div>
                 }
                 icon={
@@ -160,20 +198,28 @@ export default function AccentedTabs({
                                 delay: active ? 0.2 : 0,
                             }}
                         >
-                            {icon}
+                            {typeof icon == "function" ? icon(hovered) : icon}
                         </motion.div>
                     ) : undefined
                 }
                 iconPosition="start"
                 key={"item-" + id}
                 id={"item-" + id}
-                onMouseEnter={(e) => updateHoverIndicator(e.target as Element)}
+                onMouseEnter={(e) =>
+                    updateHoverIndicator(e.target as Element, id)
+                }
                 onMouseLeave={onTabMouseOut}
             />
         );
     };
 
     const setActiveTab = (e: unknown, v: number) => {
+        const tabProps = children[v];
+        if (!tabProps) return;
+        if (tabProps.notTogglable == true) {
+            if (tabProps.onClick) tabProps.onClick();
+            return;
+        }
         setTab(v);
     };
 
@@ -220,6 +266,19 @@ export default function AccentedTabs({
                                   height: 0,
                                   background: theme.palette.primary.main,
                               },
+                              "& .MuiTab-root::before": {
+                                  content: '""',
+                                  width: "50%",
+                                  position: "absolute",
+                                  left: "25%",
+                                  bottom: 0,
+                                  height: "1px",
+                                  background: theme.palette.divider,
+                              },
+                              "& .MuiTab-root:nth-last-child(2)::before": {
+                                  width: "100%",
+                                  left: 0,
+                              },
                           }),
                     "& .MuiTab-root.Mui-selected::after": {
                         width: orientation == "horizontal" ? "100%" : "2px",
@@ -232,9 +291,7 @@ export default function AccentedTabs({
                     },
                 }}
             >
-                {children.map((item, i) =>
-                    generateTab(item.title, item.icon, i + 1, theme)
-                )}
+                {children.map((item, i) => generateTab(item, i + 1, theme))}
                 <motion.div
                     className={classes(
                         "absolute flex items-center justify-center",
