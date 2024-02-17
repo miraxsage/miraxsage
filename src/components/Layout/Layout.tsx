@@ -1,7 +1,8 @@
-import { Box, alpha, lighten, useTheme } from "@mui/material";
+import { Box, lighten, useTheme } from "@mui/material";
 import TopMenu from "./TopMenu";
 import BottomBar from "./BottomBar";
 import AsideMenu from "./AsideMenu";
+import { getThemeColor, useThemeColor } from "../Contexts/Theme";
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -9,8 +10,9 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
     const theme = useTheme();
+    const isDarkMode = theme.palette.mode == "dark";
     const splashScreen = false;
-    const glowColor = alpha(theme.palette.bg.light, 0.5);
+    const glowColor = getThemeColor("layoutGlow", theme);
     return (
         <Box
             sx={{
@@ -32,7 +34,10 @@ export default function Layout({ children }: LayoutProps) {
         >
             <Box
                 sx={{
-                    boxShadow: `0 0 65px ${glowColor}, 0 0 20px ${glowColor}`,
+                    boxShadow: isDarkMode
+                        ? `0 0 65px ${glowColor}, 0 0 20px ${glowColor}`
+                        : `0 0 95px ${glowColor}, 0 0 20px ${glowColor}`,
+                    background: useThemeColor("layoutBackground"),
                     borderColor: splashScreen
                         ? lighten(glowColor, 0.1)
                         : theme.palette.divider,

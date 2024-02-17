@@ -4,18 +4,12 @@ import classes from "classnames";
 
 type LanguageIconProps = {
     language: "ru" | "en";
-    colored?: boolean;
 };
 
-export default function LanguageIcon({
-    language,
-    colored = false,
-}: LanguageIconProps) {
+export default function LanguageIcon({ language }: LanguageIconProps) {
     return (
         <img
-            className={classes("aspect-[1/1] w-[25px] rounded object-cover", {
-                grayscale: !colored,
-            })}
+            className={classes("aspect-[1/1] w-[25px] rounded object-cover")}
             src={{ ru, en }[language]}
         />
     );

@@ -1,20 +1,20 @@
-import { Box, darken, useTheme } from "@mui/material";
+import { Box } from "@mui/material";
 import { HorizontalPanelButton } from "../PanelButtons";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
 import VKIcon from "../Icons/VKIcon";
 import TelegramIcon from "../Icons/TelegramIcon";
 import { GitHub as GithubIcon } from "@mui/icons-material";
+import { useThemeColor } from "../Contexts/Theme";
 
 export default function BottomBar() {
-    const theme = useTheme();
     return (
         <Box
             component="footer"
             sx={{
                 borderTop: 1,
                 borderColor: "divider",
-                backgroundColor: darken(theme.palette.bg.dark, 0.08),
+                backgroundColor: useThemeColor("barBackground"),
             }}
             className="flex"
         >

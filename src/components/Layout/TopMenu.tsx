@@ -1,17 +1,17 @@
 import AccentedTabs from "@/components/AccentedTabs";
 import { HorizontalPanelButton } from "@/components/PanelButtons";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Box, darken, useTheme } from "@mui/material";
+import { Box } from "@mui/material";
+import { useThemeColor } from "../Contexts/Theme";
 
 export default function TopMenu() {
-    const theme = useTheme();
     return (
         <Box
             component="header"
             sx={{
                 borderBottom: 1,
                 borderColor: "divider",
-                backgroundColor: darken(theme.palette.bg.dark, 0.08),
+                backgroundColor: useThemeColor("barBackground"),
             }}
             className="flex"
         >

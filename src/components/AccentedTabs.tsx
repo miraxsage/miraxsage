@@ -1,12 +1,11 @@
 import {
     Box,
     ExtendButtonBase,
+    SxProps,
     Tab,
     TabTypeMap,
     Tabs,
     Theme,
-    alpha,
-    lighten,
     useTheme,
 } from "@mui/material";
 import { motion } from "framer-motion";
@@ -17,12 +16,14 @@ import {
     AddTypeToField,
     AtLeastOneImportantFieldFromGiven,
 } from "@/types/Common";
+import { getThemeColor } from "./Contexts/Theme";
 
 export interface AccentedTabsProps {
     mode?: "full" | "squeezed" | "icons";
     orientation?: "horizontal" | "vertical";
     children: AccentedTabProp[];
     underline?: boolean;
+    sx?: SxProps<Theme>;
 }
 export type AccentedTabProp = AtLeastOneImportantFieldFromGiven<
     {
@@ -46,12 +47,14 @@ export default function AccentedTabs({
     orientation = "horizontal",
     underline = true,
     children,
+    sx,
 }: AccentedTabsProps) {
     const theme = useTheme();
 
-    const [tab, setTab] = useState(1);
+    const [tab, setTab] = useState(0);
     const tabsRef = useRef<HTMLDivElement | null>(null);
 
+    // custom feature with mouse-following underscore indicator on tab hovering
     const defaultHoverIndicatorState = {
         id: 0,
         left: 0,
@@ -61,13 +64,11 @@ export default function AccentedTabs({
         hovered: false,
         initial: true,
     };
-
     type HoverIndicatorState = AddTypeToField<
         typeof defaultHoverIndicatorState,
         "id",
         string
     >;
-
     const [hoverIndicator, setHoverIndicator] = useState<HoverIndicatorState>(
         defaultHoverIndicatorState
     );
@@ -101,6 +102,7 @@ export default function AccentedTabs({
             initial: true,
         });
     };
+    // fix accidential loosing hovered state after active tab changed rerender and no mouse moved
     useEffect(() => {
         requestAnimationFrame(() => {
             const hoveredTab =
@@ -114,15 +116,16 @@ export default function AccentedTabs({
         });
     });
 
-    // hide hover indicator white window resizing
-    const [tabIndicatorHidden, setTabIndicatorHidden] = useState(false);
+    // hide active tab indicator white window resizing (fix its mui-native position updating with too long delay)
+    const [activeTabIndicatorHidden, setActiveTabIndicatorHidden] =
+        useState(false);
     useEffect(() => {
         let defrozeTimeoutId: NodeJS.Timeout | null = null;
         const onResize = () => {
             if (defrozeTimeoutId) clearTimeout(defrozeTimeoutId);
-            setTabIndicatorHidden(true);
+            setActiveTabIndicatorHidden(true);
             defrozeTimeoutId = setTimeout(
-                () => setTabIndicatorHidden(false),
+                () => setActiveTabIndicatorHidden(false),
                 500
             );
         };
@@ -147,14 +150,7 @@ export default function AccentedTabs({
             <IdentifiedTab
                 data-tab-id={id}
                 sx={{
-                    ...(orientation == "horizontal"
-                        ? {
-                              borderRightWidth: "1px",
-                              borderRightStyle: "solid",
-                              borderRightColor: "divider",
-                          }
-                        : {}),
-                    color: lighten(theme.palette.divider, 0.25),
+                    color: getThemeColor("tabRegularText", theme),
                     maxWidth: active || fullMode ? "360px" : "65px",
                     minWidth:
                         orientation == "vertical"
@@ -166,12 +162,62 @@ export default function AccentedTabs({
                     padding:
                         orientation == "vertical" ? "12px 18px" : "12px 22px",
                     transition: "color 0.3s, background 0.2s ease-in-out 0.1s",
+                    ...(orientation == "horizontal"
+                        ? {
+                              borderRightWidth: "1px",
+                              borderRightStyle: "solid",
+                              borderRightColor: "divider",
+                              "&.Mui-selected:hover::before": {
+                                  content: '""',
+                                  width: "50%",
+                                  position: "absolute",
+                                  left: 0,
+                                  bottom: 0,
+                                  height: "2px",
+                                  background: theme.palette.secondary.main,
+                              },
+                              "&::after": {
+                                  content: '""',
+                                  position: "absolute",
+                                  bottom: 0,
+                                  width: 0,
+                                  background: theme.palette.primary.main,
+                              },
+                          }
+                        : {
+                              "&::after": {
+                                  content: '""',
+                                  position: "absolute",
+                                  right: 0,
+                                  height: 0,
+                                  background: theme.palette.primary.main,
+                              },
+                              "&::before": {
+                                  content: '""',
+                                  width: "50%",
+                                  position: "absolute",
+                                  left: "25%",
+                                  bottom: 0,
+                                  height: "1px",
+                                  background: theme.palette.divider,
+                              },
+                              "&:nth-last-of-type(1)::before": {
+                                  width: "100%",
+                                  left: 0,
+                              },
+                          }),
                     "&:hover": {
-                        backgroundColor: alpha(theme.palette.divider, 0.05),
-                        color: theme.palette.contrast.main,
+                        backgroundColor: getThemeColor("tabHoverBg", theme),
+                        color: getThemeColor("tabHoverText", theme),
                     },
                     "&.Mui-selected": {
-                        color: theme.palette.contrast.light,
+                        color: getThemeColor("tabActiveText", theme),
+                    },
+                    "&.Mui-selected::after": {
+                        width: orientation == "horizontal" ? "100%" : "2px",
+                        height: orientation == "vertical" ? "100%" : "2px",
+                        transition: "all 0.2s",
+                        transitionDelay: "0.15s",
                     },
                 }}
                 label={
@@ -213,14 +259,14 @@ export default function AccentedTabs({
         );
     };
 
-    const setActiveTab = (e: unknown, v: number) => {
-        const tabProps = children[v];
+    const onActiveTabChanged = (_event: unknown, tabNum: number) => {
+        const tabProps = children[tabNum];
         if (!tabProps) return;
         if (tabProps.notTogglable == true) {
             if (tabProps.onClick) tabProps.onClick();
             return;
         }
-        setTab(v);
+        setTab(tabNum);
     };
 
     return (
@@ -237,58 +283,12 @@ export default function AccentedTabs({
                 className="mb-[-1px]"
                 orientation={orientation}
                 value={tab}
-                onChange={setActiveTab}
+                onChange={onActiveTabChanged}
                 sx={{
-                    ...(orientation == "horizontal"
-                        ? {
-                              "& .MuiTab-root.Mui-selected:hover::before": {
-                                  content: '""',
-                                  width: "50%",
-                                  position: "absolute",
-                                  left: 0,
-                                  bottom: 0,
-                                  height: "2px",
-                                  background: theme.palette.secondary.main,
-                              },
-                              "& .MuiTab-root::after": {
-                                  content: '""',
-                                  position: "absolute",
-                                  bottom: 0,
-                                  width: 0,
-                                  background: theme.palette.primary.main,
-                              },
-                          }
-                        : {
-                              "& .MuiTab-root::after": {
-                                  content: '""',
-                                  position: "absolute",
-                                  right: 0,
-                                  height: 0,
-                                  background: theme.palette.primary.main,
-                              },
-                              "& .MuiTab-root::before": {
-                                  content: '""',
-                                  width: "50%",
-                                  position: "absolute",
-                                  left: "25%",
-                                  bottom: 0,
-                                  height: "1px",
-                                  background: theme.palette.divider,
-                              },
-                              "& .MuiTab-root:nth-last-child(2)::before": {
-                                  width: "100%",
-                                  left: 0,
-                              },
-                          }),
-                    "& .MuiTab-root.Mui-selected::after": {
-                        width: orientation == "horizontal" ? "100%" : "2px",
-                        height: orientation == "vertical" ? "100%" : "2px",
-                        transition: "all 0.2s",
-                        transitionDelay: "0.15s",
-                    },
                     "& .MuiTabs-indicator": {
-                        opacity: tabIndicatorHidden ? 0 : 1,
+                        opacity: activeTabIndicatorHidden ? 0 : 1,
                     },
+                    ...sx,
                 }}
             >
                 {children.map((item, i) => generateTab(item, i + 1, theme))}

@@ -1,15 +1,16 @@
-import { Button, alpha, lighten, styled, useTheme } from "@mui/material";
+import { Button, styled } from "@mui/material";
 import { Box, SxProps, Theme } from "@mui/system";
 import classes from "classnames";
 import { ReactNode } from "react";
+import { getThemeColor } from "./Contexts/Theme";
 
 const PanelButton = styled(Button)(({ theme }) => ({
-    color: lighten(theme.palette.divider, 0.25),
+    color: getThemeColor("tabIcon", theme),
     borderRadius: 0,
     padding: "12px 22px",
     "&:hover": {
-        backgroundColor: alpha(theme.palette.divider, 0.1),
-        color: theme.palette.contrast.main,
+        backgroundColor: getThemeColor("tabHoverBg", theme),
+        color: getThemeColor("tabHoverIcon", theme),
     },
 }));
 
@@ -26,12 +27,10 @@ export const HorizontalPanelButton: React.FC<{
     sx = {},
     ...props
 }) => {
-    const theme = useTheme();
     if (iconMode && sx)
         sx = {
             padding: "12px 18px",
             minWidth: 0,
-            color: lighten(theme.palette.divider, 0.1),
             ...sx,
         };
     return (
