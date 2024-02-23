@@ -39,3 +39,13 @@ export type AtLeastOneImportantFieldFromGiven<
               : Key]: T[Key];
       }
     : never;
+
+export type AnyInnerFieldType<T extends object, K = keyof T> = K extends keyof T
+    ? T[K] extends object
+        ? T[K] | AnyInnerFieldType<T[K]>
+        : T[K]
+    : never;
+
+export type TypeOrItsAnyInnerField<T> = T extends object
+    ? T | AnyInnerFieldType<T>
+    : T;

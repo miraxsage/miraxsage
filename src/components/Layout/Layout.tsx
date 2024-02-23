@@ -2,7 +2,7 @@ import { Box, lighten, useTheme } from "@mui/material";
 import TopMenu from "./TopMenu";
 import BottomBar from "./BottomBar";
 import AsideMenu from "./AsideMenu";
-import { getThemeColor, useThemeColor } from "../Contexts/Theme";
+import { getThemeColor, useThemeColor } from "../contexts/Theme";
 
 interface LayoutProps {
     children: React.ReactNode;

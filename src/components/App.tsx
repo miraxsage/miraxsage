@@ -1,7 +1,7 @@
 import "../style.css";
 import { Box } from "@mui/material";
-import Layout from "./Layout/Layout";
-import { useThemeColor } from "./Contexts/Theme";
+import Layout from "./layout/Layout";
+import { useThemeColor } from "./contexts/Theme";
 
 function App() {
     return (

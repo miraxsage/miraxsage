@@ -3,20 +3,24 @@ import AccentedTabs from "../AccentedTabs";
 import TerminalIcon from "@mui/icons-material/Terminal";
 import MonitorIcon from "@mui/icons-material/Monitor";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
-import LanguageIcon from "../Icons/LanguageIcon";
+import LanguageIcon from "../icons/LanguageIcon";
 import LightModeIcon from "@mui/icons-material/LightMode";
+import LaunchIcon from "@mui/icons-material/Launch";
+import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import { motion } from "framer-motion";
-import { useAppearance } from "../Contexts/AppearanceContext";
-import { useThemeColor } from "../Contexts/Theme";
+import { useThemeColor } from "../contexts/Theme";
+import { useColorMode } from "@/store/appearanceSlice";
 
 const terminalIcon = <TerminalIcon />;
 const monitorIcon = <MonitorIcon />;
 const darkModeIcon = <Brightness4Icon />;
 const lightModeIcon = <LightModeIcon />;
+const unfoldIcon = <LaunchIcon />;
+const foldLeftIcon = <KeyboardDoubleArrowLeftIcon />;
 
 export default function AsideMenu() {
-    const appearanceContext = useAppearance();
-    const isDarkMode = appearanceContext.colorMode == "dark";
+    const colorMode = useColorMode();
+    const isDarkMode = colorMode.dark;
     return (
         <Box
             component="aside"
@@ -40,16 +44,15 @@ export default function AsideMenu() {
                 }}
             >
                 {[
-                    { icon: terminalIcon },
                     { icon: monitorIcon },
+                    { icon: terminalIcon },
                     {
                         icon: isDarkMode ? lightModeIcon : darkModeIcon,
                         notTogglable: true,
                         onClick() {
-                            appearanceContext.update((old) => ({
-                                colorMode:
-                                    old.colorMode == "dark" ? "light" : "dark",
-                            }));
+                            colorMode.update((old) =>
+                                old == "dark" ? "light" : "dark"
+                            );
                         },
                     },
                     {
@@ -71,6 +74,8 @@ export default function AsideMenu() {
                             </motion.div>
                         ),
                     },
+                    { icon: unfoldIcon, notTogglable: true },
+                    { icon: foldLeftIcon, notTogglable: true },
                 ]}
             </AccentedTabs>
         </Box>

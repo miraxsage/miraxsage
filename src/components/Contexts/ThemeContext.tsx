@@ -2,14 +2,15 @@ import { PartialFields } from "@/types/Common";
 import { CssBaseline } from "@mui/material";
 import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 import { ThemeProviderProps } from "@mui/material/styles/ThemeProvider";
-import { darkTheme, lightTheme } from "./Theme";
-import { useThemeMode } from "./AppearanceContext";
+
+import { useColorMode } from "@/store/appearanceSlice";
+import { darkTheme, lightTheme } from "./Theme.ts";
 
 const ThemeContext: React.FC<PartialFields<ThemeProviderProps, "theme">> = ({
     children,
     theme,
 }) => {
-    const defaultTheme = useThemeMode().dark ? darkTheme : lightTheme;
+    const defaultTheme = useColorMode().dark ? darkTheme : lightTheme;
     return (
         <StyledEngineProvider injectFirst>
             <ThemeProvider theme={theme || defaultTheme}>

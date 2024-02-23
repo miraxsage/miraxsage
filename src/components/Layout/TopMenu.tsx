@@ -2,7 +2,7 @@ import AccentedTabs from "@/components/AccentedTabs";
 import { HorizontalPanelButton } from "@/components/PanelButtons";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Box } from "@mui/material";
-import { useThemeColor } from "../Contexts/Theme";
+import { useThemeColor } from "../contexts/Theme";
 
 export default function TopMenu() {
     return (

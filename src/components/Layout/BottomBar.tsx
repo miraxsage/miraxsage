@@ -2,10 +2,10 @@ import { Box } from "@mui/material";
 import { HorizontalPanelButton } from "../PanelButtons";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
-import VKIcon from "../Icons/VKIcon";
-import TelegramIcon from "../Icons/TelegramIcon";
+import VKIcon from "../icons/VKIcon";
+import TelegramIcon from "../icons/TelegramIcon";
 import { GitHub as GithubIcon } from "@mui/icons-material";
-import { useThemeColor } from "../Contexts/Theme";
+import { useThemeColor } from "../contexts/Theme";
 
 export default function BottomBar() {
     return (

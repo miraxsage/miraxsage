@@ -16,7 +16,7 @@ import {
     AddTypeToField,
     AtLeastOneImportantFieldFromGiven,
 } from "@/types/Common";
-import { getThemeColor } from "./Contexts/Theme";
+import { getThemeColor } from "./contexts/Theme";
 
 export interface AccentedTabsProps {
     mode?: "full" | "squeezed" | "icons";

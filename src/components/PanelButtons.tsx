@@ -2,7 +2,7 @@ import { Button, styled } from "@mui/material";
 import { Box, SxProps, Theme } from "@mui/system";
 import classes from "classnames";
 import { ReactNode } from "react";
-import { getThemeColor } from "./Contexts/Theme";
+import { getThemeColor } from "./contexts/Theme";
 
 const PanelButton = styled(Button)(({ theme }) => ({
     color: getThemeColor("tabIcon", theme),
