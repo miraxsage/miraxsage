@@ -3,6 +3,7 @@ import { HorizontalPanelButton } from "@/components/PanelButtons";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Box } from "@mui/material";
 import { useThemeColor } from "../contexts/Theme";
+import __ from "@/utilities/transtation";
 
 export default function TopMenu() {
     return (
@@ -21,10 +22,10 @@ export default function TopMenu() {
             <AccentedTabs underline={false} mode="full">
                 {[
                     "_miraxsage",
-                    "_profile",
-                    "_about",
-                    "_projects",
-                    "_interact",
+                    "_" + __("profile"),
+                    "_" + __("about"),
+                    "_" + __("projects"),
+                    "_" + __("interact"),
                 ].map((id) => ({
                     title: id,
                 }))}

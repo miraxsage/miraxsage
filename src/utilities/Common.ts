@@ -1,4 +1,4 @@
-import { AnyObject, isAnyObject } from "@/types/Common";
+import { AnyObject, isAnyObject } from "@/types/common";
 
 export default function deepMerge(
     obj1: unknown,

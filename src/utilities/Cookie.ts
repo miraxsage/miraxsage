@@ -49,6 +49,8 @@ export function deleteCookie(name: string) {
     });
 }
 
+export default { getCookie, setCookie, deleteCookie };
+
 declare global {
     interface Window {
         cookie: {

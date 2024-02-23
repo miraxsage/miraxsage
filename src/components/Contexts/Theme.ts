@@ -10,7 +10,7 @@ import {
     lighten,
     useTheme,
 } from "@mui/material/styles";
-import deepMerge from "@/utilities/Common";
+import deepMerge from "@/utilities/common";
 
 declare module "@mui/material" {
     interface ButtonPropsColorOverrides {

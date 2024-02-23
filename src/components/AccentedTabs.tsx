@@ -11,11 +11,11 @@ import {
 import { motion } from "framer-motion";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import classes from "classnames";
-import { areEqualShallow } from "@/utilities/Common";
+import { areEqualShallow } from "@/utilities/common";
 import {
     AddTypeToField,
     AtLeastOneImportantFieldFromGiven,
-} from "@/types/Common";
+} from "@/types/common";
 import { getThemeColor } from "./contexts/Theme";
 
 export interface AccentedTabsProps {

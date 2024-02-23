@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { TypeOrItsAnyInnerField } from "@/types/Common";
+import { TypeOrItsAnyInnerField } from "@/types/common";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 interface AppearanceConfig {
@@ -32,6 +32,7 @@ const slice = createSlice({
             newLanguage: PayloadAction<AppearanceConfig["language"]>
         ) => {
             state.language = newLanguage.payload;
+            window.cookie.set("lang", state.language);
         },
     },
 });
@@ -79,5 +80,29 @@ export function useColorMode() {
                     typeof newMode == "function" ? newMode(mode) : newMode
                 )
             ),
+    };
+}
+
+export function useLanguage() {
+    const lang = useAppearance((appearance) => appearance.language);
+    const dispatch = useDispatch();
+    return {
+        en: lang == "en",
+        ru: lang == "ru",
+        lang,
+        update: (
+            newLang:
+                | AppearanceConfig["language"]
+                | ((
+                      oldLang: AppearanceConfig["language"]
+                  ) => AppearanceConfig["language"])
+        ) =>
+            dispatch(
+                slice.actions.language(
+                    typeof newLang == "function" ? newLang(lang) : newLang
+                )
+            ),
+        toggle: () =>
+            dispatch(slice.actions.language(lang == "ru" ? "en" : "ru")),
     };
 }

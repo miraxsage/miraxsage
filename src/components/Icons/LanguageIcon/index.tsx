@@ -9,7 +9,7 @@ type LanguageIconProps = {
 export default function LanguageIcon({ language }: LanguageIconProps) {
     return (
         <img
-            className={classes("aspect-[1/1] w-[25px] rounded object-cover")}
+            className={classes("aspect-[1/1] w-[22px] rounded object-cover")}
             src={{ ru, en }[language]}
         />
     );

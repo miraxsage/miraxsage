@@ -1,4 +1,4 @@
-import { PartialFields } from "@/types/Common";
+import { PartialFields } from "@/types/common.ts";
 import { CssBaseline } from "@mui/material";
 import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 import { ThemeProviderProps } from "@mui/material/styles/ThemeProvider";

@@ -9,7 +9,7 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import { motion } from "framer-motion";
 import { useThemeColor } from "../contexts/Theme";
-import { useColorMode } from "@/store/appearanceSlice";
+import { useColorMode, useLanguage } from "@/store/appearanceSlice";
 
 const terminalIcon = <TerminalIcon />;
 const monitorIcon = <MonitorIcon />;
@@ -21,6 +21,7 @@ const foldLeftIcon = <KeyboardDoubleArrowLeftIcon />;
 export default function AsideMenu() {
     const colorMode = useColorMode();
     const isDarkMode = colorMode.dark;
+    const lang = useLanguage();
     return (
         <Box
             component="aside"
@@ -70,9 +71,13 @@ export default function AsideMenu() {
                                         : 0.3,
                                 }}
                             >
-                                <LanguageIcon language="en" />
+                                <LanguageIcon language={lang.lang} />
                             </motion.div>
                         ),
+                        onClick() {
+                            lang.toggle();
+                            console.log(lang.lang);
+                        },
                     },
                     { icon: unfoldIcon, notTogglable: true },
                     { icon: foldLeftIcon, notTogglable: true },
