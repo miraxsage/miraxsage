@@ -1,4 +1,8 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import {
+    PayloadAction,
+    createListenerMiddleware,
+    createSlice,
+} from "@reduxjs/toolkit";
 import { TypeOrItsAnyInnerField } from "@/types/common";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
@@ -10,6 +14,10 @@ interface AppearanceConfig {
 const defaultConfig: AppearanceConfig = {
     colorMode: "dark",
     language: "ru",
+};
+
+type StateConfig = {
+    appearance: AppearanceConfig;
 };
 
 const localStorageConfig = localStorage.getItem("appearanceConfig");
@@ -37,13 +45,25 @@ const slice = createSlice({
     },
 });
 
+const appearanceListener = createListenerMiddleware<StateConfig>();
+appearanceListener.startListening({
+    predicate: (action) => action.type.startsWith("appearance"),
+    effect(_action, api) {
+        localStorage.setItem(
+            "appearanceConfig",
+            JSON.stringify(api.getState().appearance)
+        );
+    },
+});
+const listener = appearanceListener.middleware;
+
 export default slice.reducer;
 
 export const { colorMode, language } = slice.actions;
 
-type UseAppearanceSelector = TypedUseSelectorHook<{
-    appearance: AppearanceConfig;
-}>;
+export { listener };
+
+type UseAppearanceSelector = TypedUseSelectorHook<StateConfig>;
 const useAppearanceSelector: UseAppearanceSelector = useSelector;
 
 export function useAppearance(): AppearanceConfig;

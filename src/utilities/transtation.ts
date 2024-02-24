@@ -1,7 +1,10 @@
 import ru from "@/assets/transtations/ru.json";
 
 export default function __(phrase: string, lang?: "en" | "ru") {
-    if (!lang) lang = (window.cookie.get("lang") ?? "en") as "en" | "ru";
+    if (!lang)
+        lang = JSON.parse(
+            localStorage.getItem("appearanceConfig") ?? `{"language": "en"}`
+        ).language;
     const lowCasePhrase = phrase.toLowerCase();
     if (lowCasePhrase in ru) {
         if (lang == "en") return phrase;

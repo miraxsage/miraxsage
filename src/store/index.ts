@@ -1,11 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
-import appearanceSlice from "./appearanceSlice";
+import appearanceSlice, {
+    listener as appearanceListener,
+} from "./appearanceSlice";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 const store = configureStore({
     reducer: {
         appearance: appearanceSlice,
     },
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware().prepend(appearanceListener),
 });
 
 export type Store = ReturnType<typeof store.getState>;

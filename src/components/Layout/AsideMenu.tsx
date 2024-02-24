@@ -76,7 +76,6 @@ export default function AsideMenu() {
                         ),
                         onClick() {
                             lang.toggle();
-                            console.log(lang.lang);
                         },
                     },
                     { icon: unfoldIcon, notTogglable: true },
