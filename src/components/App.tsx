@@ -1,13 +1,23 @@
 import "../style.css";
 import "@/utilities/cookie";
 import { Box } from "@mui/material";
-import Layout from "./layout/Layout";
+import MainLayout from "./layout/MainLayout";
 import { useThemeColor } from "./contexts/Theme";
 import About from "./pages/About";
 import { useLanguage } from "@/store/appearanceSlice";
+import { ReactContentProps } from "@/types/react";
+import {
+    Link,
+    Outlet,
+    RouterProvider,
+    createBrowserRouter,
+} from "react-router-dom";
+import { Link as MuiLink } from "@mui/material";
+import Contacts from "./pages/Contacts";
+import Projects from "./pages/Projects";
+import Profile from "./pages/Profile";
 
-function App() {
-    useLanguage();
+function AppLayout({ children }: ReactContentProps) {
     return (
         <Box
             sx={{
@@ -16,10 +26,58 @@ function App() {
             }}
             className={`h-0 w-full flex justify-center items-center`}
         >
-            <Layout>
-                <About />
-            </Layout>
+            {children}
         </Box>
+    );
+}
+
+const router = createBrowserRouter([
+    {
+        path: "/",
+        element: (
+            <MainLayout>
+                <Outlet />
+            </MainLayout>
+        ),
+        errorElement: (
+            <div>
+                404 Page not found <br /> Let`s go{" "}
+                <Link to="/">
+                    <MuiLink>home</MuiLink>
+                </Link>
+            </div>
+        ),
+        children: [
+            {
+                path: "/",
+                element: "Hello",
+            },
+            {
+                path: "profile",
+                element: <Profile />,
+            },
+            {
+                path: "about",
+                element: <About />,
+            },
+            {
+                path: "projects",
+                element: <Projects />,
+            },
+            {
+                path: "interact",
+                element: <Contacts />,
+            },
+        ],
+    },
+]);
+
+function App() {
+    useLanguage();
+    return (
+        <AppLayout>
+            <RouterProvider router={router} />
+        </AppLayout>
     );
 }
 

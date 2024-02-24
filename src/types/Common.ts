@@ -1,14 +1,8 @@
-import { ReactNode } from "react";
-
 export type AnyObject = { [k: string]: unknown };
 
 export function isAnyObject(arg: unknown): arg is AnyObject {
     return typeof arg == "object";
 }
-
-export type ReactContentFC<P = object> = React.FunctionComponent<
-    P & { children: ReactNode }
->;
 
 export type AddTypeToField<T extends object, K extends keyof T, U> = {
     [Key in keyof T]: Key extends K ? T[Key] | U : T[Key];

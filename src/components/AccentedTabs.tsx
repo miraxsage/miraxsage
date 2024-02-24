@@ -21,18 +21,21 @@ import { getThemeColor } from "./contexts/Theme";
 export interface AccentedTabsProps {
     mode?: "full" | "squeezed" | "icons";
     orientation?: "horizontal" | "vertical";
-    children: AccentedTabProp[];
+    children: AccentedTabProps[];
     underline?: boolean;
     sx?: SxProps<Theme>;
+    onChange?: (tab: AccentedTabProps) => void;
 }
-export type AccentedTabProp = AtLeastOneImportantFieldFromGiven<
+export type AccentedTabProps = AtLeastOneImportantFieldFromGiven<
     {
+        id?: string | number;
         title: string;
+        active?: boolean;
         icon: Exclude<
             ReactNode | ((hovered: boolean) => ReactNode),
             null | undefined
         >;
-        onClick?: () => void;
+        onClick?: (tab: AccentedTabProps) => void;
         notTogglable?: boolean;
     },
     "title" | "icon"
@@ -48,10 +51,17 @@ export default function AccentedTabs({
     underline = true,
     children,
     sx,
+    onChange,
 }: AccentedTabsProps) {
     const theme = useTheme();
 
-    const [tab, setTab] = useState(0);
+    let tabFromProps = children.findIndex((c) => c.active);
+    if (tabFromProps < 0) tabFromProps = 0;
+
+    // eslint-disable-next-line prefer-const
+    let [tab, setTab] = useState(tabFromProps);
+    // if there is onChange handler prop, then it implies current tab state is being managed from outside by pointing current tab in props
+    if (onChange) tab = tabFromProps;
     const tabsRef = useRef<HTMLDivElement | null>(null);
 
     // custom feature with mouse-following underscore indicator on tab hovering
@@ -134,7 +144,7 @@ export default function AccentedTabs({
     }, []);
 
     const generateTab = (
-        { title, icon }: AccentedTabProp,
+        { title, icon }: AccentedTabProps,
         id: number,
         theme: Theme
     ) => {
@@ -263,10 +273,11 @@ export default function AccentedTabs({
         const tabProps = children[tabNum];
         if (!tabProps) return;
         if (tabProps.notTogglable == true) {
-            if (tabProps.onClick) tabProps.onClick();
+            if (tabProps.onClick) tabProps.onClick(tabProps);
             return;
         }
-        setTab(tabNum);
+        if (onChange) onChange(tabProps);
+        else setTab(tabNum);
     };
 
     return (
