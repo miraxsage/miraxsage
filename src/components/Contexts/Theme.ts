@@ -155,6 +155,21 @@ export type ThemeColors =
     | "tabIcon"
     | "tabHoverIcon"
     | "layoutGlow"
+    | "accentedBg"
+    | "secondaryBg"
+    | "accentedGdBg"
+    | "secondaryGdBg"
+    | "accentedHoverBg"
+    | "secondaryHoverBg"
+    | "accentedHoverGdBg"
+    | "secondaryHoverGdBg"
+    | "regularText"
+    | "accentedText"
+    | "secondaryText"
+    | "accentedHoverText"
+    | "secondaryHoverText"
+    | "regularHoverBg"
+    | "accentedHoverBg"
     | "pageBg";
 
 export function getThemeColor(color: ThemeColors, theme: Theme) {
@@ -199,6 +214,62 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
             return isDarkMode
                 ? theme.palette.bg.dark
                 : `linear-gradient(90deg, ${pageBgGradientColor}, transparent 20%, transparent 80%, ${pageBgGradientColor});`;
+        case "accentedGdBg":
+            return isDarkMode
+                ? `linear-gradient(90deg, ${alpha(
+                      theme.palette.primary.main,
+                      0.03
+                  )}, ${alpha(theme.palette.primary.main, 0.1)});`
+                : `linear-gradient(90deg, ${alpha(
+                      theme.palette.primary.main,
+                      0.03
+                  )}, ${alpha(theme.palette.primary.main, 0.1)});`;
+        case "accentedHoverGdBg":
+            return `linear-gradient(90deg, ${alpha(
+                theme.palette.primary.main,
+                0.07
+            )}, ${alpha(theme.palette.primary.main, 0.15)});`;
+        case "secondaryGdBg":
+            return `linear-gradient(90deg, ${alpha(
+                theme.palette.secondary.main,
+                0.03
+            )}, ${alpha(theme.palette.secondary.main, 0.1)});`;
+        case "secondaryHoverGdBg":
+            return `linear-gradient(90deg, ${alpha(
+                theme.palette.secondary.main,
+                0.07
+            )}, ${alpha(theme.palette.secondary.main, 0.15)});`;
+        case "regularText":
+            return isDarkMode
+                ? lighten(theme.palette.divider, 0.35)
+                : theme.palette.contrast.main;
+        case "accentedText":
+            return alpha(theme.palette.primary.main, 0.75);
+        case "accentedHoverText":
+            return theme.palette.primary.main;
+        case "secondaryText":
+            return alpha(
+                theme.palette.secondary[isDarkMode ? "light" : "main"],
+                0.75
+            );
+        case "secondaryHoverText":
+            return isDarkMode
+                ? lighten(theme.palette.secondary.light, 0.1)
+                : theme.palette.secondary.dark;
+        case "regularHoverBg":
+            return alpha(theme.palette.divider, 0.3);
+        case "accentedBg":
+            return alpha(theme.palette.primary.main, 0.1);
+        case "accentedHoverBg":
+            return alpha(theme.palette.primary.main, 0.15);
+        case "secondaryBg":
+            return isDarkMode
+                ? alpha(theme.palette.secondary.light, 0.1)
+                : alpha(theme.palette.secondary.main, 0.18);
+        case "secondaryHoverBg":
+            return isDarkMode
+                ? alpha(theme.palette.secondary.light, 0.15)
+                : alpha(theme.palette.secondary.dark, 0.17);
     }
 }
 export function useThemeColor(color: ThemeColors) {

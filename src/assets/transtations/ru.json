@@ -1,6 +1,20 @@
 {
     "profile": "профиль",
     "about": "резюме",
-    "projects": "портфолио",
-    "interact": "контакты"
+    "projects": ["проекты", "портфолио"],
+    "interact": "контакты",
+
+    "biography": "биография",
+    "general": "общее",
+    "education": "образование",
+    "labor": "работа",
+    "questionaire": "скрининг",
+    "experience": "опыт",
+    "technologies": "технологии",
+    "achievements": "достижения",
+    "specifications": "характиристики",
+    "soft-skills": "гибкие",
+    "hard-skills": "технические",
+    "metrics": "метрики",
+    "snippets": "сниппеты"
 }

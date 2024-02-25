@@ -60,7 +60,7 @@ export default function AccentedTabs({
 
     // eslint-disable-next-line prefer-const
     let [tab, setTab] = useState(tabFromProps);
-    // if there is onChange handler prop, then it implies current tab state is being managed from outside by pointing current tab in props
+    // if there is onChange handler prop, then it implies current tab state is being controlled from outside by pointing current tab in props
     if (onChange) tab = tabFromProps;
     const tabsRef = useRef<HTMLDivElement | null>(null);
 
