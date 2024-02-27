@@ -16,6 +16,7 @@ import { Link as MuiLink } from "@mui/material";
 import Contacts from "./pages/Contacts";
 import Projects from "./pages/Projects";
 import Profile from "./pages/Profile";
+import PagesIntegrator from "./pages/PagesIntegrator";
 
 function AppLayout({ children }: ReactContentProps) {
     return (
@@ -54,19 +55,19 @@ const router = createBrowserRouter([
             },
             {
                 path: "profile",
-                element: <Profile />,
+                element: <PagesIntegrator page="profile" />,
             },
             {
                 path: "about",
-                element: <About />,
+                element: <PagesIntegrator page="about" />,
             },
             {
                 path: "projects",
-                element: <Projects />,
+                element: <PagesIntegrator page="projects" />,
             },
             {
                 path: "interact",
-                element: <Contacts />,
+                element: <PagesIntegrator page="contacts" />,
             },
         ],
     },
