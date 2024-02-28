@@ -127,7 +127,7 @@ export const darkTheme = createTheme(
                 dark: "#151722",
             },
             secondary: {
-                light: "#7464a2",
+                light: "#8173ab",
                 main: "#5a4793",
                 dark: "#3a316a",
             },
@@ -254,7 +254,7 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
             );
         case "secondaryHoverText":
             return isDarkMode
-                ? lighten(theme.palette.secondary.light, 0.1)
+                ? theme.palette.secondary.light
                 : theme.palette.secondary.dark;
         case "regularHoverBg":
             return alpha(theme.palette.divider, 0.3);

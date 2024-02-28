@@ -10,7 +10,7 @@ export default function TopMenu() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const onTabChanged = (tab: AccentedTabProps) => {
+    const onTabSelect = (tab: AccentedTabProps) => {
         navigate(`/${tab.id == "miraxsage" ? "" : tab.id}`);
     };
 
@@ -27,7 +27,11 @@ export default function TopMenu() {
             <HorizontalPanelButton iconMode={true}>
                 <MenuIcon />
             </HorizontalPanelButton>
-            <AccentedTabs underline={false} mode="full" onChange={onTabChanged}>
+            <AccentedTabs
+                underline={false}
+                mode="full"
+                onTabSelect={onTabSelect}
+            >
                 {["miraxsage", "profile", "about", "projects", "interact"].map(
                     (id) => ({
                         id,

@@ -25,6 +25,9 @@ export interface AccentedTreeItemProps {
 
 export interface AccentedTreeViewProps {
     children: AccentedTreeItemProps[];
+    selectedItem?: string | null;
+    intend?: "regular" | "double";
+    onItemSelect?: (item: AccentedTreeItemProps) => void;
 }
 
 const openedIcon = <ExpandMoreIcon />;
@@ -45,10 +48,11 @@ interface StyledTreeItemProps {
     accented: boolean;
     hasIcon: boolean;
     hasChildren: boolean;
+    intend: "regular" | "double";
 }
 
 const AccentedTreeItem = styled(TreeItemStyledWrapper)<StyledTreeItemProps>(
-    ({ theme, level, accented, hasIcon, hasChildren }) => ({
+    ({ theme, level, accented, hasIcon, hasChildren, intend = "regular" }) => ({
         position: "relative",
         color: getThemeColor("regularText", theme),
         "& .MuiTreeItem-content": {
@@ -56,8 +60,9 @@ const AccentedTreeItem = styled(TreeItemStyledWrapper)<StyledTreeItemProps>(
             position: "relative",
             zIndex: "calc(var(--level) + 1)",
             padding: "3px 8px",
-            paddingLeft:
-                "calc(12px * var(--level) + 10px * var(--level) - 6px)",
+            paddingLeft: `calc(${
+                intend == "double" ? 34 : 12
+            }px * var(--level) + 10px * var(--level) - 6px)`,
         },
         "&:before": {
             content: '""',
@@ -67,7 +72,9 @@ const AccentedTreeItem = styled(TreeItemStyledWrapper)<StyledTreeItemProps>(
             position: "absolute",
             backgroundColor: theme.palette.divider,
             top: "16px",
-            left: "calc(12px * var(--level) + 10px * var(--level) - 6px)",
+            left: `calc(${
+                intend == "double" ? 34 : 12
+            }px * var(--level) + 10px * var(--level) - 6px)`,
         },
         "& > .MuiTreeItem-content .MuiTreeItem-iconContainer": {
             width: "auto",
@@ -92,12 +99,12 @@ const AccentedTreeItem = styled(TreeItemStyledWrapper)<StyledTreeItemProps>(
                       content: '""',
                       display: "block",
                       background: getThemeColor("secondaryHoverText", theme),
-                      width: "3px",
+                      width: "2px",
                       height: "100%",
                       position: "absolute",
                       right: 0,
                   },
-                  "& > .MuiTreeItem-group:after": {
+                  "& > div > .MuiTreeItem-group:after": {
                       content: '""',
                       display: "block",
                       position: "absolute",
@@ -112,10 +119,9 @@ const AccentedTreeItem = styled(TreeItemStyledWrapper)<StyledTreeItemProps>(
                   },
               }
             : {}),
-        [`& .MuiTreeItem-content.Mui-selected, 
-                          & .MuiTreeItem-content.Mui-focused, 
-                          & .MuiTreeItem-content.Mui-selected.Mui-focused
-                        ${accented ? ", & > .MuiTreeItem-content" : ""}`]: {
+        [`& > .MuiTreeItem-content.Mui-selected, 
+          & > .MuiTreeItem-content.Mui-selected.Mui-focused
+          ${accented ? ", & > .MuiTreeItem-content" : ""}`]: {
             color: getThemeColor(
                 accented ? "secondaryHoverText" : "accentedHoverText",
                 theme
@@ -125,8 +131,10 @@ const AccentedTreeItem = styled(TreeItemStyledWrapper)<StyledTreeItemProps>(
                 theme
             ),
         },
-        [`& .MuiTreeItem-content.Mui-selected:hover, 
-                          & .MuiTreeItem-content.Mui-focused:hover`]: {
+        "& .MuiTreeItem-content.Mui-focused": {
+            background: "transparent",
+        },
+        [`& > .MuiTreeItem-content.Mui-selected:hover`]: {
             background: getThemeColor(
                 accented ? "secondaryHoverBg" : "accentedHoverBg",
                 theme
@@ -149,7 +157,9 @@ const AccentedTreeItem = styled(TreeItemStyledWrapper)<StyledTreeItemProps>(
             width: "1px",
             height: "calc(100% - 15px)",
             top: 0,
-            left: "calc(12px * (var(--level) + 1) + 10px * var(--level) + 3px)",
+            left: `calc(${
+                intend == "double" ? 34 : 12
+            }px * (var(--level) + 1) + 10px * var(--level) + 3px)`,
             backgroundColor: theme.palette.divider,
             zIndex: "var(--level)",
         },
@@ -170,8 +180,22 @@ function AccentedTreeItemTransitionComponent(props: TransitionProps) {
     );
 }
 
-export default function AccentedTreeView({ children }: AccentedTreeViewProps) {
+export default function AccentedTreeView({
+    children,
+    selectedItem,
+    onItemSelect,
+    intend = "regular",
+}: AccentedTreeViewProps) {
     const [expandedNodes, setExpandedNodes] = useState<string[]>([]);
+    const [selectedNode, setSelectedNode] = useState<string | null>(
+        selectedItem || null
+    );
+
+    const nodesList: AccentedTreeItemProps[] = [];
+
+    if (selectedItem !== undefined && selectedItem != selectedNode)
+        setSelectedNode(selectedItem);
+
     const generateNode = (
         item?: AccentedTreeItemProps | AccentedTreeItemProps[],
         level: number = 0
@@ -180,6 +204,7 @@ export default function AccentedTreeView({ children }: AccentedTreeViewProps) {
         if (Array.isArray(item))
             return item.map((subItem) => generateNode(subItem, level));
         else {
+            nodesList.push(item);
             const hasChildren = item.children && item.children.length;
             let icon: ReactNode = null;
             if (item.icon || hasChildren) {
@@ -200,6 +225,7 @@ export default function AccentedTreeView({ children }: AccentedTreeViewProps) {
                 <AccentedTreeItem
                     key={item.id}
                     nodeId={item.id}
+                    intend={intend}
                     hasIcon={!!item.icon}
                     hasChildren={!!hasChildren}
                     level={level}
@@ -221,13 +247,21 @@ export default function AccentedTreeView({ children }: AccentedTreeViewProps) {
         if ((e.target as HTMLElement).closest(".MuiTreeItem-iconContainer"))
             setExpandedNodes(toggled);
     };
+
+    const onSelect = (e: React.SyntheticEvent, nodeIds: string) => {
+        if (!(e.target as HTMLElement).closest(".MuiTreeItem-iconContainer")) {
+            setSelectedNode(nodeIds);
+            if (onItemSelect)
+                onItemSelect(nodesList.find((c) => c.id == nodeIds)!);
+        }
+    };
     return (
         <TreeView
             onNodeToggle={onToggle}
+            onNodeSelect={onSelect}
             expanded={expandedNodes}
-            aria-label="file system navigator"
-            defaultCollapseIcon={<ExpandMoreIcon />}
-            defaultExpandIcon={<ChevronRightIcon />}
+            selected={selectedNode}
+            sx={{ userSelect: "none" }}
         >
             {generateNode(children)}
         </TreeView>

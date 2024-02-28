@@ -41,11 +41,12 @@ export default function Layout({ children }: LayoutProps) {
                     borderColor: splashScreen
                         ? lighten(glowColor, 0.1)
                         : theme.palette.divider,
+                    gridTemplateRows: "auto minmax(0, 1fr) auto",
                 }}
-                className="border rounded-xl w-full h-full overflow-hidden flex flex-col"
+                className="border rounded-xl w-full h-full overflow-hidden grid"
             >
                 <TopMenu />
-                <div className="flex-grow flex">
+                <div className="flex overflow-hidden">
                     <AsideMenu />
                     <div className="flex-grow">{children}</div>
                 </div>

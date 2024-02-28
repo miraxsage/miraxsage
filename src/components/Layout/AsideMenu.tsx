@@ -5,8 +5,8 @@ import MonitorIcon from "@mui/icons-material/Monitor";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import LanguageIcon from "../icons/LanguageIcon";
 import LightModeIcon from "@mui/icons-material/LightMode";
-import LaunchIcon from "@mui/icons-material/Launch";
-import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import FirstPageIcon from "@mui/icons-material/FirstPage";
 import { motion } from "framer-motion";
 import { useThemeColor } from "../contexts/Theme";
 import { useColorMode, useLanguage } from "@/store/appearanceSlice";
@@ -15,8 +15,8 @@ const terminalIcon = <TerminalIcon />;
 const monitorIcon = <MonitorIcon />;
 const darkModeIcon = <Brightness4Icon />;
 const lightModeIcon = <LightModeIcon />;
-const unfoldIcon = <LaunchIcon />;
-const foldLeftIcon = <KeyboardDoubleArrowLeftIcon />;
+const fullscreenIcon = <FullscreenIcon />;
+const foldLeftIcon = <FirstPageIcon />;
 
 export default function AsideMenu() {
     const colorMode = useColorMode();
@@ -78,7 +78,7 @@ export default function AsideMenu() {
                             lang.toggle();
                         },
                     },
-                    { icon: unfoldIcon, notTogglable: true },
+                    { icon: fullscreenIcon, notTogglable: true },
                     { icon: foldLeftIcon, notTogglable: true },
                 ]}
             </AccentedTabs>

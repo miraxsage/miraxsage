@@ -18,19 +18,28 @@ export const HorizontalPanelButton: React.FC<{
     dividerSide?: "left" | "right";
     dividerSize?: "full" | "squeezed";
     iconMode?: boolean;
+    iconSize?: "large" | "regular" | "small";
     children?: ReactNode;
     sx?: SxProps<Theme> | undefined;
 }> = ({
     dividerSide = "right",
     dividerSize = "full",
     iconMode = false,
+    iconSize = "large",
     sx = {},
     ...props
 }) => {
     if (iconMode && sx)
         sx = {
-            padding: "12px 18px",
             minWidth: 0,
+            ...(iconSize == "large"
+                ? { padding: "12px 18px" }
+                : {
+                      padding: "8px 9.5px",
+                      "& .MuiSvgIcon-root": {
+                          fontSize: iconSize == "small" ? "17px" : "21px",
+                      },
+                  }),
             ...sx,
         };
     return (
