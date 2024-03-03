@@ -3,7 +3,6 @@ import "@/utilities/cookie";
 import { Box } from "@mui/material";
 import MainLayout from "./layout/MainLayout";
 import { useThemeColor } from "./contexts/Theme";
-import About from "./pages/About";
 import { useLanguage } from "@/store/appearanceSlice";
 import { ReactContentProps } from "@/types/react";
 import {
@@ -13,9 +12,6 @@ import {
     createBrowserRouter,
 } from "react-router-dom";
 import { Link as MuiLink } from "@mui/material";
-import Contacts from "./pages/Contacts";
-import Projects from "./pages/Projects";
-import Profile from "./pages/Profile";
 import PagesIntegrator from "./pages/PagesIntegrator";
 
 function AppLayout({ children }: ReactContentProps) {

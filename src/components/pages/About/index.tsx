@@ -1,37 +1,36 @@
 import { useLanguage } from "@/store/appearanceSlice";
 import AboutCategoriesList from "./CategoriesList";
-import { Box, SxProps } from "@mui/material";
-import { HorizontalPanelButton } from "@/components/PanelButtons";
+import { Box } from "@mui/material";
+import {
+    HorizontalPanelButton,
+    HorizontalPanelButtonProps,
+} from "@/components/PanelButtons";
 import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import CloseIcon from "@mui/icons-material/Close";
 import AccentedTabs from "@/components/AccentedTabs";
 import __ from "@/utilities/transtation";
-import { ReactNode, useReducer, useState } from "react";
-import { Theme } from "@emotion/react";
+import { useReducer, useState } from "react";
 import { useThemeColor } from "@/components/contexts/Theme";
-import categories, { AboutCategories } from "./Categories";
+import categories, { findCategory } from "./Categories";
+import AboutBlock from "./Blocks/Block";
+import AboutGeneralBlock from "./Blocks/General";
 
-interface ToolbarButtonProps {
-    children: ReactNode;
-    sx?: SxProps<Theme>;
-}
-
-function ToolbarButton({ children, sx }: ToolbarButtonProps) {
+function ToolbarButton({ children, sx, ...props }: HorizontalPanelButtonProps) {
     return (
         <HorizontalPanelButton
             dividerSize="squeezed"
             iconMode={true}
             sx={{
-                paddingLeft: "10.5px",
-                paddingRight: "10.5px",
+                padding: "8.2px 10.5px",
                 "&:hover": {
                     background: useThemeColor("regularHoverBg"),
                 },
                 ...sx,
             }}
             iconSize="regular"
+            {...props}
         >
             {children}
         </HorizontalPanelButton>
@@ -41,7 +40,6 @@ function ToolbarButton({ children, sx }: ToolbarButtonProps) {
 function Toolbar() {
     return (
         <Box
-            component="footer"
             sx={{
                 borderBottom: 1,
                 borderColor: "divider",
@@ -61,21 +59,14 @@ function Toolbar() {
             <ToolbarButton>
                 <UnfoldLessIcon />
             </ToolbarButton>
-            <ToolbarButton sx={{ paddingLeft: "11px", paddingRight: "11px" }}>
+            <ToolbarButton
+                sx={{ paddingLeft: "11px", paddingRight: "11px" }}
+                dividerSize="collapsed"
+            >
                 <CloseIcon />
             </ToolbarButton>
         </Box>
     );
-}
-
-function findCategory(id: string, initialCats?: AboutCategories) {
-    const cats = Object.entries(initialCats || categories);
-    let i = -1;
-    while (++i < cats.length) {
-        if (cats[i][0] == id) return cats[i];
-        if (cats[i][1].items) cats.push(...Object.entries(cats[i][1].items));
-    }
-    return null;
 }
 
 export default function About() {
@@ -102,7 +93,10 @@ export default function About() {
     };
 
     return (
-        <Box className="grid" sx={{ gridTemplateColumns: "auto 1fr" }}>
+        <Box
+            className="grid h-full"
+            sx={{ gridTemplateColumns: "auto 1px 1fr" }}
+        >
             <Box className="grid" sx={{ gridTemplateRows: "auto 1fr" }}>
                 <Toolbar />
                 <AboutCategoriesList
@@ -137,40 +131,52 @@ export default function About() {
                     }}
                 />
             </Box>
+            <Box className="w-px h-full" sx={{ backgroundColor: "divider" }} />
             <div>
-                <AccentedTabs
-                    size="small"
-                    accentMode="primaryStrong"
-                    activeTab={activeCat}
-                    onTabClose={(tab) => {
-                        const activeCatIndex = openedCats.findIndex(
-                            (c) => c == activeCat
-                        );
-                        const newOpenedCats = openedCats.filter(
-                            (c) => c != tab.id
-                        );
-                        setOpenedCats(newOpenedCats);
-                        if (tab.id == activeCat)
-                            setActiveCat(
-                                !openedCats.length
-                                    ? null
-                                    : newOpenedCats[
-                                          activeCatIndex > 0
-                                              ? activeCatIndex - 1
-                                              : 0
-                                      ]
+                {!!openedCats.length && (
+                    <AccentedTabs
+                        size="small"
+                        accentMode="primaryStrong"
+                        activeTab={activeCat}
+                        onTabClose={(tab) => {
+                            const activeCatIndex = openedCats.findIndex(
+                                (c) => c == activeCat
                             );
-                    }}
-                    onTabSelect={(tab) => {
-                        setActiveCat(String(tab.id));
-                    }}
-                >
-                    {openedCats.map((cat) => ({
-                        id: cat,
-                        title: `_${__(cat)}`,
-                    }))}
-                </AccentedTabs>
-                <div>content</div>
+                            const newOpenedCats = openedCats.filter(
+                                (c) => c != tab.id
+                            );
+                            setOpenedCats(newOpenedCats);
+                            if (tab.id == activeCat)
+                                setActiveCat(
+                                    !openedCats.length
+                                        ? null
+                                        : newOpenedCats[
+                                              activeCatIndex > 0
+                                                  ? activeCatIndex - 1
+                                                  : 0
+                                          ]
+                                );
+                        }}
+                        onTabSelect={(tab) => {
+                            setActiveCat(String(tab.id));
+                        }}
+                    >
+                        {openedCats.map((cat) => ({
+                            id: cat,
+                            title: `_${__(cat)}`,
+                        }))}
+                    </AccentedTabs>
+                )}
+                <div className="px-[15px] py-[17px]">
+                    <AboutBlock category="general">
+                        <AboutGeneralBlock />
+                    </AboutBlock>
+                    <AboutBlock category="education">Education</AboutBlock>
+                    <AboutBlock category="labor">Labor</AboutBlock>
+                    <AboutBlock category="questionaire">
+                        Questionaire
+                    </AboutBlock>
+                </div>
             </div>
         </Box>
     );

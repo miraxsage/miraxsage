@@ -67,3 +67,13 @@ const categories = {
 } satisfies AboutCategories;
 
 export default categories;
+
+export function findCategory(id: string, initialCats?: AboutCategories) {
+    const cats = Object.entries(initialCats || categories);
+    let i = -1;
+    while (++i < cats.length) {
+        if (cats[i][0] == id) return cats[i][1];
+        if (cats[i][1].items) cats.push(...Object.entries(cats[i][1].items));
+    }
+    return null;
+}

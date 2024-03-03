@@ -25,6 +25,7 @@ export interface AccentedTreeItemProps {
 
 export interface AccentedTreeViewProps {
     children: AccentedTreeItemProps[];
+    expandedNodes?: string[];
     selectedItem?: string | null;
     intend?: "regular" | "double";
     onItemSelect?: (item: AccentedTreeItemProps) => void;
@@ -183,10 +184,13 @@ function AccentedTreeItemTransitionComponent(props: TransitionProps) {
 export default function AccentedTreeView({
     children,
     selectedItem,
+    expandedNodes: expandedNodesProp,
     onItemSelect,
     intend = "regular",
 }: AccentedTreeViewProps) {
-    const [expandedNodes, setExpandedNodes] = useState<string[]>([]);
+    const [expandedNodes, setExpandedNodes] = useState<string[]>(
+        expandedNodesProp ?? []
+    );
     const [selectedNode, setSelectedNode] = useState<string | null>(
         selectedItem || null
     );

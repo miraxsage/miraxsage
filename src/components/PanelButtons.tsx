@@ -14,14 +14,16 @@ const PanelButton = styled(Button)(({ theme }) => ({
     },
 }));
 
-export const HorizontalPanelButton: React.FC<{
+export interface HorizontalPanelButtonProps {
     dividerSide?: "left" | "right";
-    dividerSize?: "full" | "squeezed";
+    dividerSize?: "full" | "squeezed" | "collapsed";
     iconMode?: boolean;
     iconSize?: "large" | "regular" | "small";
     children?: ReactNode;
     sx?: SxProps<Theme> | undefined;
-}> = ({
+}
+
+export const HorizontalPanelButton: React.FC<HorizontalPanelButtonProps> = ({
     dividerSide = "right",
     dividerSize = "full",
     iconMode = false,
@@ -51,6 +53,7 @@ export const HorizontalPanelButton: React.FC<{
                         className={classes("w-px", {
                             "h-full": dividerSize == "full",
                             "h-2/4": dividerSize == "squeezed",
+                            hidden: dividerSize == "collapsed",
                         })}
                     ></Box>
                 </div>
@@ -63,6 +66,7 @@ export const HorizontalPanelButton: React.FC<{
                         className={classes("w-px", {
                             "h-full": dividerSize == "full",
                             "h-1/2": dividerSize == "squeezed",
+                            hidden: dividerSize == "collapsed",
                         })}
                     ></Box>
                 </div>

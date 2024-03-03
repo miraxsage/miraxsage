@@ -27,6 +27,7 @@ export default function PagesIntegrator({ page }: PagesIntegratorProps) {
                 loadedPages.includes(id) || page == id ? (
                     <div
                         key={id}
+                        className="h-full"
                         style={{ display: id == page ? "block" : "none" }}
                     >
                         <Page />

@@ -36,7 +36,10 @@ export default function AboutCategoriesList({
 }: AboutCategoriesListProps) {
     useLanguage();
     return (
-        <AccentedTreeView {...props}>
+        <AccentedTreeView
+            expandedNodes={["biography", "experience", "specifications"]}
+            {...props}
+        >
             {categoriesToTreeItems(categories, activeItem)}
         </AccentedTreeView>
     );

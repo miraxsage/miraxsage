@@ -34,7 +34,21 @@ declare module "@mui/material/styles" {
     }
 }
 
+declare module "@mui/system" {
+    interface BreakpointOverrides {
+        "2xl": true;
+        "3xl": true;
+    }
+}
+
 const basicTheme = {
+    palette: {
+        error: {
+            light: "#ff8c94",
+            main: "#d34d56",
+            dark: "#95252d",
+        },
+    },
     typography: {
         fontFamily: "Cascadia",
         fontSize: 15,
@@ -75,9 +89,6 @@ export const lightTheme = createTheme(
     deepMerge(basicTheme, {
         palette: {
             mode: "light",
-            error: {
-                main: "#d34d56",
-            },
             divider: "#d1d1d1",
             contrast: {
                 light: "#4d4d4d",
@@ -105,6 +116,16 @@ export const lightTheme = createTheme(
                 dark: "#42968b",
             },
         },
+        components: {
+            MuiCssBaseline: {
+                styleOverrides: {
+                    "::selection": {
+                        color: "#5a4793",
+                        backgroundColor: alpha("#5a4793", 0.2),
+                    },
+                },
+            },
+        },
     }) as ThemeOptions
 );
 
@@ -112,9 +133,6 @@ export const darkTheme = createTheme(
     deepMerge(basicTheme, {
         palette: {
             mode: "dark",
-            error: {
-                main: "#d34d56",
-            },
             divider: "#2c2f3e",
             contrast: {
                 light: "#ececec",
@@ -142,6 +160,16 @@ export const darkTheme = createTheme(
                 dark: "#42968b",
             },
         },
+        components: {
+            MuiCssBaseline: {
+                styleOverrides: {
+                    "::selection": {
+                        color: "#53c6b7",
+                        backgroundColor: alpha("#53c6b7", 0.15),
+                    },
+                },
+            },
+        },
     }) as ThemeOptions
 );
 
@@ -155,6 +183,7 @@ export type ThemeColors =
     | "tabIcon"
     | "tabHoverIcon"
     | "layoutGlow"
+    | "titleBg"
     | "accentedBg"
     | "secondaryBg"
     | "accentedGdBg"
@@ -170,7 +199,8 @@ export type ThemeColors =
     | "secondaryHoverText"
     | "regularHoverBg"
     | "accentedHoverBg"
-    | "pageBg";
+    | "pageBg"
+    | "pageBgColor";
 
 export function getThemeColor(color: ThemeColors, theme: Theme) {
     const isDarkMode = theme.palette.mode == "dark";
@@ -214,6 +244,10 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
             return isDarkMode
                 ? theme.palette.bg.dark
                 : `linear-gradient(90deg, ${pageBgGradientColor}, transparent 20%, transparent 80%, ${pageBgGradientColor});`;
+        case "pageBgColor":
+            return isDarkMode ? theme.palette.bg.dark : theme.palette.bg.dark;
+        case "titleBg":
+            return alpha(theme.palette.divider, 0.13);
         case "accentedGdBg":
             return isDarkMode
                 ? `linear-gradient(90deg, ${alpha(
