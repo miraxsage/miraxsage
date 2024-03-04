@@ -8,14 +8,23 @@ import {
 import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
+import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import CloseIcon from "@mui/icons-material/Close";
+import CallIcon from "@mui/icons-material/Call";
 import AccentedTabs from "@/components/AccentedTabs";
 import __ from "@/utilities/transtation";
 import { useReducer, useState } from "react";
 import { useThemeColor } from "@/components/contexts/Theme";
-import categories, { findCategory } from "./Categories";
+import categories, { AboutCategory, findCategory } from "./Categories";
 import AboutBlock from "./Blocks/Block";
 import AboutGeneralBlock from "./Blocks/General";
+import CustomBreadcrumbs from "@/components/Breadcrumbs";
+import { capitalize } from "@/utilities/string";
+
+const profileIcon = <AssignmentIndIcon />;
+const projectsIcon = <RocketLaunchIcon />;
+const contactIcon = <CallIcon />;
 
 function ToolbarButton({ children, sx, ...props }: HorizontalPanelButtonProps) {
     return (
@@ -168,6 +177,44 @@ export default function About() {
                     </AccentedTabs>
                 )}
                 <div className="px-[15px] py-[17px]">
+                    <CustomBreadcrumbs>
+                        {[
+                            { label: "Miraxsage", link: "/" },
+                            {
+                                label: __("About"),
+                                subitems: [
+                                    {
+                                        label: __("Profile"),
+                                        icon: profileIcon,
+                                        link: "/profile",
+                                    },
+                                    {
+                                        label: __("Projects"),
+                                        icon: projectsIcon,
+                                        link: "/projects",
+                                    },
+                                    {
+                                        label: __("Interact"),
+                                        icon: contactIcon,
+                                        link: "/interact",
+                                    },
+                                ],
+                            },
+                        ].concat(
+                            !activeCat
+                                ? []
+                                : {
+                                      label: __(capitalize(activeCat)),
+                                      subitems: Object.entries(categories)
+                                          .filter(([key]) => key != activeCat)
+                                          .map(([key, val]) => ({
+                                              label: __(capitalize(key)),
+                                              icon: val.icon,
+                                              link: "/about/" + key,
+                                          })),
+                                  }
+                        )}
+                    </CustomBreadcrumbs>
                     <AboutBlock category="general">
                         <AboutGeneralBlock />
                     </AboutBlock>

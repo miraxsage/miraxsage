@@ -1,6 +1,6 @@
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import Avatar from "./Avatar";
-import { getThemeColor } from "@/components/contexts/Theme";
+import { getThemeColor, useThemeColor } from "@/components/contexts/Theme";
 import CheckIcon from "@mui/icons-material/Check";
 import { mix } from "@/utilities/colors";
 import LanguageIcon from "@/components/icons/LanguageIcon";
@@ -97,15 +97,14 @@ function Priority({ kind }: { kind: "Connection" }) {
 }
 
 function Tag({ text }: { text: string }) {
-    const theme = useTheme();
     return (
         <Box
             component="span"
             sx={{
-                color: getThemeColor("secondaryHoverText", theme),
-                padding: "3px 7px",
-                borderRadius: "5px",
-                background: getThemeColor("secondaryHoverBg", theme),
+                color: useThemeColor("secondaryHoverText"),
+                padding: "2px 8px 3px",
+                borderRadius: "15px",
+                background: useThemeColor("secondaryHoverBg"),
             }}
         >
             {text}

@@ -169,6 +169,23 @@ export const darkTheme = createTheme(
                     },
                 },
             },
+            MuiMenu: {
+                styleOverrides: {
+                    paper: {
+                        backgroundColor: "#1d1f2d",
+                        backgroundImage:
+                            "linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))",
+                        color: "#b5b6bb", // regularHoverText
+                    },
+                },
+            },
+            MuiTooltip: {
+                styleOverrides: {
+                    tooltip: {
+                        backgroundColor: "#1d1f2d",
+                    },
+                },
+            },
         },
     }) as ThemeOptions
 );
@@ -195,6 +212,7 @@ export type ThemeColors =
     | "regularText"
     | "accentedText"
     | "secondaryText"
+    | "regularHoverText"
     | "accentedHoverText"
     | "secondaryHoverText"
     | "regularHoverBg"
@@ -276,6 +294,10 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
         case "regularText":
             return isDarkMode
                 ? lighten(theme.palette.divider, 0.35)
+                : theme.palette.contrast.main;
+        case "regularHoverText":
+            return isDarkMode
+                ? lighten(theme.palette.divider, 0.65)
                 : theme.palette.contrast.main;
         case "accentedText":
             return alpha(theme.palette.primary.main, 0.75);
