@@ -141,7 +141,7 @@ const AccentedTreeItem = styled(TreeItemStyledWrapper)<StyledTreeItemProps>(
                 theme
             ),
         },
-        "& .MuiTreeItem-content:hover": {
+        "& > .MuiTreeItem-content:hover": {
             background: getThemeColor(
                 accented ? "secondaryHoverBg" : "regularHoverBg",
                 theme

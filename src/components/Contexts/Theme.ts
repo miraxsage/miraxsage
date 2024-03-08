@@ -199,6 +199,8 @@ export type ThemeColors =
     | "tabHoverBg"
     | "tabIcon"
     | "tabHoverIcon"
+    | "scrollbarHandle"
+    | "scrollbarHoverHandle"
     | "layoutGlow"
     | "titleBg"
     | "accentedBg"
@@ -246,6 +248,14 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
             return isDarkMode
                 ? alpha(theme.palette.divider, 0.15)
                 : alpha(theme.palette.bg.light, 0.5);
+        case "scrollbarHandle":
+            return isDarkMode
+                ? alpha(theme.palette.divider, 0.6)
+                : alpha(theme.palette.divider, 0.6);
+        case "scrollbarHoverHandle":
+            return isDarkMode
+                ? alpha(theme.palette.divider, 1)
+                : alpha(theme.palette.divider, 1);
         case "tabIcon":
             return isDarkMode
                 ? lighten(theme.palette.divider, 0.25)
@@ -254,6 +264,7 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
             return isDarkMode
                 ? theme.palette.contrast.main
                 : theme.palette.contrast.main;
+
         case "layoutGlow":
             return isDarkMode
                 ? alpha(theme.palette.bg.light, 0.5)

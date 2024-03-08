@@ -6,7 +6,6 @@ import HomeIcon from "@mui/icons-material/Home";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { getThemeColor } from "./contexts/Theme";
 import { ListItemIcon, Menu, MenuItem } from "@mui/material";
-import { ContentCopy } from "@mui/icons-material";
 import { AtLeastOneImportantFieldFromGiven } from "@/types/common";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 

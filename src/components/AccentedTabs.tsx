@@ -287,7 +287,7 @@ export default function AccentedTabs({
                         backgroundColor:
                             accentMode == "primaryStrong"
                                 ? getThemeColor("secondaryHoverBg", theme)
-                                : "transparent",
+                                : getThemeColor("tabHoverBg", theme),
                     },
                     "&.Mui-selected::after": {
                         width: orientation == "horizontal" ? "100%" : "2px",

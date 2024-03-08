@@ -14,13 +14,15 @@ import CloseIcon from "@mui/icons-material/Close";
 import CallIcon from "@mui/icons-material/Call";
 import AccentedTabs from "@/components/AccentedTabs";
 import __ from "@/utilities/transtation";
-import { useReducer, useState } from "react";
+import { useLayoutEffect, useReducer, useState } from "react";
 import { useThemeColor } from "@/components/contexts/Theme";
-import categories, { AboutCategory, findCategory } from "./Categories";
+import categories, { findCategory } from "./Categories";
 import AboutBlock from "./Blocks/Block";
 import AboutGeneralBlock from "./Blocks/General";
 import CustomBreadcrumbs from "@/components/Breadcrumbs";
 import { capitalize } from "@/utilities/string";
+import CustomScrollbar from "@/components/Scrollbar";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 const profileIcon = <AssignmentIndIcon />;
 const projectsIcon = <RocketLaunchIcon />;
@@ -80,68 +82,98 @@ function Toolbar() {
 
 export default function About() {
     useLanguage();
+
+    const params = useParams();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const initialCategory = params.category ?? "biography";
+
     const [openedCats, setOpenedCats] = useReducer(
         (_oldState: unknown, newState: string[]) =>
             Object.keys(categories)
                 .map((k) => (newState.includes(k) ? k : false))
                 .filter(Boolean) as string[],
-        ["biography"]
+        [initialCategory]
     );
-    const [activeCat, setActiveCatState] = useState<string | null>("biography");
-    const [selectedCat, setSelectedCat] = useState<string | null>("biography");
+    const [activeCat, setActiveCatState] = useState<string | null>(
+        initialCategory
+    );
+    const [selectedCat, setSelectedCat] = useState<string | null>(
+        initialCategory
+    );
+
     const setActiveCat = (cat: string | null) => {
-        setActiveCatState(cat);
-        if (!cat) setSelectedCat(null);
-        else if (
-            !findCategory(
-                selectedCat ?? "",
-                categories[cat as keyof typeof categories].items
+        if (cat != activeCat) {
+            setActiveCatState(cat);
+            if (!cat) setSelectedCat(null);
+            else if (
+                !findCategory(
+                    selectedCat ?? "",
+                    categories[cat as keyof typeof categories].items
+                )
             )
-        )
-            setSelectedCat(cat);
+                setSelectedCat(cat);
+            if (cat ? !openedCats.includes(cat) : openedCats.length)
+                setOpenedCats(!cat ? [] : [...openedCats, cat]);
+        }
+        if (cat != params.category) navigate(`/about${cat ? `/${cat}` : ``}`);
     };
 
+    useLayoutEffect(() => {
+        if (!location.pathname.startsWith("/about")) return;
+        let newActiveCat = params.category ? params.category : activeCat;
+        if (
+            newActiveCat &&
+            !newActiveCat.match(
+                /^(biography|experience|specifications|snippets)$/
+            )
+        )
+            newActiveCat = "biography";
+        setActiveCat(newActiveCat);
+    });
+
     return (
-        <Box
-            className="grid h-full"
-            sx={{ gridTemplateColumns: "auto 1px 1fr" }}
-        >
+        <Box className="flex h-full">
             <Box className="grid" sx={{ gridTemplateRows: "auto 1fr" }}>
                 <Toolbar />
-                <AboutCategoriesList
-                    intend="double"
-                    activeItem={activeCat}
-                    selectedItem={selectedCat}
-                    onItemSelect={(item) => {
-                        const rootCats = Object.keys(categories);
-                        if (rootCats.includes(item.id)) {
-                            if (!openedCats.includes(item.id))
-                                setOpenedCats([...openedCats, item.id]);
-                            setActiveCat(item.id);
-                        } else {
-                            const rootCategory = rootCats.find(
-                                (c) =>
-                                    !!findCategory(
-                                        item.id,
-                                        categories[c as keyof typeof categories]
-                                            .items
-                                    )
-                            );
-                            if (rootCategory) {
-                                setActiveCat(rootCategory);
-                                if (!openedCats.includes(rootCategory))
-                                    setOpenedCats([
-                                        ...openedCats,
-                                        rootCategory,
-                                    ]);
+                <CustomScrollbar right="4px" top="2px" bottom="3px">
+                    <AboutCategoriesList
+                        intend="double"
+                        activeItem={activeCat}
+                        selectedItem={selectedCat}
+                        onItemSelect={(item) => {
+                            const rootCats = Object.keys(categories);
+                            if (rootCats.includes(item.id)) {
+                                if (!openedCats.includes(item.id))
+                                    setOpenedCats([...openedCats, item.id]);
+                                setActiveCat(item.id);
+                            } else {
+                                const rootCategory = rootCats.find(
+                                    (c) =>
+                                        !!findCategory(
+                                            item.id,
+                                            categories[
+                                                c as keyof typeof categories
+                                            ].items
+                                        )
+                                );
+                                if (rootCategory) {
+                                    setActiveCat(rootCategory);
+                                    if (!openedCats.includes(rootCategory))
+                                        setOpenedCats([
+                                            ...openedCats,
+                                            rootCategory,
+                                        ]);
+                                }
                             }
-                        }
-                        setSelectedCat(item.id);
-                    }}
-                />
+                            setSelectedCat(item.id);
+                        }}
+                    />
+                </CustomScrollbar>
             </Box>
             <Box className="w-px h-full" sx={{ backgroundColor: "divider" }} />
-            <div>
+            <Box className="grid w-full" sx={{ gridTemplateRows: "auto 1fr" }}>
                 {!!openedCats.length && (
                     <AccentedTabs
                         size="small"
@@ -175,56 +207,60 @@ export default function About() {
                             title: `_${__(cat)}`,
                         }))}
                     </AccentedTabs>
-                )}
-                <div className="px-[15px] py-[17px]">
-                    <CustomBreadcrumbs>
-                        {[
-                            { label: "Miraxsage", link: "/" },
-                            {
-                                label: __("About"),
-                                subitems: [
-                                    {
-                                        label: __("Profile"),
-                                        icon: profileIcon,
-                                        link: "/profile",
-                                    },
-                                    {
-                                        label: __("Projects"),
-                                        icon: projectsIcon,
-                                        link: "/projects",
-                                    },
-                                    {
-                                        label: __("Interact"),
-                                        icon: contactIcon,
-                                        link: "/interact",
-                                    },
-                                ],
-                            },
-                        ].concat(
-                            !activeCat
-                                ? []
-                                : {
-                                      label: __(capitalize(activeCat)),
-                                      subitems: Object.entries(categories)
-                                          .filter(([key]) => key != activeCat)
-                                          .map(([key, val]) => ({
-                                              label: __(capitalize(key)),
-                                              icon: val.icon,
-                                              link: "/about/" + key,
-                                          })),
-                                  }
-                        )}
-                    </CustomBreadcrumbs>
-                    <AboutBlock category="general">
-                        <AboutGeneralBlock />
-                    </AboutBlock>
-                    <AboutBlock category="education">Education</AboutBlock>
-                    <AboutBlock category="labor">Labor</AboutBlock>
-                    <AboutBlock category="questionaire">
-                        Questionaire
-                    </AboutBlock>
-                </div>
-            </div>
+                )}{" "}
+                <CustomScrollbar right="5px" top="3px" bottom="3px">
+                    <Box sx={{ padding: "17px 15px 17px 14px" }}>
+                        <CustomBreadcrumbs>
+                            {[
+                                { label: "Miraxsage", link: "/" },
+                                {
+                                    label: __("About"),
+                                    subitems: [
+                                        {
+                                            label: __("Profile"),
+                                            icon: profileIcon,
+                                            link: "/profile",
+                                        },
+                                        {
+                                            label: __("Projects"),
+                                            icon: projectsIcon,
+                                            link: "/projects",
+                                        },
+                                        {
+                                            label: __("Interact"),
+                                            icon: contactIcon,
+                                            link: "/interact",
+                                        },
+                                    ],
+                                },
+                            ].concat(
+                                !activeCat
+                                    ? []
+                                    : {
+                                          label: __(capitalize(activeCat)),
+                                          subitems: Object.entries(categories)
+                                              .filter(
+                                                  ([key]) => key != activeCat
+                                              )
+                                              .map(([key, val]) => ({
+                                                  label: __(capitalize(key)),
+                                                  icon: val.icon,
+                                                  link: "/about/" + key,
+                                              })),
+                                      }
+                            )}
+                        </CustomBreadcrumbs>
+                        <AboutBlock category="general">
+                            <AboutGeneralBlock />
+                        </AboutBlock>
+                        <AboutBlock category="education">Education</AboutBlock>
+                        <AboutBlock category="labor">Labor</AboutBlock>
+                        <AboutBlock category="questionaire">
+                            Questionaire
+                        </AboutBlock>
+                    </Box>
+                </CustomScrollbar>
+            </Box>
         </Box>
     );
 }

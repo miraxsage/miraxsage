@@ -45,9 +45,10 @@ export default function AsideMenu() {
                 }}
             >
                 {[
-                    { icon: monitorIcon },
-                    { icon: terminalIcon },
+                    { id: "interface-mode", icon: monitorIcon },
+                    { id: "console-mode", icon: terminalIcon },
                     {
+                        id: "color-mode",
                         icon: isDarkMode ? lightModeIcon : darkModeIcon,
                         notTogglable: true,
                         onClick() {
@@ -57,6 +58,7 @@ export default function AsideMenu() {
                         },
                     },
                     {
+                        id: "language",
                         notTogglable: true,
                         icon: (hovered: boolean) => (
                             <motion.div
@@ -78,8 +80,16 @@ export default function AsideMenu() {
                             lang.toggle();
                         },
                     },
-                    { icon: fullscreenIcon, notTogglable: true },
-                    { icon: foldLeftIcon, notTogglable: true },
+                    {
+                        id: "fullscreen-mode",
+                        icon: fullscreenIcon,
+                        notTogglable: true,
+                    },
+                    {
+                        id: "collapsed-mode",
+                        icon: foldLeftIcon,
+                        notTogglable: true,
+                    },
                 ]}
             </AccentedTabs>
         </Box>
