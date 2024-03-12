@@ -14,18 +14,28 @@ declare module "@mui/x-tree-view" {
         style?: (CSSProperties & { "--level": number }) | undefined;
     }
 }
-
-export interface AccentedTreeItemProps {
+export type AccentedTextTreeItemProps = {
+    content?: never;
     id: string;
     title: string;
     icon?: ReactNode;
-    accented?: boolean;
+    isAccented?: boolean;
     children?: AccentedTreeItemProps[];
-}
+};
+export type AccentedContentedTreeItemProps = {
+    content: ReactNode;
+    id: string;
+    title?: never;
+    icon?: never;
+    isAccented?: never;
+    children?: never;
+};
+export type AccentedTreeItemProps = AccentedContentedTreeItemProps | AccentedTextTreeItemProps;
 
 export interface AccentedTreeViewProps {
     children: AccentedTreeItemProps[];
     expandedNodes?: string[];
+    disableSelection?: boolean;
     selectedItem?: string | null;
     intend?: "regular" | "double";
     onItemSelect?: (item: AccentedTreeItemProps) => void;
@@ -38,52 +48,66 @@ const closedIcon = <ChevronRightIcon />;
 function TreeItemStyledWrapper(props: TreeItemProps & StyledTreeItemProps) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const treeProps: any = { ...props };
-    ["level", "accented", "hasIcon", "hasChildren"].forEach(
-        (p) => delete treeProps[p]
-    );
+    ["level", "isAccented", "hasIcon", "hasChildren", "isContentedItem"].forEach((p) => delete treeProps[p]);
     return <TreeItem {...treeProps} />;
 }
 
 interface StyledTreeItemProps {
     level: number;
-    accented: boolean;
-    hasIcon: boolean;
-    hasChildren: boolean;
+    isAccented?: boolean;
+    isContentedItem?: boolean;
+    hasIcon?: boolean;
+    hasChildren?: boolean;
     intend: "regular" | "double";
 }
 
 const AccentedTreeItem = styled(TreeItemStyledWrapper)<StyledTreeItemProps>(
-    ({ theme, level, accented, hasIcon, hasChildren, intend = "regular" }) => ({
+    ({
+        theme,
+        level,
+        isAccented = false,
+        isContentedItem = false,
+        hasIcon = false,
+        hasChildren = false,
+        intend = "regular",
+    }) => ({
         position: "relative",
         color: getThemeColor("regularText", theme),
         "& .MuiTreeItem-content": {
             transition: "color 0.25s, background 0.15s",
             position: "relative",
             zIndex: "calc(var(--level) + 1)",
-            padding: "3px 8px",
-            paddingLeft: `calc(${
-                intend == "double" ? 34 : 12
-            }px * var(--level) + 10px * var(--level) - 6px)`,
+            padding: isContentedItem ? "0px" : "3px 8px",
+            paddingLeft: `calc(${intend == "double" ? 34 : 12}px * var(--level) + 10px * var(--level) - 6px)`,
         },
         "&:before": {
             content: '""',
             display: "block",
             height: "1px",
-            width: level > 0 ? "10px" : "0px",
+            width: level > 0 ? (isContentedItem ? "14px" : "10px") : "0px",
             position: "absolute",
             backgroundColor: theme.palette.divider,
-            top: "16px",
-            left: `calc(${
-                intend == "double" ? 34 : 12
-            }px * var(--level) + 10px * var(--level) - 6px)`,
+            top: isContentedItem ? "50%" : "16px",
+            left: `calc(${intend == "double" ? 34 : 12}px * var(--level) + 10px * var(--level) - 6px)`,
+        },
+        "&:last-child:before": {
+            height: isContentedItem ? "50%" : "calc(100% - 16px)",
+            borderColor: theme.palette.divider,
+            backgroundColor: getThemeColor("layoutBackground", theme),
+            borderWidth: "1px 0px 0px 0px",
+            top: isContentedItem ? "50%" : "16px",
+            left: `calc(${intend == "double" ? 34 : 12}px * var(--level) + 10px * var(--level) - 7px)`,
+            zIndex: "var(--level)",
         },
         "& > .MuiTreeItem-content .MuiTreeItem-iconContainer": {
             width: "auto",
-            marginLeft:
-                level > 0 ? (hasIcon || hasChildren ? "10px" : "3px") : "4px",
+            marginLeft: level > 0 ? (hasIcon || hasChildren ? "10px" : "3px") : "4px",
             marginRight: "0px",
             paddingLeft: "2px",
             paddingRight: !hasIcon && hasChildren ? "0px" : "3px",
+        },
+        "& > .MuiTreeItem-content:not(.Mui-selected) .MuiTreeItem-iconContainer": {
+            color: isAccented ? "inherit" : getThemeColor("regularIcon", theme),
         },
         "& .MuiTreeItem-content .MuiTreeItem-iconContainer > * + *": {
             marginLeft: "3px",
@@ -94,7 +118,7 @@ const AccentedTreeItem = styled(TreeItemStyledWrapper)<StyledTreeItemProps>(
         "& .MuiTreeItem-content .MuiTreeItem-label": {
             paddingLeft: "5px",
         },
-        ...(accented
+        ...(isAccented
             ? {
                   "& > .MuiTreeItem-content:after": {
                       content: '""',
@@ -113,40 +137,36 @@ const AccentedTreeItem = styled(TreeItemStyledWrapper)<StyledTreeItemProps>(
                       height: "100%",
                       top: 0,
                       right: 0,
-                      backgroundColor: getThemeColor(
-                          "secondaryHoverText",
-                          theme
-                      ),
+                      backgroundColor: getThemeColor("secondaryHoverText", theme),
                   },
               }
             : {}),
-        [`& > .MuiTreeItem-content.Mui-selected, 
-          & > .MuiTreeItem-content.Mui-selected.Mui-focused
-          ${accented ? ", & > .MuiTreeItem-content" : ""}`]: {
-            color: getThemeColor(
-                accented ? "secondaryHoverText" : "accentedHoverText",
-                theme
-            ),
-            background: getThemeColor(
-                accented ? "secondaryBg" : "accentedBg",
-                theme
-            ),
-        },
-        "& .MuiTreeItem-content.Mui-focused": {
-            background: "transparent",
-        },
-        [`& > .MuiTreeItem-content.Mui-selected:hover`]: {
-            background: getThemeColor(
-                accented ? "secondaryHoverBg" : "accentedHoverBg",
-                theme
-            ),
-        },
-        "& > .MuiTreeItem-content:hover": {
-            background: getThemeColor(
-                accented ? "secondaryHoverBg" : "regularHoverBg",
-                theme
-            ),
-        },
+        ...(isContentedItem
+            ? {
+                  "& > .MuiTreeItem-content": {
+                      cursor: "auto",
+                  },
+                  "& > .MuiTreeItem-content:hover": {
+                      background: "transparent",
+                  },
+              }
+            : {
+                  [`& > .MuiTreeItem-content.Mui-selected, 
+                    & > .MuiTreeItem-content.Mui-selected.Mui-focused
+                    ${isAccented ? ", & > .MuiTreeItem-content" : ""}`]: {
+                      color: getThemeColor(isAccented ? "secondaryHoverText" : "accentedHoverText", theme),
+                      background: getThemeColor(isAccented ? "secondaryBg" : "accentedBg", theme),
+                  },
+                  "& .MuiTreeItem-content.Mui-focused": {
+                      background: "transparent",
+                  },
+                  [`& > .MuiTreeItem-content.Mui-selected:hover`]: {
+                      background: getThemeColor(isAccented ? "secondaryHoverBg" : "accentedHoverBg", theme),
+                  },
+                  "& > .MuiTreeItem-content:hover": {
+                      background: getThemeColor(isAccented ? "secondaryHoverBg" : "regularHoverBg", theme),
+                  },
+              }),
         "& .MuiTreeItem-group": {
             margin: 0,
             position: "relative",
@@ -158,9 +178,7 @@ const AccentedTreeItem = styled(TreeItemStyledWrapper)<StyledTreeItemProps>(
             width: "1px",
             height: "calc(100% - 15px)",
             top: 0,
-            left: `calc(${
-                intend == "double" ? 34 : 12
-            }px * (var(--level) + 1) + 10px * var(--level) + 3px)`,
+            left: `calc(${intend == "double" ? 34 : 12}px * (var(--level) + 1) + 10px * var(--level) + 3px)`,
             backgroundColor: theme.palette.divider,
             zIndex: "var(--level)",
         },
@@ -185,82 +203,87 @@ export default function AccentedTreeView({
     children,
     selectedItem,
     expandedNodes: expandedNodesProp,
+    disableSelection,
     onItemSelect,
     intend = "regular",
 }: AccentedTreeViewProps) {
-    const [expandedNodes, setExpandedNodes] = useState<string[]>(
-        expandedNodesProp ?? []
-    );
-    const [selectedNode, setSelectedNode] = useState<string | null>(
-        selectedItem || null
-    );
+    const [expandedNodes, setExpandedNodes] = useState<string[]>(expandedNodesProp ?? []);
+    const [selectedNode, setSelectedNode] = useState<string | null>(selectedItem || null);
 
     const nodesList: AccentedTreeItemProps[] = [];
 
-    if (selectedItem !== undefined && selectedItem != selectedNode)
-        setSelectedNode(selectedItem);
+    if (selectedItem !== undefined && selectedItem != selectedNode) setSelectedNode(selectedItem);
 
-    const generateNode = (
-        item?: AccentedTreeItemProps | AccentedTreeItemProps[],
-        level: number = 0
-    ): ReactNode => {
+    const generateNode = (item?: AccentedTreeItemProps | AccentedTreeItemProps[], level: number = 0): ReactNode => {
         if (!item) return null;
-        if (Array.isArray(item))
-            return item.map((subItem) => generateNode(subItem, level));
+        if (Array.isArray(item)) return item.map((subItem) => generateNode(subItem, level));
         else {
             nodesList.push(item);
-            const hasChildren = item.children && item.children.length;
-            let icon: ReactNode = null;
-            if (item.icon || hasChildren) {
-                const expandIcon = hasChildren
-                    ? expandedNodes.includes(item.id)
-                        ? openedIcon
-                        : closedIcon
-                    : null;
-                if (item.icon || expandIcon)
-                    icon = (
-                        <>
-                            {expandIcon}
-                            {item.icon}
-                        </>
-                    );
+            if ("content" in item) {
+                return (
+                    <AccentedTreeItem
+                        key={item.id}
+                        isContentedItem={true}
+                        nodeId={item.id}
+                        intend={intend}
+                        level={level}
+                        label={item.content}
+                        style={{ "--level": level }}
+                    />
+                );
+            } else {
+                const hasChildren = !!(item.children && item.children.length);
+                let icon: ReactNode = null;
+                if (item.icon || hasChildren) {
+                    const expandIcon = hasChildren ? (expandedNodes.includes(item.id) ? openedIcon : closedIcon) : null;
+                    if (item.icon || expandIcon)
+                        icon = (
+                            <>
+                                {expandIcon}
+                                {item.icon}
+                            </>
+                        );
+                }
+                return (
+                    <AccentedTreeItem
+                        key={item.id}
+                        nodeId={item.id}
+                        intend={intend}
+                        hasIcon={!!item.icon}
+                        hasChildren={!!hasChildren}
+                        level={level}
+                        isAccented={!!item.isAccented}
+                        icon={icon}
+                        label={item.title}
+                        style={{ "--level": level }}
+                        TransitionComponent={AccentedTreeItemTransitionComponent}
+                    >
+                        {generateNode(item.children, level + 1)}
+                    </AccentedTreeItem>
+                );
             }
-            return (
-                <AccentedTreeItem
-                    key={item.id}
-                    nodeId={item.id}
-                    intend={intend}
-                    hasIcon={!!item.icon}
-                    hasChildren={!!hasChildren}
-                    level={level}
-                    accented={!!item.accented}
-                    icon={icon}
-                    label={item.title}
-                    style={{ "--level": level }}
-                    TransitionComponent={AccentedTreeItemTransitionComponent}
-                >
-                    {generateNode(item.children, level + 1)}
-                </AccentedTreeItem>
-            );
         }
     };
-    const onToggle: UseTreeViewExpansionParameters["onNodeToggle"] = (
-        e: React.SyntheticEvent,
-        toggled
-    ) => {
-        if ((e.target as HTMLElement).closest(".MuiTreeItem-iconContainer"))
+    const onToggle: UseTreeViewExpansionParameters["onNodeToggle"] = (e: React.SyntheticEvent, toggled) => {
+        if (
+            (e.target as HTMLElement).closest(".MuiTreeItem-iconContainer") ||
+            disableSelection ||
+            (selectedNode && expandedNodes.includes(selectedNode)
+                ? !toggled.includes(selectedNode)
+                : toggled.includes(selectedNode!))
+        )
             setExpandedNodes(toggled);
     };
 
     const onSelect = (e: React.SyntheticEvent, nodeIds: string) => {
         if (!(e.target as HTMLElement).closest(".MuiTreeItem-iconContainer")) {
             setSelectedNode(nodeIds);
-            if (onItemSelect)
-                onItemSelect(nodesList.find((c) => c.id == nodeIds)!);
+            if (onItemSelect) onItemSelect(nodesList.find((c) => c.id == nodeIds)!);
         }
     };
     return (
         <TreeView
+            disableSelection={!!disableSelection}
             onNodeToggle={onToggle}
             onNodeSelect={onSelect}
             expanded={expandedNodes}

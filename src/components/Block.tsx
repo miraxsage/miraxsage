@@ -1,15 +1,15 @@
 import { getThemeColor } from "@/components/contexts/Theme";
 import { useTheme } from "@mui/material";
 import { Box } from "@mui/material";
-import categories, { AboutCategory, findCategory } from "../Categories";
+import categories, { AboutCategory, findCategory } from "./pages/About/Categories";
 import { ReactNode } from "react";
 import __ from "@/utilities/transtation";
 import { capitalize } from "@/utilities/string";
 
-export type AboutCategoriesKeysRecursive<
-    T extends object,
-    K extends keyof T = keyof T
-> = T extends { icon: unknown; items: unknown }
+export type AboutCategoriesKeysRecursive<T extends object, K extends keyof T = keyof T> = T extends {
+    icon: unknown;
+    items: unknown;
+}
     ? T["items"] extends object
         ? AboutCategoriesKeysRecursive<T["items"]>
         : never
@@ -43,6 +43,7 @@ export default function AboutBlock({ category, children }: AboutBlockProps) {
                     background: getThemeColor("titleBg", theme),
                     "& .MuiSvgIcon-root": {
                         fontSize: "22px",
+                        color: getThemeColor("regularIcon", theme),
                     },
                 }}
             >

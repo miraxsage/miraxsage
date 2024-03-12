@@ -3,13 +3,10 @@ import BadgeIcon from "@mui/icons-material/Badge";
 import SchoolIcon from "@mui/icons-material/School";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
-
-//import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
-import VerifiedIcon from "@mui/icons-material/Verified";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import WebhookIcon from "@mui/icons-material/Webhook";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
-
 import PsychologyAltIcon from "@mui/icons-material/PsychologyAlt";
 import PsychologyIcon from "@mui/icons-material/Psychology";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
@@ -35,14 +32,19 @@ const categories = {
                 },
             },
             labor: { icon: <BusinessCenterIcon /> },
-            questionaire: { icon: <ReceiptLongIcon /> },
+            questionaire: {
+                icon: <ReceiptLongIcon />,
+                items: {
+                    general2: { icon: <BadgeIcon /> },
+                },
+            },
         },
     },
     experience: {
         icon: <MusclesIcon />,
         items: {
             technologies: { icon: <WebhookIcon /> },
-            achievements: { icon: <VerifiedIcon /> },
+            achievements: { icon: <EmojiEventsIcon /> },
             projects: { icon: <RocketLaunchIcon /> },
         },
     },

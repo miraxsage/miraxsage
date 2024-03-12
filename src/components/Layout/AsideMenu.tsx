@@ -52,9 +52,7 @@ export default function AsideMenu() {
                         icon: isDarkMode ? lightModeIcon : darkModeIcon,
                         notTogglable: true,
                         onClick() {
-                            colorMode.update((old) =>
-                                old == "dark" ? "light" : "dark"
-                            );
+                            colorMode.update((old) => (old == "dark" ? "light" : "dark"));
                         },
                     },
                     {
@@ -63,14 +61,8 @@ export default function AsideMenu() {
                         icon: (hovered: boolean) => (
                             <motion.div
                                 animate={{
-                                    filter: hovered
-                                        ? "grayscale(0)"
-                                        : "grayscale(1)",
-                                    opacity: hovered
-                                        ? 1
-                                        : isDarkMode
-                                        ? 0.5
-                                        : 0.3,
+                                    filter: hovered ? "grayscale(0)" : "grayscale(1)",
+                                    opacity: hovered ? 1 : isDarkMode ? 0.5 : 0.4,
                                 }}
                             >
                                 <LanguageIcon language={lang.lang} />

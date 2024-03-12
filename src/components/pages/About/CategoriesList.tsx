@@ -1,7 +1,4 @@
 import __ from "@/utilities/transtation";
-import AccentedTreeView, {
-    AccentedTreeViewProps,
-} from "../../AccentedTreeView";
 
 import { useLanguage } from "@/store/appearanceSlice";
 
@@ -9,20 +6,25 @@ import categories, {
     AboutCategories,
 } from "@/components/pages/About/Categories";
 import { capitalize } from "@/utilities/string";
+import AccentedTreeView, {
+    AccentedTreeItemProps,
+    AccentedTreeViewProps,
+} from "@/components/AccentedTreeView";
 
 function categoriesToTreeItems(
     categories: AboutCategories,
     activeItem?: string | null
-): AccentedTreeViewProps["children"] {
-    return Object.entries(categories).map(([id, details]) => ({
+): AccentedTreeItemProps[] {
+    const res = Object.entries(categories).map(([id, details]) => ({
         id,
-        accented: id == activeItem,
+        isAccented: id == activeItem,
         title: __(capitalize(id)),
         icon: details.icon,
         children: details.items
             ? categoriesToTreeItems(details.items, activeItem)
             : undefined,
     }));
+    return res;
 }
 
 type AboutCategoriesListProps = {

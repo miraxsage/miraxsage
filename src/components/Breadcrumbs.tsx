@@ -16,10 +16,7 @@ type BasicBreadcrumbItem = {
     subitems: Omit<BasicBreadcrumbItem, "subitems">[];
 };
 
-export type BreadcrumbItem = AtLeastOneImportantFieldFromGiven<
-    BasicBreadcrumbItem,
-    "subitems" | "link"
->;
+export type BreadcrumbItem = AtLeastOneImportantFieldFromGiven<BasicBreadcrumbItem, "subitems" | "link">;
 
 export interface CustomBreadcrumbsProps {
     children: BreadcrumbItem[];
@@ -31,7 +28,7 @@ const StyledBreadcrumb = styled(Chip)(({ theme }) => {
         backgroundColor,
         height: theme.spacing(3),
         color: getThemeColor("regularText", theme),
-        fontSize: "1rem",
+        fontSize: "1.1rem",
         cursor: "pointer",
         "&:hover, &:focus": {
             backgroundColor: emphasize(backgroundColor, 0.06),
@@ -41,7 +38,7 @@ const StyledBreadcrumb = styled(Chip)(({ theme }) => {
             backgroundColor: emphasize(backgroundColor, 0.12),
         },
         "& .MuiChip-icon": {
-            color: getThemeColor("regularText", theme),
+            color: getThemeColor("regularIcon", theme),
             fontSize: "20px",
         },
     };
@@ -50,9 +47,7 @@ const StyledBreadcrumb = styled(Chip)(({ theme }) => {
 const expandMoreIcon = <ExpandMoreIcon />;
 const homeIcon = <HomeIcon />;
 
-export default function CustomBreadcrumbs({
-    children,
-}: CustomBreadcrumbsProps) {
+export default function CustomBreadcrumbs({ children }: CustomBreadcrumbsProps) {
     const [openedItem, setOpenedItem] = React.useState<{
         breadcrumb: BreadcrumbItem;
         ref: HTMLElement;
@@ -72,22 +67,14 @@ export default function CustomBreadcrumbs({
                         }
                         to={breadcrumb.link}
                         label={breadcrumb.label}
-                        icon={
-                            breadcrumb.icon ||
-                            (i == 0 && !breadcrumb.subitems?.length)
-                                ? homeIcon
-                                : undefined
-                        }
+                        icon={breadcrumb.icon || (i == 0 && !breadcrumb.subitems?.length) ? homeIcon : undefined}
                         key={breadcrumb.label}
                         deleteIcon={expandMoreIcon}
                         onDelete={
                             !breadcrumb.subitems || !breadcrumb.subitems.length
                                 ? undefined
                                 : (e) => {
-                                      const container =
-                                          e.target.closest(
-                                              ".MuiBreadcrumbs-li"
-                                          );
+                                      const container = e.target.closest(".MuiBreadcrumbs-li");
                                       setOpenedItem({
                                           breadcrumb,
                                           ref: container,
@@ -119,14 +106,12 @@ export default function CustomBreadcrumbs({
                                 setOpenedItem(null);
                                 navigate(item.link);
                             }}
+                            sx={{ color: getThemeColor("menuText", theme) }}
                         >
                             {item.icon && (
                                 <ListItemIcon
                                     sx={{
-                                        color: getThemeColor(
-                                            "regularHoverText",
-                                            theme
-                                        ),
+                                        color: getThemeColor("menuText", theme),
                                         "& .MuiSvgIcon-root": {
                                             fontSize: "20px",
                                         },

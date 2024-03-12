@@ -1,10 +1,7 @@
 import { useLanguage } from "@/store/appearanceSlice";
 import AboutCategoriesList from "./CategoriesList";
 import { Box } from "@mui/material";
-import {
-    HorizontalPanelButton,
-    HorizontalPanelButtonProps,
-} from "@/components/PanelButtons";
+import { HorizontalPanelButton, HorizontalPanelButtonProps } from "@/components/PanelButtons";
 import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
@@ -17,12 +14,13 @@ import __ from "@/utilities/transtation";
 import { useLayoutEffect, useReducer, useState } from "react";
 import { useThemeColor } from "@/components/contexts/Theme";
 import categories, { findCategory } from "./Categories";
-import AboutBlock from "./Blocks/Block";
+import AboutBlock from "../../Block";
 import AboutGeneralBlock from "./Blocks/General";
 import CustomBreadcrumbs from "@/components/Breadcrumbs";
 import { capitalize } from "@/utilities/string";
 import CustomScrollbar from "@/components/Scrollbar";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import AboutEducationBlock from "./Blocks/Education";
 
 const profileIcon = <AssignmentIndIcon />;
 const projectsIcon = <RocketLaunchIcon />;
@@ -59,9 +57,7 @@ function Toolbar() {
             }}
             className="flex"
         >
-            <ToolbarButton
-                sx={{ paddingLeft: "10.5px", paddingRight: "10.5px" }}
-            >
+            <ToolbarButton sx={{ paddingLeft: "10.5px", paddingRight: "10.5px" }}>
                 <FirstPageIcon />
             </ToolbarButton>
             <ToolbarButton>
@@ -70,10 +66,7 @@ function Toolbar() {
             <ToolbarButton>
                 <UnfoldLessIcon />
             </ToolbarButton>
-            <ToolbarButton
-                sx={{ paddingLeft: "11px", paddingRight: "11px" }}
-                dividerSize="collapsed"
-            >
+            <ToolbarButton sx={{ paddingLeft: "11px", paddingRight: "11px" }} dividerSize="collapsed">
                 <CloseIcon />
             </ToolbarButton>
         </Box>
@@ -96,26 +89,16 @@ export default function About() {
                 .filter(Boolean) as string[],
         [initialCategory]
     );
-    const [activeCat, setActiveCatState] = useState<string | null>(
-        initialCategory
-    );
-    const [selectedCat, setSelectedCat] = useState<string | null>(
-        initialCategory
-    );
+    const [activeCat, setActiveCatState] = useState<string | null>(initialCategory);
+    const [selectedCat, setSelectedCat] = useState<string | null>(initialCategory);
 
     const setActiveCat = (cat: string | null) => {
         if (cat != activeCat) {
             setActiveCatState(cat);
             if (!cat) setSelectedCat(null);
-            else if (
-                !findCategory(
-                    selectedCat ?? "",
-                    categories[cat as keyof typeof categories].items
-                )
-            )
+            else if (!findCategory(selectedCat ?? "", categories[cat as keyof typeof categories].items))
                 setSelectedCat(cat);
-            if (cat ? !openedCats.includes(cat) : openedCats.length)
-                setOpenedCats(!cat ? [] : [...openedCats, cat]);
+            if (cat ? !openedCats.includes(cat) : openedCats.length) setOpenedCats(!cat ? [] : [...openedCats, cat]);
         }
         if (cat != params.category) navigate(`/about${cat ? `/${cat}` : ``}`);
     };
@@ -123,16 +106,10 @@ export default function About() {
     useLayoutEffect(() => {
         if (!location.pathname.startsWith("/about")) return;
         let newActiveCat = params.category ? params.category : activeCat;
-        if (
-            newActiveCat &&
-            !newActiveCat.match(
-                /^(biography|experience|specifications|snippets)$/
-            )
-        )
+        if (newActiveCat && !newActiveCat.match(/^(biography|experience|specifications|snippets)$/))
             newActiveCat = "biography";
         setActiveCat(newActiveCat);
     });
-
     return (
         <Box className="flex h-full">
             <Box className="grid" sx={{ gridTemplateRows: "auto 1fr" }}>
@@ -145,26 +122,16 @@ export default function About() {
                         onItemSelect={(item) => {
                             const rootCats = Object.keys(categories);
                             if (rootCats.includes(item.id)) {
-                                if (!openedCats.includes(item.id))
-                                    setOpenedCats([...openedCats, item.id]);
+                                if (!openedCats.includes(item.id)) setOpenedCats([...openedCats, item.id]);
                                 setActiveCat(item.id);
                             } else {
                                 const rootCategory = rootCats.find(
-                                    (c) =>
-                                        !!findCategory(
-                                            item.id,
-                                            categories[
-                                                c as keyof typeof categories
-                                            ].items
-                                        )
+                                    (c) => !!findCategory(item.id, categories[c as keyof typeof categories].items)
                                 );
                                 if (rootCategory) {
                                     setActiveCat(rootCategory);
                                     if (!openedCats.includes(rootCategory))
-                                        setOpenedCats([
-                                            ...openedCats,
-                                            rootCategory,
-                                        ]);
+                                        setOpenedCats([...openedCats, rootCategory]);
                                 }
                             }
                             setSelectedCat(item.id);
@@ -180,22 +147,14 @@ export default function About() {
                         accentMode="primaryStrong"
                         activeTab={activeCat}
                         onTabClose={(tab) => {
-                            const activeCatIndex = openedCats.findIndex(
-                                (c) => c == activeCat
-                            );
-                            const newOpenedCats = openedCats.filter(
-                                (c) => c != tab.id
-                            );
+                            const activeCatIndex = openedCats.findIndex((c) => c == activeCat);
+                            const newOpenedCats = openedCats.filter((c) => c != tab.id);
                             setOpenedCats(newOpenedCats);
                             if (tab.id == activeCat)
                                 setActiveCat(
                                     !openedCats.length
                                         ? null
-                                        : newOpenedCats[
-                                              activeCatIndex > 0
-                                                  ? activeCatIndex - 1
-                                                  : 0
-                                          ]
+                                        : newOpenedCats[activeCatIndex > 0 ? activeCatIndex - 1 : 0]
                                 );
                         }}
                         onTabSelect={(tab) => {
@@ -208,7 +167,7 @@ export default function About() {
                         }))}
                     </AccentedTabs>
                 )}{" "}
-                <CustomScrollbar right="5px" top="3px" bottom="3px">
+                <CustomScrollbar right="4.5px" top="4px" bottom="4px">
                     <Box sx={{ padding: "17px 15px 17px 14px" }}>
                         <CustomBreadcrumbs>
                             {[
@@ -239,9 +198,7 @@ export default function About() {
                                     : {
                                           label: __(capitalize(activeCat)),
                                           subitems: Object.entries(categories)
-                                              .filter(
-                                                  ([key]) => key != activeCat
-                                              )
+                                              .filter(([key]) => key != activeCat)
                                               .map(([key, val]) => ({
                                                   label: __(capitalize(key)),
                                                   icon: val.icon,
@@ -253,11 +210,11 @@ export default function About() {
                         <AboutBlock category="general">
                             <AboutGeneralBlock />
                         </AboutBlock>
-                        <AboutBlock category="education">Education</AboutBlock>
-                        <AboutBlock category="labor">Labor</AboutBlock>
-                        <AboutBlock category="questionaire">
-                            Questionaire
+                        <AboutBlock category="education">
+                            <AboutEducationBlock />
                         </AboutBlock>
+                        <AboutBlock category="labor">Labor</AboutBlock>
+                        <AboutBlock category="questionaire">Questionaire</AboutBlock>
                     </Box>
                 </CustomScrollbar>
             </Box>

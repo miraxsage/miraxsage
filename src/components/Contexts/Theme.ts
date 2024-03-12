@@ -173,8 +173,7 @@ export const darkTheme = createTheme(
                 styleOverrides: {
                     paper: {
                         backgroundColor: "#1d1f2d",
-                        backgroundImage:
-                            "linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))",
+                        backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))",
                         color: "#b5b6bb", // regularHoverText
                     },
                 },
@@ -212,6 +211,8 @@ export type ThemeColors =
     | "accentedHoverGdBg"
     | "secondaryHoverGdBg"
     | "regularText"
+    | "regularIcon"
+    | "menuText"
     | "accentedText"
     | "secondaryText"
     | "regularHoverText"
@@ -227,48 +228,28 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
     const pageBgGradientColor = lighten(theme.palette.bg.dark, 0.4);
     switch (color) {
         case "barBackground":
-            return isDarkMode
-                ? darken(theme.palette.bg.dark, 0.08)
-                : theme.palette.bg.main;
+            return isDarkMode ? darken(theme.palette.bg.dark, 0.08) : theme.palette.bg.main;
         case "layoutBackground":
             return isDarkMode ? theme.palette.bg.dark : theme.palette.bg.light;
         case "tabRegularText":
-            return isDarkMode
-                ? lighten(theme.palette.divider, 0.25)
-                : lighten(theme.palette.contrast.main, 0.1);
+            return isDarkMode ? lighten(theme.palette.divider, 0.25) : lighten(theme.palette.contrast.main, 0.1);
         case "tabHoverText":
-            return isDarkMode
-                ? theme.palette.contrast.main
-                : darken(theme.palette.contrast.main, 0.2);
+            return isDarkMode ? theme.palette.contrast.main : darken(theme.palette.contrast.main, 0.2);
         case "tabActiveText":
-            return isDarkMode
-                ? theme.palette.contrast.light
-                : theme.palette.primary.main;
+            return isDarkMode ? theme.palette.contrast.light : theme.palette.primary.main;
         case "tabHoverBg":
-            return isDarkMode
-                ? alpha(theme.palette.divider, 0.15)
-                : alpha(theme.palette.bg.light, 0.5);
+            return isDarkMode ? alpha(theme.palette.divider, 0.15) : alpha(theme.palette.bg.light, 0.5);
         case "scrollbarHandle":
-            return isDarkMode
-                ? alpha(theme.palette.divider, 0.6)
-                : alpha(theme.palette.divider, 0.6);
+            return isDarkMode ? alpha(theme.palette.divider, 0.6) : alpha(theme.palette.divider, 0.6);
         case "scrollbarHoverHandle":
-            return isDarkMode
-                ? alpha(theme.palette.divider, 1)
-                : alpha(theme.palette.divider, 1);
+            return isDarkMode ? alpha(theme.palette.divider, 1) : alpha(theme.palette.divider, 1);
         case "tabIcon":
-            return isDarkMode
-                ? lighten(theme.palette.divider, 0.25)
-                : darken(theme.palette.contrast.dark, 0.03);
+            return isDarkMode ? lighten(theme.palette.divider, 0.25) : darken(theme.palette.contrast.dark, 0.08);
         case "tabHoverIcon":
-            return isDarkMode
-                ? theme.palette.contrast.main
-                : theme.palette.contrast.main;
+            return isDarkMode ? theme.palette.contrast.main : theme.palette.contrast.main;
 
         case "layoutGlow":
-            return isDarkMode
-                ? alpha(theme.palette.bg.light, 0.5)
-                : theme.palette.bg.dark;
+            return isDarkMode ? alpha(theme.palette.bg.light, 0.5) : theme.palette.bg.dark;
         case "pageBg":
             return isDarkMode
                 ? theme.palette.bg.dark
@@ -279,50 +260,45 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
             return alpha(theme.palette.divider, 0.13);
         case "accentedGdBg":
             return isDarkMode
-                ? `linear-gradient(90deg, ${alpha(
+                ? `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.03)}, ${alpha(
                       theme.palette.primary.main,
-                      0.03
-                  )}, ${alpha(theme.palette.primary.main, 0.1)});`
-                : `linear-gradient(90deg, ${alpha(
+                      0.1
+                  )});`
+                : `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.03)}, ${alpha(
                       theme.palette.primary.main,
-                      0.03
-                  )}, ${alpha(theme.palette.primary.main, 0.1)});`;
+                      0.1
+                  )});`;
         case "accentedHoverGdBg":
-            return `linear-gradient(90deg, ${alpha(
+            return `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.07)}, ${alpha(
                 theme.palette.primary.main,
-                0.07
-            )}, ${alpha(theme.palette.primary.main, 0.15)});`;
+                0.15
+            )});`;
         case "secondaryGdBg":
-            return `linear-gradient(90deg, ${alpha(
+            return `linear-gradient(90deg, ${alpha(theme.palette.secondary.main, 0.03)}, ${alpha(
                 theme.palette.secondary.main,
-                0.03
-            )}, ${alpha(theme.palette.secondary.main, 0.1)});`;
+                0.1
+            )});`;
         case "secondaryHoverGdBg":
-            return `linear-gradient(90deg, ${alpha(
+            return `linear-gradient(90deg, ${alpha(theme.palette.secondary.main, 0.07)}, ${alpha(
                 theme.palette.secondary.main,
-                0.07
-            )}, ${alpha(theme.palette.secondary.main, 0.15)});`;
+                0.15
+            )});`;
         case "regularText":
-            return isDarkMode
-                ? lighten(theme.palette.divider, 0.35)
-                : theme.palette.contrast.main;
+            return isDarkMode ? lighten(theme.palette.divider, 0.35) : darken(theme.palette.contrast.main, 0.15);
+        case "menuText":
+            return isDarkMode ? lighten(theme.palette.divider, 0.65) : darken(theme.palette.contrast.main, 0.15);
+        case "regularIcon":
+            return isDarkMode ? lighten(theme.palette.divider, 0.35) : theme.palette.contrast.main;
         case "regularHoverText":
-            return isDarkMode
-                ? lighten(theme.palette.divider, 0.65)
-                : theme.palette.contrast.main;
+            return isDarkMode ? lighten(theme.palette.divider, 0.65) : theme.palette.contrast.main;
         case "accentedText":
             return alpha(theme.palette.primary.main, 0.75);
         case "accentedHoverText":
             return theme.palette.primary.main;
         case "secondaryText":
-            return alpha(
-                theme.palette.secondary[isDarkMode ? "light" : "main"],
-                0.75
-            );
+            return alpha(theme.palette.secondary[isDarkMode ? "light" : "main"], 0.75);
         case "secondaryHoverText":
-            return isDarkMode
-                ? theme.palette.secondary.light
-                : theme.palette.secondary.dark;
+            return isDarkMode ? theme.palette.secondary.light : theme.palette.secondary.dark;
         case "regularHoverBg":
             return alpha(theme.palette.divider, 0.3);
         case "accentedBg":
@@ -330,13 +306,9 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
         case "accentedHoverBg":
             return alpha(theme.palette.primary.main, 0.15);
         case "secondaryBg":
-            return isDarkMode
-                ? alpha(theme.palette.secondary.light, 0.1)
-                : alpha(theme.palette.secondary.main, 0.18);
+            return isDarkMode ? alpha(theme.palette.secondary.light, 0.1) : alpha(theme.palette.secondary.main, 0.18);
         case "secondaryHoverBg":
-            return isDarkMode
-                ? alpha(theme.palette.secondary.light, 0.15)
-                : alpha(theme.palette.secondary.dark, 0.17);
+            return isDarkMode ? alpha(theme.palette.secondary.light, 0.15) : alpha(theme.palette.secondary.dark, 0.17);
     }
 }
 export function useThemeColor(color: ThemeColors) {
