@@ -5,12 +5,7 @@ import MainLayout from "./layout/MainLayout";
 import { useThemeColor } from "./contexts/Theme";
 import { useLanguage } from "@/store/appearanceSlice";
 import { ReactContentProps } from "@/types/react";
-import {
-    Link,
-    Outlet,
-    RouterProvider,
-    createBrowserRouter,
-} from "react-router-dom";
+import { Link, Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Link as MuiLink } from "@mui/material";
 import PagesIntegrator from "./pages/PagesIntegrator";
 
@@ -19,7 +14,7 @@ function AppLayout({ children }: ReactContentProps) {
         <Box
             sx={{
                 background: useThemeColor("pageBg"),
-                minHeight: "calc(max(640px, 100dvh))",
+                minHeight: "calc(max(500px, 100dvh))",
             }}
             className={`h-0 w-full flex justify-center items-center`}
         >

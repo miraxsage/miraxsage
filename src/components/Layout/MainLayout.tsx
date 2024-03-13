@@ -21,12 +21,12 @@ export default function Layout({ children }: LayoutProps) {
                     padding: "25px",
                 },
                 [theme.breakpoints.up("md")]: {
-                    minHeight: "640px",
+                    minHeight: "500px",
                     height: "95%",
                     padding: "25px",
                 },
                 [theme.breakpoints.up("xl")]: {
-                    minHeight: "640px",
+                    minHeight: "500px",
                     height: "90%",
                 },
             }}
@@ -38,9 +38,7 @@ export default function Layout({ children }: LayoutProps) {
                         ? `0 0 65px ${glowColor}, 0 0 20px ${glowColor}`
                         : `0 0 95px ${glowColor}, 0 0 20px ${glowColor}`,
                     background: useThemeColor("layoutBackground"),
-                    borderColor: splashScreen
-                        ? lighten(glowColor, 0.1)
-                        : theme.palette.divider,
+                    borderColor: splashScreen ? lighten(glowColor, 0.1) : theme.palette.divider,
                     gridTemplateRows: "auto minmax(0, 1fr) auto",
                 }}
                 className="border rounded-xl w-full h-full overflow-hidden grid"

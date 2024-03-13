@@ -284,11 +284,11 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
                 0.15
             )});`;
         case "regularText":
-            return isDarkMode ? lighten(theme.palette.divider, 0.35) : darken(theme.palette.contrast.main, 0.15);
+            return isDarkMode ? lighten(theme.palette.divider, 0.35) : darken(theme.palette.contrast.main, 0.45);
         case "menuText":
             return isDarkMode ? lighten(theme.palette.divider, 0.65) : darken(theme.palette.contrast.main, 0.15);
         case "regularIcon":
-            return isDarkMode ? lighten(theme.palette.divider, 0.35) : theme.palette.contrast.main;
+            return isDarkMode ? lighten(theme.palette.divider, 0.35) : darken(theme.palette.contrast.main, 0.05);
         case "regularHoverText":
             return isDarkMode ? lighten(theme.palette.divider, 0.65) : theme.palette.contrast.main;
         case "accentedText":
