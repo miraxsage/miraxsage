@@ -22,6 +22,7 @@ import CustomScrollbar from "@/components/Scrollbar";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import AboutEducationBlock from "./Blocks/Education";
 import AboutLaborBlock from "./Blocks/Labor";
+import AboutQuestionaireBlock from "./Blocks/Questionare";
 
 const profileIcon = <AssignmentIndIcon />;
 const projectsIcon = <RocketLaunchIcon />;
@@ -217,7 +218,9 @@ export default function About() {
                         <AboutBlock category="labor">
                             <AboutLaborBlock />
                         </AboutBlock>
-                        <AboutBlock category="questionaire">Questionaire</AboutBlock>
+                        <AboutBlock category="questionaire">
+                            <AboutQuestionaireBlock />
+                        </AboutBlock>
                     </Box>
                 </CustomScrollbar>
             </Box>

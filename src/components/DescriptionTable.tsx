@@ -269,7 +269,7 @@ export default function DescriptionTable({ children, withoutBottomBorder }: Desc
                         },
                     },
                     "& > div:not(.avatar)": {
-                        padding: "6px 15px",
+                        padding: "6px 14px",
                         borderColor: theme.palette.divider,
                         borderStyle: "solid",
                         display: "flex",

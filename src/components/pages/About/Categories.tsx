@@ -27,16 +27,10 @@ const categories = {
             general: { icon: <BadgeIcon /> },
             education: {
                 icon: <SchoolIcon />,
-                items: {
-                    general1: { icon: <BadgeIcon /> },
-                },
             },
             labor: { icon: <BusinessCenterIcon /> },
             questionaire: {
                 icon: <ReceiptLongIcon />,
-                items: {
-                    general2: { icon: <BadgeIcon /> },
-                },
             },
         },
     },
