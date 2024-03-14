@@ -49,7 +49,7 @@ const router = createBrowserRouter([
                 element: <PagesIntegrator page="profile" />,
             },
             {
-                path: "about/:category?",
+                path: "about/:category?/:block?",
                 element: <PagesIntegrator page="about" />,
             },
             {

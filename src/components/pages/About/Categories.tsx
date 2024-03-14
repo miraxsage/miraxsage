@@ -18,7 +18,7 @@ export type AboutCategory = {
     icon?: ReactNode;
     items?: { [k: string]: AboutCategory };
 };
-export type AboutCategories = Exclude<AboutCategory["items"], undefined>;
+export type AboutCategoriesInterface = Exclude<AboutCategory["items"], undefined>;
 
 const categories = {
     biography: {
@@ -60,11 +60,26 @@ const categories = {
             ["1c"]: { icon: null },
         },
     },
-} satisfies AboutCategories;
+} satisfies AboutCategoriesInterface;
 
 export default categories;
 
-export function findCategory(id: string, initialCats?: AboutCategories) {
+export type AboutCategoriesType = typeof categories;
+
+export type AboutCategoriesKeysRecursive<T extends object, K extends keyof T = keyof T> = T extends {
+    icon: unknown;
+    items: unknown;
+}
+    ? T["items"] extends object
+        ? AboutCategoriesKeysRecursive<T["items"]>
+        : never
+    : K extends string
+    ? T[K] extends { icon: unknown; items: unknown }
+        ? K | AboutCategoriesKeysRecursive<T[K]>
+        : K
+    : never;
+
+export function findCategory(id: string, initialCats?: AboutCategoriesInterface) {
     const cats = Object.entries(initialCats || categories);
     let i = -1;
     while (++i < cats.length) {

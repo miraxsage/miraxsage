@@ -2,9 +2,10 @@ import { Box, useTheme } from "@mui/material";
 
 type DescriptionTextProps = {
     children: string;
+    withoutBottomBorder?: boolean;
 };
 
-export default function DescriptionText({ children }: DescriptionTextProps) {
+export default function DescriptionText({ children, withoutBottomBorder }: DescriptionTextProps) {
     const theme = useTheme();
     return (
         <Box
@@ -14,7 +15,7 @@ export default function DescriptionText({ children }: DescriptionTextProps) {
                 cursor: "auto",
                 borderStyle: "solid",
                 borderColor: theme.palette.divider,
-                borderWidth: "1px 0px 1px 1px",
+                borderWidth: withoutBottomBorder ? "1px 0px 0px 1px" : "1px 0px 1px 1px",
                 padding: "6px 14px",
             }}
         >

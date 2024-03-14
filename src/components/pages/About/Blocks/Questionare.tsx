@@ -1,6 +1,5 @@
 import AccentedTreeView from "@/components/AccentedTreeView";
 import DescriptionText from "@/components/DescriptionText";
-import __ from "@/utilities/transtation";
 import PersonIcon from "@mui/icons-material/Person";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
@@ -128,7 +127,7 @@ export default function AboutQuestionaireBlock() {
                             {
                                 id: "hobby-datails",
                                 content: (
-                                    <DescriptionText>
+                                    <DescriptionText withoutBottomBorder={true}>
                                         Кроме профессиональных интересов также увлекаюсь вело спортом, изучаю
                                         английский, люблю путешествовать и очень хотел бы посетить много городов и
                                         известных мировых достопримечательностей.

@@ -5,28 +5,15 @@ import { HorizontalPanelButton, HorizontalPanelButtonProps } from "@/components/
 import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
-import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
-import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import CloseIcon from "@mui/icons-material/Close";
-import CallIcon from "@mui/icons-material/Call";
 import AccentedTabs from "@/components/AccentedTabs";
 import __ from "@/utilities/transtation";
 import { useLayoutEffect, useReducer, useState } from "react";
 import { useThemeColor } from "@/components/contexts/Theme";
-import categories, { findCategory } from "./Categories";
-import AboutBlock from "../../Block";
-import AboutGeneralBlock from "./Blocks/General";
-import CustomBreadcrumbs from "@/components/Breadcrumbs";
-import { capitalize } from "@/utilities/string";
+import categories, { AboutCategoriesType, findCategory } from "./Categories";
 import CustomScrollbar from "@/components/Scrollbar";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import AboutEducationBlock from "./Blocks/Education";
-import AboutLaborBlock from "./Blocks/Labor";
-import AboutQuestionaireBlock from "./Blocks/Questionare";
-
-const profileIcon = <AssignmentIndIcon />;
-const projectsIcon = <RocketLaunchIcon />;
-const contactIcon = <CallIcon />;
+import AboutBlocksIntegrator from "./BlocksIntegrator";
 
 function ToolbarButton({ children, sx, ...props }: HorizontalPanelButtonProps) {
     return (
@@ -83,6 +70,7 @@ export default function About() {
     const location = useLocation();
 
     const initialCategory = params.category ?? "biography";
+    const initialBlock = params.block ?? "initial";
 
     const [openedCats, setOpenedCats] = useReducer(
         (_oldState: unknown, newState: string[]) =>
@@ -91,27 +79,33 @@ export default function About() {
                 .filter(Boolean) as string[],
         [initialCategory]
     );
-    const [activeCat, setActiveCatState] = useState<string | null>(initialCategory);
-    const [selectedCat, setSelectedCat] = useState<string | null>(initialCategory);
+    const [activeCat, setActiveCat] = useState<string | null>(initialCategory);
+    const [selectedCat, setSelectedCat] = useState<string | null>(initialBlock);
 
-    const setActiveCat = (cat: string | null) => {
+    const setActiveCatAndBlock = (cat: string | null, block: string | null) => {
         if (cat != activeCat) {
-            setActiveCatState(cat);
-            if (!cat) setSelectedCat(null);
-            else if (!findCategory(selectedCat ?? "", categories[cat as keyof typeof categories].items))
-                setSelectedCat(cat);
+            setActiveCat(cat);
             if (cat ? !openedCats.includes(cat) : openedCats.length) setOpenedCats(!cat ? [] : [...openedCats, cat]);
         }
-        if (cat != params.category) navigate(`/about${cat ? `/${cat}` : ``}`);
+        if (block != selectedCat) setSelectedCat(block);
+        if (cat != params.category || block != params.block)
+            navigate(`/about${cat ? `/${cat}${block ? `/${block}` : ``}` : ``}`);
     };
 
     useLayoutEffect(() => {
         if (!location.pathname.startsWith("/about")) return;
         let newActiveCat = params.category ? params.category : activeCat;
-        if (newActiveCat && !newActiveCat.match(/^(biography|experience|specifications|snippets)$/))
-            newActiveCat = "biography";
-        setActiveCat(newActiveCat);
+        let newActiveBlock = !newActiveCat ? null : params.block ? params.block : selectedCat;
+        if (newActiveCat && !Object.keys(categories).includes(newActiveCat)) newActiveCat = "biography";
+        if (
+            newActiveBlock &&
+            newActiveBlock != newActiveCat &&
+            !Object.keys(categories[newActiveCat as keyof AboutCategoriesType]["items"]).includes(newActiveBlock)
+        )
+            newActiveBlock = Object.keys(categories[newActiveCat as keyof AboutCategoriesType]["items"])[0];
+        setActiveCatAndBlock(newActiveCat, newActiveBlock);
     });
+
     return (
         <Box className="flex h-full">
             <Box className="grid" sx={{ gridTemplateRows: "auto 1fr" }}>
@@ -125,18 +119,17 @@ export default function About() {
                             const rootCats = Object.keys(categories);
                             if (rootCats.includes(item.id)) {
                                 if (!openedCats.includes(item.id)) setOpenedCats([...openedCats, item.id]);
-                                setActiveCat(item.id);
+                                setActiveCatAndBlock(item.id, null);
                             } else {
                                 const rootCategory = rootCats.find(
-                                    (c) => !!findCategory(item.id, categories[c as keyof typeof categories].items)
+                                    (c) => !!findCategory(item.id, categories[c as keyof AboutCategoriesType].items)
                                 );
                                 if (rootCategory) {
-                                    setActiveCat(rootCategory);
                                     if (!openedCats.includes(rootCategory))
                                         setOpenedCats([...openedCats, rootCategory]);
+                                    setActiveCatAndBlock(rootCategory, item.id);
                                 }
                             }
-                            setSelectedCat(item.id);
                         }}
                     />
                 </CustomScrollbar>
@@ -153,14 +146,15 @@ export default function About() {
                             const newOpenedCats = openedCats.filter((c) => c != tab.id);
                             setOpenedCats(newOpenedCats);
                             if (tab.id == activeCat)
-                                setActiveCat(
+                                setActiveCatAndBlock(
                                     !openedCats.length
                                         ? null
-                                        : newOpenedCats[activeCatIndex > 0 ? activeCatIndex - 1 : 0]
+                                        : newOpenedCats[activeCatIndex > 0 ? activeCatIndex - 1 : 0],
+                                    null
                                 );
                         }}
                         onTabSelect={(tab) => {
-                            setActiveCat(String(tab.id));
+                            setActiveCatAndBlock(String(tab.id), null);
                         }}
                     >
                         {openedCats.map((cat) => ({
@@ -171,56 +165,17 @@ export default function About() {
                 )}{" "}
                 <CustomScrollbar right="4.5px" top="4px" bottom="4px">
                     <Box sx={{ padding: "17px 15px 17px 14px" }}>
-                        <CustomBreadcrumbs>
-                            {[
-                                { label: "Miraxsage", link: "/" },
-                                {
-                                    label: __("About"),
-                                    subitems: [
-                                        {
-                                            label: __("Profile"),
-                                            icon: profileIcon,
-                                            link: "/profile",
-                                        },
-                                        {
-                                            label: __("Projects"),
-                                            icon: projectsIcon,
-                                            link: "/projects",
-                                        },
-                                        {
-                                            label: __("Interact"),
-                                            icon: contactIcon,
-                                            link: "/interact",
-                                        },
-                                    ],
-                                },
-                            ].concat(
-                                !activeCat
-                                    ? []
-                                    : {
-                                          label: __(capitalize(activeCat)),
-                                          subitems: Object.entries(categories)
-                                              .filter(([key]) => key != activeCat)
-                                              .map(([key, val]) => ({
-                                                  label: __(capitalize(key)),
-                                                  icon: val.icon,
-                                                  link: "/about/" + key,
-                                              })),
-                                      }
-                            )}
-                        </CustomBreadcrumbs>
-                        <AboutBlock category="general">
-                            <AboutGeneralBlock />
-                        </AboutBlock>
-                        <AboutBlock category="education">
-                            <AboutEducationBlock />
-                        </AboutBlock>
-                        <AboutBlock category="labor">
-                            <AboutLaborBlock />
-                        </AboutBlock>
-                        <AboutBlock category="questionaire">
-                            <AboutQuestionaireBlock />
-                        </AboutBlock>
+                        <AboutBlocksIntegrator
+                            category="biography"
+                            onSelectedBlockChanged={(newSelectedBlock) =>
+                                setActiveCatAndBlock(activeCat, newSelectedBlock)
+                            }
+                            selectedBlock={
+                                (selectedCat ?? undefined) as
+                                    | keyof AboutCategoriesType["biography"]["items"]
+                                    | undefined
+                            }
+                        />
                     </Box>
                 </CustomScrollbar>
             </Box>
