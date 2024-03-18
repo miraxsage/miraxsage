@@ -15,12 +15,21 @@ interface AboutBlockProps {
     expanded?: boolean;
     onToggle?: (event: React.SyntheticEvent, isExpanded: boolean) => void;
     className?: string;
+    withoutTransition?: boolean;
 }
 
-export default function AboutBlock({ category, children, onToggle, expanded, className }: AboutBlockProps) {
+export default function AboutBlock({
+    category,
+    children,
+    onToggle,
+    expanded,
+    className,
+    withoutTransition = false,
+}: AboutBlockProps) {
     const categoryObj: AboutCategory = findCategory(category);
     return (
         <CustomAccordion
+            withoutTransition={withoutTransition}
             className={className}
             icon={categoryObj.icon}
             title={__(capitalize(category))}

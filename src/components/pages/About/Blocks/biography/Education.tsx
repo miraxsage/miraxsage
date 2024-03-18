@@ -66,7 +66,7 @@ function DataTable({ data, withoutBottomBorder = false }: { data: Data; withoutB
     return <DescriptionTable withoutBottomBorder={withoutBottomBorder}>{data}</DescriptionTable>;
 }
 
-export default function AboutEducationBlock() {
+export default function AboutBioEducationBlock() {
     return (
         <>
             <AccentedTreeView

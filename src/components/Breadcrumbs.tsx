@@ -1,11 +1,11 @@
 import * as React from "react";
-import { emphasize, styled, useTheme } from "@mui/material/styles";
+import { lighten, styled, useTheme } from "@mui/material/styles";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Chip from "@mui/material/Chip";
 import HomeIcon from "@mui/icons-material/Home";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { getThemeColor } from "./contexts/Theme";
-import { ListItemIcon, Menu, MenuItem } from "@mui/material";
+import { ListItemIcon, Menu, MenuItem, BreadcrumbsProps } from "@mui/material";
 import { AtLeastOneImportantFieldFromGiven } from "@/types/common";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 
@@ -18,9 +18,10 @@ type BasicBreadcrumbItem = {
 
 export type BreadcrumbItem = AtLeastOneImportantFieldFromGiven<BasicBreadcrumbItem, "subitems" | "link">;
 
-export interface CustomBreadcrumbsProps {
+export type CustomBreadcrumbsProps = {
     children: BreadcrumbItem[];
-}
+    withoutExpandIcon?: boolean;
+} & Omit<BreadcrumbsProps, "children">;
 
 const StyledBreadcrumb = styled(Chip)(({ theme }) => {
     const backgroundColor = getThemeColor("layoutBackground", theme);
@@ -31,11 +32,11 @@ const StyledBreadcrumb = styled(Chip)(({ theme }) => {
         fontSize: "1.1rem",
         cursor: "pointer",
         "&:hover, &:focus": {
-            backgroundColor: emphasize(backgroundColor, 0.06),
+            backgroundColor: getThemeColor("regularHoverBg", theme),
         },
         "&:active": {
             boxShadow: theme.shadows[1],
-            backgroundColor: emphasize(backgroundColor, 0.12),
+            backgroundColor: lighten(getThemeColor("regularHoverBg", theme), 0.05),
         },
         "& .MuiChip-icon": {
             color: getThemeColor("regularIcon", theme),
@@ -47,7 +48,12 @@ const StyledBreadcrumb = styled(Chip)(({ theme }) => {
 const expandMoreIcon = <ExpandMoreIcon />;
 const homeIcon = <HomeIcon />;
 
-export default function CustomBreadcrumbs({ children }: CustomBreadcrumbsProps) {
+export default function CustomBreadcrumbs({
+    children,
+    withoutExpandIcon = false,
+    sx,
+    ...props
+}: CustomBreadcrumbsProps) {
     const [openedItem, setOpenedItem] = React.useState<{
         breadcrumb: BreadcrumbItem;
         ref: HTMLElement;
@@ -56,9 +62,18 @@ export default function CustomBreadcrumbs({ children }: CustomBreadcrumbsProps) 
     const theme = useTheme();
     const navigate = useNavigate();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const revealMenuHandler = (breadcrumb: BreadcrumbItem) => (e: any) => {
+        const container = e.target.closest(".MuiBreadcrumbs-li");
+        setOpenedItem({
+            breadcrumb,
+            ref: container,
+        });
+    };
+
     return (
-        <div style={{ marginBottom: "18px" }}>
-            <Breadcrumbs>
+        <div>
+            <Breadcrumbs sx={{ marginBottom: "18px", ...sx }} {...props}>
                 {children.map((breadcrumb, i) => (
                     <StyledBreadcrumb
                         component={
@@ -67,19 +82,18 @@ export default function CustomBreadcrumbs({ children }: CustomBreadcrumbsProps) 
                         }
                         to={breadcrumb.link}
                         label={breadcrumb.label}
-                        icon={breadcrumb.icon || (i == 0 && !breadcrumb.subitems?.length) ? homeIcon : undefined}
+                        icon={breadcrumb.icon || (i == 0 && !breadcrumb.subitems?.length ? homeIcon : undefined)}
                         key={breadcrumb.label}
-                        deleteIcon={expandMoreIcon}
+                        deleteIcon={!withoutExpandIcon ? expandMoreIcon : <div></div>}
                         onDelete={
                             !breadcrumb.subitems || !breadcrumb.subitems.length
                                 ? undefined
-                                : (e) => {
-                                      const container = e.target.closest(".MuiBreadcrumbs-li");
-                                      setOpenedItem({
-                                          breadcrumb,
-                                          ref: container,
-                                      });
-                                  }
+                                : revealMenuHandler(breadcrumb)
+                        }
+                        onClick={
+                            breadcrumb.subitems && breadcrumb.subitems.length && withoutExpandIcon
+                                ? revealMenuHandler(breadcrumb)
+                                : undefined
                         }
                     />
                 ))}
@@ -104,7 +118,8 @@ export default function CustomBreadcrumbs({ children }: CustomBreadcrumbsProps) 
                             key={item.label}
                             onClick={() => {
                                 setOpenedItem(null);
-                                navigate(item.link);
+                                if (item.link.match(/(^http)|(^[^/]+\.)/)) window.open(item.link, "_blank");
+                                else navigate(item.link);
                             }}
                             sx={{ color: getThemeColor("menuText", theme) }}
                         >

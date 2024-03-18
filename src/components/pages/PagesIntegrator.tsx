@@ -11,9 +11,7 @@ import Contacts from "./Contacts";
 import { useState } from "react";
 
 export default function PagesIntegrator({ page }: PagesIntegratorProps) {
-    const [loadedPages, setLoadedPages] = useState<
-        PagesIntegratorProps["page"][]
-    >([]);
+    const [loadedPages, setLoadedPages] = useState<PagesIntegratorProps["page"][]>([]);
     if (!loadedPages.includes(page)) setLoadedPages([...loadedPages, page]);
     const pages: [Pages, React.FC][] = [
         ["profile", Profile],
@@ -25,11 +23,7 @@ export default function PagesIntegrator({ page }: PagesIntegratorProps) {
         <>
             {pages.map(([id, Page]) =>
                 loadedPages.includes(id) || page == id ? (
-                    <div
-                        key={id}
-                        className="h-full"
-                        style={{ display: id == page ? "block" : "none" }}
-                    >
+                    <div key={id} className="h-full" style={{ display: id == page ? "block" : "none" }}>
                         <Page />
                     </div>
                 ) : null

@@ -151,14 +151,14 @@ const AccentedTreeItem = styled(TreeItemStyledWrapper)<StyledTreeItemProps>(
                   },
               }
             : {
-                  [`& > .MuiTreeItem-content.Mui-selected, 
-                    & > .MuiTreeItem-content.Mui-selected.Mui-focused
-                    ${isAccented ? ", & > .MuiTreeItem-content" : ""}`]: {
-                      color: getThemeColor(isAccented ? "secondaryHoverText" : "accentedHoverText", theme),
-                      background: getThemeColor(isAccented ? "secondaryBg" : "accentedBg", theme),
-                  },
                   "& .MuiTreeItem-content.Mui-focused": {
                       background: "transparent",
+                  },
+                  [`& > .MuiTreeItem-content.Mui-selected, 
+                    & > .MuiTreeItem-content.Mui-selected.Mui-focused
+                    ${isAccented ? ", & > .MuiTreeItem-content, & > .MuiTreeItem-content.Mui-focused" : ""}`]: {
+                      color: getThemeColor(isAccented ? "secondaryHoverText" : "accentedHoverText", theme),
+                      background: getThemeColor(isAccented ? "secondaryBg" : "accentedBg", theme),
                   },
                   [`& > .MuiTreeItem-content.Mui-selected:hover`]: {
                       background: getThemeColor(isAccented ? "secondaryHoverBg" : "accentedHoverBg", theme),
@@ -212,6 +212,8 @@ export default function AccentedTreeView({
 
     const nodesList: AccentedTreeItemProps[] = [];
 
+    const accentedNodes: string[] = [];
+
     if (selectedItem !== undefined && selectedItem != selectedNode) setSelectedNode(selectedItem);
 
     const generateNode = (item?: AccentedTreeItemProps | AccentedTreeItemProps[], level: number = 0): ReactNode => {
@@ -244,6 +246,7 @@ export default function AccentedTreeView({
                             </>
                         );
                 }
+                if (item.isAccented) accentedNodes.push(item.id);
                 return (
                     <AccentedTreeItem
                         key={item.id}
@@ -264,13 +267,30 @@ export default function AccentedTreeView({
             }
         }
     };
+    const toggledNodeIsExpanded = (toggledNodes: string[]) => {
+        if (selectedNode) {
+            if (
+                expandedNodes.includes(selectedNode)
+                    ? !toggledNodes.includes(selectedNode)
+                    : toggledNodes.includes(selectedNode)
+            )
+                return true;
+            for (const accentedNode of accentedNodes) {
+                if (
+                    expandedNodes.includes(accentedNode)
+                        ? !toggledNodes.includes(accentedNode)
+                        : toggledNodes.includes(accentedNode)
+                )
+                    return true;
+            }
+        }
+        return false;
+    };
     const onToggle: UseTreeViewExpansionParameters["onNodeToggle"] = (e: React.SyntheticEvent, toggled) => {
         if (
             (e.target as HTMLElement).closest(".MuiTreeItem-iconContainer") ||
             disableSelection ||
-            (selectedNode && expandedNodes.includes(selectedNode)
-                ? !toggled.includes(selectedNode)
-                : toggled.includes(selectedNode!))
+            toggledNodeIsExpanded(toggled)
         )
             setExpandedNodes(toggled);
     };

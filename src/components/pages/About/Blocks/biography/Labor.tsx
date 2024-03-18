@@ -77,7 +77,7 @@ function DataTable({ data, withoutBottomBorder = false }: { data: Data; withoutB
     return <DescriptionTable withoutBottomBorder={withoutBottomBorder}>{data}</DescriptionTable>;
 }
 
-export default function AboutLaborBlock() {
+export default function AboutBioLaborBlock() {
     return (
         <>
             <AccentedTreeView expandedNodes={["it", "itKubanskieProdukty"]} disableSelection={true}>

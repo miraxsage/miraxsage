@@ -7,7 +7,7 @@ import BadgeIcon from "@mui/icons-material/Badge";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import SailingIcon from "@mui/icons-material/Sailing";
 
-export default function AboutQuestionaireBlock() {
+export default function AboutBioQuestionaireBlock() {
     return (
         <>
             <AccentedTreeView expandedNodes={["about"]} disableSelection={true}>

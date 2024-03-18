@@ -5,13 +5,16 @@ import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import CallIcon from "@mui/icons-material/Call";
 import { capitalize } from "@/utilities/string";
-import AboutGeneralBlock from "./Blocks/General";
-import AboutEducationBlock from "./Blocks/Education";
-import AboutLaborBlock from "./Blocks/Labor";
 import { useEffect, useState } from "react";
 import categories, { AboutCategoriesKeysRecursive, AboutCategoriesType } from "./Categories";
-import AboutQuestionaireBlock from "./Blocks/Questionare";
+import AboutBioGeneralBlock from "./Blocks/biography/General";
+import AboutBioEducationBlock from "./Blocks/biography/Education";
+import AboutBioLaborBlock from "./Blocks/biography/Labor";
+import AboutBioQuestionaireBlock from "./Blocks/biography/Questionare";
 import classes from "classnames";
+import AboutExperienceTechsBlock from "./Blocks/experience/Techs";
+import AboutExperienceAdvantagesBlock from "./Blocks/experience/Advantages";
+import AboutExperienceProjectsBlock from "./Blocks/experience/Projects";
 
 const profileIcon = <AssignmentIndIcon />;
 const projectsIcon = <RocketLaunchIcon />;
@@ -21,16 +24,21 @@ export type AboutBlocksIntegratorProps<K extends keyof AboutCategoriesType> = {
     category: K;
     selectedBlock?: AboutCategoriesKeysRecursive<AboutCategoriesType[K]>;
     onSelectedBlockChanged?: (selectedBlock: string | null, expandedBlocks: string[]) => void;
+    isSwitchingRender?: boolean;
 };
 
 const blocks = {
     biography: [
-        ["general", AboutGeneralBlock],
-        ["education", AboutEducationBlock],
-        ["labor", AboutLaborBlock],
-        ["questionaire", AboutQuestionaireBlock],
+        ["general", AboutBioGeneralBlock],
+        ["education", AboutBioEducationBlock],
+        ["labor", AboutBioLaborBlock],
+        ["questionaire", AboutBioQuestionaireBlock],
     ],
-    experience: [],
+    experience: [
+        ["technologies", AboutExperienceTechsBlock],
+        ["achievements", AboutExperienceAdvantagesBlock],
+        ["projects", AboutExperienceProjectsBlock],
+    ],
     specifications: [],
     snippets: [],
 } as const;
@@ -39,6 +47,7 @@ export default function AboutBlocksIntegrator<K extends keyof AboutCategoriesTyp
     category,
     selectedBlock,
     onSelectedBlockChanged,
+    isSwitchingRender = false,
 }: AboutBlocksIntegratorProps<K>) {
     const [activeCat] = useState(category);
     const [expandedBlocks, setExpandedBlocks] = useState<string[]>([]);
@@ -115,6 +124,7 @@ export default function AboutBlocksIntegrator<K extends keyof AboutCategoriesTyp
                             expanded={expandedBlocks.includes(block)}
                             onToggle={onBlockToggle(block)}
                             category={block}
+                            withoutTransition={isSwitchingRender}
                         >
                             {<Control />}
                         </AboutBlock>

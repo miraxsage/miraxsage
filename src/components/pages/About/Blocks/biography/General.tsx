@@ -1,5 +1,5 @@
 import { Box, useMediaQuery, useTheme } from "@mui/material";
-import Avatar from "../../../Avatar";
+import Avatar from "../../../../Avatar";
 import { getThemeColor } from "@/components/contexts/Theme";
 import React from "react";
 import { DescriptionTableValue } from "@/components/DescriptionTable";
@@ -22,7 +22,7 @@ const data = [
     ["[Relocation]", "[Under review]"],
 ];
 
-export default function AboutGeneralBlock() {
+export default function AboutBioGeneralBlock() {
     const theme = useTheme();
     const borderWidth = { borderWidth: "0px 0px 1px 1px" };
     const is3xl = useMediaQuery(theme.breakpoints.only("3xl"));
