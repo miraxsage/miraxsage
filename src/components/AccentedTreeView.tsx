@@ -7,7 +7,6 @@ import { Collapse, styled } from "@mui/material";
 import { motion } from "framer-motion";
 import { getThemeColor } from "./contexts/Theme";
 import { TransitionProps } from "@mui/material/transitions";
-import { TreeItemProps } from "@mui/x-tree-view/TreeItem";
 
 declare module "@mui/x-tree-view" {
     interface TreeItemProps {
@@ -44,14 +43,6 @@ export interface AccentedTreeViewProps {
 const openedIcon = <ExpandMoreIcon />;
 const closedIcon = <ChevronRightIcon />;
 
-// react made us to make this wrapper, couse he doesn`t have any imagination about StyledTreeItemProps and give annoying warnings
-function TreeItemStyledWrapper(props: TreeItemProps & StyledTreeItemProps) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const treeProps: any = { ...props };
-    ["level", "isAccented", "hasIcon", "hasChildren", "isContentedItem"].forEach((p) => delete treeProps[p]);
-    return <TreeItem {...treeProps} />;
-}
-
 interface StyledTreeItemProps {
     level: number;
     isAccented?: boolean;
@@ -61,7 +52,9 @@ interface StyledTreeItemProps {
     intend: "regular" | "double";
 }
 
-const AccentedTreeItem = styled(TreeItemStyledWrapper)<StyledTreeItemProps>(
+const AccentedTreeItem = styled(TreeItem, {
+    shouldForwardProp: (prop) => !String(prop).match(/^level|isAccented|hasIcon|hasChildren|isContentedItem$/),
+})<StyledTreeItemProps>(
     ({
         theme,
         level,

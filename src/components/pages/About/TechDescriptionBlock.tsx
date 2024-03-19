@@ -1,6 +1,6 @@
 import CustomBreadcrumbs from "@/components/Breadcrumbs";
 import { capitalize } from "@/utilities/string";
-import { Box, SxProps, styled, useTheme } from "@mui/material";
+import { Box } from "@mui/material";
 import HTMLIcon from "@/components/icons/HTMLIcon";
 import CSSIcon from "@/components/icons/CSSIcon";
 import JSIcon from "@/components/icons/JSIcon";
@@ -23,9 +23,8 @@ import OneCIcon from "@/components/icons/OneCIcon";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import MusclesIcon from "@/components/icons/MusclesIcon";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
-import { getThemeColor, useThemeColor } from "@/components/contexts/Theme";
-import { useNavigate } from "react-router-dom";
-import { ReactNode } from "react";
+import { useThemeColor } from "@/components/contexts/Theme";
+import DescriptionPanel from "@/components/DescriptionPanel";
 
 const data: { [k: string]: { description: string; techs: [string, string, React.FC?][] } } = {
     Frontend: {
@@ -78,120 +77,60 @@ function Separator() {
     return <Box sx={{ color: useThemeColor("regularText"), opacity: 0.5 }}>+</Box>;
 }
 
-const DescriptionElement = styled(Box)(({ theme }) => ({
-    padding: "6px 14px",
-    borderStyle: "solid",
-    borderTopWidth: "1px",
-    borderColor: theme.palette.divider,
-}));
-
-function DescriptionButton({ link, children, sx }: { link?: string; children?: ReactNode; sx?: SxProps }) {
-    const theme = useTheme();
-    const navigate = useNavigate();
-    return (
-        <Box
-            component="a"
-            sx={{
-                display: "block",
-                padding: "8px 18px",
-                borderStyle: "solid",
-                borderWidth: "1px 1px 0px 0px",
-                borderColor: theme.palette.divider,
-                color: getThemeColor("regularText", theme),
-                cursor: !link ? "auto" : "pointer",
-                "&:last-child": { borderRightWidth: 0 },
-                "&:hover": !link
-                    ? {}
-                    : {
-                          textDecoration: "underline",
-                          textUnderlineOffset: "4px",
-                          transition: "background 0.25s",
-                          background: getThemeColor("titleBg", theme),
-                      },
-                "& .MuiSvgIcon-root": {
-                    color: getThemeColor("regularIcon", theme),
-                },
-                ...sx,
-            }}
-            onClick={
-                link
-                    ? (e) => {
-                          e.preventDefault();
-                          navigate(link);
-                      }
-                    : undefined
-            }
-        >
-            {children}
-        </Box>
-    );
-}
-
-const DescriptionButtonsContainer = styled(Box)(() => ({
-    display: "flex",
-}));
-
 export default function TechDescriptionBlock({ category, withoutBottomBorder }: TechnologiesDescriptionBlock) {
-    const theme = useTheme();
     return (
-        <Box
-            tabIndex={-1}
-            sx={{
-                userSelect: "text",
-                cursor: "auto",
-                borderStyle: "solid",
-                borderColor: theme.palette.divider,
-                borderWidth: withoutBottomBorder ? "1px 0px 0px 1px" : "1px 0px 1px 1px",
-            }}
-        >
-            <CustomBreadcrumbs
-                sx={{
-                    marginBottom: "4px",
-                    padding: "3px 12px",
-                    "& .MuiBreadcrumbs-ol": {
-                        lineHeight: "32px",
+        <DescriptionPanel withoutBottomBorder={withoutBottomBorder}>
+            {{
+                elements: [
+                    <CustomBreadcrumbs
+                        sx={{
+                            marginBottom: "4px",
+                            padding: "3px 12px",
+                            "& .MuiBreadcrumbs-ol": {
+                                lineHeight: "32px",
+                            },
+                        }}
+                        maxItems={20}
+                        separator={<Separator />}
+                        withoutExpandIcon={true}
+                    >
+                        {data[capitalize(category)].techs.map(([tech, datalink, Icon]) => ({
+                            label: tech,
+                            icon: Icon && <Icon />,
+                            subitems: [
+                                {
+                                    label: tech + "-проекты",
+                                    icon: <RocketLaunchIcon />,
+                                    link: "/projects?cats=" + tech.toLowerCase(),
+                                },
+                                {
+                                    label: tech + "-навыки",
+                                    icon: <MusclesIcon />,
+                                    link: "/about/skills/hard",
+                                },
+                                {
+                                    label: "Документация",
+                                    icon: <MenuBookIcon />,
+                                    link: datalink,
+                                },
+                            ],
+                        }))}
+                    </CustomBreadcrumbs>,
+                    data[capitalize(category)].description,
+                ],
+                buttons: [
+                    {
+                        label: "Проекты",
+                        icon: <RocketLaunchIcon sx={{ fontSize: "20px", marginRight: "8px" }} />,
+                        link: `/projects?cats=${category}`,
                     },
-                }}
-                maxItems={20}
-                separator={<Separator />}
-                withoutExpandIcon={true}
-            >
-                {data[capitalize(category)].techs.map(([tech, datalink, Icon]) => ({
-                    label: tech,
-                    icon: Icon && <Icon />,
-                    subitems: [
-                        {
-                            label: tech + "-проекты",
-                            icon: <RocketLaunchIcon />,
-                            link: "/projects?cats=" + tech.toLowerCase(),
-                        },
-                        {
-                            label: tech + "-навыки",
-                            icon: <MusclesIcon />,
-                            link: "/about/skills/hard",
-                        },
-                        {
-                            label: "Документация",
-                            icon: <MenuBookIcon />,
-                            link: datalink,
-                        },
-                    ],
-                }))}
-            </CustomBreadcrumbs>
-            <DescriptionElement>{data[capitalize(category)].description}</DescriptionElement>
-            <DescriptionButtonsContainer>
-                <DescriptionButton link={`/projects?cats=${category}`}>
-                    <RocketLaunchIcon sx={{ fontSize: "20px", marginRight: "8px" }} />
-                    Проекты
-                </DescriptionButton>
-                <DescriptionButton link="/about/skills/hard">
-                    <Box component="span" sx={{ "& .MuiSvgIcon-root": { fontSize: "20px" }, marginRight: "8px" }}>
-                        <MusclesIcon />
-                    </Box>
-                    Навыки
-                </DescriptionButton>
-                <DescriptionButton sx={{ flexGrow: 1 }} />
-            </DescriptionButtonsContainer>
-        </Box>
+                    {
+                        label: "Навыки",
+                        icon: <MusclesIcon />,
+                        link: `/about/skills/hard`,
+                    },
+                ],
+            }}
+        </DescriptionPanel>
     );
 }
