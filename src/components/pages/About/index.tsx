@@ -258,11 +258,11 @@ export default function About() {
                                         opacity: cat == activeCat ? 1 : 0,
                                         clipPath:
                                             cat == activeCat
-                                                ? ["circle(75% at 50% -125%)", "circle(75% at 50% 50%)"]
+                                                ? ["circle(75% at 50% -305%)", "circle(75% at 50% 50%)"]
                                                 : ["circle(75% at 50% 50%)"],
                                     }}
                                     transition={{
-                                        duration: 0.3,
+                                        duration: 0.4,
                                         opacity: { duration: cat == activeCat ? 0 : 0.4 },
                                         display: { delay: cat == activeCat ? 0 : 0.4 },
                                     }}

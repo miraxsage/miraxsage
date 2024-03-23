@@ -1,5 +1,5 @@
 import AccentedTreeView from "@/components/AccentedTreeView";
-import TechDescriptionBlock from "../../TechDescriptionBlock";
+import TechDescriptionBlock from "./TechDescriptionBlock";
 import MarkupIcon from "@/components/icons/MarkupIcon";
 import TerminalIcon from "@/components/icons/TerminalIcon";
 import PersonalVideoIcon from "@mui/icons-material/PersonalVideo";

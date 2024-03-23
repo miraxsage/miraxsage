@@ -212,6 +212,7 @@ export type ThemeColors =
     | "secondaryHoverGdBg"
     | "regularText"
     | "regularIcon"
+    | "notelessText"
     | "menuText"
     | "accentedText"
     | "secondaryText"
@@ -285,6 +286,8 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
             )});`;
         case "regularText":
             return isDarkMode ? lighten(theme.palette.divider, 0.35) : darken(theme.palette.contrast.main, 0.45);
+        case "notelessText":
+            return isDarkMode ? lighten(theme.palette.divider, 0.07) : lighten(theme.palette.contrast.main, 0.15);
         case "menuText":
             return isDarkMode ? lighten(theme.palette.divider, 0.65) : darken(theme.palette.contrast.main, 0.15);
         case "regularIcon":

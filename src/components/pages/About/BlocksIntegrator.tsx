@@ -15,6 +15,9 @@ import classes from "classnames";
 import AboutExperienceTechsBlock from "./Blocks/experience/Techs";
 import AboutExperienceAdvantagesBlock from "./Blocks/experience/Advantages";
 import AboutExperienceProjectsBlock from "./Blocks/experience/Projects";
+import AboutSpecsSoftSkillsBlock from "./Blocks/specs/SoftSkills";
+import AboutSpecsHardSkillsBlock from "./Blocks/specs/HardSkills";
+import AboutSpecsMetricsBlock from "./Blocks/specs/Metrics";
 
 const profileIcon = <AssignmentIndIcon />;
 const projectsIcon = <RocketLaunchIcon />;
@@ -39,7 +42,11 @@ const blocks = {
         ["achievements", AboutExperienceAdvantagesBlock],
         ["projects", AboutExperienceProjectsBlock],
     ],
-    specifications: [],
+    specifications: [
+        ["soft-skills", AboutSpecsSoftSkillsBlock],
+        ["hard-skills", AboutSpecsHardSkillsBlock],
+        ["metrics", AboutSpecsMetricsBlock],
+    ],
     snippets: [],
 } as const;
 

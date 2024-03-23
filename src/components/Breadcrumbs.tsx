@@ -1,13 +1,13 @@
 import * as React from "react";
-import { lighten, styled, useTheme } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
-import Chip from "@mui/material/Chip";
 import HomeIcon from "@mui/icons-material/Home";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { getThemeColor } from "./contexts/Theme";
 import { ListItemIcon, Menu, MenuItem, BreadcrumbsProps } from "@mui/material";
 import { AtLeastOneImportantFieldFromGiven } from "@/types/common";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { CustomChip } from "./Chip";
 
 type BasicBreadcrumbItem = {
     label: string;
@@ -22,28 +22,6 @@ export type CustomBreadcrumbsProps = {
     children: BreadcrumbItem[];
     withoutExpandIcon?: boolean;
 } & Omit<BreadcrumbsProps, "children">;
-
-const StyledBreadcrumb = styled(Chip)(({ theme }) => {
-    const backgroundColor = getThemeColor("layoutBackground", theme);
-    return {
-        backgroundColor,
-        height: theme.spacing(3),
-        color: getThemeColor("regularText", theme),
-        fontSize: "1.1rem",
-        cursor: "pointer",
-        "&:hover, &:focus": {
-            backgroundColor: getThemeColor("regularHoverBg", theme),
-        },
-        "&:active": {
-            boxShadow: theme.shadows[1],
-            backgroundColor: lighten(getThemeColor("regularHoverBg", theme), 0.05),
-        },
-        "& .MuiChip-icon": {
-            color: getThemeColor("regularIcon", theme),
-            fontSize: "20px",
-        },
-    };
-}) as typeof Chip;
 
 const expandMoreIcon = <ExpandMoreIcon />;
 const homeIcon = <HomeIcon />;
@@ -75,7 +53,7 @@ export default function CustomBreadcrumbs({
         <div>
             <Breadcrumbs sx={{ marginBottom: "18px", ...sx }} {...props}>
                 {children.map((breadcrumb, i) => (
-                    <StyledBreadcrumb
+                    <CustomChip
                         component={
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             !breadcrumb.link ? undefined : (RouterLink as any)
