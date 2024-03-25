@@ -1,5 +1,5 @@
 import { getThemeColor } from "@/components/contexts/Theme";
-import { styled, useTheme } from "@mui/material";
+import { styled, useMediaQuery, useTheme } from "@mui/material";
 import { Box } from "@mui/material";
 import { ReactNode, useState } from "react";
 import { CustomChip } from "@/components/Chip";
@@ -44,7 +44,7 @@ function Diagramm({ icon, level, averageLevel, totalLevel, accentedElement }: Di
             <div className="flex self-center h-full max-h-24">
                 <Box
                     sx={{
-                        width: "1px",
+                        width: "2px",
                         marginRight: "5px",
                         background: accentedElement == "total" ? totalToColor : dividerColor,
                         transition: "all 0.2s",
@@ -52,7 +52,7 @@ function Diagramm({ icon, level, averageLevel, totalLevel, accentedElement }: Di
                 ></Box>
                 <Box
                     sx={{
-                        width: "1px",
+                        width: "2px",
                         marginRight: "5px",
                         backgroundImage: `linear-gradient(transparent 0%, transparent ${
                             100 - averagePercent
@@ -61,7 +61,7 @@ function Diagramm({ icon, level, averageLevel, totalLevel, accentedElement }: Di
                 ></Box>
                 <Box
                     sx={{
-                        width: "1px",
+                        width: "2px",
                         transition: "all 0.2s",
                         marginRight: "10px",
                         backgroundImage: `linear-gradient(transparent 0%, transparent ${
@@ -73,7 +73,7 @@ function Diagramm({ icon, level, averageLevel, totalLevel, accentedElement }: Di
             <Box
                 sx={{
                     borderRadius: "50%",
-                    padding: "1px",
+                    padding: "2px",
                     alignSelf: "center",
                     backgroundImage: `conic-gradient(from 0deg, ${averageFromColor} 0%, ${averageToColor} ${averagePercent}%, transparent ${averagePercent}%)`,
                 }}
@@ -88,7 +88,7 @@ function Diagramm({ icon, level, averageLevel, totalLevel, accentedElement }: Di
                     <Box
                         sx={{
                             borderRadius: "50%",
-                            padding: "1px",
+                            padding: "2px",
                             backgroundImage: `conic-gradient(from 0deg, ${levelFromColor} 0%, ${levelToColor} ${levelPercent}%, transparent ${levelPercent}%)`,
                         }}
                     >
@@ -153,6 +153,7 @@ export default function SoftSkillDescriptionBlock({
     averageLevel,
 }: SoftSkillDescriptionBlockProps) {
     const theme = useTheme();
+    const belowlg = useMediaQuery(theme.breakpoints.down("lg"));
     const [accentedElement, setAccentedElement] = useState<DiagrammProps["accentedElement"]>();
     const levelPercent = Math.round((100 * level) / totalLevel);
     const averagePercent = Math.round((100 * averageLevel) / totalLevel);
@@ -170,16 +171,17 @@ export default function SoftSkillDescriptionBlock({
             <Box
                 sx={{
                     background: getThemeColor("titleBg", theme),
-                    padding: "12px",
+                    padding: belowlg ? "10px" : "12px",
                     border: `1px solid ${theme.palette.divider}`,
                     display: "flex",
                     alignItems: "center",
                     borderWidth: "0px 1px 0px 0px",
+                    gridRow: "span " + (belowlg ? 2 : 1),
                 }}
             >
                 {number}
             </Box>
-            <div className="flex flex-col px-4 py-3">
+            <div className={"flex flex-col " + (belowlg ? "px-3 py-2" : "px-4 py-3")}>
                 <div
                     className="flex gap-2 flex-wrap"
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -198,7 +200,7 @@ export default function SoftSkillDescriptionBlock({
                         <MetricChip data-kind="level" label={`${levelPercent}%`} icon={<BarChartIcon />} />
                     </div>
                 </div>
-                {description}
+                {!belowlg && description}
             </div>
             <Diagramm
                 icon={icon}
@@ -207,6 +209,7 @@ export default function SoftSkillDescriptionBlock({
                 totalLevel={totalLevel}
                 accentedElement={accentedElement}
             />
+            {belowlg && <Box sx={{ gridColumn: "span 2", padding: "5px 8px 8px 8px" }}>{description}</Box>}
         </Box>
     );
 }

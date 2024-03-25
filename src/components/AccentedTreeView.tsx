@@ -138,6 +138,12 @@ const AccentedTreeItem = styled(TreeItem, {
             ? {
                   "& > .MuiTreeItem-content": {
                       cursor: "auto",
+                      paddingTop: 0,
+                      paddingRight: 0,
+                      paddingBotton: 0,
+                      "& .MuiTreeItem-label": {
+                          paddingLeft: "6px",
+                      },
                   },
                   "& > .MuiTreeItem-content:hover": {
                       background: "transparent",

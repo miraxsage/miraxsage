@@ -125,6 +125,27 @@ export const lightTheme = createTheme(
                     },
                 },
             },
+            MuiMenu: {
+                styleOverrides: {
+                    paper: {
+                        boxShadow: "0px 8px 10px 1px rgba(0,0,0,0.1),0px 3px 14px 2px rgba(0,0,0,0.12)",
+                    },
+                },
+            },
+            MuiTooltip: {
+                styleOverrides: {
+                    table: {
+                        boxShadow: "0px 3px 14px 2px rgba(0,0,0,0.12)",
+                    },
+                },
+            },
+            MuiChartsTooltip: {
+                styleOverrides: {
+                    table: {
+                        boxShadow: "0px 3px 14px 2px rgba(0,0,0,0.12)",
+                    },
+                },
+            },
         },
     }) as ThemeOptions
 );
@@ -178,6 +199,19 @@ export const darkTheme = createTheme(
                     },
                 },
             },
+            MuiChartsTooltip: {
+                styleOverrides: {
+                    container: {
+                        borderColor: "#3d4259",
+                        background: "#1d1f2d",
+                    },
+                    table: {
+                        background: "#1d1f2d",
+                        boxShadow:
+                            "0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)",
+                    },
+                },
+            },
             MuiTooltip: {
                 styleOverrides: {
                     tooltip: {
@@ -202,6 +236,8 @@ export type ThemeColors =
     | "scrollbarHoverHandle"
     | "layoutGlow"
     | "titleBg"
+    | "accentedNotelessBg"
+    | "secondaryNotelessBg"
     | "accentedBg"
     | "secondaryBg"
     | "accentedGdBg"
@@ -217,6 +253,7 @@ export type ThemeColors =
     | "accentedText"
     | "secondaryText"
     | "regularHoverText"
+    | "regularHoverIcon"
     | "accentedHoverText"
     | "secondaryHoverText"
     | "regularHoverBg"
@@ -293,7 +330,9 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
         case "regularIcon":
             return isDarkMode ? lighten(theme.palette.divider, 0.35) : darken(theme.palette.contrast.main, 0.05);
         case "regularHoverText":
-            return isDarkMode ? lighten(theme.palette.divider, 0.65) : theme.palette.contrast.main;
+            return isDarkMode ? lighten(theme.palette.divider, 0.65) : darken(theme.palette.contrast.main, 0.8);
+        case "regularHoverIcon":
+            return isDarkMode ? lighten(theme.palette.divider, 0.55) : darken(theme.palette.contrast.main, 0.5);
         case "accentedText":
             return alpha(theme.palette.primary.main, 0.75);
         case "accentedHoverText":
@@ -304,10 +343,14 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
             return isDarkMode ? theme.palette.secondary.light : theme.palette.secondary.dark;
         case "regularHoverBg":
             return alpha(theme.palette.divider, 0.3);
+        case "accentedNotelessBg":
+            return alpha(theme.palette.primary.main, 0.03);
         case "accentedBg":
             return alpha(theme.palette.primary.main, 0.1);
         case "accentedHoverBg":
             return alpha(theme.palette.primary.main, 0.15);
+        case "secondaryNotelessBg":
+            return isDarkMode ? alpha(theme.palette.secondary.light, 0.03) : alpha(theme.palette.secondary.main, 0.08);
         case "secondaryBg":
             return isDarkMode ? alpha(theme.palette.secondary.light, 0.1) : alpha(theme.palette.secondary.main, 0.18);
         case "secondaryHoverBg":

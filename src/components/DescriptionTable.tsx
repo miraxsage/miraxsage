@@ -66,7 +66,7 @@ export function ScoreModifier({
     const color = mix(
         isDarkMode ? theme.palette.success.main : theme.palette.success.light,
         isDarkMode ? theme.palette.error.main : theme.palette.error.light,
-        (value * 100) / total
+        (Math.min(value, total) * 100) / total
     );
     return (
         <Box component="span" sx={{ margin: "0px 5px" }}>

@@ -25,3 +25,31 @@ export function mix(color1: string, color2: string, weight: number) {
     }
     return color;
 }
+
+const chartGradientPoints = [
+    { color: "53c6b7", point: 0 },
+    { color: "33c4f4", point: 20 },
+    { color: "5353ce", point: 40 },
+    { color: "6953af", point: 60 },
+    { color: "9001cb", point: 80 },
+    { color: "da00ff", point: 100 },
+];
+function extractGradientColor(position: number) {
+    if (position < 0) position = 0;
+    if (position > 100) position = 100;
+    for (let i = 0; i < chartGradientPoints.length - 1; i++) {
+        const from = chartGradientPoints[i];
+        const to = chartGradientPoints[i + 1];
+        if (position >= from.point && position <= to.point)
+            return mix(from.color, to.color, (100 * (to.point - position)) / (to.point - from.point));
+    }
+    return "#000000";
+}
+export function chartColors(count: number) {
+    if (count <= 0) return [];
+    if (count == 1) return [extractGradientColor(25)];
+    const result = [];
+    const inc = 100 / (count - 1);
+    for (let i = 0; Math.floor(i) <= 100; i += inc) result.push(extractGradientColor(i));
+    return result;
+}

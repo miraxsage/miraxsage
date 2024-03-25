@@ -1,7 +1,7 @@
 {
     "profile": "профиль",
     "about": "резюме",
-    "projects": ["проекты", "портфолио"],
+    "projects": ["проекты", "портфолио", "проектов"],
     "interact": "контакты",
 
     "biography": "биография",
@@ -98,5 +98,17 @@
     "integrity": "добросовестность",
     "passion": "увлеченность",
     "issue solving": "решение проблем",
-    "persistence": "упорство"
+    "persistence": "упорство",
+
+    "low": "низкий",
+    "below average": "ниже среднего",
+    "average": "средний",
+    "above average": "выше среднего",
+    "high": "высокий",
+    "spread": "распределение",
+    "statistic": "статистика",
+    "level": "уровень",
+    "proficiency level": "уровень владения",
+    "technology": "технология",
+    "visualtization": "визуализация"
 }
