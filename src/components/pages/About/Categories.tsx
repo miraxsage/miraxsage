@@ -52,19 +52,19 @@ const categories = {
     },
     snippets: {
         icon: <DataObjectIcon />,
-        items: {
-            js: { icon: null },
-            ts: { icon: null },
-            php: { icon: null },
-            cs: { icon: null },
-            ["1c"]: { icon: null },
-        },
     },
 } satisfies AboutCategoriesInterface;
 
 export default categories;
 
 export type AboutCategoriesType = typeof categories;
+
+export type AboutCategories = keyof AboutCategoriesType;
+
+export type AboutContentfulCategories = Exclude<AboutCategories, "snippets">;
+
+export type AboutSubCategories<K extends AboutContentfulCategories = AboutContentfulCategories> =
+    AboutCategoriesKeysRecursive<AboutCategoriesType, K>;
 
 export type AboutCategoriesKeysRecursive<T extends object, K extends keyof T = keyof T> = T extends {
     icon: unknown;
@@ -87,4 +87,8 @@ export function findCategory(id: string, initialCats?: AboutCategoriesInterface)
         if (cats[i][1].items) cats.push(...Object.entries(cats[i][1].items));
     }
     return null;
+}
+
+export function hasSubcategories(cat: AboutCategories): cat is AboutContentfulCategories {
+    return "items" in categories[cat];
 }

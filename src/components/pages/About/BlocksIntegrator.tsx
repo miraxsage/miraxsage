@@ -6,7 +6,7 @@ import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import CallIcon from "@mui/icons-material/Call";
 import { capitalize } from "@/utilities/string";
 import { useEffect, useState } from "react";
-import categories, { AboutCategoriesKeysRecursive, AboutCategoriesType } from "./Categories";
+import categories, { AboutCategoriesKeysRecursive, AboutCategoriesType, hasSubcategories } from "./Categories";
 import AboutBioGeneralBlock from "./Blocks/biography/General";
 import AboutBioEducationBlock from "./Blocks/biography/Education";
 import AboutBioLaborBlock from "./Blocks/biography/Labor";
@@ -18,6 +18,9 @@ import AboutExperienceProjectsBlock from "./Blocks/experience/Projects";
 import AboutSpecsSoftSkillsBlock from "./Blocks/specs/SoftSkills";
 import AboutSpecsHardSkillsBlock from "./Blocks/specs/HardSkills";
 import AboutSpecsMetricsBlock from "./Blocks/specs/Metrics";
+import AboutSpecsSnippetsBlock from "./Blocks/snippets/Snippets";
+import { Box, useTheme } from "@mui/material";
+import CustomScrollbar from "@/components/Scrollbar";
 
 const profileIcon = <AssignmentIndIcon />;
 const projectsIcon = <RocketLaunchIcon />;
@@ -47,7 +50,7 @@ const blocks = {
         ["hard-skills", AboutSpecsHardSkillsBlock],
         ["metrics", AboutSpecsMetricsBlock],
     ],
-    snippets: [],
+    snippets: AboutSpecsSnippetsBlock,
 } as const;
 
 export default function AboutBlocksIntegrator<K extends keyof AboutCategoriesType>({
@@ -56,9 +59,11 @@ export default function AboutBlocksIntegrator<K extends keyof AboutCategoriesTyp
     onSelectedBlockChanged,
     isSwitchingRender = false,
 }: AboutBlocksIntegratorProps<K>) {
+    const theme = useTheme();
     const [activeCat] = useState(category);
     const [expandedBlocks, setExpandedBlocks] = useState<string[]>([]);
-    if (!selectedBlock || blocks[activeCat].every(([b]) => b != selectedBlock)) selectedBlock = undefined;
+    if (!selectedBlock || !hasSubcategories(activeCat) || blocks[activeCat].every(([b]) => b != selectedBlock))
+        selectedBlock = undefined;
     const onBlockToggle = (block: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
         const newExpandedBlocks = isExpanded ? [...expandedBlocks, block] : expandedBlocks.filter((b) => b != block);
         setExpandedBlocks(newExpandedBlocks);
@@ -70,7 +75,9 @@ export default function AboutBlocksIntegrator<K extends keyof AboutCategoriesTyp
     }, [selectedBlock]);
     return (
         <>
-            <CustomBreadcrumbs>
+            <CustomBreadcrumbs
+                sx={{ borderBottom: `1px solid ${theme.palette.divider}`, padding: "6px 8px", margin: 0 }}
+            >
                 {(() => {
                     const items = [
                         { label: "Miraxsage", link: "/" },
@@ -105,7 +112,7 @@ export default function AboutBlocksIntegrator<K extends keyof AboutCategoriesTyp
                                 link: "/about/" + key,
                             })),
                     });
-                    if (selectedBlock)
+                    if (selectedBlock && hasSubcategories(category))
                         items.push({
                             label: __(capitalize(selectedBlock)),
                             subitems: Object.entries(categories[category]["items"])
@@ -119,24 +126,41 @@ export default function AboutBlocksIntegrator<K extends keyof AboutCategoriesTyp
                     return items;
                 })()}
             </CustomBreadcrumbs>
-            <div>
-                {blocks[activeCat].map(([block, Control], i) => {
-                    const subBlocks = blocks[activeCat];
-                    const prevExpanded = i > 0 && expandedBlocks.includes(subBlocks[i - 1][0]);
-                    const nextExpanded = i < subBlocks.length - 1 && expandedBlocks.includes(subBlocks[i + 1][0]);
-                    return (
-                        <AboutBlock
-                            key={block}
-                            className={classes({ "prev-expanded": prevExpanded, "next-expanded": nextExpanded })}
-                            expanded={expandedBlocks.includes(block)}
-                            onToggle={onBlockToggle(block)}
-                            category={block}
-                            withoutTransition={isSwitchingRender}
-                        >
-                            {<Control />}
-                        </AboutBlock>
-                    );
-                })}
+
+            <div style={{ height: "100%" }}>
+                {hasSubcategories(activeCat) && (
+                    <CustomScrollbar right="4.5px" bottom="5px" top="5px">
+                        <Box sx={{ padding: "17px 15px 17px 14px" }}>
+                            {blocks[activeCat].map(([block, Control], i) => {
+                                const subBlocks = blocks[activeCat];
+                                const prevExpanded = i > 0 && expandedBlocks.includes(subBlocks[i - 1][0]);
+                                const nextExpanded =
+                                    i < subBlocks.length - 1 && expandedBlocks.includes(subBlocks[i + 1][0]);
+                                return (
+                                    <AboutBlock
+                                        key={block}
+                                        className={classes({
+                                            "prev-expanded": prevExpanded,
+                                            "next-expanded": nextExpanded,
+                                        })}
+                                        expanded={expandedBlocks.includes(block)}
+                                        onToggle={onBlockToggle(block)}
+                                        category={block}
+                                        withoutTransition={isSwitchingRender}
+                                    >
+                                        {<Control />}
+                                    </AboutBlock>
+                                );
+                            })}
+                        </Box>
+                    </CustomScrollbar>
+                )}
+                {(() => {
+                    if (!hasSubcategories(activeCat) && blocks[activeCat]) {
+                        const Component = blocks[activeCat] as React.FC;
+                        return <Component />;
+                    }
+                })()}
             </div>
         </>
     );

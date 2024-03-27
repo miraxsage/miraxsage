@@ -10,7 +10,14 @@ import AccentedTabs from "@/components/AccentedTabs";
 import __ from "@/utilities/transtation";
 import React, { NamedExoticComponent, useLayoutEffect, useReducer, useRef, useState } from "react";
 import { getThemeColor, useThemeColor } from "@/components/contexts/Theme";
-import categories, { AboutCategoriesKeysRecursive, AboutCategoriesType, findCategory } from "./Categories";
+import categories, {
+    AboutCategories,
+    AboutCategoriesKeysRecursive,
+    AboutCategoriesType,
+    AboutContentfulCategories,
+    findCategory,
+    hasSubcategories,
+} from "./Categories";
 import CustomScrollbar from "@/components/Scrollbar";
 import { Params, useLocation, useNavigate, useParams } from "react-router-dom";
 import AboutBlocksIntegrator from "./BlocksIntegrator";
@@ -112,7 +119,9 @@ export default function About() {
             if (cat ? !openedCats.includes(cat) : openedCats.length) setOpenedCats(!cat ? [] : [...openedCats, cat]);
         }
         if (cat) {
-            const catBlocks = Object.keys(categories[cat as keyof AboutCategoriesType]["items"]);
+            const catBlocks = hasSubcategories(cat as AboutCategories)
+                ? Object.keys(categories[cat as AboutContentfulCategories]["items"])
+                : [];
             if (block && !catBlocks.includes(block)) block = catBlocks[0];
         }
         if (block != selectedCat) setSelectedCat(block);
@@ -126,23 +135,28 @@ export default function About() {
         let newActiveBlock = !newActiveCat ? null : params.block ? params.block : selectedCat;
         if (newActiveCat && !Object.keys(categories).includes(newActiveCat)) newActiveCat = "biography";
         if (
+            hasSubcategories(newActiveCat as AboutCategories) &&
             newActiveBlock &&
             newActiveBlock != newActiveCat &&
-            !Object.keys(categories[newActiveCat as keyof AboutCategoriesType]["items"]).includes(newActiveBlock)
+            !Object.keys(categories[newActiveCat as AboutContentfulCategories]["items"]).includes(newActiveBlock)
         )
-            newActiveBlock = Object.keys(categories[newActiveCat as keyof AboutCategoriesType]["items"])[0];
+            newActiveBlock = Object.keys(categories[newActiveCat as AboutContentfulCategories]["items"])[0];
         setActiveCatAndBlock(newActiveCat, newActiveBlock);
     });
 
     if (activeCat && !(activeCat in catsBlocksIntegrators)) {
-        const integratorCat = activeCat as keyof AboutCategoriesType;
+        const integratorCat = activeCat as AboutCategories;
         let isSwitchingRender = true;
         catsBlocksIntegrators[integratorCat] = {
             activeBlock: selectedCat,
             integrator: React.memo(
                 ({ cat, block, params }) => {
                     catsBlocksIntegrators[cat]!.activeBlock =
-                        block && findCategory(block, categories[cat]["items"]) ? block : null;
+                        block &&
+                        hasSubcategories(cat) &&
+                        findCategory(block, categories[cat as AboutContentfulCategories]["items"])
+                            ? block
+                            : null;
                     setTimeout(function () {
                         // use timeout because of React.StrictMode twice render
                         isSwitchingRender = false;
@@ -186,7 +200,7 @@ export default function About() {
                                 );
                             } else {
                                 const rootCategory = rootCats.find(
-                                    (c) => !!findCategory(item.id, categories[c as keyof AboutCategoriesType].items)
+                                    (c) => !!findCategory(item.id, categories[c as AboutContentfulCategories].items)
                                 );
                                 if (rootCategory) {
                                     if (!openedCats.includes(rootCategory))
@@ -199,7 +213,7 @@ export default function About() {
                 </CustomScrollbar>
             </Box>
             <Box className="w-px h-full" sx={{ backgroundColor: "divider" }} />
-            <Box className="grid w-full" sx={{ gridTemplateRows: "auto 1fr" }}>
+            <Box className="grid w-full" sx={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
                 {!!openedCats.length && (
                     <AccentedTabs
                         size="small"
@@ -229,53 +243,64 @@ export default function About() {
                         }))}
                     </AccentedTabs>
                 )}{" "}
-                <CustomScrollbar right="4.5px" top="4px" bottom="4px">
-                    {activeCat && (
-                        <Box
-                            sx={{
-                                display: "grid",
-                                position: "relative",
-                                padding: "17px 15px 17px 14px",
-                            }}
-                            ref={blocksIntegratorContainer}
-                        >
-                            {Object.entries(catsBlocksIntegrators).map(([cat, { integrator: Integrator }]) => (
-                                <motion.div
-                                    style={{
-                                        gridArea: "1/1/1/1",
-                                        zIndex: cat == activeCat ? 1 : 0,
-                                        background: getThemeColor("layoutBackground", theme),
-                                    }}
-                                    key={`${cat}-integrator`}
-                                    data-id={`${cat}-integrator`}
-                                    initial={
-                                        Object.keys(catsBlocksIntegrators).length > 1
-                                            ? { opacity: 0, clipPath: "circle(75% at 50% -125%)" }
-                                            : false
-                                    }
-                                    animate={{
-                                        display: cat == activeCat ? "block" : "none",
-                                        opacity: cat == activeCat ? 1 : 0,
-                                        clipPath:
-                                            cat == activeCat
-                                                ? ["circle(75% at 50% -305%)", "circle(75% at 50% 50%)"]
-                                                : ["circle(75% at 50% 50%)"],
-                                    }}
-                                    transition={{
-                                        duration: 0.4,
-                                        opacity: { duration: cat == activeCat ? 0 : 0.4 },
-                                        display: { delay: cat == activeCat ? 0 : 0.4 },
-                                    }}
-                                >
-                                    {
-                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                        <Integrator cat={activeCat as any} block={selectedCat as any} params={params} />
-                                    }
-                                </motion.div>
-                            ))}
-                        </Box>
-                    )}
-                </CustomScrollbar>
+                {/* <CustomScrollbar right="4.5px" top="4px" bottom="4px"> */}
+                {activeCat && (
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateRows: "minmax(0, 1fr)",
+                            height: "100%",
+                            // padding: "17px 15px 17px 14px",
+                        }}
+                        ref={blocksIntegratorContainer}
+                    >
+                        {Object.entries(catsBlocksIntegrators).map(([cat, { integrator: Integrator }]) => (
+                            <motion.div
+                                style={{
+                                    gridArea: "1/1/1/1",
+                                    zIndex: cat == activeCat ? 1 : 0,
+                                    background: getThemeColor("layoutBackground", theme),
+                                    gridTemplateRows: "auto minmax(0, 1fr)",
+                                }}
+                                key={`${cat}-integrator`}
+                                data-id={`${cat}-integrator`}
+                                initial={
+                                    Object.keys(catsBlocksIntegrators).length > 1
+                                        ? { opacity: 0, clipPath: "circle(75% at 50% -125%)" }
+                                        : false
+                                }
+                                animate={{
+                                    display: cat == activeCat ? "grid" : "none",
+                                    opacity: cat == activeCat ? 1 : 0,
+                                    clipPath:
+                                        cat == activeCat
+                                            ? [
+                                                  "circle(75% at 50% -305%)",
+                                                  "circle(75% at 50% 50%)",
+                                                  "circle(1000% at 50% 50%)",
+                                              ]
+                                            : [
+                                                  "circle(1000% at 50% 50%)",
+                                                  "circle(1000% at 50% 50%)",
+                                                  "circle(1000% at 50% 50%)",
+                                              ],
+                                }}
+                                transition={{
+                                    duration: 0.5,
+                                    clipPath: { duration: 0.5, times: [0, 0.99, 1] },
+                                    opacity: { duration: cat == activeCat ? 0 : 0.4, delay: 0.1 },
+                                    display: { delay: cat == activeCat ? 0 : 0.4 },
+                                }}
+                            >
+                                {
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    <Integrator cat={activeCat as any} block={selectedCat as any} params={params} />
+                                }
+                            </motion.div>
+                        ))}
+                    </Box>
+                )}
+                {/* </CustomScrollbar> */}
             </Box>
         </Box>
     );

@@ -1,3 +1,13 @@
+export const js = `function carry(func){
+    return function exec(...args1){
+        if(args1.length >= func.length)
+            return func(args1);
+        return (...args2) => exec(...args1, ...args2);
+    }
+}
+console.log('hello world!');`;
+
+export const ts = `
 import AccentedTreeView from "@/components/AccentedTreeView";
 import MarkupIcon from "@/components/icons/MarkupIcon";
 import TerminalIcon from "@/components/icons/TerminalIcon";
@@ -58,7 +68,7 @@ export default function AboutSpecsHardSkillsBlock() {
                 {[
                     {
                         id: "frontend",
-                        title: `Frontend`,
+                        title: "Frontend",
                         icon: <MarkupIcon />,
                         children: [
                             {
@@ -69,7 +79,7 @@ export default function AboutSpecsHardSkillsBlock() {
                     },
                     {
                         id: "backend",
-                        title: `Backend`,
+                        title: "Backend",
                         icon: <TerminalIcon />,
                         children: [
                             {
@@ -80,7 +90,7 @@ export default function AboutSpecsHardSkillsBlock() {
                     },
                     {
                         id: "desktop",
-                        title: `Desktop`,
+                        title: "Desktop",
                         icon: <PersonalVideoIcon />,
                         children: [
                             {
@@ -90,7 +100,18 @@ export default function AboutSpecsHardSkillsBlock() {
                         ],
                     },
                 ]}
+
+                
             </AccentedTreeView>
         </>
     );
 }
+`;
+
+export const react = "React code";
+export const php = "PHP code";
+export const wp = "Wordpress code";
+export const mysql = "MySql code";
+export const cs = "C# code";
+export const wpf = "wpf code";
+export const onec = "1c code";

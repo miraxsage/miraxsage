@@ -43,7 +43,7 @@ function TechnologiesChart({ data, currentChart, onCurrentChartChange, sx }: Tec
     const isxl = useMediaQuery(theme.breakpoints.only("xl"));
     const belowlg = useMediaQuery(theme.breakpoints.down("lg"));
     const colors = chartColors(data.length).map((c) => alpha(c, 0.7));
-    const [currentTab, setCurrentTab] = useState("spread");
+    const [currentTab, setCurrentTab] = useState("stat");
     const spreadChartData = data.map(([name, , , level], i) => ({
         id: i,
         value: level,
@@ -141,7 +141,7 @@ export default function TechnologiesTable({ data }: TechnologiesTableProps) {
     const abovexl = useMediaQuery(theme.breakpoints.up("2xl"));
     const belowlg = useMediaQuery(theme.breakpoints.down("lg"));
     const navigate = useNavigate();
-    const [currentChart, setCurrentChart] = useState<"spread" | "stat">("spread");
+    const [currentChart, setCurrentChart] = useState<"spread" | "stat">("stat");
     return (
         <>
             <Box
@@ -276,6 +276,7 @@ export default function TechnologiesTable({ data }: TechnologiesTableProps) {
                     data.length < 10 &&
                     Array.from({ length: 10 - data.length }).map((_val, i) => (
                         <Box
+                            key={`empty_${i}`}
                             sx={{
                                 gridColumn: "span 5",
                                 ".MuiTreeItem-label div&": { borderTopWidth: i > 0 ? 0 : "1px" },

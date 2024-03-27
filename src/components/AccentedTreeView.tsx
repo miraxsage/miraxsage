@@ -19,6 +19,7 @@ export type AccentedTextTreeItemProps = {
     title: string;
     icon?: ReactNode;
     isAccented?: boolean;
+    notSelectable?: boolean;
     children?: AccentedTreeItemProps[];
 };
 export type AccentedContentedTreeItemProps = {
@@ -28,6 +29,7 @@ export type AccentedContentedTreeItemProps = {
     icon?: never;
     isAccented?: never;
     children?: never;
+    notSelectable?: never;
 };
 export type AccentedTreeItemProps = AccentedContentedTreeItemProps | AccentedTextTreeItemProps;
 
@@ -296,8 +298,16 @@ export default function AccentedTreeView({
 
     const onSelect = (e: React.SyntheticEvent, nodeIds: string) => {
         if (!(e.target as HTMLElement).closest(".MuiTreeItem-iconContainer")) {
-            setSelectedNode(nodeIds);
-            if (onItemSelect) onItemSelect(nodesList.find((c) => c.id == nodeIds)!);
+            const node = nodesList.find((c) => c.id == nodeIds);
+            if (node && node.notSelectable !== true) {
+                setSelectedNode(nodeIds);
+                if (onItemSelect) onItemSelect(nodesList.find((c) => c.id == nodeIds)!);
+            } else
+                setExpandedNodes(
+                    expandedNodes.includes(nodeIds)
+                        ? expandedNodes.filter((n) => n != nodeIds)
+                        : [...expandedNodes, nodeIds]
+                );
         }
     };
     return (
