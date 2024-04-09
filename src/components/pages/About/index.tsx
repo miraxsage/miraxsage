@@ -1,7 +1,6 @@
 import { useLanguage } from "@/store/appearanceSlice";
 import AboutCategoriesList from "./CategoriesList";
 import { Box, useTheme } from "@mui/material";
-import { HorizontalPanelButton, HorizontalPanelButtonProps } from "@/components/PanelButtons";
 import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
@@ -9,7 +8,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import AccentedTabs from "@/components/AccentedTabs";
 import __ from "@/utilities/transtation";
 import React, { NamedExoticComponent, useLayoutEffect, useReducer, useRef, useState } from "react";
-import { getThemeColor, useThemeColor } from "@/components/contexts/Theme";
+import { getThemeColor } from "@/components/contexts/Theme";
 import categories, {
     AboutCategories,
     AboutCategoriesKeysRecursive,
@@ -22,26 +21,7 @@ import CustomScrollbar from "@/components/Scrollbar";
 import { Params, useLocation, useNavigate, useParams } from "react-router-dom";
 import AboutBlocksIntegrator from "./BlocksIntegrator";
 import { motion } from "framer-motion";
-
-function ToolbarButton({ children, sx, ...props }: HorizontalPanelButtonProps) {
-    return (
-        <HorizontalPanelButton
-            dividerSize="squeezed"
-            iconMode={true}
-            sx={{
-                padding: "8.2px 10.5px",
-                "&:hover": {
-                    background: useThemeColor("regularHoverBg"),
-                },
-                ...sx,
-            }}
-            iconSize="regular"
-            {...props}
-        >
-            {children}
-        </HorizontalPanelButton>
-    );
-}
+import { ToolbarButton } from "@/components/ToolbarButton";
 
 function Toolbar() {
     return (
@@ -182,14 +162,15 @@ export default function About() {
 
     return (
         <Box className="flex h-full">
-            <Box className="grid" sx={{ gridTemplateRows: "auto 1fr" }}>
+            <Box className="grid" sx={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
                 <Toolbar />
-                <CustomScrollbar right="4px" top="2px" bottom="3px">
+                <CustomScrollbar right="2px" top="2px" bottom="3px">
                     <AboutCategoriesList
                         intend="double"
+                        selectionMode="single"
                         activeItem={activeCat}
-                        selectedItem={selectedCat}
-                        onItemSelect={(item) => {
+                        selectedItems={selectedCat ?? undefined}
+                        onItemsSelect={(item) => {
                             const rootCats = Object.keys(categories);
                             if (rootCats.includes(item.id)) {
                                 if (!openedCats.includes(item.id)) setOpenedCats([...openedCats, item.id]);

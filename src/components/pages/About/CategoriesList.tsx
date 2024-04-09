@@ -4,7 +4,12 @@ import { useLanguage } from "@/store/appearanceSlice";
 
 import categories, { AboutCategoriesInterface } from "@/components/pages/About/Categories";
 import { capitalize } from "@/utilities/string";
-import AccentedTreeView, { AccentedTreeItemProps, AccentedTreeViewProps } from "@/components/AccentedTreeView";
+import AccentedTreeView, {
+    AccentedTreeItemProps,
+    AccentedTreeViewMultipleProps,
+    AccentedTreeViewSingleProps,
+    AccentedTreeViewUnselectableProps,
+} from "@/components/AccentedTreeView";
 
 function categoriesToTreeItems(
     categories: AboutCategoriesInterface,
@@ -22,8 +27,11 @@ function categoriesToTreeItems(
 
 type AboutCategoriesListProps = {
     activeItem?: string | null;
-    selectedItem?: string | null;
-} & Omit<AccentedTreeViewProps, "children" | "selectedItem">;
+} & (
+    | Omit<AccentedTreeViewSingleProps, "children">
+    | Omit<AccentedTreeViewMultipleProps, "children">
+    | Omit<AccentedTreeViewUnselectableProps, "children">
+);
 
 export default function AboutCategoriesList({ activeItem, ...props }: AboutCategoriesListProps) {
     useLanguage();

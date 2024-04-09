@@ -11,30 +11,40 @@ export type CustomScrollbarProps = {
     top?: string;
     right?: string;
     bottom?: string;
+    padding?: string;
     horizontal?: {
         left?: string;
         right?: string;
         bottom?: string;
+        padding?: string;
     };
     sx?: SxProps;
 };
 
-export default function CustomScrollbar({ children, top, right, bottom, sx = {}, ...props }: CustomScrollbarProps) {
+export default function CustomScrollbar({
+    children,
+    top,
+    right,
+    bottom,
+    padding,
+    sx = {},
+    ...props
+}: CustomScrollbarProps) {
     const horizontal = props.horizontal ?? {};
-    const { left: hleft, right: hright, bottom: hbottom } = horizontal;
+    const { left: hleft, right: hright, bottom: hbottom, padding: hpadding } = horizontal;
     return (
         <Box
             className="h-full"
             sx={{
-                "& .os-scrollbar.os-scrollbar-vertical": {
-                    top: top ?? 0,
-                    right: right ?? 0,
-                    bottom: bottom ?? 0,
+                "& .os-scrollbar.os-scrollbar-vertical.os-scrollbar-cornerless": {
+                    top: padding ?? top ?? 0,
+                    right: padding ?? right ?? 0,
+                    bottom: padding ?? bottom ?? 0,
                 },
-                "& .os-scrollbar.os-scrollbar-horizontal": {
-                    left: hleft ?? 0,
-                    right: hright ?? 0,
-                    bottom: hbottom ?? 0,
+                "& .os-scrollbar.os-scrollbar-horizontal.os-scrollbar-cornerless": {
+                    left: hpadding ?? hleft ?? 0,
+                    right: hpadding ?? hright ?? 0,
+                    bottom: hpadding ?? hbottom ?? 0,
                 },
                 ...sx,
             }}

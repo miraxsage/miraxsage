@@ -232,6 +232,7 @@ export type ThemeColors =
     | "tabHoverBg"
     | "tabIcon"
     | "tabHoverIcon"
+    | "cardHoverBg"
     | "scrollbarHandle"
     | "scrollbarHoverHandle"
     | "layoutGlow"
@@ -270,7 +271,7 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
         case "layoutBackground":
             return isDarkMode ? theme.palette.bg.dark : theme.palette.bg.light;
         case "tabRegularText":
-            return isDarkMode ? lighten(theme.palette.divider, 0.25) : lighten(theme.palette.contrast.main, 0.1);
+            return isDarkMode ? lighten(theme.palette.divider, 0.26) : darken(theme.palette.contrast.main, 0.1);
         case "tabHoverText":
             return isDarkMode ? theme.palette.contrast.main : darken(theme.palette.contrast.main, 0.2);
         case "tabActiveText":
@@ -296,6 +297,8 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
             return isDarkMode ? theme.palette.bg.dark : theme.palette.bg.dark;
         case "titleBg":
             return alpha(theme.palette.divider, 0.13);
+        case "cardHoverBg":
+            return isDarkMode ? alpha(theme.palette.divider, 0.3) : alpha(theme.palette.divider, 0.15);
         case "accentedGdBg":
             return isDarkMode
                 ? `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.03)}, ${alpha(
@@ -322,7 +325,7 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
                 0.15
             )});`;
         case "regularText":
-            return isDarkMode ? lighten(theme.palette.divider, 0.35) : darken(theme.palette.contrast.main, 0.45);
+            return isDarkMode ? lighten(theme.palette.divider, 0.4) : darken(theme.palette.contrast.main, 0.6);
         case "notelessText":
             return isDarkMode ? lighten(theme.palette.divider, 0.07) : lighten(theme.palette.contrast.main, 0.15);
         case "menuText":

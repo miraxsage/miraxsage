@@ -71,7 +71,7 @@ export default function AboutBioEducationBlock() {
         <>
             <AccentedTreeView
                 expandedNodes={["general", "generalSges14", "high", "highTechnical", "highTechnicalKubSTU"]}
-                disableSelection={true}
+                selectionMode="disable"
             >
                 {[
                     {

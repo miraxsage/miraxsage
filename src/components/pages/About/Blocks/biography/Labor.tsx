@@ -80,7 +80,7 @@ function DataTable({ data, withoutBottomBorder = false }: { data: Data; withoutB
 export default function AboutBioLaborBlock() {
     return (
         <>
-            <AccentedTreeView expandedNodes={["it", "itKubanskieProdukty"]} disableSelection={true}>
+            <AccentedTreeView expandedNodes={["it", "itKubanskieProdukty"]} selectionMode="disable">
                 {[
                     {
                         id: "it",

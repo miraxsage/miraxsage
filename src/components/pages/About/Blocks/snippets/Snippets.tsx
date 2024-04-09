@@ -30,83 +30,86 @@ export default function AboutSpecsSnippetsBlock() {
                     marginRight: "-14px",
                 }}
             >
-                <AccentedTreeView
-                    expandedNodes={["frontend", "backend"]}
-                    selectedItem={lang}
-                    onItemSelect={(item) => setLang(item.id)}
-                >
-                    {[
-                        {
-                            id: "frontend",
-                            title: "Frontend",
-                            icon: <MarkupIcon />,
-                            notSelectable: true,
-                            children: [
-                                {
-                                    id: "js",
-                                    title: "JavaScript",
-                                    icon: <JSIcon />,
-                                },
-                                {
-                                    id: "ts",
-                                    title: "TypeScript",
-                                    icon: <TSIcon />,
-                                },
-                                {
-                                    id: "react",
-                                    title: "React",
-                                    icon: <ReactIcon />,
-                                },
-                            ],
-                        },
-                        {
-                            id: "backend",
-                            title: "Backend",
-                            icon: <TerminalIcon />,
-                            notSelectable: true,
-                            children: [
-                                {
-                                    id: "php",
-                                    title: "PHP",
-                                    icon: <PHPIcon />,
-                                },
-                                {
-                                    id: "wp",
-                                    title: "Wordpress",
-                                    icon: <WordpressIcon />,
-                                },
-                                {
-                                    id: "mysql",
-                                    title: "MySQL",
-                                    icon: <MySqlIcon />,
-                                },
-                            ],
-                        },
-                        {
-                            id: "desktop",
-                            title: "Desktop",
-                            icon: <PersonalVideoIcon />,
-                            notSelectable: true,
-                            children: [
-                                {
-                                    id: "cs",
-                                    title: "Visual C#",
-                                    icon: <CSharpIcon />,
-                                },
-                                {
-                                    id: "wpf",
-                                    title: "WPF",
-                                    icon: <WindowsIcon />,
-                                },
-                                {
-                                    id: "onec",
-                                    title: "1C",
-                                    icon: <OneCIcon />,
-                                },
-                            ],
-                        },
-                    ]}
-                </AccentedTreeView>
+                <CustomScrollbar right="2px" top="2px" bottom="3px">
+                    <AccentedTreeView
+                        expandedNodes={["frontend", "backend"]}
+                        selectionMode="single"
+                        selectedItems={lang}
+                        onItemsSelect={(item) => setLang(item.id)}
+                    >
+                        {[
+                            {
+                                id: "frontend",
+                                title: "Frontend",
+                                icon: <MarkupIcon />,
+                                notSelectable: true,
+                                children: [
+                                    {
+                                        id: "js",
+                                        title: "JavaScript",
+                                        icon: <JSIcon />,
+                                    },
+                                    {
+                                        id: "ts",
+                                        title: "TypeScript",
+                                        icon: <TSIcon />,
+                                    },
+                                    {
+                                        id: "react",
+                                        title: "React",
+                                        icon: <ReactIcon />,
+                                    },
+                                ],
+                            },
+                            {
+                                id: "backend",
+                                title: "Backend",
+                                icon: <TerminalIcon />,
+                                notSelectable: true,
+                                children: [
+                                    {
+                                        id: "php",
+                                        title: "PHP",
+                                        icon: <PHPIcon />,
+                                    },
+                                    {
+                                        id: "wp",
+                                        title: "Wordpress",
+                                        icon: <WordpressIcon />,
+                                    },
+                                    {
+                                        id: "mysql",
+                                        title: "MySQL",
+                                        icon: <MySqlIcon />,
+                                    },
+                                ],
+                            },
+                            {
+                                id: "desktop",
+                                title: "Desktop",
+                                icon: <PersonalVideoIcon />,
+                                notSelectable: true,
+                                children: [
+                                    {
+                                        id: "cs",
+                                        title: "Visual C#",
+                                        icon: <CSharpIcon />,
+                                    },
+                                    {
+                                        id: "wpf",
+                                        title: "WPF",
+                                        icon: <WindowsIcon />,
+                                    },
+                                    {
+                                        id: "onec",
+                                        title: "1C",
+                                        icon: <OneCIcon />,
+                                    },
+                                ],
+                            },
+                        ]}
+                    </AccentedTreeView>
+                </CustomScrollbar>
                 <CustomScrollbar
                     top="5px"
                     bottom="5px"

@@ -22,10 +22,6 @@ import AboutSpecsSnippetsBlock from "./Blocks/snippets/Snippets";
 import { Box, useTheme } from "@mui/material";
 import CustomScrollbar from "@/components/Scrollbar";
 
-const profileIcon = <AssignmentIndIcon />;
-const projectsIcon = <RocketLaunchIcon />;
-const contactIcon = <CallIcon />;
-
 export type AboutBlocksIntegratorProps<K extends keyof AboutCategoriesType> = {
     category: K;
     selectedBlock?: AboutCategoriesKeysRecursive<AboutCategoriesType[K]>;
@@ -86,17 +82,17 @@ export default function AboutBlocksIntegrator<K extends keyof AboutCategoriesTyp
                             subitems: [
                                 {
                                     label: __("Profile"),
-                                    icon: profileIcon,
+                                    icon: <AssignmentIndIcon />,
                                     link: "/profile",
                                 },
                                 {
                                     label: __("Projects"),
-                                    icon: projectsIcon,
+                                    icon: <RocketLaunchIcon />,
                                     link: "/projects",
                                 },
                                 {
                                     label: __("Interact"),
-                                    icon: contactIcon,
+                                    icon: <CallIcon />,
                                     link: "/interact",
                                 },
                             ],

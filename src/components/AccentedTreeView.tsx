@@ -1,12 +1,13 @@
 import { TreeItem, TreeView } from "@mui/x-tree-view";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { CSSProperties, ReactNode, useState } from "react";
+import React, { CSSProperties, ReactNode, useState } from "react";
 import { UseTreeViewExpansionParameters } from "@mui/x-tree-view/internals/plugins/useTreeViewExpansion";
-import { Collapse, styled } from "@mui/material";
+import { Checkbox, Collapse, alpha, styled } from "@mui/material";
 import { motion } from "framer-motion";
 import { getThemeColor } from "./contexts/Theme";
 import { TransitionProps } from "@mui/material/transitions";
+import { areEqualShallow } from "@/utilities/common";
 
 declare module "@mui/x-tree-view" {
     interface TreeItemProps {
@@ -33,14 +34,34 @@ export type AccentedContentedTreeItemProps = {
 };
 export type AccentedTreeItemProps = AccentedContentedTreeItemProps | AccentedTextTreeItemProps;
 
-export interface AccentedTreeViewProps {
+interface AccentedTreeViewBasicProps {
     children: AccentedTreeItemProps[];
     expandedNodes?: string[];
-    disableSelection?: boolean;
-    selectedItem?: string | null;
     intend?: "regular" | "double";
-    onItemSelect?: (item: AccentedTreeItemProps) => void;
+    checkable?: boolean;
+    checkedAndSelected?: boolean;
+    checkedItems?: string[];
+    onItemsChecked?: (item: AccentedTreeItemProps[]) => void;
 }
+export interface AccentedTreeViewSingleProps extends AccentedTreeViewBasicProps {
+    selectionMode: "single";
+    selectedItems?: string;
+    onItemsSelect?: (item: AccentedTreeItemProps) => void;
+}
+export interface AccentedTreeViewMultipleProps extends AccentedTreeViewBasicProps {
+    selectionMode: "multiple";
+    selectedItems?: string[];
+    onItemsSelect?: (item: AccentedTreeItemProps[]) => void;
+}
+export interface AccentedTreeViewUnselectableProps extends AccentedTreeViewBasicProps {
+    selectionMode?: "disable";
+    selectedItems?: never;
+    onItemsSelect?: never;
+}
+export type AccentedTreeViewProps =
+    | AccentedTreeViewSingleProps
+    | AccentedTreeViewMultipleProps
+    | AccentedTreeViewUnselectableProps;
 
 const openedIcon = <ExpandMoreIcon />;
 const closedIcon = <ChevronRightIcon />;
@@ -112,6 +133,14 @@ const AccentedTreeItem = styled(TreeItem, {
         },
         "& .MuiTreeItem-content .MuiTreeItem-label": {
             paddingLeft: "5px",
+        },
+        "& .MuiTreeItem-iconContainer .MuiCheckbox-root": {
+            padding: "0px",
+            marginRight: "5px",
+            color: "currentColor",
+            ":hover": {
+                background: alpha(getThemeColor("regularText", theme), 0.2),
+            },
         },
         ...(isAccented
             ? {
@@ -200,22 +229,123 @@ function AccentedTreeItemTransitionComponent(props: TransitionProps) {
     );
 }
 
+function setNodeChecking(nodeId: string, checkedNodes: string[], status: boolean) {
+    const index = checkedNodes.findIndex((nid) => nid == nodeId);
+    if (!status && index >= 0) delete checkedNodes[index];
+    if (status && index < 0) checkedNodes.push(nodeId);
+    return status;
+}
+
+function fixNodesFullChecking(
+    nodes: AccentedTreeItemProps[],
+    checkedNodes: string[],
+    changedNodesOrStatus: { nodeId: string; status: boolean }[] | boolean
+) {
+    let allNodesChecked = true;
+    nodes.forEach((node) => {
+        if (node.children && node.children.length) {
+            if (typeof changedNodesOrStatus == "boolean") {
+                setNodeChecking(node.id, checkedNodes, changedNodesOrStatus);
+                fixNodesFullChecking(node.children, checkedNodes, changedNodesOrStatus);
+                return;
+            }
+            const changedNode = changedNodesOrStatus.find((n) => n.nodeId == node.id);
+            if (changedNode) fixNodesFullChecking(node.children, checkedNodes, changedNode.status);
+            else {
+                if (!fixNodesFullChecking(node.children, checkedNodes, changedNodesOrStatus)) {
+                    const index = checkedNodes.findIndex((nid) => nid == node.id);
+                    if (index >= 0) delete checkedNodes[index];
+                    return (allNodesChecked = false);
+                } else {
+                    if (!checkedNodes.includes(node.id)) checkedNodes.push(node.id);
+                }
+            }
+        } else {
+            if (typeof changedNodesOrStatus == "boolean")
+                return setNodeChecking(node.id, checkedNodes, changedNodesOrStatus);
+            else if (!checkedNodes.includes(node.id)) return (allNodesChecked = false);
+        }
+    });
+    return typeof changedNodesOrStatus == "boolean" ? changedNodesOrStatus : allNodesChecked;
+}
+
+function getNodesChanges(nodesBefore: string[], nodesAfter: string[]) {
+    const result: { nodeId: string; status: boolean }[] = [];
+    nodesAfter.forEach((nodeAfter) => {
+        if (!nodesBefore.includes(nodeAfter)) result.push({ nodeId: nodeAfter, status: true });
+    });
+    nodesBefore.forEach((nodeBefore) => {
+        if (!nodesAfter.includes(nodeBefore)) result.push({ nodeId: nodeBefore, status: false });
+    });
+    return result;
+}
+
 export default function AccentedTreeView({
     children,
-    selectedItem,
-    expandedNodes: expandedNodesProp,
-    disableSelection,
-    onItemSelect,
+    selectedItems: selectedItemsProp = [],
+    checkedItems: checkedItemsProp = [],
+    expandedNodes: expandedNodesProp = [],
+    selectionMode = "single",
+    onItemsSelect,
+    onItemsChecked,
     intend = "regular",
+    checkable,
+    checkedAndSelected,
 }: AccentedTreeViewProps) {
-    const [expandedNodes, setExpandedNodes] = useState<string[]>(expandedNodesProp ?? []);
-    const [selectedNode, setSelectedNode] = useState<string | null>(selectedItem || null);
+    let selectedItems: string[] = [];
+    if (selectionMode == "single" && typeof selectedItemsProp == "string") selectedItems = [selectedItemsProp];
+    if (selectionMode == "multiple" && Array.isArray(selectedItemsProp)) selectedItems = selectedItemsProp;
+
+    const [expandedNodes, setExpandedNodes] = useState<string[]>(expandedNodesProp);
+    const [selectedNodes, setSelectedNodes] = useState<string[]>(selectedItems);
+    const [checkedNodes, setCheckedNodes] = useState<string[]>(checkedItemsProp);
 
     const nodesList: AccentedTreeItemProps[] = [];
 
     const accentedNodes: string[] = [];
 
-    if (selectedItem !== undefined && selectedItem != selectedNode) setSelectedNode(selectedItem);
+    if (onItemsSelect && !areEqualShallow(selectedItems, selectedNodes)) setSelectedNodes(selectedItems);
+
+    const onCheckedChange = (nodeId: string) => (_event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+        const alreadyChecked = checkedNodes.includes(nodeId);
+        let newCheckedNodes: string[] | null = null;
+        if (checked && !alreadyChecked) newCheckedNodes = [...checkedNodes, nodeId];
+        if (!checked && alreadyChecked) newCheckedNodes = checkedNodes.filter((n) => n != nodeId);
+        if (newCheckedNodes) {
+            fixNodesFullChecking(children, newCheckedNodes, getNodesChanges(checkedNodes, newCheckedNodes));
+            setCheckedNodes(newCheckedNodes);
+            if (checkedAndSelected) setSelectedNodes(newCheckedNodes);
+        }
+        if (onItemsChecked && newCheckedNodes) onItemsChecked(nodesList.filter((n) => newCheckedNodes!.includes(n.id)));
+        if (onItemsSelect && checkedAndSelected && newCheckedNodes) {
+            const newSelectedFinalNodes =
+                selectionMode == "single"
+                    ? nodesList.find((n) => newCheckedNodes && n.id == newCheckedNodes[0])
+                    : nodesList.filter((n) => newCheckedNodes!.includes(n.id));
+            if (newSelectedFinalNodes)
+                (onItemsSelect as (item: AccentedTreeItemProps | AccentedTreeItemProps[]) => void)(
+                    newSelectedFinalNodes
+                );
+        }
+    };
+
+    const isIndeterminateNode = (nodeId: string): boolean | null => {
+        const node = nodesList.find((n) => n.id == nodeId);
+        if (!node) return null;
+
+        if (node.children && node.children.length) {
+            let checked = 0;
+            const withChildren: string[] = [];
+            node.children.forEach((child) => {
+                const isChecked = checkedNodes.includes(child.id);
+                if (isChecked) checked++;
+                if (child.children?.length) withChildren.push(child.id);
+            });
+            if (checked != 0 && checked < node.children.length) return true;
+            return withChildren.reduce<boolean | null>((acc, cur) => acc || isIndeterminateNode(cur), false);
+        }
+        return false;
+    };
 
     const generateNode = (item?: AccentedTreeItemProps | AccentedTreeItemProps[], level: number = 0): ReactNode => {
         if (!item) return null;
@@ -243,6 +373,13 @@ export default function AccentedTreeView({
                         icon = (
                             <>
                                 {expandIcon}
+                                {checkable && (
+                                    <Checkbox
+                                        indeterminate={isIndeterminateNode(item.id) === true}
+                                        checked={checkedNodes.includes(item.id)}
+                                        onChange={onCheckedChange(item.id)}
+                                    />
+                                )}
                                 {item.icon}
                             </>
                         );
@@ -268,14 +405,16 @@ export default function AccentedTreeView({
             }
         }
     };
-    const toggledNodeIsExpanded = (toggledNodes: string[]) => {
-        if (selectedNode) {
-            if (
-                expandedNodes.includes(selectedNode)
-                    ? !toggledNodes.includes(selectedNode)
-                    : toggledNodes.includes(selectedNode)
-            )
-                return true;
+    const allowToggle = (toggledNodes: string[]) => {
+        if (selectedNodes.length) {
+            for (const selectedNode of selectedNodes) {
+                if (
+                    expandedNodes.includes(selectedNode)
+                        ? !toggledNodes.includes(selectedNode)
+                        : toggledNodes.includes(selectedNode)
+                )
+                    return true;
+            }
             for (const accentedNode of accentedNodes) {
                 if (
                     expandedNodes.includes(accentedNode)
@@ -288,35 +427,63 @@ export default function AccentedTreeView({
         return false;
     };
     const onToggle: UseTreeViewExpansionParameters["onNodeToggle"] = (e: React.SyntheticEvent, toggled) => {
+        if ((e.target as HTMLElement).closest(".MuiTreeItem-iconContainer .MuiCheckbox-root")) return;
         if (
             (e.target as HTMLElement).closest(".MuiTreeItem-iconContainer") ||
-            disableSelection ||
-            toggledNodeIsExpanded(toggled)
-        )
+            selectionMode == "disable" ||
+            allowToggle(toggled)
+        ) {
             setExpandedNodes(toggled);
+        }
     };
 
-    const onSelect = (e: React.SyntheticEvent, nodeIds: string) => {
+    const onSelect = (e: React.SyntheticEvent, nodeIds: string | string[]) => {
         if (!(e.target as HTMLElement).closest(".MuiTreeItem-iconContainer")) {
-            const node = nodesList.find((c) => c.id == nodeIds);
-            if (node && node.notSelectable !== true) {
-                setSelectedNode(nodeIds);
-                if (onItemSelect) onItemSelect(nodesList.find((c) => c.id == nodeIds)!);
-            } else
-                setExpandedNodes(
-                    expandedNodes.includes(nodeIds)
-                        ? expandedNodes.filter((n) => n != nodeIds)
-                        : [...expandedNodes, nodeIds]
-                );
+            const newSelectedItems = typeof nodeIds == "string" ? [nodeIds] : nodeIds;
+            const newSelectedNodes = nodesList.filter((c) => newSelectedItems.includes(c.id));
+            const newFinallySelectedItems: string[] = [];
+            let allNodesNotSelectable = true;
+            const newFinallyExpandedNodes = [...expandedNodes];
+            newSelectedNodes.forEach((n) => {
+                if (n && n.notSelectable !== true) {
+                    allNodesNotSelectable = false;
+                    newFinallySelectedItems.push(n.id);
+                } else {
+                    if (newFinallyExpandedNodes.includes(n.id))
+                        delete newFinallyExpandedNodes[newFinallyExpandedNodes.findIndex((sn) => sn == n.id)];
+                    else newFinallyExpandedNodes.push(n.id);
+                }
+            });
+            setExpandedNodes(newFinallyExpandedNodes);
+            if (!allNodesNotSelectable) {
+                if (checkedAndSelected) {
+                    fixNodesFullChecking(
+                        children,
+                        newFinallySelectedItems,
+                        getNodesChanges(selectedItems, newFinallySelectedItems)
+                    );
+                    setCheckedNodes(newFinallySelectedItems);
+                    setSelectedNodes(newFinallySelectedItems);
+                } else setSelectedNodes(newFinallySelectedItems);
+
+                if (onItemsSelect) {
+                    const newFinallySelectedNodes = nodesList.filter((c) => newFinallySelectedItems.includes(c.id));
+                    (onItemsSelect as (item: AccentedTreeItemProps | AccentedTreeItemProps[]) => void)(
+                        selectionMode == "single" ? newFinallySelectedNodes[0] : newFinallySelectedNodes
+                    );
+                }
+                if (onItemsChecked) onItemsChecked(nodesList.filter((c) => newFinallySelectedItems.includes(c.id)));
+            }
         }
     };
     return (
         <TreeView
-            disableSelection={!!disableSelection}
+            disableSelection={selectionMode == "disable"}
+            multiSelect={selectionMode == "multiple"}
             onNodeToggle={onToggle}
             onNodeSelect={onSelect}
             expanded={expandedNodes}
-            selected={selectedNode}
+            selected={selectionMode == "single" ? (selectedNodes.length ? selectedNodes[0] : null) : selectedNodes}
             sx={{ userSelect: "none" }}
         >
             {generateNode(children)}

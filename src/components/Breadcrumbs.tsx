@@ -12,11 +12,12 @@ import { CustomChip } from "./Chip";
 type BasicBreadcrumbItem = {
     label: string;
     icon?: React.ReactElement;
-    link: string;
-    subitems: Omit<BasicBreadcrumbItem, "subitems">[];
+    link?: string;
+    onClick?: (item: BasicBreadcrumbItem) => void;
+    subitems?: AtLeastOneImportantFieldFromGiven<Omit<BasicBreadcrumbItem, "subitems">, "link" | "onClick">[];
 };
 
-export type BreadcrumbItem = AtLeastOneImportantFieldFromGiven<BasicBreadcrumbItem, "subitems" | "link">;
+export type BreadcrumbItem = AtLeastOneImportantFieldFromGiven<BasicBreadcrumbItem, "subitems" | "link" | "onClick">;
 
 export type CustomBreadcrumbsProps = {
     children: BreadcrumbItem[];
@@ -50,7 +51,7 @@ export default function CustomBreadcrumbs({
     };
 
     return (
-        <div>
+        <>
             <Breadcrumbs sx={{ marginBottom: "18px", ...sx }} {...props}>
                 {children.map((breadcrumb, i) => (
                     <CustomChip
@@ -68,11 +69,11 @@ export default function CustomBreadcrumbs({
                                 ? undefined
                                 : revealMenuHandler(breadcrumb)
                         }
-                        onClick={
-                            breadcrumb.subitems && breadcrumb.subitems.length && withoutExpandIcon
-                                ? revealMenuHandler(breadcrumb)
-                                : undefined
-                        }
+                        onClick={() => {
+                            if (breadcrumb.subitems && breadcrumb.subitems.length && withoutExpandIcon)
+                                revealMenuHandler(breadcrumb);
+                            if (breadcrumb.onClick) breadcrumb.onClick(breadcrumb);
+                        }}
                     />
                 ))}
             </Breadcrumbs>
@@ -96,8 +97,11 @@ export default function CustomBreadcrumbs({
                             key={item.label}
                             onClick={() => {
                                 setOpenedItem(null);
-                                if (item.link.match(/(^http)|(^[^/]+\.)/)) window.open(item.link, "_blank");
-                                else navigate(item.link);
+                                if (item.link) {
+                                    if (item.link.match(/(^http)|(^[^/]+\.)/)) window.open(item.link, "_blank");
+                                    else navigate(item.link);
+                                }
+                                if (item.onClick) item.onClick(item);
                             }}
                             sx={{ color: getThemeColor("menuText", theme) }}
                         >
@@ -118,6 +122,6 @@ export default function CustomBreadcrumbs({
                     ))}
                 </Menu>
             )}
-        </div>
+        </>
     );
 }

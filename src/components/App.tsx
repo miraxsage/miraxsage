@@ -8,6 +8,7 @@ import { ReactContentProps } from "@/types/react";
 import { Link, Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Link as MuiLink } from "@mui/material";
 import PagesIntegrator from "./pages/PagesIntegrator";
+import { projects } from "./pages/Projects/Projects";
 
 function AppLayout({ children }: ReactContentProps) {
     return (
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
                 path: "projects",
                 element: <PagesIntegrator page="projects" />,
             },
+            ...projects.map((p) => ({
+                path: `projects/${p.slug}`,
+                lazy: () => import(`@/components/pages/Projects/${p.slug}/index.tsx`),
+            })),
             {
                 path: "interact",
                 element: <PagesIntegrator page="contacts" />,

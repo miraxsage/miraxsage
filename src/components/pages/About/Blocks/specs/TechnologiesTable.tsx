@@ -8,16 +8,10 @@ import { Box, SxProps, alpha, useMediaQuery, useTheme } from "@mui/material";
 import { BarChart, PieChart } from "@mui/x-charts";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { TechnologyInterface } from "./Technologies";
 
 export type TechnologiesTableProps = {
-    data: [
-        string, // name
-        string, // docslink
-        icon: React.FC, // icon
-        number, // level
-        number, // experience
-        number // projects
-    ][];
+    data: TechnologyInterface[];
 };
 
 type TechnologiesChartProps = {
