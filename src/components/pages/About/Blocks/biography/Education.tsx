@@ -1,5 +1,5 @@
 import AccentedTreeView from "@/components/AccentedTreeView";
-import DescriptionTable, { DescriptionTableOptions } from "@/components/DescriptionTable";
+import DescriptionTable, { DescriptionTableRowOptions } from "@/components/DescriptionTable";
 import __ from "@/utilities/transtation";
 import BaseEducationIcon from "@/components/icons/BaseEducationIcon";
 import MiscellaneousServicesIcon from "@mui/icons-material/MiscellaneousServices";
@@ -9,7 +9,7 @@ import AdditionalEducationIcon from "@/components/icons/AdditionalEducationIcon"
 import VerifiedIcon from "@mui/icons-material/Verified";
 import SchoolIcon from "@/components/icons/SchoolIcon";
 
-type Data = [string, string, DescriptionTableOptions?][];
+type Data = [string, string, DescriptionTableRowOptions?][];
 
 const schoolData: Data = [
     [

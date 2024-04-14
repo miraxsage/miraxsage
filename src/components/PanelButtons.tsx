@@ -21,6 +21,7 @@ export interface HorizontalPanelButtonProps {
     iconSize?: "large" | "regular" | "small";
     children?: ReactNode;
     sx?: SxProps<Theme> | undefined;
+    onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 export const HorizontalPanelButton: React.FC<HorizontalPanelButtonProps> = ({

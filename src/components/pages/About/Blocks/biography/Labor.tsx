@@ -1,10 +1,10 @@
 import AccentedTreeView from "@/components/AccentedTreeView";
-import DescriptionTable, { DescriptionTableOptions } from "@/components/DescriptionTable";
+import DescriptionTable, { DescriptionTableRowOptions } from "@/components/DescriptionTable";
 import __ from "@/utilities/transtation";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import MemoryIcon from "@mui/icons-material/Memory";
 
-type Data = [string, string, DescriptionTableOptions?][];
+type Data = [string, string, DescriptionTableRowOptions?][];
 
 const kubanskieProduktyData: Data = [
     ["[Full name|1]", "[Limited liability company] «[Kubanskie produkty]»", { fullLine: true }],

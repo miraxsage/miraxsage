@@ -8,15 +8,17 @@ import __ from "@/utilities/transtation";
 import { capitalize } from "@/utilities/string";
 import classes from "classnames";
 
-export type DescriptionTableOptions = {
+export type DescriptionTableRowOptions = {
     fullLine?: boolean;
     showLastInCompactMode?: boolean;
 };
 
-export type DescriptionTableData = [string, string, DescriptionTableOptions?][];
+export type DescriptionTableData = [string, string | ReactNode, DescriptionTableRowOptions?][];
 
 export type DescriptionTableProps = {
     children: DescriptionTableData;
+    maxWidth?: "2 cols" | "1 col";
+    withoutTopBorder?: boolean;
     withoutBottomBorder?: boolean;
 };
 
@@ -187,8 +189,8 @@ function DescriptionTableRow({
 }: {
     index: number;
     name: string;
-    value: string;
-    opts?: DescriptionTableOptions;
+    value: string | ReactNode;
+    opts?: DescriptionTableRowOptions;
 }) {
     return (
         <React.Fragment key={`${name}_line`}>
@@ -216,17 +218,20 @@ function DescriptionTableRow({
                     borderWidth: "0px 0px 1px 1px",
                 }}
             >
-                <div>
-                    <DescriptionTableValue name={name} value={value} />
-                </div>
+                <div>{typeof value == "string" ? <DescriptionTableValue name={name} value={value} /> : value}</div>
             </Box>
         </React.Fragment>
     );
 }
 
-export default function DescriptionTable({ children, withoutBottomBorder }: DescriptionTableProps) {
+export default function DescriptionTable({
+    children,
+    withoutTopBorder,
+    withoutBottomBorder,
+    maxWidth = "2 cols",
+}: DescriptionTableProps) {
     const theme = useTheme();
-    const isDoubleColMode = useMediaQuery(theme.breakpoints.up("2xl"));
+    const isDoubleColMode = useMediaQuery(theme.breakpoints.up("2xl")) && maxWidth == "2 cols";
     return (
         <Box
             sx={{
@@ -246,11 +251,15 @@ export default function DescriptionTable({ children, withoutBottomBorder }: Desc
                     marginBottom: "-1px",
                     borderColor: theme.palette.divider,
                     borderStyle: "solid",
-                    borderTopWidth: "1px",
+                    borderTopWidth: withoutTopBorder ? "0px" : "1px",
                     [theme.breakpoints.up("2xl")]: {
-                        gridTemplateColumns: "auto auto 1fr auto auto 1fr",
+                        gridTemplateColumns:
+                            maxWidth == "1 col" ? "auto minmax(auto, 1fr) 1fr" : "auto auto 1fr auto auto 1fr",
+                        "& .grid-full-title": {
+                            gridColumn: maxWidth == "1 col" ? "span 2" : "span 1",
+                        },
                         "& .full-line": {
-                            gridColumn: "span 4",
+                            gridColumn: maxWidth == "1 col" ? "span 3" : "span 4",
                         },
                     },
                     [theme.breakpoints.between("lg", "2xl")]: {
@@ -274,6 +283,9 @@ export default function DescriptionTable({ children, withoutBottomBorder }: Desc
                         borderStyle: "solid",
                         display: "flex",
                         alignItems: "center",
+                        "&.grid-first-title": {
+                            padding: "6px 16px",
+                        },
                     },
                     "& > .grid-title": {
                         background: getThemeColor("titleBg", theme),

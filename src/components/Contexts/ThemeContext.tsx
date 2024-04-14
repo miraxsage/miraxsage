@@ -6,19 +6,18 @@ import { ThemeProviderProps } from "@mui/material/styles/ThemeProvider";
 import { useColorMode } from "@/store/appearanceSlice";
 import { darkTheme, lightTheme } from "./Theme.ts";
 import { CustomScrollbarStylesContainer } from "../Scrollbar.tsx";
+import CommonStylesContext from "./CommonStylesContext.tsx";
 
-const ThemeContext: React.FC<PartialFields<ThemeProviderProps, "theme">> = ({
-    children,
-    theme,
-}) => {
+const ThemeContext: React.FC<PartialFields<ThemeProviderProps, "theme">> = ({ children, theme: propTheme }) => {
     const defaultTheme = useColorMode().dark ? darkTheme : lightTheme;
+    const theme = propTheme || defaultTheme;
     return (
         <StyledEngineProvider injectFirst>
-            <ThemeProvider theme={theme || defaultTheme}>
+            <ThemeProvider theme={theme}>
                 <CssBaseline />
-                <CustomScrollbarStylesContainer>
-                    {children}
-                </CustomScrollbarStylesContainer>
+                <CommonStylesContext>
+                    <CustomScrollbarStylesContainer>{children}</CustomScrollbarStylesContainer>
+                </CommonStylesContext>
             </ThemeProvider>
         </StyledEngineProvider>
     );

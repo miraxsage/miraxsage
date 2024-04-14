@@ -30,6 +30,7 @@ export default function CustomScrollbar({
     sx = {},
     ...props
 }: CustomScrollbarProps) {
+    if (!right && !bottom && !top && !padding) padding = "4px";
     const horizontal = props.horizontal ?? {};
     const { left: hleft, right: hright, bottom: hbottom, padding: hpadding } = horizontal;
     return (

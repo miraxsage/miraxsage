@@ -1,8 +1,5 @@
 import CustomBreadcrumbs, { BreadcrumbItem } from "@/components/Breadcrumbs";
 import { Box, useTheme } from "@mui/material";
-import PersonIcon from "@mui/icons-material/Person";
-import WebhookIcon from "@mui/icons-material/Webhook";
-import StarIcon from "@mui/icons-material/Star";
 import CustomScrollbar from "@/components/Scrollbar";
 import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
@@ -15,9 +12,10 @@ import ProjectFiltersList from "./FiltersList";
 import { projects } from "./Projects";
 import ProjectCard from "./ProjectCard";
 import { getThemeColor } from "@/components/contexts/Theme";
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ProjectsBreadcrumbs from "./ProjectsBreadcrumbs";
+import { useAppearance } from "@/store/appearanceSlice";
+import { navigateToProjects, projectsOrderItems, useProjectsLocation } from "./projectsNavigation";
 
 function Toolbar() {
     return (
@@ -46,21 +44,15 @@ function Toolbar() {
     );
 }
 
-const orderItems = [
-    { slug: "name", name: "По наименованию", icon: PersonIcon },
-    { slug: "rating", name: "По рейтингу", icon: StarIcon },
-    { slug: "techs", name: "По технологиям", icon: WebhookIcon },
-];
-
 export default function Projects() {
     const theme = useTheme();
-    const [techFilters, setTechFilters] = useState<string[]>([]);
-    const [order, setOrder] = useState<"rating" | "name" | "techs">("rating");
-    const [orderDirection, setOrderDirection] = useState<"up" | "down">("down");
-    const orderItem = orderItems.find((o) => o.slug == order);
-    const OrderIcon = orderItem?.icon;
     const navigate = useNavigate();
-    console.log(useLocation().pathname);
+    const lang = useAppearance().language;
+    const projectsLocation = useProjectsLocation()!;
+    const { techs, order, orderDirection } = projectsLocation;
+    const orderItem = projectsOrderItems.find((o) => o.slug == order);
+    const OrderIcon = orderItem?.icon;
+
     return (
         <Box className="grid h-full" sx={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
             <ProjectsBreadcrumbs />
@@ -69,7 +61,14 @@ export default function Projects() {
                     <Toolbar />
                     <CustomScrollbar right="2px" top="2px" bottom="3px">
                         <ProjectFiltersList
-                            onItemsChecked={(checkedProjects) => setTechFilters(checkedProjects.map((p) => p.id))}
+                            activeItems={techs}
+                            onItemsChecked={(checkedProjects) =>
+                                navigateToProjects(
+                                    navigate,
+                                    { techs: checkedProjects.map((p) => p.id) },
+                                    projectsLocation
+                                )
+                            }
                         />
                     </CustomScrollbar>
                 </Box>
@@ -101,13 +100,20 @@ export default function Projects() {
                                             }}
                                         >
                                             <OrderIcon />
-                                            {orderDirection == "down" ? <DownIcon /> : <UpIcon />}
+                                            {orderDirection == "desc" ? <DownIcon /> : <UpIcon />}
                                         </Box>
                                     ) : (
                                         <div></div>
                                     ),
-                                    onClick: () => setOrderDirection((o) => (o == "up" ? "down" : "up")),
-                                    subitems: orderItems
+                                    onClick: () =>
+                                        navigateToProjects(
+                                            navigate,
+                                            {
+                                                orderDirection: orderDirection == "desc" ? "asc" : "desc",
+                                            },
+                                            projectsLocation
+                                        ),
+                                    subitems: projectsOrderItems
                                         .filter((o) => o.slug != order)
                                         .map((o) => {
                                             const Icon = o.icon;
@@ -115,12 +121,17 @@ export default function Projects() {
                                                 label: o.name,
                                                 icon: <Icon />,
                                                 onClick: (item) =>
-                                                    setOrder(
-                                                        item.label == "По наименованию"
-                                                            ? "name"
-                                                            : item.label == "По рейтингу"
-                                                            ? "rating"
-                                                            : "techs"
+                                                    navigateToProjects(
+                                                        navigate,
+                                                        {
+                                                            order:
+                                                                item.label == "По наименованию"
+                                                                    ? "name"
+                                                                    : item.label == "По рейтингу"
+                                                                    ? "rating"
+                                                                    : "techs",
+                                                        },
+                                                        projectsLocation
                                                     ),
                                             };
                                         }),
@@ -129,7 +140,7 @@ export default function Projects() {
                         }
                     </CustomBreadcrumbs>
                     <Box sx={{ border: `1px solid ${theme.palette.divider}`, borderWidth: "0px 0px 1px 0px" }}></Box>
-                    <CustomScrollbar padding="3px">
+                    <CustomScrollbar>
                         <Box
                             className="grid w-full"
                             sx={{
@@ -149,25 +160,27 @@ export default function Projects() {
                             {projects
                                 .sort((a, b) => {
                                     if (order == "name")
-                                        return (orderDirection == "down" ? -1 : 1) * a.name.localeCompare(b.name);
+                                        return (
+                                            (orderDirection == "desc" ? -1 : 1) *
+                                            a.name[lang].localeCompare(b.name[lang])
+                                        );
                                     if (order == "rating")
-                                        return (orderDirection == "down" ? -1 : 1) * (a.rating - b.rating);
+                                        return (orderDirection == "desc" ? -1 : 1) * (a.rating - b.rating);
                                     if (order == "techs")
                                         return (
-                                            (orderDirection == "down" ? -1 : 1) *
+                                            (orderDirection == "desc" ? -1 : 1) *
                                             (a.technologies.length - b.technologies.length)
                                         );
                                     return 0;
                                 })
-                                .filter(
-                                    (p) =>
-                                        techFilters.length == 0 || p.technologies.some((t) => techFilters.includes(t))
-                                )
+                                .filter((p) => techs.length == 0 || p.technologies.some((t) => techs.includes(t)))
                                 .map((p) => (
                                     <ProjectCard
-                                        onClick={() => navigate(`/projects/${p.slug}`)}
+                                        onClick={() =>
+                                            navigateToProjects(navigate, { project: p.slug }, projectsLocation)
+                                        }
                                         key={`project-${p.slug}-card`}
-                                        {...p}
+                                        project={p}
                                     />
                                 ))}
                         </Box>

@@ -1,3 +1,5 @@
+import ProjectPage from "../ProjectPage";
+
 export function Component() {
-    return "WEB ARCH THEME PAGE";
+    return <ProjectPage>"WEB ARCH THEME PAGE"</ProjectPage>;
 }

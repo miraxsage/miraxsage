@@ -18,10 +18,17 @@ function filtersToTreeItems(filters: ProjectsFiltersInterface): AccentedTreeItem
 
 type ProjectFiltersListProps = Omit<
     AccentedTreeViewMultipleProps,
-    "children" | "selectedItem" | "selectionMode" | "checkable" | "checkedAndSelected" | "expandedNodes"
->;
+    | "children"
+    | "selectedItem"
+    | "selectionMode"
+    | "checkable"
+    | "checkedAndSelected"
+    | "expandedNodes"
+    | "checkedItems"
+    | "selectedItems"
+> & { activeItems: string[] };
 
-export default function ProjectFiltersList({ ...props }: ProjectFiltersListProps) {
+export default function ProjectFiltersList({ activeItems, ...props }: ProjectFiltersListProps) {
     useLanguage();
     return (
         <AccentedTreeView
@@ -29,6 +36,7 @@ export default function ProjectFiltersList({ ...props }: ProjectFiltersListProps
             checkable={true}
             checkedAndSelected={true}
             expandedNodes={["frontend", "backend"]}
+            {...(activeItems ? { checkedItems: activeItems, selectedItems: activeItems } : {})}
             {...props}
         >
             {filtersToTreeItems(filters)}

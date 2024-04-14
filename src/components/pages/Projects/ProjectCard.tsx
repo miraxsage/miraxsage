@@ -1,19 +1,21 @@
 import { Box, SxProps, alpha, lighten, useMediaQuery, useTheme } from "@mui/material";
-import { TechnologiesList, technologyInfo } from "../About/Blocks/specs/Technologies";
+import { TechnologiesList, getTechnologyInfo } from "../About/Blocks/specs/Technologies";
 import StarIcon from "@mui/icons-material/Star";
 import CustomScrollbar from "@/components/Scrollbar";
 import { ProjectInterface } from "./Projects";
 import { getThemeColor } from "@/components/contexts/Theme";
 import { useId } from "react";
+import { useAppearance } from "@/store/appearanceSlice";
 
-type ProjectCardProps = ProjectInterface & {
+type ProjectCardProps = {
+    project: ProjectInterface;
     sx?: SxProps;
     style?: React.CSSProperties;
     onClick?: React.MouseEventHandler<HTMLDivElement>;
 };
 
 function TechIcon({ technology }: { technology: TechnologiesList }) {
-    const techInfo = technologyInfo(technology);
+    const techInfo = getTechnologyInfo(technology);
     if (techInfo) {
         const Icon = techInfo[2];
         return <Icon />;
@@ -84,22 +86,13 @@ function Title({ children }: { children: string }) {
     );
 }
 
-export default function ProjectCard({
-    slug,
-    name,
-    description,
-    technologies,
-    rating,
-    coverBrightmess,
-    sx,
-    style,
-    onClick,
-}: ProjectCardProps) {
+export default function ProjectCard({ project, sx, style, onClick }: ProjectCardProps) {
     const theme = useTheme();
     const threeCols = useMediaQuery(theme.breakpoints.only("3xl"));
     const twoCols = useMediaQuery(theme.breakpoints.between("xl", "3xl"));
     const oneCol = useMediaQuery(theme.breakpoints.down("xl"));
     const isDarkMode = theme.palette.mode == "dark";
+    const lang = useAppearance().language;
     return (
         <Box
             onClick={onClick}
@@ -119,9 +112,13 @@ export default function ProjectCard({
                         objectFit: "cover",
                         width: "100%",
                         height: "100%",
-                        mixBlendMode: isDarkMode ? (coverBrightmess == "dark" ? "luminosity" : "soft-light") : "normal",
+                        mixBlendMode: isDarkMode
+                            ? project.coverBrightmess == "dark"
+                                ? "luminosity"
+                                : "soft-light"
+                            : "normal",
                         filter: isDarkMode
-                            ? coverBrightmess == "dark"
+                            ? project.coverBrightmess == "dark"
                                 ? "grayscale(1) contrast(1.05) brightness(0.7)"
                                 : "grayscale(1) contrast(0.6)"
                             : "grayscale(1)",
@@ -130,7 +127,7 @@ export default function ProjectCard({
                         left: 0,
                         transition: "opacity 0.3s",
                         "&:first-of-type": {
-                            opacity: isDarkMode ? (coverBrightmess == "dark" ? 0.35 : 1) : 0.4,
+                            opacity: isDarkMode ? (project.coverBrightmess == "dark" ? 0.35 : 1) : 0.4,
                         },
                         "&:last-of-type": {
                             opacity: 0,
@@ -257,10 +254,10 @@ export default function ProjectCard({
                 }}
             >
                 <Box className="img-container">
-                    <img src={`/img/projects/${slug}/cover.jpg`} />
-                    <img src={`/img/projects/${slug}/cover.jpg`} />
+                    <img src={`/img/projects/${project.slug}/cover.jpg`} />
+                    <img src={`/img/projects/${project.slug}/cover.jpg`} />
                 </Box>
-                <Title>{name}</Title>
+                <Title>{project.name[lang]}</Title>
                 <Box
                     className="flex"
                     sx={{ border: "1px solid" + theme.palette.divider, borderWidth: "1px 0px 1px 0px" }}
@@ -275,7 +272,7 @@ export default function ProjectCard({
                             },
                         }}
                     >
-                        {technologies.map((t) => (
+                        {project.technologies.map((t) => (
                             <TechIcon key={t} technology={t} />
                         ))}
                     </Box>
@@ -288,14 +285,11 @@ export default function ProjectCard({
                             },
                         }}
                     >
-                        <span>{rating}</span> <StarIcon />
+                        <span>{project.rating}</span> <StarIcon />
                     </Box>
                 </Box>
-                <CustomScrollbar padding="5px">
-                    <Box sx={{ padding: "8px 10px", lineHeight: 1.25 }}>
-                        {description} выапд оывап лдывап ылвдаоп ылдвоапыдлвоапдлывоап лыдво лва лвп длыовап лдоывапд
-                        опдл дпо вадлпоывалдп
-                    </Box>
+                <CustomScrollbar>
+                    <Box sx={{ padding: "8px 10px", lineHeight: 1.25 }}>{project.description[lang]}</Box>
                 </CustomScrollbar>
             </Box>
             <div className="connector">

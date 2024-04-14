@@ -2,6 +2,7 @@ import { Box, SxProps, styled, useTheme } from "@mui/material";
 import { getThemeColor } from "@/components/contexts/Theme";
 import { useNavigate } from "react-router-dom";
 import { ReactNode } from "react";
+import { AllUnionStringCombinations } from "@/types/common";
 
 const DescriptionElement = styled(Box, { shouldForwardProp: (prop) => prop != "withoutPadding" })<{
     withoutPadding?: boolean;
@@ -14,7 +15,14 @@ const DescriptionElement = styled(Box, { shouldForwardProp: (prop) => prop != "w
     },
 }));
 
-function DescriptionButton({ link, children, sx }: { link?: string; children?: ReactNode; sx?: SxProps }) {
+export type LinkButton = {
+    link?: string;
+    children?: ReactNode;
+    sx?: SxProps;
+    borders?: AllUnionStringCombinations<"top" | "right" | "bottom" | "left"> | "none";
+};
+
+export function LinkButton({ link, children, sx, borders }: LinkButton) {
     const theme = useTheme();
     const navigate = useNavigate();
     return (
@@ -24,7 +32,15 @@ function DescriptionButton({ link, children, sx }: { link?: string; children?: R
                 display: "block",
                 padding: "8px 18px",
                 borderStyle: "solid",
-                borderWidth: "1px 1px 0px 0px",
+                userSelect: "none",
+                lineHeight: 1.25,
+                borderWidth: borders
+                    ? borders == "none"
+                        ? "0px"
+                        : `${borders.includes("top") ? 1 : 0}px ${borders.includes("right") ? 1 : 0}px ${
+                              borders.includes("bottom") ? 1 : 0
+                          }px ${borders.includes("left") ? 1 : 0}px `
+                    : "1px",
                 borderColor: theme.palette.divider,
                 color: getThemeColor("regularText", theme),
                 cursor: !link ? "auto" : "pointer",
@@ -96,7 +112,7 @@ export default function DescriptionPanel({
             {buttons && buttons.length ? (
                 <DescriptionButtonsContainer>
                     {buttons.map((b, i) => (
-                        <DescriptionButton key={i} link={b.link}>
+                        <LinkButton key={i} link={b.link}>
                             {b.icon && (
                                 <Box
                                     component="span"
@@ -106,9 +122,9 @@ export default function DescriptionPanel({
                                 </Box>
                             )}
                             {b.label}
-                        </DescriptionButton>
+                        </LinkButton>
                     ))}
-                    <DescriptionButton sx={{ flexGrow: 1 }} />
+                    <LinkButton sx={{ flexGrow: 1 }} />
                 </DescriptionButtonsContainer>
             ) : null}
         </Box>

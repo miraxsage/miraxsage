@@ -29,7 +29,7 @@ export type TechnologyInterface = [
 ];
 
 export type TechnologiesInterface = {
-    [k: string]: TechnologyInterface[] | TechnologiesInterface;
+    [k: string]: TechnologyInterface[];
 };
 
 export type Technologies = typeof technologies;
@@ -54,22 +54,58 @@ export type TechnologiesList<
         : never
     : never;
 
-export function technologyInfo(
-    technology: TechnologiesList,
-    technologiesList: TechnologiesInterface | null = null
-): TechnologyInterface | null {
-    if (!technologiesList) technologiesList = technologies;
-    for (const [, v] of Object.entries(technologiesList)) {
-        if (Array.isArray(v)) {
-            for (const techInfo of v) {
-                if (technology == techInfo[0]) return techInfo;
-            }
-        } else {
-            const r = technologyInfo(technology, v);
-            if (r) return r;
-        }
+export function getTechnologyInfo(technology: TechnologiesList): TechnologyInterface | null {
+    let result = null;
+    eachTechnologyDo((tech, isCat, val) => {
+        if (!isCat && tech == technology) result = val;
+    });
+    return result;
+}
+
+export function eachTechnologyDo(
+    action: (tech: TechnologiesList<"All">, isCat: boolean, val: TechnologyInterface[] | TechnologyInterface) => void
+) {
+    Object.keys(technologies).forEach((key) => {
+        action(key as TechnologiesList<"Cats">, true, technologies[key as TechnologiesList<"Cats">]);
+        technologies[key as TechnologiesList<"Cats">].forEach((tech) => {
+            action(tech[0], false, tech);
+        });
+    });
+}
+
+export function findTechnology(
+    tech: string
+):
+    | { name: TechnologiesList<"Cats">; isCat: true; val: TechnologyInterface[] }
+    | { name: TechnologiesList<"Techs">; isCat: false; val: TechnologyInterface }
+    | null {
+    tech = tech.trim().toLowerCase().replace(/\s+/, " ");
+    let result = null;
+    eachTechnologyDo((t, isCat, val) => {
+        if (t.toLowerCase() == tech) result = { name: t, isCat, val };
+    });
+    return result;
+}
+
+export function isTechnology(tech: string): tech is TechnologiesList<"All"> {
+    return Boolean(findTechnology(tech));
+}
+
+export function isCategoryTechnology(cat: TechnologiesList<"All">): cat is TechnologiesList<"Cats"> {
+    return cat in technologies;
+}
+
+export function technologiesEqualsOrRelative(techA: TechnologiesList<"All">, techB: TechnologiesList<"All">) {
+    if (techA == techB) return true;
+    const techInfoA = findTechnology(techA);
+    const techInfoB = findTechnology(techB);
+    if (techInfoA?.isCat) {
+        if (techInfoB?.isCat) return false;
+        return techInfoA.val.some(([name]) => name == techInfoB?.name);
+    } else {
+        if (techInfoB?.isCat) techInfoB.val.some(([name]) => name == techInfoA?.name);
     }
-    return null;
+    return false;
 }
 
 export const technologies = {

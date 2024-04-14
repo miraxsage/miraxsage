@@ -7,8 +7,15 @@ import { useLanguage } from "@/store/appearanceSlice";
 import { ReactContentProps } from "@/types/react";
 import { Link, Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Link as MuiLink } from "@mui/material";
-import PagesIntegrator from "./pages/PagesIntegrator";
-import { projects } from "./pages/Projects/Projects";
+//import PagesIntegrator from "./pages/PagesIntegrator";
+import { AppSpinner } from "./AppSpinner";
+import React from "react";
+import { Provider } from "react-redux";
+import ThemeContext from "./contexts/ThemeContext";
+import store from "@/store";
+//import Projects from "./pages/Projects";
+//import About from "./pages/About";
+//import Profile from "./pages/Profile";
 
 function AppLayout({ children }: ReactContentProps) {
     return (
@@ -47,33 +54,61 @@ const router = createBrowserRouter([
             },
             {
                 path: "profile",
-                element: <PagesIntegrator page="profile" />,
+                lazy: async () => {
+                    const { default: Component } = await import("@/components/pages/Profile.tsx");
+                    return { Component };
+                },
+                //element: <Profile />, //<PagesIntegrator page="profile" />,
             },
             {
                 path: "about/:category?/:block?",
-                element: <PagesIntegrator page="about" />,
+                lazy: async () => {
+                    const { default: Component } = await import("@/components/pages/About/index.tsx");
+                    return { Component };
+                },
+                //element: <About />, //<PagesIntegrator page="about" />,
             },
             {
                 path: "projects",
-                element: <PagesIntegrator page="projects" />,
+                lazy: async () => {
+                    const { default: Component } = await import("@/components/pages/Projects/index.tsx");
+                    return { Component };
+                },
+                //element: <Projects />, //<PagesIntegrator page="projects" />,
             },
-            ...projects.map((p) => ({
-                path: `projects/${p.slug}`,
-                lazy: () => import(`@/components/pages/Projects/${p.slug}/index.tsx`),
-            })),
+            {
+                path: `projects/:slug`,
+                lazy: () => import(`@/components/pages/Projects/ProjectPage.tsx`),
+            },
             {
                 path: "interact",
-                element: <PagesIntegrator page="contacts" />,
+                lazy: async () => {
+                    const { default: Component } = await import("@/components/pages/Contacts.tsx");
+                    return { Component };
+                },
+                //element: <PagesIntegrator page="contacts" />,
             },
         ],
     },
 ]);
 
-function App() {
+export function App() {
+    return (
+        <React.StrictMode>
+            <Provider store={store}>
+                <ThemeContext>
+                    <AppContent />
+                </ThemeContext>
+            </Provider>
+        </React.StrictMode>
+    );
+}
+
+function AppContent() {
     useLanguage();
     return (
         <AppLayout>
-            <RouterProvider router={router} />
+            <RouterProvider router={router} fallbackElement={<AppSpinner />} />
         </AppLayout>
     );
 }

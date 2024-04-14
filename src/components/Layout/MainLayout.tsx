@@ -3,12 +3,15 @@ import TopMenu from "./TopMenu";
 import BottomBar from "./BottomBar";
 import AsideMenu from "./AsideMenu";
 import { getThemeColor, useThemeColor } from "../contexts/Theme";
+import { useNavigation } from "react-router-dom";
 
 interface LayoutProps {
     children: React.ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
+    const navigation = useNavigation();
+    console.log("state", navigation.state);
     const theme = useTheme();
     const isDarkMode = theme.palette.mode == "dark";
     const splashScreen = false;
