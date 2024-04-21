@@ -37,15 +37,15 @@ export default function CustomScrollbar({
         <Box
             className="h-full"
             sx={{
-                "& .os-scrollbar.os-scrollbar-vertical.os-scrollbar-cornerless": {
+                "& .os-scrollbar.os-scrollbar-vertical": {
                     top: padding ?? top ?? 0,
                     right: padding ?? right ?? 0,
                     bottom: padding ?? bottom ?? 0,
                 },
-                "& .os-scrollbar.os-scrollbar-horizontal.os-scrollbar-cornerless": {
-                    left: hpadding ?? hleft ?? 0,
-                    right: hpadding ?? hright ?? 0,
-                    bottom: hpadding ?? hbottom ?? 0,
+                "& .os-scrollbar.os-scrollbar-horizontal": {
+                    left: hpadding ?? hleft ?? padding ?? 0,
+                    right: hpadding ?? hright ?? padding ?? 0,
+                    bottom: hpadding ?? hbottom ?? padding ?? 0,
                 },
                 ...sx,
             }}

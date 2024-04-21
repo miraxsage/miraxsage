@@ -14,9 +14,11 @@ import { AppSpinner } from "@/components/Spinners";
 import { getLocatedProjects, getProjectsNavigationLink, useProjectsLocation } from "./projectsNavigation";
 import { getThemeColor } from "@/components/contexts/Theme";
 import ProjectCarousel from "@/components/pages/Projects/ProjectCarousel";
+import ProjectImageViewer from "./ProjectImageViewer";
 
 export default function ProjectPage() {
     const [refreshState, refresh] = useState<boolean>(false);
+    const [beingViewedImage, setBeingViewedImage] = useState<number | undefined>();
     const slug = useParams().slug!;
     const theme = useTheme();
     const lang = useAppearance().language;
@@ -55,77 +57,94 @@ export default function ProjectPage() {
                         <ProjectInfoTable project={slug} />
                     </CustomScrollbar>
                     <Box sx={{ background: theme.palette.divider }}></Box>
-                    <Box className="grid" sx={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
-                        <Box
-                            sx={{
-                                display: "grid",
-                                gridTemplateColumns: "1fr auto 1fr",
-                                "& .MuiSvgIcon-root": {
-                                    color: getThemeColor("regularIcon", theme),
-                                    fontSize: "20px",
-                                    marginRight: "8px",
-                                    position: "relative",
-                                    top: "-2px",
-                                },
-                            }}
-                        >
-                            <LinkButton
-                                borders="bottom"
+                    <Box sx={{ position: "relative" }}>
+                        <Box className="grid" sx={{ gridTemplateRows: "auto minmax(0, 1fr)", height: "100%" }}>
+                            <Box
                                 sx={{
-                                    textAlign: "right",
-                                }}
-                                link={
-                                    prevProjSlug
-                                        ? getProjectsNavigationLink({ project: prevProjSlug }, curProjectLocation!)
-                                        : undefined
-                                }
-                            >
-                                {prevProjSlug && (
-                                    <>
-                                        <ArrowBackIcon />
-                                        Предыдущий
-                                    </>
-                                )}
-                            </LinkButton>
-                            <LinkButton
-                                borders="right-bottom-left"
-                                link={getProjectsNavigationLink({ project: "all" }, curProjectLocation!)}
-                            >
-                                <RocketLaunchIcon />
-                                Все проекты
-                            </LinkButton>
-                            <LinkButton
-                                borders="bottom"
-                                link={
-                                    nextProjSlug
-                                        ? getProjectsNavigationLink({ project: nextProjSlug }, curProjectLocation!)
-                                        : undefined
-                                }
-                                sx={{
+                                    display: "grid",
+                                    gridTemplateColumns: "1fr auto 1fr",
                                     "& .MuiSvgIcon-root": {
-                                        margin: "0px 0px 0px 8px",
+                                        color: getThemeColor("regularIcon", theme),
+                                        fontSize: "20px",
+                                        marginRight: "8px",
+                                        position: "relative",
+                                        top: "-2px",
                                     },
                                 }}
                             >
-                                {nextProjSlug && (
-                                    <>
-                                        Следующий
-                                        <ArrowForwardIcon />
-                                    </>
-                                )}
-                            </LinkButton>
+                                <LinkButton
+                                    borders="bottom"
+                                    sx={{
+                                        textAlign: "right",
+                                    }}
+                                    link={
+                                        prevProjSlug
+                                            ? getProjectsNavigationLink({ project: prevProjSlug }, curProjectLocation!)
+                                            : undefined
+                                    }
+                                >
+                                    {prevProjSlug && (
+                                        <>
+                                            <ArrowBackIcon />
+                                            Предыдущий
+                                        </>
+                                    )}
+                                </LinkButton>
+                                <LinkButton
+                                    borders="right-bottom-left"
+                                    link={getProjectsNavigationLink({ project: "all" }, curProjectLocation!)}
+                                >
+                                    <RocketLaunchIcon />
+                                    Все проекты
+                                </LinkButton>
+                                <LinkButton
+                                    borders="bottom"
+                                    link={
+                                        nextProjSlug
+                                            ? getProjectsNavigationLink({ project: nextProjSlug }, curProjectLocation!)
+                                            : undefined
+                                    }
+                                    sx={{
+                                        "& .MuiSvgIcon-root": {
+                                            margin: "0px 0px 0px 8px",
+                                        },
+                                    }}
+                                >
+                                    {nextProjSlug && (
+                                        <>
+                                            Следующий
+                                            <ArrowForwardIcon />
+                                        </>
+                                    )}
+                                </LinkButton>
+                            </Box>
+                            {content.current[lang] ? (
+                                <CustomScrollbar sx={{ padding: "15px" }}>
+                                    {
+                                        <div style={{ width: "100%" }}>
+                                            {
+                                                <ProjectCarousel
+                                                    key={`${slug}-carousel`}
+                                                    project={curProject}
+                                                    onImageClick={(img) => setBeingViewedImage(img)}
+                                                />
+                                            }
+                                            {content.current[lang]}
+                                        </div>
+                                    }
+                                </CustomScrollbar>
+                            ) : (
+                                <AppSpinner compact={true} />
+                            )}
                         </Box>
-                        {content.current[lang] ? (
-                            <CustomScrollbar sx={{ padding: "15px" }}>
-                                {
-                                    <div style={{ width: "100%" }}>
-                                        {<ProjectCarousel project={curProject} />}
-                                        {content.current[lang]}
-                                    </div>
-                                }
-                            </CustomScrollbar>
-                        ) : (
-                            <AppSpinner compact={true} />
+                        {beingViewedImage && (
+                            <Box sx={{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%" }}>
+                                <ProjectImageViewer
+                                    image={beingViewedImage}
+                                    project={curProject}
+                                    onClose={() => setBeingViewedImage(undefined)}
+                                />
+                            </Box>
                         )}
                     </Box>
                 </Box>

@@ -47,14 +47,15 @@ export function LinkButton({ link, children, sx, borders, withoutBorders = false
                 color: getThemeColor("regularText", theme),
                 cursor: !link ? "auto" : "pointer",
                 "&:last-child": { borderRightWidth: 0 },
-                "&:hover": !link
-                    ? {}
-                    : {
-                          textDecoration: "underline",
-                          textUnderlineOffset: "4px",
-                          transition: "background 0.25s",
-                          background: getThemeColor("titleBg", theme),
-                      },
+                "&:hover":
+                    !link && !onClick
+                        ? {}
+                        : {
+                              textDecoration: "underline",
+                              textUnderlineOffset: "4px",
+                              transition: "background 0.25s",
+                              background: getThemeColor("titleBg", theme),
+                          },
                 "& .MuiSvgIcon-root": {
                     color: getThemeColor("regularIcon", theme),
                 },

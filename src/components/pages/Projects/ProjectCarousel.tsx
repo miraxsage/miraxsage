@@ -20,6 +20,7 @@ interface SwiperElement extends HTMLElement {
         slidePrev: () => void;
         on: (event: string, handler: () => void) => void;
         progress: number;
+        destroy: () => void;
     };
 }
 
@@ -70,17 +71,20 @@ export default function ProjectCarousel({ project, onImageClick }: ProjectCarous
                 el: ".swiper-pagination",
             },
         };
+        let swiper: SwiperElement["swiper"] | null = null;
         if (rootRef.current) {
             setTimeout(() => {
                 if (rootRef.current) {
                     Object.assign(rootRef.current, swiperParams);
                     rootRef.current.initialize();
-                    rootRef.current.swiper.on("slideChange", function () {
+                    swiper = rootRef.current.swiper;
+                    swiper.on("slideChange", function () {
                         actualContext.current?.refreshProgress?.();
                     });
                 }
             });
         }
+        return () => swiper?.destroy();
     }, []);
     const slides = Array.from(new Array(project.images)).map((_e, i) => (
         <swiper-slide>
@@ -91,7 +95,7 @@ export default function ProjectCarousel({ project, onImageClick }: ProjectCarous
                     position: "relative",
                     boxSizing: "border-box",
                 }}
-                onClick={() => onImageClick?.(i)}
+                onClick={() => onImageClick?.(i + 1)}
             >
                 <Box sx={{ position: "absolute", width: "100%", height: "100%" }}>
                     <SimpleSpinner />

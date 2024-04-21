@@ -59,6 +59,7 @@ export function AppSpinner({ compact }: { compact?: boolean }) {
         };`;
         loaderStyles.id = stylesId;
         document.querySelector("head")?.appendChild(loaderStyles);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
