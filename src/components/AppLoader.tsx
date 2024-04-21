@@ -1,6 +1,6 @@
 import { useState } from "react";
 import CascadiaExtraLight from "@/assets/fonts/CascadiaCodePL-Light.woff2";
-import { AppSpinner } from "./AppSpinner";
+import { AppSpinner } from "./Spinners";
 
 let AppComponent: React.FC | null = null;
 

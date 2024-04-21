@@ -1,7 +1,7 @@
 import { Box, SxProps, styled, useTheme } from "@mui/material";
 import { getThemeColor } from "@/components/contexts/Theme";
 import { useNavigate } from "react-router-dom";
-import { ReactNode } from "react";
+import { MouseEventHandler, ReactNode } from "react";
 import { AllUnionStringCombinations } from "@/types/common";
 
 const DescriptionElement = styled(Box, { shouldForwardProp: (prop) => prop != "withoutPadding" })<{
@@ -19,10 +19,12 @@ export type LinkButton = {
     link?: string;
     children?: ReactNode;
     sx?: SxProps;
-    borders?: AllUnionStringCombinations<"top" | "right" | "bottom" | "left"> | "none";
+    borders?: AllUnionStringCombinations<"top" | "right" | "bottom" | "left">;
+    withoutBorders?: boolean;
+    onClick?: MouseEventHandler;
 };
 
-export function LinkButton({ link, children, sx, borders }: LinkButton) {
+export function LinkButton({ link, children, sx, borders, withoutBorders = false, onClick }: LinkButton) {
     const theme = useTheme();
     const navigate = useNavigate();
     return (
@@ -34,13 +36,13 @@ export function LinkButton({ link, children, sx, borders }: LinkButton) {
                 borderStyle: "solid",
                 userSelect: "none",
                 lineHeight: 1.25,
-                borderWidth: borders
-                    ? borders == "none"
-                        ? "0px"
+                borderWidth: !withoutBorders
+                    ? borders == undefined
+                        ? "1px"
                         : `${borders.includes("top") ? 1 : 0}px ${borders.includes("right") ? 1 : 0}px ${
                               borders.includes("bottom") ? 1 : 0
                           }px ${borders.includes("left") ? 1 : 0}px `
-                    : "1px",
+                    : "0px",
                 borderColor: theme.palette.divider,
                 color: getThemeColor("regularText", theme),
                 cursor: !link ? "auto" : "pointer",
@@ -58,14 +60,13 @@ export function LinkButton({ link, children, sx, borders }: LinkButton) {
                 },
                 ...sx,
             }}
-            onClick={
-                link
-                    ? (e) => {
-                          e.preventDefault();
-                          navigate(link);
-                      }
-                    : undefined
-            }
+            onClick={(e) => {
+                if (onClick) onClick(e);
+                if (link) {
+                    e.preventDefault();
+                    navigate(link);
+                }
+            }}
         >
             {children}
         </Box>

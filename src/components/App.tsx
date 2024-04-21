@@ -8,7 +8,7 @@ import { ReactContentProps } from "@/types/react";
 import { Link, Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Link as MuiLink } from "@mui/material";
 //import PagesIntegrator from "./pages/PagesIntegrator";
-import { AppSpinner } from "./AppSpinner";
+import { AppSpinner } from "./Spinners";
 import React from "react";
 import { Provider } from "react-redux";
 import ThemeContext from "./contexts/ThemeContext";

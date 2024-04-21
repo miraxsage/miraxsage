@@ -15,6 +15,7 @@ import deepMerge from "@/utilities/common";
 declare module "@mui/material" {
     interface ButtonPropsColorOverrides {
         contrast: true;
+        regular: true;
         bg: true;
         thirdary: true;
     }
@@ -90,6 +91,11 @@ export const lightTheme = createTheme(
         palette: {
             mode: "light",
             divider: "#d1d1d1",
+            regular: {
+                light: "#f9f9f9",
+                main: "#a4a4a4",
+                dark: "#414141",
+            },
             contrast: {
                 light: "#4d4d4d",
                 main: "#a4a4a4",
@@ -155,6 +161,11 @@ export const darkTheme = createTheme(
         palette: {
             mode: "dark",
             divider: "#2c2f3e",
+            regular: {
+                light: "#a0a3b1",
+                main: "#676a78",
+                dark: "#2c2f3e",
+            },
             contrast: {
                 light: "#ececec",
                 main: "#a2a2a2",

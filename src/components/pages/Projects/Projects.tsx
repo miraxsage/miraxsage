@@ -13,7 +13,7 @@ export type ProjectInterface = {
     devTimeMonths: number;
     gitHubLink?: string;
     technologies: TechnologiesList[];
-    images: string[];
+    images: number;
     coverBrightmess?: "ligth" | "dark";
 };
 
@@ -43,7 +43,7 @@ export const projects = [
         devTimeMonths: 11,
         gitHubLink: "https://github.com/miraxsage/wordsense",
         technologies: ["HTML", "CSS", "JS", "JQuery", "PHP", "Yii2"],
-        images: [],
+        images: 18,
     },
     {
         slug: "webarch-theme",
@@ -57,7 +57,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: ["HTML", "CSS", "JS", "React", "PHP", "Wordpress", "MySQL"],
-        images: [],
+        images: 0,
     },
     {
         slug: "auto-stock",
@@ -74,7 +74,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: ["HTML", "CSS", "JS", "JQuery", "PHP", "Wordpress", "MySQL", "1C"],
-        images: [],
+        images: 0,
     },
     {
         slug: "turicum",
@@ -88,7 +88,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: ["HTML", "CSS", "JS", "JQuery", "PHP", "Wordpress"],
-        images: [],
+        images: 0,
     },
     {
         slug: "formula",
@@ -102,11 +102,11 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: ["HTML", "CSS", "JS", "JQuery", "PHP", "Wordpress", "MySQL"],
-        images: [],
+        images: 0,
     },
     {
         slug: "hs-portal",
-        name: { en: "", ru: "HS-PORTAL — строительная компания" },
+        name: { en: "HS-PORTAL — сonstruction company", ru: "HS-PORTAL — строительная компания" },
         shortName: { en: "Construction company", ru: "Строительная компания" },
         description: { en: "Construction company", ru: "Строительная компания" },
         domain: "Сonstruction",
@@ -116,7 +116,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: ["HTML", "CSS", "JS", "JQuery", "PHP", "Wordpress", "MySQL"],
-        images: [],
+        images: 0,
     },
     {
         slug: "numerology",
@@ -130,7 +130,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: ["HTML", "CSS", "JS", "JQuery", "PHP", "Wordpress"],
-        images: [],
+        images: 0,
         coverBrightmess: "dark",
     },
     {
@@ -145,7 +145,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: ["HTML", "CSS", "JS", "JQuery", "PHP", "Wordpress"],
-        images: [],
+        images: 0,
     },
     {
         slug: "wordsense",
@@ -163,7 +163,7 @@ export const projects = [
         devTimeMonths: 11,
         gitHubLink: "https://github.com/miraxsage/wordsense",
         technologies: ["HTML", "CSS", "JS", "JQuery", "PHP", "Wordpress"],
-        images: [],
+        images: 0,
     },
     {
         slug: "miraxsage",
@@ -177,7 +177,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: ["HTML", "CSS", "JS", "JQuery", "PHP", "Wordpress"],
-        images: [],
+        images: 0,
         coverBrightmess: "dark",
     },
 
@@ -197,7 +197,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: [".NET Framework", "Visual C#", "WPF"],
-        images: [],
+        images: 0,
     },
     {
         slug: "syntax-resolver",
@@ -211,7 +211,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: [".NET Framework", "Visual C#", "WPF"],
-        images: [],
+        images: 0,
     },
     {
         slug: "dep-workflow",
@@ -228,7 +228,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: [".NET Framework", "Visual C#", "WPF"],
-        images: [],
+        images: 0,
     },
     {
         slug: "multi-cropper",
@@ -245,7 +245,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: [".NET Framework", "Visual C#", "WPF"],
-        images: [],
+        images: 0,
         coverBrightmess: "dark",
     },
     {
@@ -263,7 +263,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: [".NET Framework", "Visual C#", "WPF"],
-        images: [],
+        images: 0,
         coverBrightmess: "dark",
     },
     {
@@ -278,7 +278,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: [".NET Framework", "Visual C#", "WPF"],
-        images: [],
+        images: 0,
         coverBrightmess: "dark",
     },
     {
@@ -296,7 +296,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: [".NET Framework", "Visual C#", "WPF"],
-        images: [],
+        images: 0,
     },
     {
         slug: "water-marker",
@@ -313,7 +313,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: [".NET Framework", "Visual C#", "WPF"],
-        images: [],
+        images: 0,
     },
     {
         slug: "gal-extender",
@@ -330,7 +330,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: [".NET Framework", "Visual C#", "WPF"],
-        images: [],
+        images: 0,
         coverBrightmess: "dark",
     },
     {
@@ -345,7 +345,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: [".NET Framework", "Visual C#", "WPF"],
-        images: [],
+        images: 0,
     },
     {
         slug: "suzrp",
@@ -362,7 +362,7 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: ["1C"],
-        images: [],
+        images: 0,
     },
     {
         slug: "cook-book",
@@ -379,6 +379,6 @@ export const projects = [
         participating: "team",
         devTimeMonths: 11,
         technologies: [".NET Framework", "Visual C#", "WPF"],
-        images: [],
+        images: 0,
     },
 ] as const satisfies ProjectInterface[];

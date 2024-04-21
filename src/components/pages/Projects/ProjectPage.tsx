@@ -10,8 +10,10 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useAppearance } from "@/store/appearanceSlice";
-import { AppSpinner } from "@/components/AppSpinner";
+import { AppSpinner } from "@/components/Spinners";
 import { getLocatedProjects, getProjectsNavigationLink, useProjectsLocation } from "./projectsNavigation";
+import { getThemeColor } from "@/components/contexts/Theme";
+import ProjectCarousel from "@/components/pages/Projects/ProjectCarousel";
 
 export default function ProjectPage() {
     const [refreshState, refresh] = useState<boolean>(false);
@@ -22,6 +24,7 @@ export default function ProjectPage() {
     const curProjectLocation = useProjectsLocation();
     const locatedProjects = getLocatedProjects(curProjectLocation!, lang);
     const curProjIndex = locatedProjects.findIndex((p) => p.slug == slug);
+    const curProject = locatedProjects[curProjIndex];
     const prevProjSlug = curProjIndex < 0 ? "all" : curProjIndex == 0 ? null : locatedProjects[curProjIndex - 1].slug;
     const nextProjSlug =
         curProjIndex < 0
@@ -58,6 +61,7 @@ export default function ProjectPage() {
                                 display: "grid",
                                 gridTemplateColumns: "1fr auto 1fr",
                                 "& .MuiSvgIcon-root": {
+                                    color: getThemeColor("regularIcon", theme),
                                     fontSize: "20px",
                                     marginRight: "8px",
                                     position: "relative",
@@ -112,17 +116,16 @@ export default function ProjectPage() {
                             </LinkButton>
                         </Box>
                         {content.current[lang] ? (
-                            content.current[lang]
+                            <CustomScrollbar sx={{ padding: "15px" }}>
+                                {
+                                    <div style={{ width: "100%" }}>
+                                        {<ProjectCarousel project={curProject} />}
+                                        {content.current[lang]}
+                                    </div>
+                                }
+                            </CustomScrollbar>
                         ) : (
-                            <Box
-                                sx={{
-                                    "& .loader-container": {
-                                        minHeight: "unset",
-                                    },
-                                }}
-                            >
-                                <AppSpinner />
-                            </Box>
+                            <AppSpinner compact={true} />
                         )}
                     </Box>
                 </Box>

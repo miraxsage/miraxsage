@@ -1,4 +1,4 @@
-import { AppSpinner } from "../AppSpinner";
+import { AppSpinner } from "../Spinners";
 
 export default function Contacts() {
     return <AppSpinner />;
