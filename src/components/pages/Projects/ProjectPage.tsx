@@ -1,6 +1,6 @@
 import { Box, useTheme } from "@mui/material";
 import ProjectsBreadcrumbs from "./ProjectsBreadcrumbs";
-import { isProjectSlug } from "./Projects";
+import { isProjectSlug, projects } from "./Projects";
 import { useParams } from "react-router-dom";
 import ProjectInfoTable from "./ProjectInfoTable";
 import CustomScrollbar from "@/components/Scrollbar";
@@ -15,6 +15,7 @@ import { getLocatedProjects, getProjectsNavigationLink, useProjectsLocation } fr
 import { getThemeColor } from "@/components/contexts/Theme";
 import ProjectCarousel from "@/components/pages/Projects/ProjectCarousel";
 import ProjectImageViewer from "./ProjectImageViewer";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function ProjectPage() {
     const [refreshState, refresh] = useState<boolean>(false);
@@ -22,10 +23,28 @@ export default function ProjectPage() {
     const slug = useParams().slug!;
     const theme = useTheme();
     const lang = useAppearance().language;
-    const content = useRef<{ ru: ReactNode; en: ReactNode; slug: string }>({ ru: null, en: null, slug });
     const curProjectLocation = useProjectsLocation();
     const locatedProjects = getLocatedProjects(curProjectLocation!, lang);
+    const allProjectsLocation = curProjectLocation!.techs.length == 0 || locatedProjects.length == projects.length;
+    const content = useRef<{ ru: ReactNode; en: ReactNode; slug: string; swapDirection?: "left" | "right" }>({
+        ru: null,
+        en: null,
+        slug,
+    });
+    const prevProjIndex = locatedProjects.findIndex((p) => p.slug == content.current.slug);
     const curProjIndex = locatedProjects.findIndex((p) => p.slug == slug);
+    if (content.current.slug != slug) {
+        const swapDirection = prevProjIndex < 0 ? undefined : prevProjIndex < curProjIndex ? "right" : "left";
+        content.current = { ru: null, en: null, slug, swapDirection };
+    }
+    if (
+        !content.current[lang] &&
+        Object.keys(content.current).some(
+            (k) => !k.match(/^slug|swap/) && content.current[k as keyof typeof content.current]
+        )
+    )
+        content.current.swapDirection = undefined;
+    const swapDir = content.current.swapDirection;
     const curProject = locatedProjects[curProjIndex];
     const prevProjSlug = curProjIndex < 0 ? "all" : curProjIndex == 0 ? null : locatedProjects[curProjIndex - 1].slug;
     const nextProjSlug =
@@ -35,11 +54,10 @@ export default function ProjectPage() {
             ? null
             : locatedProjects[curProjIndex + 1].slug;
     useEffect(() => {
-        if (content.current.slug != slug) content.current = { ru: null, en: null, slug };
         (async () => {
             try {
                 const Module = await import(`@/components/pages/Projects/${slug}/${lang}.tsx`);
-                content.current[lang] = <Module.Component />;
+                content.current[lang] = <Module.Component onImageClick={(img: number) => setBeingViewedImage(img)} />;
             } catch {
                 content.current[lang] = lang == "ru" ? "Описание проекта отсутствует" : "Project's description absents";
             }
@@ -83,19 +101,17 @@ export default function ProjectPage() {
                                             : undefined
                                     }
                                 >
-                                    {prevProjSlug && (
-                                        <>
-                                            <ArrowBackIcon />
-                                            Предыдущий
-                                        </>
-                                    )}
+                                    <div style={{ opacity: prevProjSlug ? 1 : 0.5 }}>
+                                        <ArrowBackIcon />
+                                        Предыдущий
+                                    </div>
                                 </LinkButton>
                                 <LinkButton
                                     borders="right-bottom-left"
                                     link={getProjectsNavigationLink({ project: "all" }, curProjectLocation!)}
                                 >
                                     <RocketLaunchIcon />
-                                    Все проекты
+                                    {allProjectsLocation ? "Все проекты" : "Все выбранные проекты"}
                                 </LinkButton>
                                 <LinkButton
                                     borders="bottom"
@@ -110,32 +126,79 @@ export default function ProjectPage() {
                                         },
                                     }}
                                 >
-                                    {nextProjSlug && (
-                                        <>
-                                            Следующий
-                                            <ArrowForwardIcon />
-                                        </>
-                                    )}
+                                    <div style={{ opacity: nextProjSlug ? 1 : 0.5 }}>
+                                        Следующий
+                                        <ArrowForwardIcon />
+                                    </div>
                                 </LinkButton>
                             </Box>
-                            {content.current[lang] ? (
-                                <CustomScrollbar sx={{ padding: "15px" }}>
-                                    {
-                                        <div style={{ width: "100%" }}>
-                                            {
-                                                <ProjectCarousel
-                                                    key={`${slug}-carousel`}
-                                                    project={curProject}
-                                                    onImageClick={(img) => setBeingViewedImage(img)}
-                                                />
-                                            }
-                                            {content.current[lang]}
-                                        </div>
-                                    }
-                                </CustomScrollbar>
-                            ) : (
-                                <AppSpinner compact={true} />
-                            )}
+                            <Box sx={{ display: "grid", gridTemplateRows: "minmax(0, 1fr)", height: "100%" }}>
+                                <AnimatePresence mode="sync">
+                                    {content.current[lang] ? (
+                                        <motion.div
+                                            key={`${slug}-content`}
+                                            initial={{ opacity: 0 }}
+                                            animate={{
+                                                opacity: 1,
+                                                clipPath: [
+                                                    !swapDir
+                                                        ? "circle(75% at 50% -300%)"
+                                                        : swapDir == "left"
+                                                        ? "circle(75% at -300% 50%)"
+                                                        : "circle(75% at 300% 50%)",
+                                                    "circle(75% at 50% 50%)",
+                                                    "circle(1000% at 50% 50%)",
+                                                ],
+                                                transition: {
+                                                    opacity: { duration: 0.45 },
+                                                    clipPath: { duration: 0.5, times: [0, 0.99, 1] },
+                                                },
+                                            }}
+                                            exit={{
+                                                opacity: 0.2,
+                                                clipPath: "circle(1000% at 50% 50%)",
+                                                transition: { duration: 0.5 },
+                                            }}
+                                            style={{ gridArea: "1/1/1/1", height: "100%" }}
+                                        >
+                                            <CustomScrollbar padding="5px">
+                                                {
+                                                    <Box
+                                                        sx={{
+                                                            width: "100%",
+                                                            padding: "15px",
+                                                            "& p": {
+                                                                textIndent: "40px",
+                                                                textAlign: "justify",
+                                                            },
+                                                        }}
+                                                    >
+                                                        {
+                                                            <ProjectCarousel
+                                                                key={`${slug}-carousel`}
+                                                                project={curProject}
+                                                                onImageClick={(img) => setBeingViewedImage(img)}
+                                                            />
+                                                        }
+                                                        {content.current[lang]}
+                                                    </Box>
+                                                }
+                                            </CustomScrollbar>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div
+                                            key={`${slug}-spinner`}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.1, delay: swapDir ? 0.15 : 0 }}
+                                            style={{ gridArea: "1/1/1/1", height: "100%" }}
+                                        >
+                                            <AppSpinner withoutBg={true} compact={true} />
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </Box>
                         </Box>
                         {beingViewedImage && (
                             <Box sx={{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%" }}>

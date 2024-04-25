@@ -2,7 +2,6 @@ import { Box, SxProps, styled, useTheme } from "@mui/material";
 import { getThemeColor } from "@/components/contexts/Theme";
 import { useNavigate } from "react-router-dom";
 import { MouseEventHandler, ReactNode } from "react";
-import { AllUnionStringCombinations } from "@/types/common";
 
 const DescriptionElement = styled(Box, { shouldForwardProp: (prop) => prop != "withoutPadding" })<{
     withoutPadding?: boolean;
@@ -19,12 +18,25 @@ export type LinkButton = {
     link?: string;
     children?: ReactNode;
     sx?: SxProps;
-    borders?: AllUnionStringCombinations<"top" | "right" | "bottom" | "left">;
-    withoutBorders?: boolean;
+    borders?:
+        | "top"
+        | "right"
+        | "bottom"
+        | "left"
+        | "top-right"
+        | "top-right-bottom"
+        | "right-bottom"
+        | "right-bottom-left"
+        | "bottom-left"
+        | "bottom-left-top"
+        | "left-top"
+        | "left-top-right"
+        | "all"
+        | "none";
     onClick?: MouseEventHandler;
 };
 
-export function LinkButton({ link, children, sx, borders, withoutBorders = false, onClick }: LinkButton) {
+export function LinkButton({ link, children, sx, borders, onClick }: LinkButton) {
     const theme = useTheme();
     const navigate = useNavigate();
     return (
@@ -36,13 +48,14 @@ export function LinkButton({ link, children, sx, borders, withoutBorders = false
                 borderStyle: "solid",
                 userSelect: "none",
                 lineHeight: 1.25,
-                borderWidth: !withoutBorders
-                    ? borders == undefined
+                borderWidth:
+                    borders == "none" || !borders
+                        ? "0px"
+                        : borders == "all"
                         ? "1px"
                         : `${borders.includes("top") ? 1 : 0}px ${borders.includes("right") ? 1 : 0}px ${
                               borders.includes("bottom") ? 1 : 0
-                          }px ${borders.includes("left") ? 1 : 0}px `
-                    : "0px",
+                          }px ${borders.includes("left") ? 1 : 0}px `,
                 borderColor: theme.palette.divider,
                 color: getThemeColor("regularText", theme),
                 cursor: !link ? "auto" : "pointer",

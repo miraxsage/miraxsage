@@ -7,7 +7,7 @@ function copyWordCasing(initialWord: string, targetWord: string) {
 }
 function copyTextCasing(initialText: string, targetText: string) {
     initialText = initialText.trim();
-    targetText = targetText.trim().toLowerCase();
+    targetText = targetText.trim();
     const initialWords = initialText.split(" ");
     const targetWords = targetText.split(" ");
     if (initialWords.length != targetWords.length) return copyWordCasing(initialText, targetText);

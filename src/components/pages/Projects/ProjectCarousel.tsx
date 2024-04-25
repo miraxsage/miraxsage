@@ -1,10 +1,14 @@
-import { Box, Button, useTheme } from "@mui/material";
+import { Box, Button, lighten, useTheme } from "@mui/material";
 import { register } from "swiper/element/bundle";
 import { useEffect, useRef, useState } from "react";
 import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { ProjectInterface } from "./Projects";
+import { ProjectInterface, ProjectsList } from "./Projects";
 import { SimpleSpinner } from "../../Spinners";
+import { ProjectCardImage } from "./ProjectCard";
+import { getThemeColor } from "@/components/contexts/Theme";
+import { useColorMode } from "@/store/appearanceSlice";
+import { darken } from "@mui/material";
 
 let swiperWebComponentsAreRegistered = false;
 
@@ -44,6 +48,7 @@ type ProjectCarouselProps = {
 
 export default function ProjectCarousel({ project, onImageClick }: ProjectCarouselProps) {
     const theme = useTheme();
+    const isDarkMode = useColorMode().dark;
     const [progress, setProgress] = useState<"start" | "middle" | "end">("start");
     const actualContext = useRef<{ refreshProgress?: () => void }>({});
     if (!swiperWebComponentsAreRegistered) {
@@ -97,10 +102,10 @@ export default function ProjectCarousel({ project, onImageClick }: ProjectCarous
                 }}
                 onClick={() => onImageClick?.(i + 1)}
             >
-                <Box sx={{ position: "absolute", width: "100%", height: "100%" }}>
+                <Box className="loader-container" sx={{ position: "absolute", width: "100%", height: "100%" }}>
                     <SimpleSpinner />
                 </Box>
-                <Box
+                {/* <Box
                     sx={{
                         width: "100%",
                         height: "100%",
@@ -113,6 +118,30 @@ export default function ProjectCarousel({ project, onImageClick }: ProjectCarous
                     loading="lazy"
                     onLoad={(e) => {
                         if (e.target) (e.target as HTMLElement).parentElement?.querySelector(":scope > div")?.remove();
+                    }}
+                /> */}
+                <ProjectCardImage
+                    slug={project.slug as ProjectsList}
+                    img={i + 1}
+                    lazyLoading={true}
+                    sx={{
+                        "&:after": {
+                            content: '""',
+                            display: "block",
+                            position: "absolute",
+                            top: 0,
+                            right: 0,
+                            height: "100%",
+                            width: "5px",
+                            background: getThemeColor("layoutBackground", theme),
+                        },
+                    }}
+                    onImageLoad={(e) => {
+                        if (e.target)
+                            (e.target as HTMLElement)
+                                .closest("swiper-slide")
+                                ?.querySelector(":scope .loader-container")
+                                ?.remove();
                     }}
                 />
             </Box>
@@ -131,7 +160,9 @@ export default function ProjectCarousel({ project, onImageClick }: ProjectCarous
                 borderRadius: "5px",
                 minHeight: "202px",
                 "& swiper-container": {
-                    "--swiper-pagination-bullet-inactive-color": theme.palette.divider,
+                    "--swiper-pagination-bullet-inactive-color": isDarkMode
+                        ? lighten(theme.palette.divider, 0.3)
+                        : darken(theme.palette.divider, 0.5),
                     "--swiper-pagination-bullet-inactive-opacity": 0.5,
                     "--swiper-theme-color": theme.palette.primary.main,
                     "--swiper-pagination-bottom": "4px",
@@ -149,6 +180,7 @@ export default function ProjectCarousel({ project, onImageClick }: ProjectCarous
                     borderRight: `1px solid ${theme.palette.divider}`,
                     borderRadius: "4px 0px 0px 4px",
                     minWidth: "45px",
+                    marginRight: "5px",
                 }}
                 onClick={() => navigate("prev")}
             >

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import LogoIcon from "./icons/Logo";
 
-export function AppSpinner({ compact }: { compact?: boolean }) {
+export function AppSpinner({ compact, withoutBg }: { compact?: boolean; withoutBg?: boolean }) {
     const stylesId = compact ? "app-loader-compact-styles" : "app-loader-styles";
     useEffect(() => {
         const appearanceConfig = JSON.parse(localStorage.getItem("appearanceConfig") ?? "{}") ?? {
@@ -22,7 +22,7 @@ export function AppSpinner({ compact }: { compact?: boolean }) {
             margin: 0;
         }
         .${stylesId}.loader-container{
-            background: ${bg};
+            background: ${withoutBg ? "transparent" : bg};
             display: flex;
             align-items: center;
             justify-content: center;

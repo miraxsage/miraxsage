@@ -2,10 +2,10 @@ import { Box, SxProps, alpha, lighten, useMediaQuery, useTheme } from "@mui/mate
 import { TechnologiesList, getTechnologyInfo } from "../About/Blocks/specs/Technologies";
 import StarIcon from "@mui/icons-material/Star";
 import CustomScrollbar from "@/components/Scrollbar";
-import { ProjectInterface } from "./Projects";
+import { ProjectInterface, ProjectsList, projects } from "./Projects";
 import { getThemeColor } from "@/components/contexts/Theme";
 import { useId } from "react";
-import { useAppearance } from "@/store/appearanceSlice";
+import { useAppearance, useColorMode } from "@/store/appearanceSlice";
 
 type ProjectCardProps = {
     project: ProjectInterface;
@@ -86,6 +86,68 @@ function Title({ children }: { children: string }) {
     );
 }
 
+export type ProjectCardImageProps = {
+    slug: ProjectsList;
+    img?: number;
+    component?: React.ElementType;
+    lazyLoading?: boolean;
+    onImageLoad?: React.ReactEventHandler<HTMLImageElement>;
+    sx?: SxProps;
+};
+
+export function ProjectCardImage({ slug, img, component, lazyLoading, onImageLoad, sx }: ProjectCardImageProps) {
+    const theme = useTheme();
+    const isDarkMode = useColorMode().dark;
+    const project: ProjectInterface | undefined = projects.find((p) => p.slug == slug);
+    if (!slug || !project) return null;
+    return (
+        <Box
+            component={component}
+            sx={{
+                overflow: "hidden",
+                position: "relative",
+                cursor: "pointer",
+                background: getThemeColor("layoutBackground", theme),
+                "& img": {
+                    transition: "opacity 0.2s, transform 0.3s cubic-bezier(0.33, 1, 0.68, 1)",
+                    "&:first-of-type": {
+                        mixBlendMode: isDarkMode
+                            ? project.coverBrightmess == "dark"
+                                ? "luminosity"
+                                : "soft-light"
+                            : "normal",
+                        filter: isDarkMode
+                            ? project.coverBrightmess == "dark"
+                                ? "grayscale(1) contrast(1.05) brightness(0.7)"
+                                : "grayscale(1) contrast(0.6)"
+                            : "grayscale(1)",
+                        opacity: isDarkMode ? (project.coverBrightmess == "dark" ? 0.35 : 1) : 0.55,
+                    },
+                    "&:last-of-type": {
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        opacity: 0,
+                        "&:hover": {
+                            opacity: isDarkMode ? 0.8 : 1,
+                            transform: "scale(1.05)",
+                        },
+                    },
+                },
+                ...sx,
+            }}
+        >
+            <img
+                {...(lazyLoading ? { loading: "lazy" } : {})}
+                {...(onImageLoad ? { onLoad: onImageLoad } : {})}
+                data-img-num={img}
+                src={`/img/projects/${slug}/${img ? img + "_preview" : "cover"}.jpg`}
+            />
+            <img data-img-num={img} src={`/img/projects/${slug}/${img ? img + "_preview" : "cover"}.jpg`} />
+        </Box>
+    );
+}
+
 export default function ProjectCard({ project, sx, style, onClick }: ProjectCardProps) {
     const theme = useTheme();
     const threeCols = useMediaQuery(theme.breakpoints.only("3xl"));
@@ -104,38 +166,6 @@ export default function ProjectCard({ project, sx, style, onClick }: ProjectCard
                 position: "relative",
                 transition: "all 0.3s",
                 transitionProperty: "color, background",
-                "& .img-container": {
-                    overflow: "hidden",
-                    position: "relative",
-                    borderRadius: "8px 8px 0px 0px",
-                    "& img": {
-                        objectFit: "cover",
-                        width: "100%",
-                        height: "100%",
-                        mixBlendMode: isDarkMode
-                            ? project.coverBrightmess == "dark"
-                                ? "luminosity"
-                                : "soft-light"
-                            : "normal",
-                        filter: isDarkMode
-                            ? project.coverBrightmess == "dark"
-                                ? "grayscale(1) contrast(1.05) brightness(0.7)"
-                                : "grayscale(1) contrast(0.6)"
-                            : "grayscale(1)",
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        transition: "opacity 0.3s",
-                        "&:first-of-type": {
-                            opacity: isDarkMode ? (project.coverBrightmess == "dark" ? 0.35 : 1) : 0.4,
-                        },
-                        "&:last-of-type": {
-                            opacity: 0,
-                            mixBlendMode: "normal",
-                            filter: "grayscale(0) contrast(1)",
-                        },
-                    },
-                },
                 "& .MuiSvgIcon-root": {
                     fontSize: "19px",
                     color: getThemeColor("regularIcon", theme),
@@ -230,12 +260,13 @@ export default function ProjectCard({ project, sx, style, onClick }: ProjectCard
                     display: "grid",
                     gridTemplateRows: "200px auto 102px",
                     cursor: "pointer",
-                    transition: "all 0.3s",
+                    transition: "color 0.3s",
                     "&:hover": {
                         color: getThemeColor("regularHoverIcon", theme),
                         background: getThemeColor("cardHoverBg", theme),
-                        "& .img-container img:last-of-type": {
-                            opacity: isDarkMode ? 0.7 : 1,
+                        "& img:last-of-type": {
+                            opacity: isDarkMode ? 0.8 : 1,
+                            transform: "scale(1.05)",
                         },
                         ".text": {
                             color: isDarkMode
@@ -253,10 +284,7 @@ export default function ProjectCard({ project, sx, style, onClick }: ProjectCard
                     },
                 }}
             >
-                <Box className="img-container">
-                    <img src={`/img/projects/${project.slug}/cover.jpg`} />
-                    <img src={`/img/projects/${project.slug}/cover.jpg`} />
-                </Box>
+                <ProjectCardImage slug={project.slug as ProjectsList} sx={{ borderRadius: "8px 8px 0px 0px" }} />
                 <Title>{project.name[lang]}</Title>
                 <Box
                     className="flex"

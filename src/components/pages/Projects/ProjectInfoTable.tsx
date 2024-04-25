@@ -17,6 +17,7 @@ export default function ProjectInfoTable({ project: slug }: { project: ProjectsL
                     [__("Full name"), project.name[lang], { fullLine: true }],
                     [__("Description"), project.description[lang], { fullLine: true }],
                     [__("Technologies"), <TechnologiesCrumbs techs={project.technologies} />, { fullLine: true }],
+                    [__("Domain area"), __(project.domain)],
                     [__("Rating"), `[Score ${project.rating}/5]`],
                     [__("Year"), project.year.toString()],
                     [__("Status"), __(capitalize(project.status))],

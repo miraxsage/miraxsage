@@ -352,7 +352,7 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
         case "accentedHoverText":
             return theme.palette.primary.main;
         case "secondaryText":
-            return alpha(theme.palette.secondary[isDarkMode ? "light" : "main"], 0.75);
+            return alpha(theme.palette.secondary[isDarkMode ? "light" : "dark"], 0.75);
         case "secondaryHoverText":
             return isDarkMode ? theme.palette.secondary.light : theme.palette.secondary.dark;
         case "regularHoverBg":
