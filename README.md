@@ -1,6 +1,5 @@
 
-![Miraxsage](https://github.com/miraxsage/miraxsage/assets/98733648/78b9dc76-1af5-430d-8868-de017e2157a5)
-
+![Github Screen Result](https://github.com/miraxsage/miraxsage/assets/98733648/907d0a28-4729-4511-a4ac-8173c8fa928a)
 ### Hello everyone! 👋
 #### My name is Maxim, and I am a web developer.
 
