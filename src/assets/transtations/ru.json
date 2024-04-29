@@ -130,5 +130,12 @@
     "application solutions": "прикладные решения",
     "research": "исследования",
     "advertising": "реклама",
-    "cooking": "кулинария"
+    "cooking": "кулинария",
+    "previous": ["предыдущий", "предыдущее"],
+    "next": ["следующий", "следующее"],
+    "to description": "к описанию",
+    "zoom_out": "мельче",
+    "zoom_in": "крупнее",
+    "all projects": "все проекты",
+    "all chosen projects": "все выбранные проекты"
 }

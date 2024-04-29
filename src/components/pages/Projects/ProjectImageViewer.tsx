@@ -13,6 +13,7 @@ import { SimpleSpinner } from "@/components/Spinners";
 import { useColorMode } from "@/store/appearanceSlice";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
+import __ from "@/utilities/transtation";
 
 type ProjectImageViewerProps = {
     project: ProjectInterface;
@@ -34,7 +35,7 @@ function ProjectImage({ source, scale, loading }: ProjectImageProps) {
         <Box
             sx={{
                 minHeight: source?.height ? `max(100%, ${source.height * scale}px)` : "100%",
-                maxHeight: source?.height ? source?.height : "100%",
+                maxHeight: source?.height ? `${source.height * scale}px` : "100%",
                 minWidth: source?.width ? source.width * scale : "100%",
                 display: "flex",
                 alignItems: "center",
@@ -147,22 +148,23 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
                     >
                         <div style={{ opacity: !isFirstImage ? 1 : 0.5 }}>
                             <ArrowBackIcon />
-                            Предыдущее
+                            {__("Previous|1")}
                         </div>
                     </LinkButton>
                     <LinkButton borders="bottom" onClick={scale > 0.5 ? () => setScale(scale - 0.1) : undefined}>
                         <div style={{ opacity: scale > 0.5 ? 1 : 0.5 }}>
                             <ZoomOutIcon />
-                            Мельче
+                            {__("Zoom_out")}
                         </div>
                     </LinkButton>
                     <LinkButton borders="right-bottom-left" onClick={onClose}>
-                        <RocketLaunchIcon />К описанию
+                        <RocketLaunchIcon />
+                        {__("To description")}
                     </LinkButton>
                     <LinkButton borders="bottom" onClick={scale < 1.5 ? () => setScale(scale + 0.1) : undefined}>
                         <div style={{ opacity: scale < 1.5 ? 1 : 0.5 }}>
                             <ZoomInIcon />
-                            Крупнее
+                            {__("Zoom_in")}
                         </div>
                     </LinkButton>
 
@@ -176,7 +178,7 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
                         onClick={!isLastImage ? () => navigate("next") : undefined}
                     >
                         <div style={{ opacity: !isLastImage ? 1 : 0.5 }}>
-                            Следующее
+                            {__("Next|1")}
                             <ArrowForwardIcon />
                         </div>
                     </LinkButton>

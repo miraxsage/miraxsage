@@ -58,7 +58,7 @@ export function LinkButton({ link, children, sx, borders, onClick }: LinkButton)
                           }px ${borders.includes("left") ? 1 : 0}px `,
                 borderColor: theme.palette.divider,
                 color: getThemeColor("regularText", theme),
-                cursor: !link ? "auto" : "pointer",
+                cursor: !link && !onClick ? "auto" : "pointer",
                 "&:last-child": { borderRightWidth: 0 },
                 "&:hover":
                     !link && !onClick

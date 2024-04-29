@@ -16,6 +16,7 @@ import { getThemeColor } from "@/components/contexts/Theme";
 import ProjectCarousel from "@/components/pages/Projects/ProjectCarousel";
 import ProjectImageViewer from "./ProjectImageViewer";
 import { motion, AnimatePresence } from "framer-motion";
+import __ from "@/utilities/transtation";
 
 export default function ProjectPage() {
     const [refreshState, refresh] = useState<boolean>(false);
@@ -103,7 +104,7 @@ export default function ProjectPage() {
                                 >
                                     <div style={{ opacity: prevProjSlug ? 1 : 0.5 }}>
                                         <ArrowBackIcon />
-                                        Предыдущий
+                                        {__("Previous")}
                                     </div>
                                 </LinkButton>
                                 <LinkButton
@@ -111,7 +112,7 @@ export default function ProjectPage() {
                                     link={getProjectsNavigationLink({ project: "all" }, curProjectLocation!)}
                                 >
                                     <RocketLaunchIcon />
-                                    {allProjectsLocation ? "Все проекты" : "Все выбранные проекты"}
+                                    {allProjectsLocation ? __("All projects") : "All chosen projects"}
                                 </LinkButton>
                                 <LinkButton
                                     borders="bottom"
@@ -127,7 +128,7 @@ export default function ProjectPage() {
                                     }}
                                 >
                                     <div style={{ opacity: nextProjSlug ? 1 : 0.5 }}>
-                                        Следующий
+                                        {__("Next")}
                                         <ArrowForwardIcon />
                                     </div>
                                 </LinkButton>

@@ -18,6 +18,9 @@ import DotNetFrameworkIcon from "@/components/icons/DotNetFrameworkIcon";
 import CSharpIcon from "@/components/icons/CSharpIcon";
 import WindowsIcon from "@/components/icons/WindowsIcon";
 import OneCIcon from "@/components/icons/OneCIcon";
+import BootstrapIcon from "@/components/icons/BootstrapIcon";
+import MSSQLServerIcon from "@/components/icons/MSSQLServerIcon";
+import SQLiteIcon from "@/components/icons/SQLiteIcon";
 
 export type TechnologyInterface = [
     string, // name
@@ -119,6 +122,7 @@ export const technologies = {
         ["Redux", "https://redux.js.org/", ReduxIcon, 68, 2.5, 7],
         ["ReactRouter", "https://reactrouter.com/en/main", ReactRouterIcon, 65, 2.5, 6],
         ["FramerMotion", "https://www.framer.com/motion/", FramerMotionIcon, 65, 2, 5],
+        ["Bootstrap", "https://getbootstrap.com/", BootstrapIcon, 76, 4, 8],
         ["MUI", "https://mui.com/material-ui/", MUIIcon, 68, 2, 5],
     ],
     backend: [
@@ -131,6 +135,8 @@ export const technologies = {
     ],
     desktop: [
         [".NET Framework", "https://learn.microsoft.com/en-us/dotnet/framework/", DotNetFrameworkIcon, 74, 11, 31],
+        ["SQLite", "https://www.sqlite.org/", SQLiteIcon, 65, 7, 8],
+        ["MS SQL Server", "https://learn.microsoft.com/en-us/sql/sql-server", MSSQLServerIcon, 56, 5, 16],
         ["Visual C#", "https://learn.microsoft.com/en-us/dotnet/csharp/", CSharpIcon, 75, 11, 31],
         ["WPF", "https://learn.microsoft.com/en-us/dotnet/desktop/wpf", WindowsIcon, 70, 8, 26],
         ["1C", "https://its.1c.ru/db/v838doc", OneCIcon, 73, 6, 22],
