@@ -1,7 +1,7 @@
 
 ![Github Screen Result](https://github.com/miraxsage/miraxsage/assets/98733648/907d0a28-4729-4511-a4ac-8173c8fa928a)
 ### Hello everyone! 👋
-#### My name is Maxim, and I am a web developer.
+#### My name is Maxim and I am a web developer.
 
 <div align="center" style="margin: 40px 0">
    <a href="https://github.com/romankh3/github-profile-views-counter">
