@@ -1,5 +1,6 @@
 import { useState } from "react";
 import CascadiaExtraLight from "@/assets/fonts/CascadiaCodePL-Light.woff2";
+import NeueMachinaRegular from "@/assets/fonts/NeueMachina-Regular.woff2";
 import { AppSpinner } from "./Spinners";
 
 let AppComponent: React.FC | null = null;
@@ -11,6 +12,7 @@ export default function AppLoader() {
             const [AppModule, CascadiaFont] = await Promise.all([
                 import("@/components/App"),
                 new FontFace("Cascadia", `url(${CascadiaExtraLight})`).load(),
+                new FontFace("NeueMachina", `url(${NeueMachinaRegular})`).load(),
             ]);
             AppComponent = AppModule.default;
             document.fonts.add(CascadiaFont);

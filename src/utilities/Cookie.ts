@@ -15,11 +15,7 @@ type cookieOptions = {
     expires?: Date | string;
     [k: string]: string | unknown;
 };
-export function setCookie(
-    name: string,
-    value: string,
-    options: cookieOptions = {}
-) {
+export function setCookie(name: string, value: string, options: cookieOptions = {}) {
     options = {
         path: "/",
         ...options,
@@ -29,8 +25,7 @@ export function setCookie(
         options.expires = options.expires.toUTCString();
     }
 
-    let updatedCookie =
-        encodeURIComponent(name) + "=" + encodeURIComponent(value);
+    let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
 
     for (const optionKey in options) {
         updatedCookie += "; " + optionKey;

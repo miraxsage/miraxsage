@@ -7,10 +7,10 @@ import { DescriptionTableValue } from "@/components/DescriptionTable";
 const data = [
     ["[Full name]", "[Manin Maxim] [Forbidden 8]"],
     ["[Date of birth]", "[Forbidden 2].[Forbidden 2].199[Forbidden 1]"],
-    ["[Specialization]", "Web-[developer] [Tag various stack]"],
+    ["[Specialization]", "Web-[developer] [Tag full stack]"],
     ["[Core technologies]", "JS, HTML, CSS, React, PHP, Laravel, Wordpress"],
-    ["[Contact number]", "8 (908) 681-40-71 [Priority Connection]"],
-    ["[Email]", "manin.maxim@mail.ru"],
+    ["[Telegram]", "[Link https://t.me/miraxsage] [Priority Connection]"],
+    ["[Email]", "[Link mailto:manin.maxim@mail.ru manin.maxim@mail.ru]"],
     ["[Education]", "[General] [secondary] [Score (4.3/5)] [Higher][Nbsp][specialized] [Score (5.0/5)]"],
     ["[Foreign languages]", "[Language EN (B1)]"],
     ["[Citizenship]", "[Language RU - onlyIcon] [Russian Federation]"],

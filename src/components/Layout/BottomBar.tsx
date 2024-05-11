@@ -21,31 +21,17 @@ export default function BottomBar() {
             <HorizontalPanelButton iconMode={true}>
                 <InfoOutlinedIcon />
             </HorizontalPanelButton>
-            <div className="flex-grow flex items-center px-[22px] py-[18px] leading-[1.2rem]">
-                Status
-            </div>
+            <div className="flex-grow flex items-center px-[22px] py-[18px] leading-[1.2rem]">Status</div>
             <HorizontalPanelButton dividerSide="left" iconMode={true}>
-                <AlternateEmailOutlinedIcon />
-            </HorizontalPanelButton>
-            <HorizontalPanelButton
-                dividerSide="left"
-                dividerSize="squeezed"
-                iconMode={true}
-            >
                 <TelegramIcon />
             </HorizontalPanelButton>
-            <HorizontalPanelButton
-                dividerSide="left"
-                dividerSize="squeezed"
-                iconMode={true}
-            >
+            <HorizontalPanelButton dividerSide="left" dividerSize="squeezed" iconMode={true}>
+                <AlternateEmailOutlinedIcon />
+            </HorizontalPanelButton>
+            <HorizontalPanelButton dividerSide="left" dividerSize="squeezed" iconMode={true}>
                 <VKIcon />
             </HorizontalPanelButton>
-            <HorizontalPanelButton
-                dividerSide="left"
-                dividerSize="squeezed"
-                iconMode={true}
-            >
+            <HorizontalPanelButton dividerSide="left" dividerSize="squeezed" iconMode={true}>
                 <GithubIcon />
             </HorizontalPanelButton>
         </Box>

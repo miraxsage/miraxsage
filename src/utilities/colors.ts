@@ -1,3 +1,18 @@
+function getClearHexColor(color: string) {
+    if (!color) return "000000";
+    if (color.startsWith("#")) return color.slice(1);
+    const rgbMatch = color.match(/^\s*rgba?\((\d+),\s*(\d+),\s*(\d+),?\s*(\d+(?:\.\d+)?)?/);
+    if (rgbMatch) {
+        const r = Number(rgbMatch[1]).toString(16);
+        const g = Number(rgbMatch[2]).toString(16);
+        const b = Number(rgbMatch[3]).toString(16);
+        const a = rgbMatch[4] ? (Number(rgbMatch[4]) * 100).toString(16) : "";
+        return r + g + b + a;
+    }
+    if (color.match(/^[a-f0-9]{6}$/i)) return color;
+    return "000000";
+}
+
 export function mix(color1: string, color2: string, weight: number) {
     function d2h(d: number) {
         return d.toString(16);
@@ -6,17 +21,18 @@ export function mix(color1: string, color2: string, weight: number) {
         return parseInt(h, 16);
     } // convert a hex value to decimal
 
-    if (color1.startsWith("#")) color1 = color1.slice(1);
-    if (color2.startsWith("#")) color2 = color2.slice(1);
+    const foreground = getClearHexColor(color1);
+    const background = getClearHexColor(color2);
 
     weight = typeof weight !== "undefined" ? weight : 50; // set the weight to 50%, if that argument is omitted
+    if (weight < 1) weight *= 100;
 
     let color = "#";
 
     for (let i = 0; i <= 5; i += 2) {
         // loop through each of the 3 hex pairs—red, green, and blue
-        const v1 = h2d(color1.slice(i, i + 2)), // extract the current pairs
-            v2 = h2d(color2.slice(i, i + 2));
+        const v1 = h2d(background.slice(i, i + 2)), // extract the current pairs
+            v2 = h2d(foreground.slice(i, i + 2));
         // combine the current pairs from each source color, according to the specified weight
         let val = d2h(Math.floor(v2 + (v1 - v2) * (weight / 100.0)));
         while (val.length < 2) val = "0" + val;

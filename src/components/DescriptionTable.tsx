@@ -7,13 +7,18 @@ import LanguageIcon from "@/components/icons/LanguageIcon";
 import __ from "@/utilities/transtation";
 import { capitalize } from "@/utilities/string";
 import classes from "classnames";
+import Link from "./Link";
 
 export type DescriptionTableRowOptions = {
     fullLine?: boolean;
     showLastInCompactMode?: boolean;
 };
 
-export type DescriptionTableData = [string, string | ReactNode, DescriptionTableRowOptions?][];
+export type DescriptionTableData = [
+    string | { title: string; icon: ReactNode },
+    string | ReactNode,
+    DescriptionTableRowOptions?
+][];
 
 export type DescriptionTableProps = {
     children: DescriptionTableData;
@@ -66,8 +71,8 @@ export function ScoreModifier({
     const theme = useTheme();
     const isDarkMode = theme.palette.mode == "dark";
     const color = mix(
-        isDarkMode ? theme.palette.success.main : theme.palette.success.light,
         isDarkMode ? theme.palette.error.main : theme.palette.error.light,
+        isDarkMode ? theme.palette.success.main : theme.palette.success.light,
         (Math.min(value, total) * 100) / total
     );
     return (
@@ -145,6 +150,12 @@ export function DescriptionTableValue({ name, value }: { name?: string; value: s
                     kind={capitalize(props[0]) as Parameters<typeof PriorityModifier>[0]["kind"]}
                 />
             );
+        else if (kind == "link")
+            result.push(
+                <Link key={elKey} href={props[0]}>
+                    {props[1] ?? props[0]}
+                </Link>
+            );
         else if (kind == "score") {
             const parenthesis = props[0].match(/^\((.+)\)$/);
             const prop = parenthesis ? parenthesis[1] : props[0];
@@ -188,7 +199,7 @@ function DescriptionTableRow({
     opts,
 }: {
     index: number;
-    name: string;
+    name: string | { title: string; icon: ReactNode };
     value: string | ReactNode;
     opts?: DescriptionTableRowOptions;
 }) {
@@ -210,7 +221,8 @@ function DescriptionTableRow({
                     borderWidth: "0px 0px 1px 1px",
                 }}
             >
-                <DescriptionTableValue value={name} />
+                {typeof name != "string" && name.icon}
+                <DescriptionTableValue value={typeof name == "string" ? name : name.title} />
             </Box>
             <Box
                 className={classes("grid-value", { "full-line": opts?.fullLine })}
@@ -218,7 +230,13 @@ function DescriptionTableRow({
                     borderWidth: "0px 0px 1px 1px",
                 }}
             >
-                <div>{typeof value == "string" ? <DescriptionTableValue name={name} value={value} /> : value}</div>
+                <div>
+                    {typeof value == "string" ? (
+                        <DescriptionTableValue name={typeof name == "string" ? name : name.title} value={value} />
+                    ) : (
+                        value
+                    )}
+                </div>
             </Box>
         </React.Fragment>
     );
@@ -332,7 +350,7 @@ export default function DescriptionTable({
                         }
                         res.push(
                             <DescriptionTableRow
-                                key={`${name}_row`}
+                                key={`${typeof name == "string" ? name : name.title}_row`}
                                 index={index}
                                 name={name}
                                 value={val}
@@ -344,7 +362,7 @@ export default function DescriptionTable({
                         index = index ?? 0;
                         res.push(
                             <DescriptionTableRow
-                                key={`${name}_row`}
+                                key={`${typeof name == "string" ? name : name.title}_row`}
                                 index={++index}
                                 name={name}
                                 value={val}

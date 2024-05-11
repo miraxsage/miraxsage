@@ -1,4 +1,5 @@
 import CascadiaExtraLight from "@/assets/fonts/CascadiaCodePL-Light.woff2";
+import NeueMachinaRegular from "@/assets/fonts/NeueMachina-Regular.woff2";
 import {
     Palette,
     PaletteColor,
@@ -18,6 +19,9 @@ declare module "@mui/material" {
         regular: true;
         bg: true;
         thirdary: true;
+    }
+    interface IconButtonPropsColorOverrides {
+        regular: true;
     }
 }
 declare module "@mui/material/styles" {
@@ -73,13 +77,22 @@ const basicTheme = {
         MuiCssBaseline: {
             styleOverrides: {
                 body: {
-                    "@font-face": {
-                        fontFamily: "Cascadia",
-                        fontStyle: "normal",
-                        fontDisplay: "swap",
-                        fontWight: 400,
-                        src: `url("${CascadiaExtraLight}")`,
-                    },
+                    "@font-face": [
+                        {
+                            fontFamily: "Cascadia",
+                            fontStyle: "normal",
+                            fontDisplay: "swap",
+                            fontWight: 400,
+                            src: `url("${CascadiaExtraLight}")`,
+                        },
+                        {
+                            fontFamily: "NeueMachina",
+                            fontStyle: "normal",
+                            fontDisplay: "swap",
+                            fontWight: 400,
+                            src: `url("${NeueMachinaRegular}")`,
+                        },
+                    ],
                 },
             },
         },
@@ -352,9 +365,9 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
         case "accentedHoverText":
             return theme.palette.primary.main;
         case "secondaryText":
-            return alpha(theme.palette.secondary[isDarkMode ? "light" : "dark"], 0.75);
+            return alpha(theme.palette.secondary[isDarkMode ? "light" : "dark"], isDarkMode ? 0.75 : 1);
         case "secondaryHoverText":
-            return isDarkMode ? theme.palette.secondary.light : theme.palette.secondary.dark;
+            return isDarkMode ? theme.palette.secondary.light : darken(theme.palette.secondary.dark, 0.2);
         case "regularHoverBg":
             return alpha(theme.palette.divider, 0.3);
         case "accentedNotelessBg":

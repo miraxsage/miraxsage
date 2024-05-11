@@ -1,9 +1,9 @@
 import { ReactContentProps } from "@/types/react";
 import { SxProps, useTheme } from "@mui/material";
 import { Box } from "@mui/material";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+import { OverlayScrollbarsComponent, OverlayScrollbarsComponentProps } from "overlayscrollbars-react";
 import "overlayscrollbars/overlayscrollbars.css";
-import { ReactNode } from "react";
+import { ReactNode, forwardRef } from "react";
 import { getThemeColor } from "./contexts/Theme";
 
 export type CustomScrollbarProps = {
@@ -19,45 +19,45 @@ export type CustomScrollbarProps = {
         padding?: string;
     };
     sx?: SxProps;
-};
+} & OverlayScrollbarsComponentProps;
 
-export default function CustomScrollbar({
-    children,
-    top,
-    right,
-    bottom,
-    padding,
-    sx = {},
-    ...props
-}: CustomScrollbarProps) {
-    if (!right && !bottom && !top && !padding) padding = "4px";
-    const horizontal = props.horizontal ?? {};
-    const { left: hleft, right: hright, bottom: hbottom, padding: hpadding } = horizontal;
-    return (
-        <Box
-            className="h-full"
-            sx={{
-                "& .os-scrollbar.os-scrollbar-vertical, & .os-scrollbar.os-scrollbar-vertical.os-scrollbar-cornerless":
-                    {
-                        top: padding ?? top ?? 0,
-                        right: padding ?? right ?? 0,
-                        bottom: padding ?? bottom ?? 0,
-                    },
-                "& .os-scrollbar.os-scrollbar-horizontal, & .os-scrollbar.os-scrollbar-horizontal.os-scrollbar-cornerless":
-                    {
-                        left: hpadding ?? hleft ?? padding ?? 0,
-                        right: hpadding ?? hright ?? padding ?? 0,
-                        bottom: hpadding ?? hbottom ?? padding ?? 0,
-                    },
-                ...sx,
-            }}
-        >
-            <OverlayScrollbarsComponent style={{ height: "100%" }} options={{ scrollbars: { autoHide: "move" } }}>
-                {children}
-            </OverlayScrollbarsComponent>
-        </Box>
-    );
-}
+const CustomScrollbar = forwardRef(
+    ({ children, top, right, bottom, padding, sx = {}, horizontal = {}, ...props }: CustomScrollbarProps, ref) => {
+        if (!right && !bottom && !top && !padding) padding = "4px";
+        const { left: hleft, right: hright, bottom: hbottom, padding: hpadding } = horizontal;
+        return (
+            <Box
+                ref={ref}
+                className="h-full"
+                sx={{
+                    "& .os-scrollbar.os-scrollbar-vertical, & .os-scrollbar.os-scrollbar-vertical.os-scrollbar-cornerless":
+                        {
+                            top: padding ?? top ?? 0,
+                            right: padding ?? right ?? 0,
+                            bottom: padding ?? bottom ?? 0,
+                        },
+                    "& .os-scrollbar.os-scrollbar-horizontal, & .os-scrollbar.os-scrollbar-horizontal.os-scrollbar-cornerless":
+                        {
+                            left: hpadding ?? hleft ?? padding ?? 0,
+                            right: hpadding ?? hright ?? padding ?? 0,
+                            bottom: hpadding ?? hbottom ?? padding ?? 0,
+                        },
+                    ...sx,
+                }}
+            >
+                <OverlayScrollbarsComponent
+                    style={{ height: "100%" }}
+                    options={{ scrollbars: { autoHide: "move" } }}
+                    {...props}
+                >
+                    {children}
+                </OverlayScrollbarsComponent>
+            </Box>
+        );
+    }
+);
+
+export default CustomScrollbar;
 
 export function CustomScrollbarStylesContainer({ children }: ReactContentProps) {
     const theme = useTheme();

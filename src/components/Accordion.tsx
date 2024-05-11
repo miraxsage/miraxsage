@@ -8,11 +8,15 @@ export type CustomAccordionProps = {
     title: string;
     children: ReactNode;
     withoutTransition?: boolean;
+    expandable?: boolean;
 } & Omit<AccordionProps, "children">;
 
-const StyledAccordion = styled(Accordion, { shouldForwardProp: (prop) => prop != "withoutTransition" })<{
+const StyledAccordion = styled(Accordion, {
+    shouldForwardProp: (prop) => prop != "withoutTransition" && prop != "expandable",
+})<{
     withoutTransition?: boolean;
-}>(({ theme, withoutTransition = false }) => ({
+    expandable?: boolean;
+}>(({ theme, withoutTransition = false, expandable }) => ({
     background: getThemeColor("titleBg", theme),
     borderWidth: "1px 1px 0px 1px",
     borderStyle: "solid",
@@ -42,6 +46,9 @@ const StyledAccordion = styled(Accordion, { shouldForwardProp: (prop) => prop !=
         borderColor: getThemeColor("titleBg", theme),
         borderBottomWidth: "1px",
         transition: withoutTransition ? "none" : "border 0.1s linear 0.1s",
+        "& .MuiAccordionSummary-content": {
+            cursor: expandable ? "pointer" : "default",
+        },
         "& .MuiSvgIcon-root": {
             color: getThemeColor("regularIcon", theme),
         },
@@ -81,6 +88,7 @@ export default function CustomAccordion({
     children,
     icon,
     withoutTransition = false,
+    expandable = true,
     ...props
 }: CustomAccordionProps) {
     return (
@@ -88,8 +96,10 @@ export default function CustomAccordion({
             withoutTransition={withoutTransition}
             {...(withoutTransition ? { TransitionProps: { timeout: 0 } } : {})}
             {...props}
+            {...(expandable ? {} : { expanded: true })}
+            {...{ expandable }}
         >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <AccordionSummary expandIcon={expandable ? <ExpandMoreIcon /> : null}>
                 <div className="title-container">
                     {icon}
                     {title}

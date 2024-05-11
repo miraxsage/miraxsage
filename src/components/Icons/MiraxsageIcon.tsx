@@ -1,15 +1,15 @@
 import { alpha, darken, lighten, useTheme } from "@mui/material";
-const MiraxsageIcon = () => {
+const MiraxsageIcon = ({ contrast }: { contrast?: boolean }) => {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode == "dark";
-    let baseColor = lighten(theme.palette.divider, 0.65);
+    let baseColor = lighten(theme.palette.divider, contrast ? 0.78 : 0.65);
     let c1 = baseColor;
     let c2 = alpha(baseColor, 0.8);
     let c3 = alpha(baseColor, 0.7);
     let c4 = alpha(baseColor, 0.5);
     let c5 = alpha(baseColor, 0.3);
     let c55 = c5;
-    let c6 = alpha(baseColor, 0.01);
+    let c6 = alpha(baseColor, contrast ? 0 : 0.01);
     let c7 = alpha(baseColor, 0.0);
     let c8 = c1;
     let c9 = c7;

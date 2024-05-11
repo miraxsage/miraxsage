@@ -1,6 +1,6 @@
 import "../style.css";
 import "@/utilities/cookie";
-import { Box } from "@mui/material";
+import { SxProps } from "@mui/material";
 import MainLayout from "./layout/MainLayout";
 import { useThemeColor } from "./contexts/Theme";
 import { useLanguage } from "@/store/appearanceSlice";
@@ -13,21 +13,24 @@ import React from "react";
 import { Provider } from "react-redux";
 import ThemeContext from "./contexts/ThemeContext";
 import store from "@/store";
+import Landing from "./pages/Landing";
+import OverlapedChildrenContainer from "./OverlapedChildrenContainer";
 //import Projects from "./pages/Projects";
 //import About from "./pages/About";
 //import Profile from "./pages/Profile";
 
-function AppLayout({ children }: ReactContentProps) {
+function AppLayout({ children, sx }: { sx?: SxProps } & ReactContentProps) {
     return (
-        <Box
+        <OverlapedChildrenContainer
             sx={{
                 background: useThemeColor("pageBg"),
                 minHeight: "calc(max(500px, 100dvh))",
+                height: 0,
+                ...sx,
             }}
-            className={`h-0 w-full flex justify-center items-center`}
         >
             {children}
-        </Box>
+        </OverlapedChildrenContainer>
     );
 }
 
@@ -83,7 +86,7 @@ const router = createBrowserRouter([
             {
                 path: "interact",
                 lazy: async () => {
-                    const { default: Component } = await import("@/components/pages/Contacts.tsx");
+                    const { default: Component } = await import("@/components/pages/Contacts/index.tsx");
                     return { Component };
                 },
                 //element: <PagesIntegrator page="contacts" />,
@@ -106,9 +109,18 @@ export function App() {
 
 function AppContent() {
     useLanguage();
+    const isLandingPage = window.location.pathname == "/";
     return (
         <AppLayout>
-            <RouterProvider router={router} fallbackElement={<AppSpinner />} />
+            {!isLandingPage ? (
+                <AppLayout sx={{ background: "unset" }}>
+                    <RouterProvider router={router} fallbackElement={<AppSpinner />} />
+                </AppLayout>
+            ) : (
+                <AppLayout sx={{ background: "unset" }}>
+                    <Landing />
+                </AppLayout>
+            )}
         </AppLayout>
     );
 }

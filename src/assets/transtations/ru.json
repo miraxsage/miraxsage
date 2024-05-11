@@ -1,9 +1,12 @@
 {
+    "manin": "манин",
+    "maxim": "максим",
+    "web": "веб",
     "profile": "профиль",
     "about": "резюме",
+    "resume": "резюме",
     "projects": ["проекты", "портфолио", "проектов"],
     "interact": "контакты",
-
     "biography": "биография",
     "general": "общее",
     "education": "образование",
@@ -117,9 +120,10 @@
     "develompent period": "период разрабоки",
     "github link": "ссылка на Github",
     "completed": "выполнен",
+    "developing": "в разработке",
     "mon.": "мес.",
     "team": "командное",
-    "self": "личное",
+    "selfown": "личное",
     "description": "описание",
     "domain area": "доменная область",
     "real estate": "недвижимость",
@@ -137,5 +141,15 @@
     "zoom_out": "мельче",
     "zoom_in": "крупнее",
     "all projects": "все проекты",
-    "all chosen projects": "все выбранные проекты"
+    "all chosen projects": "все выбранные проекты",
+    "your name": "ваше имя",
+    "email address": "адрес электронной почты",
+    "appeal's subject": "тема обращения",
+    "message": "сообщение",
+    "job offer": "приглашение на работу",
+    "thanks letter": "благодарственное письмо",
+    "resume / portfolio question": "вопрос о резюме / портфолио",
+    "other": "другое",
+    "cancel": "отмена",
+    "close": "закрыть"
 }

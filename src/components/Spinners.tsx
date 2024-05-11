@@ -15,7 +15,8 @@ export function AppSpinner({ compact, withoutBg }: { compact?: boolean; withoutB
                     : "linear-gradient(90deg, rgb(240, 240, 240), transparent 20%, transparent 80%, rgb(240, 240, 240))"
                 : "#151722";
         const fg = appearanceConfig.colorMode == "light" ? "#d1d1d1" : "#2c2f3e";
-        if (document.querySelector("head style#" + stylesId)) return;
+        const oldStyles = document.querySelector("head style#" + stylesId);
+        if (oldStyles) oldStyles.remove();
         const loaderStyles = document.createElement("style");
         loaderStyles.innerHTML = `
         body{
@@ -23,9 +24,9 @@ export function AppSpinner({ compact, withoutBg }: { compact?: boolean; withoutB
         }
         .${stylesId}.loader-container{
             background: ${withoutBg ? "transparent" : bg};
-            display: flex;
+            display: grid;
             align-items: center;
-            justify-content: center;
+            justify-items: center;
             ${compact ? "min-height: unset;" : "min-height: 100dvh;"}
             width: 100%;
             height: 100%;

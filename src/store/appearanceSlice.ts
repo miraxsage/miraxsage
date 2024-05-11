@@ -1,8 +1,4 @@
-import {
-    PayloadAction,
-    createListenerMiddleware,
-    createSlice,
-} from "@reduxjs/toolkit";
+import { PayloadAction, createListenerMiddleware, createSlice } from "@reduxjs/toolkit";
 import { TypeOrItsAnyInnerField } from "@/types/common";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
@@ -21,24 +17,16 @@ type StateConfig = {
 };
 
 const localStorageConfig = localStorage.getItem("appearanceConfig");
-const initialConfig = (
-    localStorageConfig ? JSON.parse(localStorageConfig) : defaultConfig
-) as AppearanceConfig;
+const initialConfig = (localStorageConfig ? JSON.parse(localStorageConfig) : defaultConfig) as AppearanceConfig;
 
 const slice = createSlice({
     name: "appearance",
     initialState: initialConfig,
     reducers: {
-        colorMode: (
-            state,
-            options: PayloadAction<AppearanceConfig["colorMode"]>
-        ) => {
+        colorMode: (state, options: PayloadAction<AppearanceConfig["colorMode"]>) => {
             state.colorMode = options.payload;
         },
-        language: (
-            state,
-            newLanguage: PayloadAction<AppearanceConfig["language"]>
-        ) => {
+        language: (state, newLanguage: PayloadAction<AppearanceConfig["language"]>) => {
             state.language = newLanguage.payload;
             window.cookie.set("lang", state.language);
         },
@@ -49,10 +37,7 @@ const appearanceListener = createListenerMiddleware<StateConfig>();
 appearanceListener.startListening({
     predicate: (action) => action.type.startsWith("appearance"),
     effect(_action, api) {
-        localStorage.setItem(
-            "appearanceConfig",
-            JSON.stringify(api.getState().appearance)
-        );
+        localStorage.setItem("appearanceConfig", JSON.stringify(api.getState().appearance));
     },
 });
 const listener = appearanceListener.middleware;
@@ -68,17 +53,15 @@ const useAppearanceSelector: UseAppearanceSelector = useSelector;
 
 export function useAppearance(): AppearanceConfig;
 
-export function useAppearance<
-    SelectType extends TypeOrItsAnyInnerField<AppearanceConfig>
->(selector: (state: AppearanceConfig) => SelectType): SelectType;
+export function useAppearance<SelectType extends TypeOrItsAnyInnerField<AppearanceConfig>>(
+    selector: (state: AppearanceConfig) => SelectType
+): SelectType;
 
-export function useAppearance<
-    SelectType extends TypeOrItsAnyInnerField<AppearanceConfig>
->(selector?: (state: AppearanceConfig) => SelectType | AppearanceConfig) {
+export function useAppearance<SelectType extends TypeOrItsAnyInnerField<AppearanceConfig>>(
+    selector?: (state: AppearanceConfig) => SelectType | AppearanceConfig
+) {
     if (selector == undefined) selector = (s) => s;
-    return useAppearanceSelector(
-        (state) => selector?.(state.appearance) ?? state.appearance
-    );
+    return useAppearanceSelector((state) => selector?.(state.appearance) ?? state.appearance);
 }
 
 export function useColorMode() {
@@ -88,18 +71,12 @@ export function useColorMode() {
         dark: mode == "dark",
         light: mode == "light",
         mode,
+        toggle: () => dispatch(slice.actions.colorMode(mode == "dark" ? "light" : "dark")),
         update: (
             newMode:
                 | AppearanceConfig["colorMode"]
-                | ((
-                      oldMode: AppearanceConfig["colorMode"]
-                  ) => AppearanceConfig["colorMode"])
-        ) =>
-            dispatch(
-                slice.actions.colorMode(
-                    typeof newMode == "function" ? newMode(mode) : newMode
-                )
-            ),
+                | ((oldMode: AppearanceConfig["colorMode"]) => AppearanceConfig["colorMode"])
+        ) => dispatch(slice.actions.colorMode(typeof newMode == "function" ? newMode(mode) : newMode)),
     };
 }
 
@@ -113,16 +90,8 @@ export function useLanguage() {
         update: (
             newLang:
                 | AppearanceConfig["language"]
-                | ((
-                      oldLang: AppearanceConfig["language"]
-                  ) => AppearanceConfig["language"])
-        ) =>
-            dispatch(
-                slice.actions.language(
-                    typeof newLang == "function" ? newLang(lang) : newLang
-                )
-            ),
-        toggle: () =>
-            dispatch(slice.actions.language(lang == "ru" ? "en" : "ru")),
+                | ((oldLang: AppearanceConfig["language"]) => AppearanceConfig["language"])
+        ) => dispatch(slice.actions.language(typeof newLang == "function" ? newLang(lang) : newLang)),
+        toggle: () => dispatch(slice.actions.language(lang == "ru" ? "en" : "ru")),
     };
 }
