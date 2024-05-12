@@ -1,4 +1,5 @@
 import { alpha, darken, lighten, useTheme } from "@mui/material";
+import { getLandingColor } from "../pages/Landing";
 const MiraxsageIcon = ({ contrast }: { contrast?: boolean }) => {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode == "dark";
@@ -14,17 +15,20 @@ const MiraxsageIcon = ({ contrast }: { contrast?: boolean }) => {
     let c8 = c1;
     let c9 = c7;
     if (!isDarkMode) {
-        baseColor = darken(theme.palette.divider, 0.5);
-        c1 = alpha(lighten(theme.palette.divider, 0.5), 0.5);
-        c2 = alpha(baseColor, 0.3);
-        c3 = alpha(baseColor, 0.28);
-        c4 = alpha(baseColor, 0.4);
-        c5 = alpha(baseColor, 0.6);
-        c55 = alpha(baseColor, 0.45);
-        c6 = alpha(baseColor, 0.7);
-        c7 = alpha(baseColor, 0.07);
-        c8 = alpha(baseColor, 0.1);
-        c9 = alpha(baseColor, 0.6);
+        baseColor =
+            contrast && !isDarkMode
+                ? darken(getLandingColor("contrast", theme), 0.3)
+                : darken(theme.palette.divider, 0.5);
+        c1 = contrast ? lighten(theme.palette.divider, 0.75) : alpha(lighten(theme.palette.divider, 0.5), 0.5);
+        c2 = contrast ? lighten(baseColor, 0.7) : alpha(baseColor, 0.3);
+        c3 = contrast ? lighten(baseColor, 0.7) : alpha(baseColor, 0.28);
+        c4 = contrast ? lighten(baseColor, 0.6) : alpha(baseColor, 0.4);
+        c5 = contrast ? lighten(baseColor, 0.4) : alpha(baseColor, 0.6);
+        c55 = contrast ? lighten(baseColor, 0.55) : alpha(baseColor, 0.45);
+        c6 = contrast ? lighten(baseColor, 0.2) : alpha(baseColor, 0.7);
+        c7 = contrast ? alpha(baseColor, 0.03) : alpha(baseColor, 0.07);
+        c8 = contrast ? lighten(baseColor, 0.95) : alpha(baseColor, 0.1);
+        c9 = contrast ? lighten(baseColor, 0.3) : alpha(baseColor, 0.6);
     }
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -20 500 670">

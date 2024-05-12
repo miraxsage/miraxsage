@@ -1,9 +1,17 @@
 import { useEffect, useId } from "react";
-import { Box, GlobalStyles, SxProps } from "@mui/material";
+import { Box, SxProps, alpha, darken } from "@mui/material";
 import "./SimplexNoise.min.js";
+import { useLandingColor } from "./index.js";
+import { useColorMode } from "@/store/appearanceSlice.js";
+import { lighten } from "@mui/material";
 
 export function AnimatedGeometricWaves({ sx, singleRender }: { sx?: SxProps; singleRender: boolean }) {
     const id = "animated-waves-" + useId();
+    const isDarkMode = useColorMode().dark;
+    let accentColor = useLandingColor(isDarkMode ? "accentB" : "accentA");
+    accentColor = isDarkMode ? darken(accentColor, 0.3) : alpha(lighten(accentColor, 0.3), 0.9);
+    let notelessColor = useLandingColor(isDarkMode ? "noteless" : "contrast");
+    notelessColor = isDarkMode ? alpha(notelessColor, 0.4) : lighten(notelessColor, 0.8);
     useEffect(() => {
         const canvas = document.getElementById(id);
         canvas.width = canvas.clientWidth;
@@ -27,6 +35,7 @@ export function AnimatedGeometricWaves({ sx, singleRender }: { sx?: SxProps; sin
                 this.amplitude = 0;
                 this.strands = [];
                 this.lastRender = 0;
+                this.disposed = false;
             }
 
             addStrand(strand = new Strand()) {
@@ -46,8 +55,10 @@ export function AnimatedGeometricWaves({ sx, singleRender }: { sx?: SxProps; sin
                     this.ctx.lineTo(x, y);
                 }
                 let gradient = this.ctx.createLinearGradient(canvas.width / 4, 0, canvas.width * 0.7, 0);
-                gradient.addColorStop(0.2, "#292c3f40");
-                gradient.addColorStop(1, "#2a8a69");
+                gradient.addColorStop(isDarkMode ? 0.2 : 0.5, notelessColor);
+                gradient.addColorStop(1, accentColor);
+                // gradient.addColorStop(0.2, "#292c3f40");
+                // gradient.addColorStop(1, "#2a8a69");
                 this.ctx.strokeStyle = gradient;
                 this.ctx.stroke();
             }
@@ -57,6 +68,7 @@ export function AnimatedGeometricWaves({ sx, singleRender }: { sx?: SxProps; sin
             }
 
             buildFrame(t) {
+                if (this.disposed) return;
                 const time = t;
                 if (this.amplitude > 0 && !singleRender) requestAnimationFrame(this.buildFrame);
                 //if (time - this.lastRender < 200) return;
@@ -76,6 +88,7 @@ export function AnimatedGeometricWaves({ sx, singleRender }: { sx?: SxProps; sin
             }
 
             animateTransition() {
+                if (this.disposed) return;
                 let anim = function () {
                     if (this.amplitude < 100 && this.amplitude > 0) requestAnimationFrame(anim);
                     this.amplitude += this.isActive ? 1 : -1;
@@ -84,7 +97,9 @@ export function AnimatedGeometricWaves({ sx, singleRender }: { sx?: SxProps; sin
                 cancelAnimationFrame(this.transitionRAF);
                 this.transitionRAF = requestAnimationFrame(anim);
             }
-
+            dispose() {
+                this.disposed = true;
+            }
             close() {
                 this.isActive = false;
                 this.animateTransition();
@@ -108,6 +123,10 @@ export function AnimatedGeometricWaves({ sx, singleRender }: { sx?: SxProps; sin
         }));
         options.forEach((option) => wave.addStrand(new Strand(option)));
         wave.animate();
+        return () => {
+            console.log("dispose");
+            wave.dispose();
+        };
     }, []);
     return (
         <Box sx={sx}>

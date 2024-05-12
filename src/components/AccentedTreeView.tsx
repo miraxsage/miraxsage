@@ -3,7 +3,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import React, { CSSProperties, ReactNode, useState } from "react";
 import { UseTreeViewExpansionParameters } from "@mui/x-tree-view/internals/plugins/useTreeViewExpansion";
-import { Checkbox, Collapse, alpha, styled } from "@mui/material";
+import { Checkbox, Collapse, SxProps, alpha, styled } from "@mui/material";
 import { motion } from "framer-motion";
 import { getThemeColor } from "./contexts/Theme";
 import { TransitionProps } from "@mui/material/transitions";
@@ -42,7 +42,10 @@ interface AccentedTreeViewBasicProps {
     checkedAndSelected?: boolean;
     checkedItems?: string[];
     onItemsChecked?: (item: AccentedTreeItemProps[]) => void;
+    onToggle?: (event: React.SyntheticEvent<Element, Event>, nodeIds: string[]) => void;
+    sx?: SxProps;
 }
+
 export interface AccentedTreeViewSingleProps extends AccentedTreeViewBasicProps {
     selectionMode: "single";
     selectedItems?: string;
@@ -288,9 +291,11 @@ export default function AccentedTreeView({
     selectionMode = "single",
     onItemsSelect,
     onItemsChecked,
+    onToggle,
     intend = "regular",
     checkable,
     checkedAndSelected,
+    sx,
 }: AccentedTreeViewProps) {
     let selectedItems: string[] = [];
     if (selectionMode == "single" && typeof selectedItemsProp == "string") selectedItems = [selectedItemsProp];
@@ -426,13 +431,14 @@ export default function AccentedTreeView({
         }
         return false;
     };
-    const onToggle: UseTreeViewExpansionParameters["onNodeToggle"] = (e: React.SyntheticEvent, toggled) => {
+    const onToggleHandler: UseTreeViewExpansionParameters["onNodeToggle"] = (e: React.SyntheticEvent, toggled) => {
         if ((e.target as HTMLElement).closest(".MuiTreeItem-iconContainer .MuiCheckbox-root")) return;
         if (
             (e.target as HTMLElement).closest(".MuiTreeItem-iconContainer") ||
             selectionMode == "disable" ||
             allowToggle(toggled)
         ) {
+            if (onToggle) onToggle(e, toggled);
             setExpandedNodes(toggled);
         }
     };
@@ -480,11 +486,11 @@ export default function AccentedTreeView({
         <TreeView
             disableSelection={selectionMode == "disable"}
             multiSelect={selectionMode == "multiple"}
-            onNodeToggle={onToggle}
+            onNodeToggle={onToggleHandler}
             onNodeSelect={onSelect}
             expanded={expandedNodes}
             selected={selectionMode == "single" ? (selectedNodes.length ? selectedNodes[0] : null) : selectedNodes}
-            sx={{ userSelect: "none" }}
+            sx={{ userSelect: "none", ...sx }}
         >
             {generateNode(children)}
         </TreeView>

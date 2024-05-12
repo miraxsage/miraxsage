@@ -1,20 +1,33 @@
 import { mix } from "@/utilities/colors";
-import { Box, SxProps, alpha, useTheme } from "@mui/material";
+import { Box, SxProps, alpha } from "@mui/material";
+import { useLandingColor } from ".";
+import { useColorMode } from "@/store/appearanceSlice";
 
-export default function CodeBackground({ sx }: { sx?: SxProps; gradientOrientation?: "toBottom" | "toTop" }) {
-    const theme = useTheme();
-    const color = theme.palette.divider;
+export default function CodeBackground({
+    sx,
+    gradientOrientation = "toBottom",
+}: {
+    sx?: SxProps;
+    gradientOrientation?: "toBottom" | "toTop";
+}) {
+    const isDarkMode = useColorMode().dark;
+    const color = useLandingColor("contrast");
+    let color1 = alpha(mix(color, useLandingColor("accentA"), 0.7), isDarkMode ? 0.1 : 0.2);
+    const color2 = gradientOrientation == "toBottom" ? "transparent" : color1;
+    color1 = gradientOrientation == "toTop" ? "transparent" : color1;
     return (
         <Box
             sx={{
                 color,
                 position: "absolute",
+                width: "100%",
+                overflow: "hidden",
                 top: 0,
                 left: 0,
                 whiteSpace: "pre",
                 fontSize: "22px",
                 userSelect: "none",
-                background: `linear-gradient(180deg, ${alpha(mix(color, "#3ec9d2", 0.2), 0.3)}, ${alpha(color, 0)})`,
+                background: `linear-gradient(180deg, ${color1}, ${color2})`,
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 ...sx,

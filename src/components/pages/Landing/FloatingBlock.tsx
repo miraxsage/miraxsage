@@ -1,8 +1,10 @@
 import { getThemeColor } from "@/components/contexts/Theme";
+import { useColorMode } from "@/store/appearanceSlice";
 import { Box, GlobalStyles, alpha, useTheme } from "@mui/material";
 
 export default function FloatingBlock() {
     const theme = useTheme();
+    const isDarkMode = useColorMode().dark;
     return (
         <>
             <GlobalStyles
@@ -26,7 +28,9 @@ export default function FloatingBlock() {
                     height: "200%",
                     width: "250%",
                     bottom: "70%",
-                    background: getThemeColor("barBackground", theme),
+                    background: isDarkMode
+                        ? getThemeColor("barBackground", theme)
+                        : `linear-gradient(180deg, #ffffff 80%, ${getThemeColor("barBackground", theme)})`,
                     border: `1px solid ${alpha(theme.palette.divider, 0.8)}`,
                     borderWidth: "0px 0px 1px 0px",
                     transformOrigin: "50% -20%",

@@ -3,7 +3,6 @@ import FloatingLine from "./FloatingLine";
 import FloatingBlock from "./FloatingBlock";
 import { getThemeColor } from "@/components/contexts/Theme";
 import { mix } from "@/utilities/colors";
-import { HorizontalPanelButton, HorizontalPanelButtonProps } from "@/components/PanelButtons";
 import PersonIcon from "@mui/icons-material/Person";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import LanguageIcon from "@/components/icons/LanguageIcon";
@@ -17,22 +16,11 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import { GitHub } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { AnimatedGeometricWaves } from "./AnimatedGeometricWaves";
-import { getGPUTier } from "detect-gpu";
+// import { getGPUTier } from "detect-gpu";
 import { GlobalStyles } from "@mui/material";
 import __ from "@/utilities/transtation";
 import { useLandingColor } from ".";
-
-function TransparentButton({ sx, ...props }: HorizontalPanelButtonProps) {
-    return (
-        <HorizontalPanelButton
-            dividerSide="right"
-            dividerSize="squeezed"
-            iconMode={true}
-            sx={{ "&:hover": { background: "transparent" }, ...sx }}
-            {...props}
-        />
-    );
-}
+import TransparentButton from "./TransparentButton";
 
 function TypingShield({ titles }: { titles: string[] }) {
     const [currentTitle, setCurrentTitle] = useState(0);
@@ -75,8 +63,8 @@ function TypingShield({ titles }: { titles: string[] }) {
         };
     }, []);
     const typedTitle = title.slice(0, Math.min(typedSymbols, title.length) - 1);
-    // const isDarkMode = useColorMode().dark;
-    // const paleColor = lighten(useLandingColor("accentAPale"), 0.8);
+    const isDarkMode = useColorMode().dark;
+    const paleColor = useLandingColor(isDarkMode ? "accentAPale" : "contrast");
     return (
         <>
             {typedTitle}
@@ -99,13 +87,20 @@ function TypingShield({ titles }: { titles: string[] }) {
 }
 
 function WebDeveloperShield() {
+    const isDarkMode = useColorMode().dark;
+    let paleColor = useLandingColor(isDarkMode ? "accentAPale" : "contrast");
+    paleColor = isDarkMode ? paleColor : lighten(paleColor, 0.3);
+    const darkPaleColor = lighten(useLandingColor("accentA"), isDarkMode ? 0.4 : 0.4);
+    const contrastColor = lighten(useLandingColor("contrast"), isDarkMode ? 0 : 0.2);
+    const accentBLight = lighten(useLandingColor("accentB"), isDarkMode ? 0.2 : 0.5);
+    const accentALight = lighten(useLandingColor("accentA"), isDarkMode ? 0.3 : 0.5);
     return (
         <Box
             sx={{
                 fontSize: "57px",
                 userSelect: "none",
                 lineHeight: 1,
-                background: `linear-gradient(45deg, #ffffff 10%, #98ecdb)`,
+                background: `linear-gradient(45deg, ${contrastColor} 10%, ${darkPaleColor})`,
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
             }}
@@ -136,7 +131,7 @@ function WebDeveloperShield() {
                     sx={{
                         border: "1px solid",
                         borderImageSlice: 1,
-                        borderImageSource: "linear-gradient(180deg, #d5faf6, #a1eedd)",
+                        borderImageSource: `linear-gradient(180deg, ${paleColor}, ${darkPaleColor})`,
                         borderWidth: "0px 0px 0px 2px",
                         gridArea: "2/1/5/1",
                     }}
@@ -175,7 +170,7 @@ function WebDeveloperShield() {
                 ></Box>
                 <Box
                     sx={{
-                        border: "1px solid #a1eedd",
+                        border: "1px solid " + darkPaleColor,
                         borderWidth: "0px 0px 2px 2px",
                         borderBottomLeftRadius: "10px",
                         gridArea: "5/1/5/1",
@@ -184,7 +179,7 @@ function WebDeveloperShield() {
                 <Box
                     sx={{
                         border: "1px solid " + paleColor,
-                        borderImageSource: "linear-gradient(90deg, #98ecdb, #59e1c3 45%, #6eecaf 55%, #d5faf6 80%)",
+                        borderImageSource: `linear-gradient(90deg, ${darkPaleColor}, ${accentALight} 25%, ${accentBLight} 75%, ${paleColor} 95%)`,
                         borderImageSlice: 1,
                         borderWidth: "0px 0px 2px 0px",
                         gridColumn: "span 3",
@@ -220,7 +215,10 @@ function SlideContent() {
         >
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100dvh" }}>
                 <Box sx={{ padding: "100px 0px", position: "relative", top: "-100px" }}>
-                    <Box className="grid" sx={{ justifyContent: "center", margin: "3vw 0" }}>
+                    <Box
+                        className="grid"
+                        sx={{ justifyContent: "center", margin: "3vw 0", "& button": { fontSize: "22px" } }}
+                    >
                         <Box className="flex">
                             <TransparentButton>
                                 <PersonIcon />
@@ -290,28 +288,32 @@ function SlideContent() {
 
 export default function MainSlide() {
     const theme = useTheme();
+    const isDarkMode = useColorMode().dark;
     const pageBgColor = getThemeColor("pageBgColor", theme);
-    useEffect(() => {
-        (async () => {
-            const gpuTier = await getGPUTier();
-            console.log(gpuTier);
-            // Example output:
-            // {
-            //   "tier": 1,
-            //   "isMobile": false,
-            //   "type": "BENCHMARK",
-            //   "fps": 21,
-            //   "gpu": "intel iris graphics 6100"
-            // }
-        })();
-    }, []);
+    const colorMode = useColorMode().mode;
+    // useEffect(() => {
+    //     (async () => {
+    //         const gpuTier = await getGPUTier();
+    //         console.log(gpuTier);
+    //         // Example output:
+    //         // {
+    //         //   "tier": 1,
+    //         //   "isMobile": false,
+    //         //   "type": "BENCHMARK",
+    //         //   "fps": 21,
+    //         //   "gpu": "intel iris graphics 6100"
+    //         // }
+    //     })();
+    // }, []);
     return (
         <Box
             sx={{
                 position: "relative",
                 overflow: "hidden",
                 width: "100%",
-                background: `linear-gradient(12deg, ${mix(pageBgColor, "#2bc979", 0.08)}, ${pageBgColor} 50%)`,
+                background: `linear-gradient(12deg, ${mix(pageBgColor, useLandingColor("accentB"), 0.08)}, ${
+                    isDarkMode ? pageBgColor : "#ffffff"
+                } 50%)`,
             }}
         >
             <GlobalStyles
@@ -334,6 +336,7 @@ export default function MainSlide() {
             <FloatingLine shift={15} />
             <FloatingLine shift={25} />
             <AnimatedGeometricWaves
+                key={`waves-${colorMode}-1`}
                 singleRender={true}
                 sx={{
                     position: "absolute",
@@ -348,6 +351,7 @@ export default function MainSlide() {
                 }}
             />
             <AnimatedGeometricWaves
+                key={`waves-${colorMode}-2`}
                 singleRender={false}
                 sx={{
                     position: "absolute",
@@ -360,6 +364,7 @@ export default function MainSlide() {
                 }}
             />
             <AnimatedGeometricWaves
+                key={`waves-${colorMode}-3`}
                 singleRender={false}
                 sx={{
                     position: "absolute",

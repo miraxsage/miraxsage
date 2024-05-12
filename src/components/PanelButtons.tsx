@@ -16,7 +16,7 @@ const PanelButton = styled(Button)(({ theme }) => ({
 
 export interface HorizontalPanelButtonProps {
     dividerSide?: "left" | "right";
-    dividerSize?: "full" | "squeezed" | "collapsed";
+    dividerSize?: "full" | "squeezed" | "collapsed" | "removed";
     iconMode?: boolean;
     iconSize?: "large" | "regular" | "small";
     children?: ReactNode;
@@ -47,7 +47,7 @@ export const HorizontalPanelButton: React.FC<HorizontalPanelButtonProps> = ({
         };
     return (
         <>
-            {dividerSide == "left" && (
+            {dividerSide == "left" && dividerSize != "removed" && (
                 <div className="h-full relative flex items-center">
                     <Box
                         sx={{ backgroundColor: "divider" }}
@@ -60,7 +60,7 @@ export const HorizontalPanelButton: React.FC<HorizontalPanelButtonProps> = ({
                 </div>
             )}
             <PanelButton sx={sx} {...props} />
-            {dividerSide == "right" && (
+            {dividerSide == "right" && dividerSize != "removed" && (
                 <div className="h-full relative flex items-center">
                     <Box
                         sx={{ backgroundColor: "divider" }}

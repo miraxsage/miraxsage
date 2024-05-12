@@ -1,40 +1,29 @@
-import { Box, BoxProps } from "@mui/material";
+import { Box } from "@mui/material";
 import DeveloperIllustration from "./DeveloperIllustration";
-import Link from "@/components/Link";
-import { useLanguage } from "@/store/appearanceSlice";
 import __ from "@/utilities/transtation";
-
-function SpecialLink({ sx, children, ...props }: BoxProps<"a">) {
-    return (
-        <Link
-            sx={{
-                textDecorationColor: "#589487",
-                WebkitTextFillColor: "#589487",
-                "&:hover": {
-                    textDecorationColor: "#2bc979",
-                    WebkitTextFillColor: "#2bc979",
-                },
-                ...sx,
-            }}
-            {...props}
-        >
-            {children}
-        </Link>
-    );
-}
+import { useLandingColor } from "..";
+import { mix } from "@/utilities/colors";
+import LandingLink from "../LandingLink";
+import { useLanguage } from "@/store/appearanceSlice";
 
 export default function HelloBlock() {
     const lang = useLanguage();
+    const textColor = useLandingColor("contrast");
+    const accentColor = useLandingColor("accentA");
+    const darkPaleAccent = mix(accentColor, "#777777", 0.6);
     return (
         <Box sx={{ display: "flex", gap: "5vw", alignItems: "center", justifyContent: "center" }}>
             <DeveloperIllustration sx={{ width: "40%" }} />
             <Box>
-                <Box sx={{ fontFamily: "NeueMachina", color: "white", fontSize: "57px", lineHeight: 1 }}>
+                <Box sx={{ fontFamily: "NeueMachina", color: textColor, fontSize: "57px", lineHeight: 1 }}>
                     {lang.ru ? "Всем " : "Hello "}
                     <Box
                         sx={{
                             display: "inline-block",
-                            background: `linear-gradient(25deg, #2dcab2, #2bc979)`,
+                            background: `linear-gradient(25deg, ${useLandingColor("accentA")}, ${useLandingColor(
+                                "accentB"
+                            )})`,
+                            lineHeight: 1.25,
                             WebkitBackgroundClip: "text",
                             WebkitTextFillColor: "transparent",
                         }}
@@ -45,12 +34,13 @@ export default function HelloBlock() {
                     <Box component="span" sx={{ fontSize: "45px", position: "relative", top: "-4px" }}>
                         👋
                     </Box>
+                    <Box sx={{ height: "25px" }}></Box>
                     <Box
                         sx={{
-                            background: `linear-gradient(90deg, #ffffff 30%, #589487)`,
+                            background: `linear-gradient(90deg, ${textColor} 30%, ${darkPaleAccent})`,
                             fontFamily: "Cascadia",
                             lineHeight: 1.2,
-                            fontSize: "30px",
+                            fontSize: "27px",
                             fontWeight: "500",
                             WebkitBackgroundClip: "text",
                             WebkitTextFillColor: "transparent",
@@ -59,7 +49,7 @@ export default function HelloBlock() {
                         <br />
                         {lang.ru ? "Меня зовут Максим и я" : "My name is Maxim and I am a"}
                         <br />
-                        <Box component="span" sx={{ textDecoration: "line-through", textDecorationColor: "white" }}>
+                        <Box component="span" sx={{ textDecoration: "line-through", textDecorationColor: textColor }}>
                             {lang.ru ? "трудоголик" : "workaholic"}
                         </Box>
                         {lang.ru ? " веб-разработчик" : " web-developer"}
@@ -94,11 +84,11 @@ export default function HelloBlock() {
                                 <br />
                             </>
                         )}{" "}
-                        <SpecialLink href="/about">_{__("resume")}</SpecialLink>
+                        <LandingLink href="/about">{__("resume")}</LandingLink>
                         <Box component="span" sx={{ WebkitBackgroundClip: "unset", WebkitTextFillColor: "white" }}>
                             📜
                         </Box>{" "}
-                        и <SpecialLink href="/projects">_{__("portfolio")}</SpecialLink>
+                        и <LandingLink href="/projects">{__("portfolio")}</LandingLink>
                         <Box component="span" sx={{ WebkitBackgroundClip: "unset", WebkitTextFillColor: "white" }}>
                             💼
                         </Box>

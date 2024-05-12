@@ -4,9 +4,12 @@ import { Box, useTheme } from "@mui/material";
 import CodeBackground from "../CodeBackground";
 import FloatingLine from "../FloatingLine";
 import HelloBlock from "./HelloBlock";
+import { useLandingColor } from "..";
+import { useColorMode } from "@/store/appearanceSlice";
 
 export function AboutSlide() {
     const theme = useTheme();
+    const isDarkMode = useColorMode().dark;
     const layoutBackgroundColor = getThemeColor("layoutBackground", theme);
     return (
         <Box
@@ -28,7 +31,7 @@ export function AboutSlide() {
                     borderTop: `1px solid ${theme.palette.divider}`,
                     background: `linear-gradient(200deg, ${mix(
                         layoutBackgroundColor,
-                        "#3ec9d2",
+                        useLandingColor(isDarkMode ? "accentA" : "accentB"),
                         0.08
                     )}, ${layoutBackgroundColor} 50%)`,
                 }}
@@ -43,15 +46,37 @@ export function AboutSlide() {
                 <CodeBackground
                     sx={{
                         left: "unset",
-                        top: "-190px",
-                        maxHeight: "calc(350px + 2vw)",
+                        maxHeight: "40vh",
                         right: "-5%",
-                        transform: "skew(0, 10deg)",
+                        transform: "translateY(-200px) skew(0, 10deg)",
                     }}
                 />
             </Box>
-            <Box className="container" sx={{ position: "relative", margin: "0 auto" }}>
-                <HelloBlock />
+            <CodeBackground
+                gradientOrientation="toTop"
+                sx={{
+                    top: "unset",
+                    bottom: 0,
+                    maxHeight: "40vh",
+                    left: "-5%",
+                    transform: "translateY(0%)",
+                }}
+            />
+            <Box
+                className="container"
+                sx={{
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    minHeight: "100dvh",
+                    margin: "0 auto",
+                }}
+            >
+                <Box sx={{ width: "100%" }}>
+                    <HelloBlock />
+                </Box>
             </Box>
         </Box>
     );
