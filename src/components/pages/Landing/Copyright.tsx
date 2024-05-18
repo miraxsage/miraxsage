@@ -1,4 +1,4 @@
-import { useLanguage } from "@/store/appearanceSlice";
+import { useColorMode, useLanguage } from "@/store/appearanceSlice";
 import { Box, alpha, useTheme } from "@mui/material";
 import { useLandingColor } from ".";
 import TransparentButton from "./TransparentButton";
@@ -12,7 +12,9 @@ import { useThemeColor } from "@/components/contexts/Theme";
 export default function Copyright() {
     const lang = useLanguage();
     const theme = useTheme();
+    const isDarkMode = useColorMode().dark;
     const color = useLandingColor("noteless");
+    const accentColor = useLandingColor("accentA");
     return (
         <Box
             sx={{
@@ -40,11 +42,17 @@ export default function Copyright() {
                         © 2024 Miraxsage. Все права защищены.
                         <br />
                         Все материалы на сайте (товарные знаки, логотипы и изображения за исключением ряда <br />
-                        иллюстраций заимствованных в свободном доступе) являются собственностью владельца <br />
+                        иллюстраций, заимствованных в свободном доступе) являются собственностью владельца <br />
                         (Манина Максима Павловича) и могут быть использованы только с личного разрешения.
                     </>
                 ) : (
-                    <></>
+                    <>
+                        © 2024 Miraxsage. All rights reserved.
+                        <br />
+                        All materials on the website (trademarks, logos, and images excluding certain <br />
+                        illustrations sourced from public domain) are the property of the owner (Manin <br />
+                        Maxim) and may only be used with personal permission.
+                    </>
                 )}
                 <Box
                     className="grid"
@@ -54,7 +62,7 @@ export default function Copyright() {
                         "& button": {
                             color: alpha(color, 0.6),
                             "&:hover": {
-                                color: lighten(color, 0.3),
+                                color: isDarkMode ? lighten(color, 0.3) : accentColor,
                             },
                         },
                     }}
