@@ -3,12 +3,12 @@ import { getLandingColor } from "../pages/Landing";
 const MiraxsageIcon = ({ contrast }: { contrast?: boolean }) => {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode == "dark";
-    let baseColor = lighten(theme.palette.divider, contrast ? 0.78 : 0.65);
+    let baseColor = lighten(theme.palette.divider, contrast ? 0.8 : 0.65);
     let c1 = baseColor;
-    let c2 = alpha(baseColor, 0.8);
-    let c3 = alpha(baseColor, 0.7);
-    let c4 = alpha(baseColor, 0.5);
-    let c5 = alpha(baseColor, 0.3);
+    let c2 = alpha(baseColor, 0.83);
+    let c3 = alpha(baseColor, 0.85);
+    let c4 = alpha(baseColor, 0.6);
+    let c5 = alpha(baseColor, 0.45);
     let c55 = c5;
     let c6 = alpha(baseColor, contrast ? 0 : 0.01);
     let c7 = alpha(baseColor, 0.0);
@@ -25,16 +25,22 @@ const MiraxsageIcon = ({ contrast }: { contrast?: boolean }) => {
         c4 = contrast ? lighten(baseColor, 0.6) : alpha(baseColor, 0.4);
         c5 = contrast ? lighten(baseColor, 0.4) : alpha(baseColor, 0.6);
         c55 = contrast ? lighten(baseColor, 0.55) : alpha(baseColor, 0.45);
-        c6 = contrast ? lighten(baseColor, 0.2) : alpha(baseColor, 0.7);
+        c6 = contrast ? lighten(baseColor, 0.2) : alpha(baseColor, 0.9);
         c7 = contrast ? alpha(baseColor, 0.03) : alpha(baseColor, 0.07);
         c8 = contrast ? lighten(baseColor, 0.95) : alpha(baseColor, 0.1);
-        c9 = contrast ? lighten(baseColor, 0.3) : alpha(baseColor, 0.6);
+        c9 = contrast ? lighten(baseColor, 0.3) : alpha(baseColor, 0.7);
     }
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -20 500 670">
             <defs>
+                <linearGradient id="miraxsage-grd" x1={0} x2={0} y1={0} y2={670} gradientUnits="userSpaceOnUse">
+                    <stop offset={0} stopColor={isDarkMode ? c6 : contrast ? "#6f56b6" : c6} />
+                    <stop offset={1} stopColor={isDarkMode ? c6 : contrast ? "#4c6588" : c9} />
+                </linearGradient>
                 <style>
-                    {`.svgcls-1{fill:${c1}}.svgcls-2{fill:${c2}}.svgcls-3{fill:${c3}}.svgcls-4{fill:${c4}}.svgcls-5{fill:${c5}}.svgcls-55{fill:${c55}}.svgcls-6{fill:${c6}}.svgcls-7{fill:${c7}}.svgcls-8{fill:${c8}}.svgcls-9{fill:${c9}}`}
+                    {`.svgcls-1{fill:${c1}}.svgcls-2{fill:${c2}}.svgcls-3{fill:${c3}}.svgcls-4{fill:${c4}}.svgcls-5{fill:${c5}}.svgcls-55{fill:${c55}}.svgcls-6{fill:url("#miraxsage-grd")}.svgcls-7{fill:${c7}}.svgcls-8{fill:${c8}}.svgcls-9{fill:${
+                        isDarkMode ? c9 : `url("#miraxsage-grd")`
+                    }`}
                 </style>
             </defs>
             <g id="\u0421\u043B\u043E\u0439_2" data-name="\u0421\u043B\u043E\u0439 2">
@@ -133,8 +139,13 @@ const MiraxsageIcon = ({ contrast }: { contrast?: boolean }) => {
                         className="svgcls-6"
                     />
                     <path
-                        d="m239.79 385-.48-1.08c2.6-.21 5.1-.54 7.61-.59 8-.16 15.62-1.91 23.19-4.21 6.24-1.89 12.47-2.73 18.35 1.25a19.76 19.76 0 0 0 2.45 1.18l8.94-3.64c4.39-.52 7.86 1.89 11.52 3.65l5.16 3.41c.36.37.68 1 1.08 1.05 3.91.65 7.83 1.18 11.73 1.8a16.42 16.42 0 0 1 2.56 1c-1.24 1.09-2 1.76-2.78 2.42-.33-1.72-1.43-.93-2.42-.8-6 .74-11.67.13-17-3.12-4.9-3-10.1-3.5-15.39-.72a23.66 23.66 0 0 1-3.18 1.22c-3.12-1.22-5.92-2.41-8.79-3.4-4.76-1.65-9.36.11-14 .88-6.37 1-12.71 2.1-19.2.89-1-.18-2.6-.85-3 1.1Z"
+                        d="M239.8,405l-0.5-1.1c2.6-0.2,5.1-0.5,7.6-0.6c8-0.2,15.6-1.9,23.2-4.2c6.2-1.9,12.5-2.7,18.4,1.2
+                        c0.8,0.4,1.6,0.8,2.5,1.2l8.9-3.6c4.4-0.5,7.9,1.9,11.5,3.6l5.2,3.4c0.4,0.4,0.7,1,1.1,1c3.9,0.6,7.8,1.2,11.7,1.8
+                        c0.9,0.3,1.7,0.6,2.6,1c-1.2,1.1-2,1.8-2.8,2.4c1.3-2.9-1.7-1.4-2.7-1.3c-6,0.7-11.5-1.1-16.8-4.4c-4.9-2.8-9.1-3.3-14.4-0.5
+                        c-1,0.5-2.9,1.2-4,1.6c-3.1-1.2-5.4-2.3-8.3-3.3c-4.5-1.9-8.8-0.1-13.4,0.5c-6.4,1-14.7,1.6-18.8,1.3c-1-0.2-7-0.9-7.4,1
+                        L239.8,405z"
                         className="svgcls-5"
+                        transform="translate(0, -19.8)"
                     />
                     <path
                         d="m316.53 384.93-5.16-3.41c1.8-1.4 2.63-2.17 4.14-1.08a2.31 2.31 0 0 0 3.07 0c.93-1 3.74-9.84 4.37-10.79 3.35-5.91 10.21-4.32 12.71-5.31a10.58 10.58 0 0 0 4.85-3.58c6.42-9.73 12.9-19.44 18.74-29.52 5.5-9.48 11-19 14.52-29.52.45-1.32.94-2.74 2.76-2.77-3.14 7.52-6.22 15.08-9.43 22.57-1.47 3.41-3.2 6.7-4.8 10-.47.42-1.13.74-1.38 1.26a148 148 0 0 1-13.48 21.76c-3.6 5-6.75 10.43-10.92 14.91-5.2 5.6-11.23 10.43-16.74 15.44Z"
@@ -149,7 +160,11 @@ const MiraxsageIcon = ({ contrast }: { contrast?: boolean }) => {
                         className="svgcls-2"
                     />
                     <path
-                        d="M261.6 389.45h-2.31a37.53 37.53 0 0 1-9.72-1.09l-3.45-1.11c.42-2 2-1.28 3-1.1 6.49 1.21 12.83.15 19.2-.89 4.64-.77 9.24-2.53 14-.88 2.87 1 5.67 2.18 8.79 3.4a23.66 23.66 0 0 0 3.18-1.22c5.29-2.78 10.49-2.28 15.39.72 5.33 3.25 11 3.86 17 3.12 1-.13 2.09-.92 2.42.8-5.91 2.61-12.16 1.53-18.3 1.74-3.22-1-6.39-2.3-9.67-2.7-2.21-.27-4.33-.6-7 .71a10.26 10.26 0 0 1-5 .5 15.42 15.42 0 0 1-5.46-1.81c-3-.6-4.9-.28-7.35-.42l-5-.21"
+                        d="M261.6,409.5h-2.3c-3.3,0.1-6.5-0.3-9.7-1.1l-6.2-2.1c0.4-2,6.4-1.2,7.4-1c6.2,0.1,14.2-0.6,20.6-1.6
+                        c4.6-0.8,8.2-1.8,13-0.2c2.9,1,3.8,2,6.9,3.3c1.1-0.3,2.6-1.2,3.6-1.7c4.3-2.5,9.6-2.3,14.2,0.3c5.3,3.2,11.5,5.4,17.5,4.7
+                        c1-0.1,4.1-1.7,2.5,1.3c-5.9,2.6-12.2,1.5-18.3,1.7c-3.2-1-6.4-2.3-9.7-2.7c-2.2-0.3-4.3-0.6-7,0.7c-1.6,0.6-3.3,0.8-5,0.5
+                        c-1.9-0.3-3.8-0.9-5.5-1.8c-3-0.6-4.9-0.3-7.4-0.4l-5-0.2"
+                        transform="translate(0, -20)"
                         className="svgcls-6"
                     />
                     <path
@@ -158,7 +173,7 @@ const MiraxsageIcon = ({ contrast }: { contrast?: boolean }) => {
                     />
                     <path
                         d="M294.19 390.92c1.86-1.37 4.75-1 7-.71 3.28.4 6.45 1.75 9.67 2.7-1.18 2-2.28 4.11-3.58 6-.33.49-1.31.53-2 .78-.77-5.18-3.78-8-9.11-8.6Z"
-                        className="svgcls-5"
+                        className="svgcls-4"
                     />
                     <path
                         d="m230.1 241.05-3.31 1.33-8.26-2.63c-.36 1.37-.65 2.49-.94 3.61a13.73 13.73 0 0 1-1.06-2c-1.22-3.41-3.1-4.13-6.13-2.22-1.27.8-2.47 1.71-3.71 2.58-4.89 2.92-10.05 2.84-13.89-.58 2.33-1.85 4.37-4.05 6.88-5.36 7.16-3.75 14.46-7.25 22.52-8.72 2.29-.42 4.6-.79 6.87-1.38-3.92-1.86-8-1.2-11.86-.47a72.79 72.79 0 0 0-11.72 3.54c-3.78 1.41-7.41 3.23-11.38 5 1.56-3 7.79-6.82 13.08-8.13 5-1.25 10.1-2.41 15.15-4.13a35.91 35.91 0 0 1-4.41-.56c-7.67-1.89-15.2-.91-22.76.79-7.37 1.65-12 1.08-18.95-2 3.61-2.25 7-4.72 10.74-6.58a66.71 66.71 0 0 1 11.68-4.52 59.54 59.54 0 0 1 11.22-1.81c6.42-.53 12.87-1.09 19.31-1 8.26.1 16.52.7 24.76 1.32a113.54 113.54 0 0 1 14.37 1.94 20 20 0 0 1 6.91 3.22 8.24 8.24 0 0 1 3.56 6.84c.33 9.74-4.35 16.48-12.58 21.08-1.65.92-3.4 1.69-5.36 2.65l1.33 3.33-10.68-4a28.4 28.4 0 0 0-12.28-8.16c-.09.94-.17 1.75-.25 2.57a4.6 4.6 0 0 1-1.39-.8 11.57 11.57 0 0 0-11.78-4.24c-1.7.59-4.26 0-4.05 3.65l5.06-1.57c2.15-.3 3.17 1.06 4.11 2.68 1.1 1.9-.35 3.21-.8 4.73Z"
