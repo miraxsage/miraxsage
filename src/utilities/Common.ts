@@ -47,3 +47,9 @@ export function debounce(id: string, handler: () => void, delay: number = 100, i
         debounceIds.push({ id, timerId: immidiateLaunch ? null : setTimeout(handler, delay), time: Date.now(), delay });
     }
 }
+
+export function rangeProgress(commonRangeVal: number, targetRangeFrom: number, targetRangeTo: number) {
+    if (commonRangeVal <= targetRangeFrom) return 0;
+    if (commonRangeVal >= targetRangeTo) return 1;
+    return (commonRangeVal - targetRangeFrom) / (targetRangeTo - targetRangeFrom);
+}

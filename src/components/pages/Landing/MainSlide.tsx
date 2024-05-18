@@ -21,6 +21,7 @@ import { GlobalStyles } from "@mui/material";
 import __ from "@/utilities/transtation";
 import { useLandingColor } from ".";
 import TransparentButton from "./TransparentButton";
+import { rangeProgress } from "@/utilities/common";
 
 function TypingShield({ titles }: { titles: string[] }) {
     const [currentTitle, setCurrentTitle] = useState(0);
@@ -210,7 +211,7 @@ function SlideContent() {
             sx={{
                 position: "relative",
                 margin: "0 auto",
-                minHeight: "135vh",
+                minHeight: "calc(100vh + 0.1763269807 * 100vw)",
             }}
         >
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100dvh" }}>
@@ -286,7 +287,11 @@ function SlideContent() {
     );
 }
 
-export default function MainSlide() {
+type MainSlideProps = {
+    scrollProgress: number;
+};
+
+export default function MainSlide({ scrollProgress }: MainSlideProps) {
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;
     const pageBgColor = getThemeColor("pageBgColor", theme);
@@ -305,12 +310,14 @@ export default function MainSlide() {
     //         // }
     //     })();
     // }, []);
+    console.log("opa", scrollProgress, 1 - rangeProgress(scrollProgress, 10, 20));
     return (
         <Box
             sx={{
                 position: "relative",
                 overflow: "hidden",
                 width: "100%",
+                opacity: 1 - rangeProgress(scrollProgress, 7, 17),
                 background: `linear-gradient(12deg, ${mix(pageBgColor, useLandingColor("accentB"), 0.08)}, ${
                     isDarkMode ? pageBgColor : "#ffffff"
                 } 50%)`,
@@ -344,9 +351,9 @@ export default function MainSlide() {
                     left: 0,
                     width: "150%",
                     height: "100vh",
-                    animation: "rotate-by-circle 90s linear infinite",
+                    animation: "rotate-by-circle 120s linear infinite",
                     "&>canvas": {
-                        animation: "swing-waves 90s ease-in-out infinite",
+                        animation: "swing-waves 120s ease-in-out infinite",
                     },
                 }}
             />

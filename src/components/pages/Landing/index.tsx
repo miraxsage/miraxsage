@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import MainSlide from "./MainSlide";
 import { AboutSlide } from "./AboutSlide";
 import GetCloserSlide from "./GetCloserSlide";
-import Copyright from "./Copyright";
 
 type LandingColor = "accentA" | "accentAPale" | "accentB" | "contrast" | "noteless";
 
@@ -15,7 +14,7 @@ export function getLandingColor(color: LandingColor, theme: Theme): string {
     if (color == "accentA") return isDarkMode ? "#2dcab2" : "#5f43b5";
     if (color == "accentAPale") return lighten(getLandingColor("accentA", theme), 0.8);
     if (color == "accentB") return isDarkMode ? "#2bc979" : "#4178cb";
-    if (color == "contrast") return isDarkMode ? "#ffffff" : "#9c9fab";
+    if (color == "contrast") return isDarkMode ? "#ffffff" : "#8f92a1";
     if (color == "noteless") return theme.palette.divider;
     return "#ff0000";
 }
@@ -28,6 +27,7 @@ export function useLandingColor(color: LandingColor) {
 
 export default function Landing() {
     const [scrollProgress, setScrollProgress] = useState(0);
+    const [scrollTop, setScrollTop] = useState(0);
     const rootRef = useRef<HTMLDivElement>();
     useEffect(() => {
         const scrollContainer = rootRef.current?.querySelector(
@@ -52,13 +52,13 @@ export default function Landing() {
     }, []);
     return (
         <CustomScrollbar ref={rootRef} className="landing-background-scroll-view" sx={{ width: "100%" }}>
-            <Box sx={{ height: "300%" }}>
+            <Box sx={{ height: "500%" }}>
                 <Box sx={{ zIndex: 111, right: 0, position: "fixed" }}>{scrollProgress} %</Box>
-            </Box>
-            <Box sx={{ position: "absolute", width: "100%", overflow: "hidden", top: 0, left: 0 }}>
-                <MainSlide />
-                <AboutSlide />
-                <GetCloserSlide />
+                <Box sx={{ position: "absolute", width: "100%", overflow: "hidden", top: 0, left: 0 }}>
+                    <MainSlide scrollProgress={scrollProgress} />
+                    <AboutSlide scrollProgress={scrollProgress} />
+                    <GetCloserSlide />
+                </Box>
             </Box>
         </CustomScrollbar>
     );
