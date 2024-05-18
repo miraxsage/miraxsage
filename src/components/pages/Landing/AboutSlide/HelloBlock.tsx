@@ -88,7 +88,7 @@ export default function HelloBlock() {
                         <Box component="span" sx={{ WebkitBackgroundClip: "unset", WebkitTextFillColor: "white" }}>
                             📜
                         </Box>{" "}
-                        и <LandingLink href="/projects">{__("portfolio")}</LandingLink>
+                        {lang.ru ? "и" : "and"} <LandingLink href="/projects">{__("portfolio")}</LandingLink>
                         <Box component="span" sx={{ WebkitBackgroundClip: "unset", WebkitTextFillColor: "white" }}>
                             💼
                         </Box>

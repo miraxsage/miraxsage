@@ -6,8 +6,16 @@ import FloatingLine from "../FloatingLine";
 import HelloBlock from "./HelloBlock";
 import { useLandingColor } from "..";
 import { useColorMode } from "@/store/appearanceSlice";
+import AboutBlock from "./AboutBlock";
+import SkillsBlock from "./SkillsBlock";
+import ExperienceBlock from "./ExperienceBlock";
+import TeamBlock from "./TeamBlock";
 
-export function AboutSlide() {
+type AboutSlideProps = {
+    scrollProgress: number;
+};
+
+export function AboutSlide({ scrollProgress }: AboutSlideProps) {
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;
     const layoutBackgroundColor = getThemeColor("layoutBackground", theme);
@@ -17,16 +25,17 @@ export function AboutSlide() {
                 position: "relative",
                 width: "100%",
                 height: 0,
-                minHeight: "135vh",
+                top: -1 * Math.min(scrollProgress, 20) * 50 + "px",
+                minHeight: "calc(100vh + 0.1763269807 * 100vw)",
             }}
         >
             <Box
                 sx={{
                     position: "absolute",
-                    top: "-16%",
                     width: "100%",
                     overflow: "hidden",
                     height: "150%",
+                    transformOrigin: "0% 0%",
                     transform: "skew(0, -10deg)",
                     borderTop: `1px solid ${theme.palette.divider}`,
                     background: `linear-gradient(200deg, ${mix(
@@ -46,9 +55,11 @@ export function AboutSlide() {
                 <CodeBackground
                     sx={{
                         left: "unset",
-                        maxHeight: "40vh",
-                        right: "-5%",
-                        transform: "translateY(-200px) skew(0, 10deg)",
+                        maxHeight: "calc(0.1763269807 * 100vw * 1.3)",
+                        textAlign: "right",
+                        right: "-1%",
+                        transformOrigin: "100% 0%",
+                        transform: "skew(0, 10deg)",
                     }}
                 />
             </Box>
@@ -57,8 +68,8 @@ export function AboutSlide() {
                 sx={{
                     top: "unset",
                     bottom: 0,
-                    maxHeight: "40vh",
-                    left: "-5%",
+                    maxHeight: "calc(0.1763269807 * 100vw * 1.3)",
+                    left: "-1%",
                     transform: "translateY(0%)",
                 }}
             />
@@ -75,7 +86,9 @@ export function AboutSlide() {
                 }}
             >
                 <Box sx={{ width: "100%" }}>
-                    <HelloBlock />
+                    <ExperienceBlock />
+                    <TeamBlock />
+                    <SkillsBlock />
                 </Box>
             </Box>
         </Box>

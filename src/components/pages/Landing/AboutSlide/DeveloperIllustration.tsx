@@ -2,6 +2,9 @@ import { useColorMode } from "@/store/appearanceSlice";
 import { Box, SxProps, alpha, darken, lighten } from "@mui/material";
 import { useLandingColor } from "..";
 
+//"#92e3a9" = accentColor
+//"#263238" = darkColor
+
 const DeveloperIllustration = ({ sx }: { sx?: SxProps }) => {
     const isDarkMode = useColorMode().dark;
     const accentColor = lighten(useLandingColor(isDarkMode ? "accentB" : "accentA"), isDarkMode ? 0.1 : 0.5);

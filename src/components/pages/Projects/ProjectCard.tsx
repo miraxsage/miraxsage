@@ -316,7 +316,7 @@ export default function ProjectCard({ project, sx, style, onClick }: ProjectCard
                         <span>{project.rating}</span> <StarIcon />
                     </Box>
                 </Box>
-                <CustomScrollbar>
+                <CustomScrollbar sx={{ "& [data-overlayscrollbars-contents]": { overscrollBehavior: "contain" } }}>
                     <Box sx={{ padding: "8px 10px", lineHeight: 1.25 }}>{project.description[lang]}</Box>
                 </CustomScrollbar>
             </Box>

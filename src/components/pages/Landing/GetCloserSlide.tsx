@@ -1,4 +1,4 @@
-import { getThemeColor, useThemeColor } from "@/components/contexts/Theme";
+import { getThemeColor } from "@/components/contexts/Theme";
 import { mix } from "@/utilities/colors";
 import { Box, SxProps, alpha, lighten, useTheme } from "@mui/material";
 import FloatingLine from "./FloatingLine";
@@ -82,10 +82,10 @@ export default function GetCloserSlide() {
             <Box
                 sx={{
                     position: "absolute",
-                    top: "-16%",
                     width: "100%",
                     overflow: "hidden",
                     height: "150%",
+                    transformOrigin: "0% 0%",
                     transform: "skew(0, -10deg)",
                     borderTop: `1px solid ${theme.palette.divider}`,
                     background: `linear-gradient(200deg, ${alpha(
