@@ -2,7 +2,8 @@ import { Box, lighten, useTheme } from "@mui/material";
 import TopMenu from "./TopMenu";
 import BottomBar from "./BottomBar";
 import AsideMenu from "./AsideMenu";
-import { getThemeColor, useThemeColor } from "../contexts/Theme";
+import { getThemeColor } from "../contexts/Theme";
+import { useLocation } from "react-router-dom";
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -13,7 +14,10 @@ export default function Layout({ children }: LayoutProps) {
     const isDarkMode = theme.palette.mode == "dark";
     const splashScreen = false;
     const glowColor = getThemeColor("layoutGlow", theme);
-    return (
+    const location = useLocation();
+    return location.pathname == "/" ? (
+        children
+    ) : (
         <Box
             sx={{
                 [theme.breakpoints.down("md")]: {
@@ -37,7 +41,7 @@ export default function Layout({ children }: LayoutProps) {
                     boxShadow: isDarkMode
                         ? `0 0 65px ${glowColor}, 0 0 20px ${glowColor}`
                         : `0 0 95px ${glowColor}, 0 0 20px ${glowColor}`,
-                    background: useThemeColor("layoutBackground"),
+                    background: getThemeColor("layoutBackground", theme),
                     borderColor: splashScreen ? lighten(glowColor, 0.1) : theme.palette.divider,
                     gridTemplateRows: "auto minmax(0, 1fr) auto",
                 }}

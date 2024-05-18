@@ -53,7 +53,7 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "/",
-                element: "Hello",
+                element: <Landing />,
             },
             {
                 path: "profile",
@@ -109,18 +109,23 @@ export function App() {
 
 function AppContent() {
     useLanguage();
-    const isLandingPage = window.location.pathname == "/";
+    // const isLandingPage = window.location.pathname == "/";
+    // return (
+    //     <AppLayout>
+    //         {!isLandingPage ? (
+    //             <AppLayout sx={{ background: "unset" }}>
+    //                 <RouterProvider router={router} fallbackElement={<AppSpinner />} />
+    //             </AppLayout>
+    //         ) : (
+    //             <AppLayout sx={{ background: "unset" }}>
+    //                 <Landing />
+    //             </AppLayout>
+    //         )}
+    //     </AppLayout>
+    // );
     return (
         <AppLayout>
-            {!isLandingPage ? (
-                <AppLayout sx={{ background: "unset" }}>
-                    <RouterProvider router={router} fallbackElement={<AppSpinner />} />
-                </AppLayout>
-            ) : (
-                <AppLayout sx={{ background: "unset" }}>
-                    <Landing />
-                </AppLayout>
-            )}
+            <RouterProvider router={router} fallbackElement={<AppSpinner />} />
         </AppLayout>
     );
 }
