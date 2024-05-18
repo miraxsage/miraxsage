@@ -28,7 +28,8 @@ export type TechnologyInterface = [
     icon: React.FC, // icon
     number, // level
     number, // experience
-    number // projects
+    number, // projects
+    string? // color
 ];
 
 export type TechnologiesInterface = {
@@ -113,17 +114,17 @@ export function technologiesEqualsOrRelative(techA: TechnologiesList<"All">, tec
 
 export const technologies = {
     frontend: [
-        ["HTML", "https://html.spec.whatwg.org/", HTMLIcon, 72, 11, 25],
-        ["CSS", "https://www.w3.org/TR/?tags%5B0%5D=css", CSSIcon, 78, 11, 25],
-        ["JS", "https://tc39.es/ecma262/", JSIcon, 87, 11, 25],
-        ["Typescript", "https://www.typescriptlang.org/", TSIcon, 71, 3.5, 6],
-        ["JQuery", "https://jquery.com/", JQueryIcon, 91, 8, 23],
-        ["React", "https://react.dev/", ReactIcon, 74, 3.5, 8],
-        ["Redux", "https://redux.js.org/", ReduxIcon, 68, 2.5, 7],
-        ["ReactRouter", "https://reactrouter.com/en/main", ReactRouterIcon, 65, 2.5, 6],
-        ["FramerMotion", "https://www.framer.com/motion/", FramerMotionIcon, 65, 2, 5],
-        ["Bootstrap", "https://getbootstrap.com/", BootstrapIcon, 76, 4, 8],
-        ["MUI", "https://mui.com/material-ui/", MUIIcon, 68, 2, 5],
+        ["HTML", "https://html.spec.whatwg.org/", HTMLIcon, 72, 11, 25, "#fc4f13"],
+        ["CSS", "https://www.w3.org/TR/?tags%5B0%5D=css", CSSIcon, 78, 11, 25, "#264de4"],
+        ["JS", "https://tc39.es/ecma262/", JSIcon, 87, 11, 25, "#e4b900"],
+        ["Typescript", "https://www.typescriptlang.org/", TSIcon, 71, 3.5, 6, "#3179c6"],
+        ["JQuery", "https://jquery.com/", JQueryIcon, 91, 8, 23, "#0773b4"],
+        ["React", "https://react.dev/", ReactIcon, 74, 3.5, 8, "#00baed"],
+        ["Redux", "https://redux.js.org/", ReduxIcon, 68, 2.5, 7, "#764abc"],
+        ["ReactRouter", "https://reactrouter.com/en/main", ReactRouterIcon, 65, 2.5, 6, "#d0021b"],
+        ["FramerMotion", "https://www.framer.com/motion/", FramerMotionIcon, 65, 2, 5, "#eb00c3"],
+        ["Bootstrap", "https://getbootstrap.com/", BootstrapIcon, 76, 4, 8, "#6b10f4"],
+        ["MUI", "https://mui.com/material-ui/", MUIIcon, 68, 2, 5, "#0080ff"],
     ],
     backend: [
         ["PHP", "https://www.php.net/", PHPIcon, 71, 8, 15],

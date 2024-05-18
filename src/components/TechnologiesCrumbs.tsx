@@ -14,8 +14,10 @@ const wholeTechnologiesList = [...technologies.frontend, ...technologies.backend
 
 export default function TechnologiesCrumbs({
     techs,
+    contrast,
     sx = {},
 }: {
+    contrast?: boolean;
     techs: TechnologiesList<"Techs">[] | TechnologiesList<"Cats">;
     sx?: SxProps;
 }) {
@@ -34,9 +36,10 @@ export default function TechnologiesCrumbs({
             separator={<Separator />}
             withoutExpandIcon={true}
         >
-            {techsItems.map(([tech, datalink, Icon]) => ({
+            {techsItems.map(([tech, datalink, Icon, , , , color]) => ({
                 label: tech,
-                icon: Icon && <Icon />,
+                iconColor: contrast ? color : undefined,
+                icon: <Icon />,
                 subitems: [
                     {
                         label: tech + "-проекты",

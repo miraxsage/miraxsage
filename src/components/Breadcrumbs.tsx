@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useTheme } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import HomeIcon from "@mui/icons-material/Home";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -11,6 +11,7 @@ import { CustomChip } from "./Chip";
 
 type BasicBreadcrumbItem = {
     label: string;
+    iconColor?: string;
     icon?: React.ReactElement;
     link?: string;
     onClick?: (item: BasicBreadcrumbItem) => void;
@@ -59,6 +60,23 @@ export default function CustomBreadcrumbs({
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             !breadcrumb.link ? undefined : (RouterLink as any)
                         }
+                        sx={{
+                            ...(breadcrumb.iconColor
+                                ? {
+                                      border: "1px solid transparent",
+                                      transition: "all 0.3s",
+                                      transitionProperty: "background, border-color, color",
+                                      "& .MuiChip-icon": {
+                                          color: breadcrumb.iconColor,
+                                      },
+                                      "&:hover": {
+                                          borderColor: breadcrumb.iconColor,
+                                          background: alpha(breadcrumb.iconColor, 0.1),
+                                          color: getThemeColor("regularHoverText", theme),
+                                      },
+                                  }
+                                : {}),
+                        }}
                         to={breadcrumb.link}
                         label={breadcrumb.label}
                         icon={breadcrumb.icon || (i == 0 && !breadcrumb.subitems?.length ? homeIcon : undefined)}
