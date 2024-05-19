@@ -1,6 +1,6 @@
 import { getThemeColor } from "@/components/contexts/Theme";
 import { mix } from "@/utilities/colors";
-import { Box, SxProps, alpha, lighten, useTheme } from "@mui/material";
+import { Box, SxProps, alpha, lighten, useMediaQuery, useTheme } from "@mui/material";
 import FloatingLine from "./FloatingLine";
 import { useColorMode, useLanguage } from "@/store/appearanceSlice";
 import { useLandingColor } from ".";
@@ -22,7 +22,7 @@ import TelegramIcon from "@/components/icons/TelegramIcon";
 import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
 import MessageIcon from "@mui/icons-material/Message";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import { GitHub } from "@mui/icons-material";
+import { GitHub, SmartButtonRounded, SmartDisplayOutlined } from "@mui/icons-material";
 import { ReactNode, useState } from "react";
 import Copyright from "./Copyright";
 
@@ -50,6 +50,17 @@ function SpecialButton({ children, sx }: SpecialButtonProps) {
                 padding: "5px 20px",
                 color: paleTextColor,
                 borderColor: theme.palette.divider,
+                [theme.breakpoints.down("2xl")]: {
+                    fontSize: "25px",
+                },
+                [theme.breakpoints.down("lg")]: {
+                    fontSize: "23px",
+                },
+                [theme.breakpoints.down("sm")]: {
+                    fontSize: "20px",
+                    width: "auto",
+                    padding: "8px 0px 8px 8px",
+                },
                 ...sx,
             }}
         >
@@ -67,7 +78,10 @@ export default function GetCloserSlide() {
     const accentColor = useLandingColor("accentA");
     const darkPaleAccent = mix(accentColor, "#777777", 0.6);
     const paleTextColor = isDarkMode ? lighten(theme.palette.divider, 0.35) : lighten(textColor, 0.2);
-
+    const sm = useMediaQuery(theme.breakpoints.down("sm"));
+    const md = useMediaQuery(theme.breakpoints.down("md"));
+    const lg = useMediaQuery(theme.breakpoints.down("lg"));
+    const _2xl = useMediaQuery(theme.breakpoints.down("2xl"));
     const [openedNodes, setOpenedNodes] = useState(["bio", "exp", "spec"]);
 
     return (
@@ -112,6 +126,9 @@ export default function GetCloserSlide() {
                     justifyContent: "center",
                     minHeight: "100dvh",
                     margin: "0 auto",
+                    [theme.breakpoints.down("sm")]: {
+                        padding: "0px 10px",
+                    },
                 }}
             >
                 <Box
@@ -122,25 +139,39 @@ export default function GetCloserSlide() {
                         lineHeight: 1,
                         width: "fit-content",
                         margin: "0 auto",
+                        [theme.breakpoints.down("md")]: {
+                            fontSize: "42px",
+                        },
                     }}
                 >
-                    {lang.ru ? "Познакомимся " : "Let's get  "}
                     <Box
                         sx={{
-                            display: "inline-block",
-                            background: `linear-gradient(25deg, ${useLandingColor("accentA")}, ${useLandingColor(
-                                "accentB"
-                            )})`,
-                            lineHeight: 1.25,
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
+                            [theme.breakpoints.down("lg")]: {
+                                textAlign: "center",
+                            },
                         }}
                     >
-                        {lang.ru ? "ближе" : "closer"}
-                    </Box>
-                    ?{" "}
-                    <Box component="span" sx={{ fontSize: "45px", position: "relative", top: "-4px" }}>
-                        🫱🫲
+                        {lang.ru ? "Познакомимся " : "Let's get  "}
+                        <Box
+                            sx={{
+                                display: "inline-block",
+                                background: `linear-gradient(25deg, ${useLandingColor("accentA")}, ${useLandingColor(
+                                    "accentB"
+                                )})`,
+                                lineHeight: 1.25,
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                            }}
+                        >
+                            {lang.ru ? "ближе" : "closer"}
+                        </Box>
+                        ?{" "}
+                        <Box
+                            component="span"
+                            sx={{ fontSize: "45px", position: "relative", top: "-4px", whiteSpace: "nowrap" }}
+                        >
+                            🫱🫲
+                        </Box>
                     </Box>
                     <Box sx={{ height: "25px" }}></Box>
                     <Box
@@ -153,7 +184,7 @@ export default function GetCloserSlide() {
                             WebkitBackgroundClip: "text",
                             WebkitTextFillColor: "transparent",
                             display: "grid",
-                            gridTemplate: "auto auto auto / 25px 25px auto",
+                            gridTemplate: "auto auto auto / 25px 25px 1fr",
                             marginTop: "25px",
                             "& .connective-line": {
                                 borderColor: theme.palette.divider,
@@ -170,6 +201,15 @@ export default function GetCloserSlide() {
                                     background: theme.palette.divider,
                                     borderRadius: "50%",
                                 },
+                            },
+                            [theme.breakpoints.down("2xl")]: {
+                                fontSize: "25px",
+                            },
+                            [theme.breakpoints.down("lg")]: {
+                                fontSize: "23px",
+                            },
+                            [theme.breakpoints.down("sm")]: {
+                                fontSize: "20px",
                             },
                         }}
                     >
@@ -266,17 +306,35 @@ export default function GetCloserSlide() {
                         sx={{
                             display: "grid",
                             gridTemplate: "25px 25px auto / 25px 25px auto 100px 1fr",
+                            [theme.breakpoints.down("md")]: {
+                                gridTemplate: "25px 25px auto / 25px 25px auto 50px 1fr",
+                            },
+                            [theme.breakpoints.down("md")]: {
+                                gridTemplate: "25px 25px auto / 25px 25px auto 25px 1fr",
+                            },
+                            [theme.breakpoints.down("sm")]: {
+                                gridTemplate: "25px 25px auto / 25px 25px auto minmax(5px, 15px) 1fr",
+                            },
                         }}
                     >
                         <Box
                             sx={{
                                 ...(openedNodes.includes("bio")
                                     ? openedNodes.includes("exp")
-                                        ? { height: "311.5px", width: "95px" }
-                                        : { height: "214px", width: "53px" }
+                                        ? {
+                                              height: sm ? "258.5px" : lg ? "281.5px" : _2xl ? "296.5px" : "311.5px",
+                                              width: "95px",
+                                          }
+                                        : {
+                                              height: sm ? "178.5px" : lg ? "193.5px" : _2xl ? "201.5px" : "214px",
+                                              width: "53px",
+                                          }
                                     : openedNodes.includes("exp")
-                                    ? { height: "219px", width: "95px" }
-                                    : { height: "120px", width: "53px" }),
+                                    ? { height: sm ? "187px" : lg ? "201px" : _2xl ? "209px" : "219px", width: "95px" }
+                                    : {
+                                          height: sm ? "106px" : lg ? "112px" : _2xl ? "117px" : "120px",
+                                          width: "53px",
+                                      }),
                                 transition: "all 0.3s",
                                 transitionProperty: "height, width",
                                 borderColor: theme.palette.divider,
@@ -286,7 +344,7 @@ export default function GetCloserSlide() {
                         ></Box>
                         <Box
                             sx={{
-                                height: "75px",
+                                height: sm ? "70px" : "73px",
                                 transition: "height 0.3s",
                                 borderColor: theme.palette.divider,
                                 borderWidth: "0px 0px 1px 1px",
@@ -302,6 +360,7 @@ export default function GetCloserSlide() {
                             expandedNodes={["bio", "exp", "spec"]}
                             sx={{
                                 gridArea: "3/3/3/4",
+                                minWidth: "248px",
                                 "& .MuiTreeItem-root": {
                                     "&:before": {
                                         top: "28px",
@@ -332,6 +391,24 @@ export default function GetCloserSlide() {
                                     {
                                         marginLeft: "5px",
                                     },
+                                [theme.breakpoints.down("2xl")]: {
+                                    [`& .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-iconContainer svg,
+                                        & .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-label`]: {
+                                        fontSize: "25px",
+                                    },
+                                },
+                                [theme.breakpoints.down("lg")]: {
+                                    [`& .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-iconContainer svg,
+                                        & .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-label`]: {
+                                        fontSize: "23px",
+                                    },
+                                },
+                                [theme.breakpoints.down("sm")]: {
+                                    [`& .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-iconContainer svg,
+                                        & .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-label`]: {
+                                        fontSize: "20px",
+                                    },
+                                },
                             }}
                         >
                             {[
@@ -379,23 +456,23 @@ export default function GetCloserSlide() {
                         >
                             <SpecialButton sx={{ borderWidth: "0px 0px 1px 1px" }}>
                                 <TelegramIcon />
-                                Telegram
+                                {!sm && "Telegram"}
                             </SpecialButton>
                             <SpecialButton sx={{ borderWidth: "0px 1px 1px 0px" }}>
                                 <AlternateEmailOutlinedIcon />
-                                Email
+                                {!sm && "Email"}
                             </SpecialButton>
                             <SpecialButton sx={{ borderWidth: "0px 0px 1px 1px" }}>
                                 <LinkedInIcon />
-                                LinkedIn
+                                {!sm && "LinkedIn"}
                             </SpecialButton>
                             <SpecialButton sx={{ borderWidth: "0px 1px 0px 0px" }}>
                                 <GitHub />
-                                Github
+                                {!sm && "Github"}
                             </SpecialButton>
                             <SpecialButton>
                                 <MessageIcon />
-                                {__("Write")}
+                                {!sm && __("Write")}
                             </SpecialButton>
                         </Box>
                     </Box>

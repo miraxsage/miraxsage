@@ -12,8 +12,8 @@ export default function HelloBlock() {
     const accentColor = useLandingColor("accentA");
     const darkPaleAccent = mix(accentColor, "#777777", 0.6);
     return (
-        <Box sx={{ display: "flex", gap: "5vw", alignItems: "center", justifyContent: "center" }}>
-            <DeveloperIllustration sx={{ width: "40%" }} />
+        <Box sx={{ display: "flex", gap: "5vw", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
+            <DeveloperIllustration sx={{ flexBasis: "500px", maxWidth: "40%", flexGrow: 1 }} />
             <Box>
                 <Box sx={{ fontFamily: "NeueMachina", color: textColor, fontSize: "57px", lineHeight: 1 }}>
                     {lang.ru ? "Всем " : "Hello "}

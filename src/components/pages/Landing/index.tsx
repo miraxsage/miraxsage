@@ -1,6 +1,6 @@
 import CustomScrollbar from "@/components/Scrollbar";
 import { debounce } from "@/utilities/common";
-import { Box, Theme, lighten, useTheme } from "@mui/material";
+import { Box, GlobalStyles, Theme, lighten, useTheme } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import MainSlide from "./MainSlide";
 import { AboutSlide } from "./AboutSlide";
@@ -47,7 +47,7 @@ export default function Landing() {
                 40
             );
         };
-        scrollContainer?.addEventListener("scroll", scrollHandler);
+        //scrollContainer?.addEventListener("scroll", scrollHandler);
         return () => scrollContainer?.removeEventListener("scroll", scrollHandler);
     }, []);
     return (

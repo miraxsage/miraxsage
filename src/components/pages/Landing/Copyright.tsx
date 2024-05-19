@@ -34,6 +34,7 @@ export default function Copyright() {
                     width: "fit-content",
                     margin: "0 auto",
                     color,
+                    padding: "0 15px",
                     lineHeight: 1.25,
                 }}
             >

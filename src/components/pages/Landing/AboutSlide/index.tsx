@@ -6,7 +6,7 @@ import FloatingLine from "../FloatingLine";
 import HelloBlock from "./HelloBlock";
 import { useLandingColor } from "..";
 import { useColorMode } from "@/store/appearanceSlice";
-import AboutBlock from "./AboutBlock";
+import AboutMeBlock from "./AboutMeBlock";
 import SkillsBlock from "./SkillsBlock";
 import ExperienceBlock from "./ExperienceBlock";
 import TeamBlock from "./TeamBlock";
@@ -25,7 +25,10 @@ export function AboutSlide({ scrollProgress }: AboutSlideProps) {
                 position: "relative",
                 width: "100%",
                 height: 0,
-                top: -1 * Math.min(scrollProgress, 20) * 50 + "px",
+                // top:
+                //     scrollProgress < 20
+                //         ? -1 * scrollProgress * 50 + "px"
+                //         : Math.min(0, -1 * 20 * 50 + (scrollProgress - 20) * 25) + "px",
                 minHeight: "calc(100vh + 0.1763269807 * 100vw)",
             }}
         >
@@ -81,15 +84,12 @@ export function AboutSlide({ scrollProgress }: AboutSlideProps) {
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
-                    minHeight: "100dvh",
+                    minHeight: "calc(max(100dvh, 1000px))",
                     margin: "0 auto",
                 }}
             >
-                <Box sx={{ width: "100%" }}>
-                    <ExperienceBlock />
-                    <TeamBlock />
-                    <SkillsBlock />
-                </Box>
+                {/* <HelloBlock /> */}
+                <AboutMeBlock />
             </Box>
         </Box>
     );

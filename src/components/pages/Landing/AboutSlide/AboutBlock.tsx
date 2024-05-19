@@ -1,21 +1,110 @@
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { useLandingColor } from "..";
 import { mix } from "@/utilities/colors";
-import LandingLink from "../LandingLink";
-import { useLanguage } from "@/store/appearanceSlice";
-import WebDeveloperIllustration from "./WebDeveloperIllustration";
-import Emoji from "../Emoji";
+import { ReactNode } from "react";
 
-export default function AboutBlock() {
-    const lang = useLanguage();
+type AboutBlockProps = {
+    illustration: ReactNode;
+    order?: "left" | "right";
+    title: [string, string, string, string?];
+    children: ReactNode;
+};
+export default function AboutBlock({
+    illustration,
+    order = "left",
+    title: [titleA, titleB, titleC, titleD],
+    children,
+}: AboutBlockProps) {
+    const theme = useTheme();
     const textColor = useLandingColor("contrast");
     const accentColor = useLandingColor("accentA");
     const darkPaleAccent = mix(accentColor, "#777777", 0.6);
+    illustration = (
+        <Box
+            sx={{
+                maxWidth: "45%",
+                overflow: "hidden",
+                flexGrow: 1,
+                "& svg": {
+                    minHeight: "500px",
+                    maxWidth: "700px",
+                },
+                [theme.breakpoints.down("xl")]: {
+                    maxWidth: "30%",
+                    [order == "left" ? "borderRight" : "borderLeft"]: `1px solid ${theme.palette.divider}`,
+                    "& > div": {
+                        translate: "100% 0%",
+                    },
+                    "& svg": {
+                        minHeight: "600px",
+                        translate: "-100% 0%",
+                    },
+                },
+                [theme.breakpoints.down("md")]: {
+                    maxWidth: "90%",
+                    maxHeight: "400px",
+                    [order == "left" ? "borderRight" : "borderLeft"]: `0px`,
+                    borderTop: `1px solid ${theme.palette.divider}`,
+                    "& > div": {
+                        translate: "0% 350px",
+                    },
+                    "& svg": {
+                        minHeight: "350px",
+                        translate: "0% -100%",
+                    },
+                },
+                [theme.breakpoints.down("sm")]: {
+                    maxHeight: "250px",
+                    "& > div": {
+                        translate: "0% 250px",
+                    },
+                    "& svg": {
+                        minHeight: "300px",
+                        translate: "0% -100%",
+                    },
+                },
+            }}
+        >
+            {illustration}
+        </Box>
+    );
     return (
-        <Box sx={{ display: "flex", gap: "5vw", alignItems: "center", justifyContent: "center" }}>
+        <Box
+            sx={{
+                display: "flex",
+                gap: "5vw",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "absolute",
+                width: "100%",
+                [theme.breakpoints.down("2xl")]: {
+                    gap: "3vw",
+                },
+                [theme.breakpoints.down("xl")]: {
+                    gap: "20px",
+                },
+                [theme.breakpoints.down("lg")]: {
+                    gap: "50px",
+                },
+                [theme.breakpoints.down("md")]: {
+                    flexWrap: "wrap",
+                },
+            }}
+        >
+            {order == "left" && illustration}
             <Box>
-                <Box sx={{ fontFamily: "NeueMachina", color: textColor, fontSize: "57px", lineHeight: 1 }}>
-                    {lang.ru ? "Обо " : "About "}
+                <Box
+                    sx={{
+                        fontFamily: "NeueMachina",
+                        color: textColor,
+                        fontSize: "57px",
+                        lineHeight: 1,
+                        [theme.breakpoints.down("md")]: {
+                            fontSize: "42px",
+                        },
+                    }}
+                >
+                    {titleA}{" "}
                     <Box
                         sx={{
                             display: "inline-block",
@@ -27,10 +116,12 @@ export default function AboutBlock() {
                             WebkitTextFillColor: "transparent",
                         }}
                     >
-                        {lang.ru ? "мне" : "me"}
-                    </Box>{" "}
+                        {titleB}
+                    </Box>
+                    {titleD && titleC}
                     <Box component="span" sx={{ fontSize: "45px", position: "relative", top: "-4px" }}>
-                        👨‍💻
+                        {" "}
+                        {titleD ? titleD : titleC}
                     </Box>
                     <Box sx={{ height: "25px" }}></Box>
                     <Box
@@ -42,60 +133,27 @@ export default function AboutBlock() {
                             fontWeight: "500",
                             WebkitBackgroundClip: "text",
                             WebkitTextFillColor: "transparent",
+                            width: "700px",
+                            textWrap: "balance",
+                            [theme.breakpoints.down("2xl")]: {
+                                fontSize: "25px",
+                            },
+                            [theme.breakpoints.down("lg")]: {
+                                fontSize: "23px",
+                                width: "500px",
+                            },
+                            [theme.breakpoints.down("sm")]: {
+                                fontSize: "20px",
+                                width: "365px",
+                            },
                         }}
                     >
                         <br />
-                        {lang.ru ? (
-                            <>
-                                Программированием <Emoji e="📟" /> и веб-разработкой я <br />
-                                увлекся еще в 11 классе <Emoji e="🌱" />, далеком 2010-м.
-                                <br />
-                                Еще тогда мне нравилось собирать сложные, <br />
-                                красивые и функциональные интерфейсы. <Emoji e="📱" />
-                                <br />
-                                <br />
-                                В 2015 с красным дипломом <Emoji e="📕" /> окончил
-                                <br />
-                                <LandingLink href="/about/education">университет</LandingLink>
-                                <Emoji e="🏦" /> по профильному направлению
-                                <br />
-                                информационных технологий.
-                                <br />
-                                <br />
-                                И тогда и до сих пор не терял творческого <br />
-                                интереса и вдохновения программировать, <br />
-                                проектировать, порой часами исправлять <br />
-                                единственный баг <Emoji e="🐞" />, но в итоге все
-                                <br />
-                                равно всегда находить решение. <Emoji e="⛅️" />
-                            </>
-                        ) : (
-                            <>
-                                I became passionate about programming <Emoji e="📟" /> <br />
-                                and web development back in 2010 when <br />
-                                I was in the 11th grade <Emoji e="🌱" />. Even then, <br />
-                                I enjoyed creating complex, beautiful, <br />
-                                and functional interfaces. <Emoji e="📱" />
-                                <br />
-                                <br />
-                                In 2015, I graduated with honors <Emoji e="📕" /> <br />
-                                from <LandingLink href="/about/education">university</LandingLink>
-                                <Emoji e="🏦" /> with a degree <br />
-                                in Information Technology.
-                                <br />
-                                <br />
-                                From then on and to this day, I have <br />
-                                never lost my creative interest and <br />
-                                inspiration for programming. I love <br />
-                                designing, sometimes spending hours <br />
-                                fixing a single bug <Emoji e="🐞" />, but always
-                                <br /> finding a solution in the end. <Emoji e="⛅️" />
-                            </>
-                        )}
+                        {children}
                     </Box>
                 </Box>
             </Box>
-            <WebDeveloperIllustration sx={{ width: "40%" }} />
+            {order == "right" && illustration}
         </Box>
     );
 }
