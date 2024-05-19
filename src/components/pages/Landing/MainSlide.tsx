@@ -1,4 +1,4 @@
-import { Box, lighten, useTheme } from "@mui/material";
+import { Box, alpha, lighten, useMediaQuery, useTheme } from "@mui/material";
 import FloatingLine from "./FloatingLine";
 import FloatingBlock from "./FloatingBlock";
 import { getThemeColor } from "@/components/contexts/Theme";
@@ -19,7 +19,7 @@ import { AnimatedGeometricWaves } from "./AnimatedGeometricWaves";
 // import { getGPUTier } from "detect-gpu";
 import { GlobalStyles } from "@mui/material";
 import __ from "@/utilities/transtation";
-import { useLandingColor } from ".";
+import { getLandingColor, useLandingColor } from ".";
 import TransparentButton from "./TransparentButton";
 import { rangeProgress } from "@/utilities/common";
 
@@ -88,6 +88,7 @@ function TypingShield({ titles }: { titles: string[] }) {
 }
 
 function WebDeveloperShield() {
+    const theme = useTheme();
     const isDarkMode = useColorMode().dark;
     let paleColor = useLandingColor(isDarkMode ? "accentAPale" : "contrast");
     paleColor = isDarkMode ? paleColor : lighten(paleColor, 0.3);
@@ -104,12 +105,27 @@ function WebDeveloperShield() {
                 background: `linear-gradient(45deg, ${contrastColor} 10%, ${darkPaleColor})`,
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
+                overflow: "hidden",
+                [theme.breakpoints.down("lg")]: {
+                    fontSize: "42px",
+                    marginBottom: "10px",
+                    lineHeight: "0.8",
+                    "& .first-shield-title": {
+                        padding: "0px 9px 0px 9px",
+                    },
+                    "& .second-shield-title": {
+                        padding: "7px 9px 8px 9px",
+                    },
+                },
             }}
         >
             <Box
                 sx={{
                     display: "grid",
                     gridTemplate: "10px auto 10px auto 10px / 10px auto 10px 1fr 10px",
+                    [theme.breakpoints.down("sm")]: {
+                        gridTemplate: "7px auto 5px auto 6px / 5px auto 5px 1fr 5px",
+                    },
                 }}
             >
                 <Box
@@ -137,7 +153,10 @@ function WebDeveloperShield() {
                         gridArea: "2/1/5/1",
                     }}
                 ></Box>
-                <Box sx={{ gridArea: "2/2/span 2/span 1", padding: "0px 14px 0px 14px" }}>
+                <Box
+                    className="first-shield-title"
+                    sx={{ gridArea: "2/2/span 2/span 1", padding: "0px 14px 0px 14px" }}
+                >
                     <TypingShield titles={[__("Web"), "Frontend", "Fullstack"]} />
                 </Box>
                 <Box
@@ -165,7 +184,12 @@ function WebDeveloperShield() {
                         gridArea: "3/5/3/5",
                     }}
                 ></Box>
-                <Box sx={{ gridArea: "3/2/span 2/span 3", padding: "5px 14px 8px 14px" }}>{__("developer")}</Box>
+                <Box
+                    className="second-shield-title"
+                    sx={{ gridArea: "3/2/span 2/span 3", padding: "5px 14px 8px 14px" }}
+                >
+                    {__("developer")}
+                </Box>
                 <Box
                     sx={{ border: "1px solid " + paleColor, borderWidth: "0px 2px 0px 0px", gridArea: "4/5/4/5" }}
                 ></Box>
@@ -201,9 +225,12 @@ function WebDeveloperShield() {
 }
 
 function SlideContent() {
+    const theme = useTheme();
     const lang = useAppearance().language;
     const isDarkMode = useColorMode().dark;
     const colorModeHook = useColorMode();
+    const smallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+    const showAvatarDividers = useMediaQuery("(max-height: 850px)");
     const langHook = useLanguage();
     return (
         <Box
@@ -214,33 +241,125 @@ function SlideContent() {
                 minHeight: "calc(100vh + 0.1763269807 * 100vw)",
             }}
         >
-            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100dvh" }}>
-                <Box sx={{ padding: "100px 0px", position: "relative", top: "-100px" }}>
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "calc(90%)",
+                    margin: "0 auto",
+                    minHeight: "100dvh",
+                }}
+            >
+                <Box
+                    sx={{
+                        width: "100%",
+                        padding: "50px 0px",
+                        position: "relative",
+                        [theme.breakpoints.down("sm")]: {
+                            padding: 0,
+                        },
+                    }}
+                >
                     <Box
                         className="grid"
-                        sx={{ justifyContent: "center", margin: "3vw 0", "& button": { fontSize: "22px" } }}
+                        sx={{
+                            justifyContent: "center",
+                            "& button": { fontSize: "22px" },
+                            marginBottom: "30px",
+                            [theme.breakpoints.down("sm")]: {
+                                marginBottom: 0,
+                            },
+                        }}
                     >
-                        <Box className="flex">
-                            <TransparentButton>
-                                <PersonIcon />
-                                {"\u00A0"}_{__("about")}
-                            </TransparentButton>
+                        <Box
+                            className="flex"
+                            sx={{
+                                position: "relative",
+                                "&:before": {
+                                    content: "''",
+                                    display: "block",
+                                    position: "absolute",
+                                    width: "100%",
+                                    height: "100%",
+                                    borderRadius: "50%",
+                                    filter: "blur(25px)",
+                                    background: getThemeColor("barBackground", theme),
+                                },
+                            }}
+                        >
+                            {!smallScreen && (
+                                <TransparentButton>
+                                    <PersonIcon />
+                                    {"\u00A0"}_{__("about")}
+                                </TransparentButton>
+                            )}
                             <TransparentButton onClick={langHook.toggle}>
                                 <LanguageIcon language={lang} />
                             </TransparentButton>
-                            <TransparentButton onClick={colorModeHook.toggle}>
+                            <TransparentButton
+                                onClick={colorModeHook.toggle}
+                                dividerSize={smallScreen ? "collapsed" : "squeezed"}
+                            >
                                 {!isDarkMode ? <Brightness4Icon /> : <LightModeIcon />}
                             </TransparentButton>
-                            <TransparentButton dividerSize="collapsed">
-                                <RocketLaunchIcon />
-                                {"\u00A0"}_{__("projects")}
-                            </TransparentButton>
+                            {!smallScreen && (
+                                <TransparentButton dividerSize="collapsed">
+                                    <RocketLaunchIcon />
+                                    {"\u00A0"}_{__("projects")}
+                                </TransparentButton>
+                            )}
                         </Box>
                     </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <Box sx={{ width: "400px", marginRight: "50px" }}>
-                            <MiraxsageIcon contrast={true} />
-                            <Box className="grid" sx={{ justifyContent: "center" }}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: "50px",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            [theme.breakpoints.down("lg")]: {
+                                gap: 0,
+                            },
+                        }}
+                    >
+                        <Box sx={{ maxWidth: "400px", flexBasis: "300px", flexGrow: 1 }}>
+                            <Box sx={{ display: "flex", justifyContent: "center" }}>
+                                <Box
+                                    sx={{
+                                        overflow: "hidden",
+                                        width: "100%",
+                                        [theme.breakpoints.down("sm")]: {
+                                            height: "calc(min(500px, 100dvh - 400px))",
+                                            margin: "5px 0",
+                                            borderImage: `linear-gradient(90deg, transparent -10%, ${alpha(
+                                                getLandingColor("noteless", theme),
+                                                showAvatarDividers ? 1 : 0
+                                            )}, transparent 110%)`,
+                                            borderImageSlice: "1",
+                                            borderWidth: "1px 0px 1px 0px",
+                                            "& > *": {
+                                                position: "relative",
+                                                top: "calc(-0.3 * (500px - 100%))",
+                                                translate: "0 0",
+                                            },
+                                        },
+                                    }}
+                                >
+                                    <MiraxsageIcon contrast={true} />
+                                </Box>
+                            </Box>
+
+                            <Box
+                                className="grid"
+                                sx={{
+                                    justifyContent: "center",
+                                    marginBottom: "15px",
+                                    [theme.breakpoints.down("sm")]: {
+                                        marginBottom: "0",
+                                    },
+                                }}
+                            >
                                 <Box className="flex">
                                     <TransparentButton>
                                         <TelegramIcon />
@@ -257,7 +376,16 @@ function SlideContent() {
                                 </Box>
                             </Box>
                         </Box>
-                        <Box sx={{ fontFamily: "NeueMachina", fontSize: "90px", lineHeight: 1 }}>
+                        <Box
+                            sx={{
+                                fontFamily: "NeueMachina",
+                                fontSize: "90px",
+                                lineHeight: 1,
+                                [theme.breakpoints.down("lg")]: {
+                                    fontSize: "70px",
+                                },
+                            }}
+                        >
                             <Box
                                 sx={{
                                     display: "inline-block",
@@ -274,6 +402,9 @@ function SlideContent() {
                                 sx={{
                                     color: useLandingColor("contrast"),
                                     marginBottom: "50px",
+                                    [theme.breakpoints.down("sm")]: {
+                                        marginBottom: "20px",
+                                    },
                                 }}
                             >
                                 {__("Maxim")}
@@ -310,14 +441,15 @@ export default function MainSlide({ scrollProgress }: MainSlideProps) {
     //         // }
     //     })();
     // }, []);
-    console.log("opa", scrollProgress, 1 - rangeProgress(scrollProgress, 10, 20));
+    //console.log("opa", scrollProgress, 1 - rangeProgress(scrollProgress, 10, 20));
+    console.log("rerender main slide");
     return (
         <Box
             sx={{
                 position: "relative",
                 overflow: "hidden",
                 width: "100%",
-                opacity: 1 - rangeProgress(scrollProgress, 7, 17),
+                //opacity: 1 - rangeProgress(scrollProgress, 7, 17),
                 background: `linear-gradient(12deg, ${mix(pageBgColor, useLandingColor("accentB"), 0.08)}, ${
                     isDarkMode ? pageBgColor : "#ffffff"
                 } 50%)`,
@@ -325,9 +457,13 @@ export default function MainSlide({ scrollProgress }: MainSlideProps) {
         >
             <GlobalStyles
                 styles={{
+                    "@keyframes rotate-by-circle-max-amplitude": {
+                        from: { transform: "translate(-30vw, 0) rotate(0deg) translate(30vw, 5vw) rotate(0deg)" },
+                        to: { transform: "translate(-30vw, 0) rotate(360deg) translate(30vw, 5vw) rotate(-360deg)" },
+                    },
                     "@keyframes rotate-by-circle": {
-                        from: { transform: "rotate(0deg) translateX(100px) rotate(0deg)" },
-                        to: { transform: "rotate(360deg) translateX(100px) rotate(-360deg)" },
+                        from: { transform: "translate(-20vw, 0) rotate(0deg) translate(10vw, 0) rotate(0deg)" },
+                        to: { transform: "translate(-20vw, 0) rotate(360deg) translate(10vw, 0) rotate(-360deg)" },
                     },
                     "@keyframes swing-waves": {
                         "0%": { transform: "translate(-10%, -5%) rotate(-20deg) scaleX(1)" },
@@ -349,11 +485,17 @@ export default function MainSlide({ scrollProgress }: MainSlideProps) {
                     position: "absolute",
                     top: 0,
                     left: 0,
-                    width: "150%",
+                    width: "150vw",
                     height: "100vh",
                     animation: "rotate-by-circle 120s linear infinite",
                     "&>canvas": {
                         animation: "swing-waves 120s ease-in-out infinite",
+                    },
+                    [theme.breakpoints.down("sm")]: {
+                        animation: "rotate-by-circle-max-amplitude 70s linear infinite",
+                        "&>canvas": {
+                            animation: "swing-waves 30s ease-in-out infinite",
+                        },
                     },
                 }}
             />

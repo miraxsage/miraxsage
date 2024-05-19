@@ -3,7 +3,7 @@ import { getLandingColor } from "../pages/Landing";
 const MiraxsageIcon = ({ contrast }: { contrast?: boolean }) => {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode == "dark";
-    let baseColor = lighten(theme.palette.divider, contrast ? 0.8 : 0.65);
+    let baseColor = lighten(theme.palette.divider, contrast ? 0.85 : 0.65);
     let c1 = baseColor;
     let c2 = alpha(baseColor, 0.83);
     let c3 = alpha(baseColor, 0.85);

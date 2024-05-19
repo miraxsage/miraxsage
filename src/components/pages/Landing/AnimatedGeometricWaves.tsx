@@ -124,13 +124,12 @@ export function AnimatedGeometricWaves({ sx, singleRender }: { sx?: SxProps; sin
         options.forEach((option) => wave.addStrand(new Strand(option)));
         wave.animate();
         return () => {
-            console.log("dispose");
             wave.dispose();
         };
     }, []);
     return (
         <Box sx={sx}>
-            <canvas style={{ width: "100%", height: "100%" }} id={id}></canvas>
+            <canvas style={{ width: "100%", minWidth: "800px", height: "100%" }} id={id}></canvas>
         </Box>
     );
 }
