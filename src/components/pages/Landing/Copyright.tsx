@@ -22,9 +22,8 @@ export default function Copyright() {
                 width: "100%",
                 borderColor: alpha(theme.palette.divider, 0.5),
                 borderWidth: "1px 0px 0px 0px",
-                bottom: "0",
                 padding: "50px 0px",
-                position: "absolute",
+                position: "relative",
             }}
         >
             <Box

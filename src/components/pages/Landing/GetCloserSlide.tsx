@@ -22,7 +22,7 @@ import TelegramIcon from "@/components/icons/TelegramIcon";
 import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
 import MessageIcon from "@mui/icons-material/Message";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import { GitHub, SmartButtonRounded, SmartDisplayOutlined } from "@mui/icons-material";
+import { GitHub } from "@mui/icons-material";
 import { ReactNode, useState } from "react";
 import Copyright from "./Copyright";
 
@@ -79,7 +79,6 @@ export default function GetCloserSlide() {
     const darkPaleAccent = mix(accentColor, "#777777", 0.6);
     const paleTextColor = isDarkMode ? lighten(theme.palette.divider, 0.35) : lighten(textColor, 0.2);
     const sm = useMediaQuery(theme.breakpoints.down("sm"));
-    const md = useMediaQuery(theme.breakpoints.down("md"));
     const lg = useMediaQuery(theme.breakpoints.down("lg"));
     const _2xl = useMediaQuery(theme.breakpoints.down("2xl"));
     const [openedNodes, setOpenedNodes] = useState(["bio", "exp", "spec"]);
@@ -89,8 +88,8 @@ export default function GetCloserSlide() {
             sx={{
                 position: "relative",
                 width: "100%",
-                height: 0,
-                minHeight: "135vh",
+                overflow: "hidden",
+                minHeight: "100vh",
             }}
         >
             <Box
@@ -100,7 +99,7 @@ export default function GetCloserSlide() {
                     overflow: "hidden",
                     height: "150%",
                     transformOrigin: "0% 0%",
-                    transform: "skew(0, -10deg)",
+                    transform: "skew(0, -10deg) translateY(calc(0.1763269807 * 100dvw))",
                     borderTop: `1px solid ${theme.palette.divider}`,
                     background: `linear-gradient(200deg, ${alpha(
                         mix(layoutBackgroundColor, useLandingColor("accentB"), 0.08),
@@ -126,8 +125,9 @@ export default function GetCloserSlide() {
                     justifyContent: "center",
                     minHeight: "100dvh",
                     margin: "0 auto",
+                    padding: "calc(0.1763269807 * 100dvw + 50px) 0 calc(0.1763269807 * 30dvw + 50px)",
                     [theme.breakpoints.down("sm")]: {
-                        padding: "0px 10px",
+                        padding: "calc(0.1763269807 * 100dvw + 50px) 10px calc(0.1763269807 * 30dvw + 50px)",
                     },
                 }}
             >
