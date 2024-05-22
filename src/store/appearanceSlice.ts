@@ -18,6 +18,7 @@ type StateConfig = {
 
 const localStorageConfig = localStorage.getItem("appearanceConfig");
 const initialConfig = (localStorageConfig ? JSON.parse(localStorageConfig) : defaultConfig) as AppearanceConfig;
+document.documentElement.lang = initialConfig.language;
 
 const slice = createSlice({
     name: "appearance",
@@ -29,6 +30,7 @@ const slice = createSlice({
         language: (state, newLanguage: PayloadAction<AppearanceConfig["language"]>) => {
             state.language = newLanguage.payload;
             window.cookie.set("lang", state.language);
+            document.documentElement.lang = state.language;
         },
     },
 });
