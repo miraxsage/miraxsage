@@ -14,14 +14,14 @@ import TelegramIcon from "@/components/icons/TelegramIcon";
 import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import { GitHub } from "@mui/icons-material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatedGeometricWaves } from "./AnimatedGeometricWaves";
 // import { getGPUTier } from "detect-gpu";
 import { GlobalStyles } from "@mui/material";
 import __ from "@/utilities/transtation";
-import { getLandingColor, useLandingColor } from ".";
+import { ScrollObservable, getLandingColor, useLandingColor } from ".";
 import TransparentButton from "./TransparentButton";
-import { rangeProgress } from "@/utilities/common";
+import { rangeProgress } from "@/utilities/math";
 
 function TypingShield({ titles }: { titles: string[] }) {
     const [currentTitle, setCurrentTitle] = useState(0);
@@ -329,6 +329,10 @@ function SlideContent() {
                                     sx={{
                                         overflow: "hidden",
                                         width: "100%",
+                                        maxHeight: "60dvh",
+                                        "& svg": {
+                                            translate: "0 calc(min(60dvh - 100%, 0px) * 0.4)",
+                                        },
                                         [theme.breakpoints.down("sm")]: {
                                             height: "calc(min(500px, 100dvh - 400px))",
                                             margin: "5px 0",
@@ -419,32 +423,28 @@ function SlideContent() {
 }
 
 type MainSlideProps = {
-    scrollProgress: number;
+    scrollObservable?: ScrollObservable;
 };
 
-export default function MainSlide({ scrollProgress }: MainSlideProps) {
+export default function MainSlide({ scrollObservable }: MainSlideProps) {
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;
     const pageBgColor = getThemeColor("pageBgColor", theme);
     const colorMode = useColorMode().mode;
-    // useEffect(() => {
-    //     (async () => {
-    //         const gpuTier = await getGPUTier();
-    //         console.log(gpuTier);
-    //         // Example output:
-    //         // {
-    //         //   "tier": 1,
-    //         //   "isMobile": false,
-    //         //   "type": "BENCHMARK",
-    //         //   "fps": 21,
-    //         //   "gpu": "intel iris graphics 6100"
-    //         // }
-    //     })();
-    // }, []);
-    //console.log("opa", scrollProgress, 1 - rangeProgress(scrollProgress, 10, 20));
-    console.log("rerender main slide");
+    const rootRef = useRef<HTMLDivElement | undefined>();
+    useEffect(() => {
+        if (!scrollObservable) return;
+        scrollObservable.onChange(() => {
+            if (!rootRef.current) return;
+            const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+            rootRef.current.style.opacity = (
+                1 - rangeProgress(scrollObservable.scrollTop, vh * 0.1, vh * 0.5)
+            ).toString();
+        });
+    }, [scrollObservable]);
     return (
         <Box
+            ref={rootRef}
             sx={{
                 position: "relative",
                 overflow: "hidden",

@@ -1,4 +1,4 @@
-import { Box, useTheme } from "@mui/material";
+import { Box, SxProps, useMediaQuery, useTheme } from "@mui/material";
 import { useLandingColor } from "..";
 import { mix } from "@/utilities/colors";
 import { ReactNode } from "react";
@@ -7,18 +7,23 @@ type AboutBlockProps = {
     illustration: ReactNode;
     order?: "left" | "right";
     title: [string, string, string, string?];
-    children: ReactNode;
+    children: ReactNode | { text: ReactNode; controls: ReactNode };
+    sx?: SxProps;
+    id?: string;
 };
 export default function AboutBlock({
     illustration,
     order = "left",
     title: [titleA, titleB, titleC, titleD],
     children,
+    sx,
+    id,
 }: AboutBlockProps) {
     const theme = useTheme();
     const textColor = useLandingColor("contrast");
     const accentColor = useLandingColor("accentA");
     const darkPaleAccent = mix(accentColor, "#777777", 0.6);
+    const mediumScreen = useMediaQuery(theme.breakpoints.down("md"));
     illustration = (
         <Box
             sx={{
@@ -41,7 +46,7 @@ export default function AboutBlock({
                     },
                 },
                 [theme.breakpoints.down("md")]: {
-                    maxWidth: "90%",
+                    maxWidth: "calc(100% - 20px)",
                     maxHeight: "400px",
                     [order == "left" ? "borderRight" : "borderLeft"]: `0px`,
                     borderTop: `1px solid ${theme.palette.divider}`,
@@ -70,29 +75,50 @@ export default function AboutBlock({
     );
     return (
         <Box
+            id={id}
             sx={{
-                display: "flex",
-                gap: "5vw",
+                position: "relative",
+                display: "grid",
+                height: "100dvh",
                 alignItems: "center",
-                justifyContent: "center",
-                position: "absolute",
-                width: "100%",
-                [theme.breakpoints.down("2xl")]: {
-                    gap: "3vw",
-                },
-                [theme.breakpoints.down("xl")]: {
-                    gap: "20px",
-                },
-                [theme.breakpoints.down("lg")]: {
-                    gap: "50px",
-                },
+                gridArea: "1/1/1/1",
+                padding: "50px 0",
+                maxWidth: "calc(100dvw - 50px)",
+                margin: "0 auto",
+                background: "transparent",
                 [theme.breakpoints.down("md")]: {
-                    flexWrap: "wrap",
+                    maxWidth: "calc(100dvw - 20px)",
                 },
+                ...sx,
             }}
+            style={{ visibility: "hidden" }}
         >
-            {order == "left" && illustration}
-            <Box>
+            <Box
+                sx={{
+                    display: "flex",
+                    gap: "5vw",
+                    maxWidth: "calc(100dvw - 50px)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "100%",
+                    [theme.breakpoints.down("2xl")]: {
+                        gap: "3vw",
+                    },
+                    [theme.breakpoints.down("xl")]: {
+                        gap: "20px",
+                    },
+                    [theme.breakpoints.down("lg")]: {
+                        gap: "50px",
+                    },
+                    [theme.breakpoints.down("md")]: {
+                        maxWidth: "calc(100dvw - 20px)",
+                        flexWrap: "wrap",
+                    },
+                    ...sx,
+                }}
+            >
+                {order == "left" && !mediumScreen && illustration}
+
                 <Box
                     sx={{
                         fontFamily: "NeueMachina",
@@ -101,6 +127,7 @@ export default function AboutBlock({
                         lineHeight: 1,
                         [theme.breakpoints.down("md")]: {
                             fontSize: "42px",
+                            justifySelf: "stretch",
                         },
                     }}
                 >
@@ -142,6 +169,9 @@ export default function AboutBlock({
                                 fontSize: "23px",
                                 width: "500px",
                             },
+                            [theme.breakpoints.down("md")]: {
+                                hyphens: "auto",
+                            },
                             [theme.breakpoints.down("sm")]: {
                                 fontSize: "20px",
                                 width: "365px",
@@ -149,11 +179,13 @@ export default function AboutBlock({
                         }}
                     >
                         <br />
-                        {children}
+                        {children && typeof children == "object" && "text" in children ? children.text : children}
                     </Box>
+                    {children && typeof children == "object" && "controls" in children && children.controls}
                 </Box>
+
+                {(order == "right" || mediumScreen) && illustration}
             </Box>
-            {order == "right" && illustration}
         </Box>
     );
 }
