@@ -440,6 +440,9 @@ export default function MainSlide({ scrollObservable }: MainSlideProps) {
             rootRef.current.style.opacity = (
                 1 - rangeProgress(scrollObservable.scrollTop, vh * 0.1, vh * 0.5)
             ).toString();
+            rootRef.current.style.filter = `blur(${
+                rangeProgress(scrollObservable.scrollTop, vh * 0.25, vh * 0.5) * 10
+            }px)`;
         });
     }, [scrollObservable]);
     return (

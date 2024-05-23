@@ -87,7 +87,7 @@ export default function Landing() {
             <Box sx={{ position: "absolute", width: "100%", top: 0, left: 0 }}>
                 <MainSlide scrollObservable={scrollObservable} />
                 <AboutSlide scrollObservable={scrollObservable} />
-                <GetCloserSlide scrollObservable={scrollObservable} />
+                <GetCloserSlide />
             </Box>
         </CustomScrollbar>
     );

@@ -10,7 +10,7 @@ export default function AboutMeBlock({ id, sx }: { id: string; sx?: SxProps }) {
     return (
         <AboutBlock
             illustration={<ExperienceIllustration />}
-            order="right"
+            order="left"
             title={lang.ru ? ["Про", "опыт", "💎"] : ["About", "experience", "💎"]}
             id={id}
             sx={sx}

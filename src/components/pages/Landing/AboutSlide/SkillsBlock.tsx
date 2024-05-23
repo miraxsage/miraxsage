@@ -17,7 +17,7 @@ export default function SkillsBlock({ id, sx }: { id: string; sx?: SxProps }) {
     return (
         <AboutBlock
             illustration={<SkillsIllustration />}
-            order="left"
+            order="right"
             title={lang.ru ? ["Про", "навыки", "💪"] : ["About", "skills", "💪"]}
             id={id}
             sx={sx}

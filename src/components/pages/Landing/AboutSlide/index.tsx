@@ -66,29 +66,32 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
                     const prevBlock = i > 0 ? blocksElements[i - 1] : null;
                     if (i > 0) {
                         if (hideRemined) {
+                            prevBlock!.style.zIndex = "";
                             block.style.visibility = "hidden";
                             continue;
                         } else block.style.visibility = "visible";
                         if (scroll <= halfvh) {
                             const progress = scroll / halfvh;
-                            block.style.translate = "0 " + (100 - round(100 * progress, 2)) + "%";
+                            block.style.translate = "0 " + (60 - round(60 * progress, 2)) + "%";
 
                             block.style.clipPath = `xywh(-20% -${
-                                (1 - rangeProgress(progress, 0.4, 1)) * 125
-                            }% 140% 125% round 0 0 70% 70%)`;
-                            // block.style.clipPath = `circle(75% at 50% ${
-                            //     50 - (1 - rangeProgress(progress, 0.4, 1)) * 125
-                            // }%)`;
+                                (1 - rangeProgress(progress, 0, 1)) * 125
+                            }% 140% 125% round 0 0 100vw 100vw)`;
+                            const smoothProgress = Math.sin((progress * Math.PI) / 2);
+                            const smoothInProgress = 1.5 * progress ** 0.25 - 0.5;
                             prevBlock!.style.translate =
-                                "0 -" + (scroll * (1 - progress * 0.5) + blocksInnerScrollHeights[i - 1]) + "px";
-                            prevBlock!.style.opacity = Math.max(0, 1 - progress * 1).toString();
+                                "0 -" + (halfvh * 0.7 * smoothProgress + blocksInnerScrollHeights[i - 1]) + "px";
+                            prevBlock!.style.scale = (1 - 0.05 * smoothProgress).toString();
+                            prevBlock!.style.opacity = (1 - Math.max(0, smoothInProgress * 1.5 - 0.5)).toString();
                             prevBlock!.style.filter = `blur(${rangeProgress(progress, 0.4, 1) * 10}px)`;
+                            prevBlock!.style.zIndex = !hideRemined && progress < 0.5 ? "1" : "";
                             hideRemined = true;
                         } else {
                             block.style.translate = "0 0";
                             block.style.clipPath = "";
                             prevBlock!.style.opacity = "0";
                             prevBlock!.style.filter = "";
+                            prevBlock!.style.zIndex = "";
                             scroll -= halfvh;
                         }
                     }
@@ -105,9 +108,11 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
                 }
                 if (scroll > 0 && !hideRemined) {
                     const lastBlock = blocksElements.at(-1)!;
+                    const vhProgress = rangeProgress(scroll, 0, vh);
                     lastBlock.style.translate = "0 -" + (blocksInnerScrollHeights.at(-1)! + scroll * 0.5) + "px";
-                    lastBlock.style.opacity = (1 - rangeProgress(scroll, 0, vh)).toString();
-                    lastBlock.style.filter = `blur(${rangeProgress(scroll, halfvh, vh) * 10}px)`;
+                    lastBlock.style.opacity = (1 - vhProgress).toString();
+                    lastBlock.style.filter = `blur(${rangeProgress(scroll, halfvh * 0.5, vh) * 10}px)`;
+                    lastBlock.style.scale = (1 - 0.1 * vhProgress).toString();
                 }
 
                 margin = -round(pxToAboutSlide, 2) + "px 0 0 0";
@@ -125,10 +130,6 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
                     position: "relative",
                     width: "100%",
                     height: 0,
-                    // top:
-                    //     scrollProgress < 20
-                    //         ? -1 * scrollProgress * 50 + "px"
-                    //         : Math.min(0, -1 * 20 * 50 + (scrollProgress - 20) * 25) + "px",
                     minHeight: "calc(100dvh + 0.1763269807 * 100dvw)",
                 }}
             >
