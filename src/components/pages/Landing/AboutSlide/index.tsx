@@ -12,6 +12,7 @@ import ExperienceBlock from "./ExperienceBlock";
 import TeamBlock from "./TeamBlock";
 import { useEffect, useRef } from "react";
 import { rangeProgress, round } from "@/utilities/math";
+import AchievementsBlock from "./AchievementsBlock";
 
 type AboutSlideProps = {
     scrollObservable?: ScrollObservable;
@@ -22,6 +23,7 @@ const blocks = {
     "about-me": AboutMeBlock,
     skills: SkillsBlock,
     experience: ExperienceBlock,
+    achievements: AchievementsBlock,
     team: TeamBlock,
 };
 
