@@ -49,7 +49,7 @@ export default function TechnologiesCrumbs({
                     {
                         label: tech + "-навыки",
                         icon: <MusclesIcon />,
-                        link: "/about/skills/hard",
+                        link: "/about/specifications/hard-skills",
                     },
                     {
                         label: "Документация",

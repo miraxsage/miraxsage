@@ -14,6 +14,8 @@ export default function AboutMeBlock({ id, sx }: { id: string; sx?: SxProps }) {
             title={lang.ru ? ["Про", "опыт", "💎"] : ["About", "experience", "💎"]}
             id={id}
             sx={sx}
+            squeezedImgHPos="-73% 0%"
+            squeezedImgVPos="0% -76%"
         >
             {lang.ru ? (
                 <>

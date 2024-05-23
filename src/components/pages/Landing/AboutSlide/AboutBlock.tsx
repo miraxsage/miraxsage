@@ -10,6 +10,8 @@ type AboutBlockProps = {
     children: ReactNode | { text: ReactNode; controls: ReactNode };
     sx?: SxProps;
     id?: string;
+    squeezedImgHPos?: string;
+    squeezedImgVPos?: string;
 };
 export default function AboutBlock({
     illustration,
@@ -18,6 +20,8 @@ export default function AboutBlock({
     children,
     sx,
     id,
+    squeezedImgHPos,
+    squeezedImgVPos,
 }: AboutBlockProps) {
     const theme = useTheme();
     const textColor = useLandingColor("contrast");
@@ -42,7 +46,7 @@ export default function AboutBlock({
                     },
                     "& svg": {
                         minHeight: "600px",
-                        translate: "-100% 0%",
+                        translate: squeezedImgHPos ?? "-70% 0%",
                     },
                 },
                 [theme.breakpoints.down("md")]: {
@@ -55,7 +59,7 @@ export default function AboutBlock({
                     },
                     "& svg": {
                         minHeight: "350px",
-                        translate: "0% -100%",
+                        translate: squeezedImgVPos ?? "0% -100%",
                     },
                 },
                 [theme.breakpoints.down("sm")]: {
@@ -65,7 +69,7 @@ export default function AboutBlock({
                     },
                     "& svg": {
                         minHeight: "300px",
-                        translate: "0% -100%",
+                        translate: squeezedImgVPos ?? "0% -100%",
                     },
                 },
             }}

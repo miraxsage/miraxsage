@@ -1,11 +1,19 @@
 import { Box, BoxProps, alpha, useTheme } from "@mui/material";
 import { getThemeColor } from "./contexts/Theme";
+import { useNavigate } from "react-router-dom";
 
-export default function Link({ sx, children, ...props }: BoxProps<"a">) {
+export default function Link({ sx, children, href, ...props }: BoxProps<"a">) {
     const theme = useTheme();
+    const navigate = useNavigate();
     return (
         <Box
             component="a"
+            onClick={(e: MouseEvent) => {
+                if (href && href.startsWith("/")) {
+                    e.preventDefault();
+                    navigate(href);
+                }
+            }}
             sx={{
                 color: getThemeColor("secondaryText", theme),
                 textDecoration: "underline",
@@ -18,6 +26,8 @@ export default function Link({ sx, children, ...props }: BoxProps<"a">) {
                 },
                 ...sx,
             }}
+            href={href}
+            target="_blank"
             {...props}
         >
             {children}

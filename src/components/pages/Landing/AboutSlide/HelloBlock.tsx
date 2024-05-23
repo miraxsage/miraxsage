@@ -17,12 +17,13 @@ export default function HelloBlock({ id, sx }: { id: string; sx?: SxProps }) {
             title={lang.ru ? ["Всем", "привет", "👋"] : ["Hello", "everyone", "👋"]}
             id={id}
             sx={sx}
+            squeezedImgHPos="-82% 0%"
         >
-            {lang.ru ? "Меня зовут Максим и я" : "My name is Maxim and I am a"}
+            {lang.ru ? "Меня зовут Максим и я " : "My name is Maxim and I am a "}
             <Box component="span" sx={{ textDecoration: "line-through", textDecorationColor: textColor }}>
-                {lang.ru ? " трудоголик" : " workaholic"}
+                {lang.ru ? "трудоголик" : "workaholic"}
             </Box>
-            {lang.ru ? " веб-разработчик" : " web-developer"}
+            {lang.ru ? " веб-разработчик " : " web-developer "}
             <Box component="span" sx={{ WebkitBackgroundClip: "unset", WebkitTextFillColor: "white" }}>
                 🙂‍
             </Box>
@@ -55,9 +56,9 @@ export default function HelloBlock({ id, sx }: { id: string; sx?: SxProps }) {
             </Box>
             ,
             {lang.ru ? (
-                <>перейдя по соответствующим ссылкам в каждом из блоков или начале страницы.</>
+                <> перейдя по соответствующим ссылкам в каждом из блоков или начале страницы.</>
             ) : (
-                <>by clicking on the appropriate links in each of the blocks or at the beginning of the page.</>
+                <> by clicking on the appropriate links in each of the blocks or at the beginning of the page.</>
             )}
         </AboutBlock>
     );

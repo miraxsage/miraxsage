@@ -213,7 +213,7 @@ const AchievementIllustration = ({ sx }: { sx?: SxProps }) => {
                     d="m417.01 376.67-360.84-24.4 14.97-16.97 333.32 22.53 12.55 18.84z"
                     style={{
                         fill: accentColor,
-                        stroke: "pink",
+                        stroke: borderColor,
                         strokeLinecap: "round",
                         strokeLinejoin: "round",
                     }}

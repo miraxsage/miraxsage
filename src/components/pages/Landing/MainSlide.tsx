@@ -16,12 +16,12 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import { GitHub } from "@mui/icons-material";
 import { useEffect, useRef, useState } from "react";
 import { AnimatedGeometricWaves } from "./AnimatedGeometricWaves";
-// import { getGPUTier } from "detect-gpu";
 import { GlobalStyles } from "@mui/material";
 import __ from "@/utilities/transtation";
 import { ScrollObservable, getLandingColor, useLandingColor } from ".";
 import TransparentButton from "./TransparentButton";
 import { rangeProgress } from "@/utilities/math";
+import { useNavigate } from "react-router-dom";
 
 function TypingShield({ titles }: { titles: string[] }) {
     const [currentTitle, setCurrentTitle] = useState(0);
@@ -232,6 +232,13 @@ function SlideContent() {
     const smallScreen = useMediaQuery(theme.breakpoints.down("sm"));
     const showAvatarDividers = useMediaQuery("(max-height: 850px)");
     const langHook = useLanguage();
+    const navigate = useNavigate();
+    const linkClick = (link: string) => {
+        return () => {
+            if (link.startsWith("/")) navigate(link);
+            else window.open(link, "_blank");
+        };
+    };
     return (
         <Box
             className="container"
@@ -289,7 +296,7 @@ function SlideContent() {
                             }}
                         >
                             {!smallScreen && (
-                                <TransparentButton>
+                                <TransparentButton onClick={linkClick("/about")}>
                                     <PersonIcon />
                                     {"\u00A0"}_{__("about")}
                                 </TransparentButton>
@@ -304,7 +311,7 @@ function SlideContent() {
                                 {!isDarkMode ? <Brightness4Icon /> : <LightModeIcon />}
                             </TransparentButton>
                             {!smallScreen && (
-                                <TransparentButton dividerSize="collapsed">
+                                <TransparentButton onClick={linkClick("/projects")} dividerSize="collapsed">
                                     <RocketLaunchIcon />
                                     {"\u00A0"}_{__("projects")}
                                 </TransparentButton>
@@ -365,16 +372,21 @@ function SlideContent() {
                                 }}
                             >
                                 <Box className="flex">
-                                    <TransparentButton>
+                                    <TransparentButton onClick={linkClick("https://t.me/miraxsage")}>
                                         <TelegramIcon />
                                     </TransparentButton>
-                                    <TransparentButton>
+                                    <TransparentButton onClick={linkClick("mailto:manin.maxim@mail.ru")}>
                                         <AlternateEmailOutlinedIcon />
                                     </TransparentButton>
-                                    <TransparentButton>
+                                    <TransparentButton
+                                        onClick={linkClick("https://www.linkedin.com/in/manin-maxim-ba74a6221/")}
+                                    >
                                         <LinkedInIcon />
                                     </TransparentButton>
-                                    <TransparentButton dividerSize="collapsed">
+                                    <TransparentButton
+                                        onClick={linkClick("https://github.com/miraxsage/")}
+                                        dividerSize="collapsed"
+                                    >
                                         <GitHub />
                                     </TransparentButton>
                                 </Box>
@@ -452,7 +464,6 @@ export default function MainSlide({ scrollObservable }: MainSlideProps) {
                 position: "relative",
                 overflow: "hidden",
                 width: "100%",
-                //opacity: 1 - rangeProgress(scrollProgress, 7, 17),
                 background: `linear-gradient(12deg, ${mix(pageBgColor, useLandingColor("accentB"), 0.08)}, ${
                     isDarkMode ? pageBgColor : "#ffffff"
                 } 50%)`,

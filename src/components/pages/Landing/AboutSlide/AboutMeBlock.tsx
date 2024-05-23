@@ -14,6 +14,7 @@ export default function AboutMeBlock({ id, sx }: { id: string; sx?: SxProps }) {
             title={lang.ru ? ["Обо", "мне", "👨‍💻"] : ["About", "me", "👨‍💻"]}
             id={id}
             sx={sx}
+            squeezedImgHPos="-85% 0%"
         >
             {lang.ru ? (
                 <>
@@ -25,7 +26,7 @@ export default function AboutMeBlock({ id, sx }: { id: string; sx?: SxProps }) {
                     <br />
                     <br />
                     В 2015 с красным дипломом <Emoji e="📕" /> окончил{" "}
-                    <LandingLink href="/about/education">университет</LandingLink>
+                    <LandingLink href="/about/biography/education">университет</LandingLink>
                     <Emoji e="🏦" /> по профильному направлению информационных технологий.
                     <br />
                     <br />
@@ -35,13 +36,13 @@ export default function AboutMeBlock({ id, sx }: { id: string; sx?: SxProps }) {
                 </>
             ) : (
                 <>
-                    I became passionate about programming <Emoji e="📟" />
-                    and web development back in 2010 when I was in the 11th grade <Emoji e="🌱" />. Even then, I enjoyed
-                    creating complex, beautiful, and functional interfaces. <Emoji e="📱" />
+                    I became passionate about programming <Emoji e="📟" /> and web development back in 2010 when I was
+                    in the 11th grade <Emoji e="🌱" />. Even then, I enjoyed creating complex, beautiful, and functional
+                    interfaces. <Emoji e="📱" />
                     <br />
                     <br />
-                    In 2015, I graduated with honors <Emoji e="📕" />
-                    from <LandingLink href="/about/education">university</LandingLink>
+                    In 2015, I graduated with honors <Emoji e="📕" /> from{" "}
+                    <LandingLink href="/about/biography/education">university</LandingLink>
                     <Emoji e="🏦" /> with a degree in Information Technology.
                     <br />
                     <br />

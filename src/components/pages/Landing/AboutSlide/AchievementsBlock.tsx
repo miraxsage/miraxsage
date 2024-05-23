@@ -14,6 +14,7 @@ export default function AchievementsBlock({ id, sx }: { id: string; sx?: SxProps
             title={lang.ru ? ["Про", "достижения", "🏆"] : ["About", "achievements", "🏆"]}
             id={id}
             sx={sx}
+            squeezedImgVPos="0% -80%"
         >
             {lang.ru ? (
                 <>
@@ -25,6 +26,7 @@ export default function AchievementsBlock({ id, sx }: { id: string; sx?: SxProps
                         component="ul"
                         sx={{
                             listStyle: "disc",
+                            paddingLeft: "25px",
                             "& li": {
                                 marginTop: "15px",
                             },
@@ -33,36 +35,54 @@ export default function AchievementsBlock({ id, sx }: { id: string; sx?: SxProps
                         <li>
                             Самостоятельно разработал <LandingLink href="/projects/auto-stock">сайт</LandingLink> учета
                             остатков авто деталей <Emoji e="🚗" />, интеграцию с 1С, что существенно сократило объем
-                            ручной работы на ~ 60 чел.ч в месяц
+                            ручной работы на ~ 60 чел.ч в месяц.
                         </li>
                         <li>
-                            С нуля создал собственную <LandingLink href="/projects/suzrpk">конфигурацию 1С</LandingLink>{" "}
+                            С нуля создал собственную <LandingLink href="/projects/suzrp">конфигурацию 1С</LandingLink>{" "}
                             для специального учета заработной платы <Emoji e="🪙" /> кабельного производства, активно
-                            используемую на сегодняшний день более 4 лет
+                            используемую на сегодняшний день более 4 лет.
                         </li>
                         <li>
                             В роли ведущего программиста написал действующий краевой{" "}
                             <LandingLink href="/projects/kvll">портал</LandingLink> объявлений о недвижимости{" "}
                             <Emoji e="📰" />, целиком занимался бизнес-логикой проекта, программированием backend и
-                            frontend частей
+                            frontend частей.
                         </li>
                     </Box>
                 </>
             ) : (
                 <>
-                    I became passionate about programming <Emoji e="📟" />
-                    and web development back in 2010 when I was in the 11th grade <Emoji e="🌱" />. Even then, I enjoyed
-                    creating complex, beautiful, and functional interfaces. <Emoji e="📱" />
+                    More than personal achievements, publications, certificates, and awards <Emoji e="🤵" />, I would
+                    like to highlight some professional{" "}
+                    <LandingLink href="/about/experience/achievements">results</LandingLink>:
                     <br />
-                    <br />
-                    In 2015, I graduated with honors <Emoji e="📕" />
-                    from <LandingLink href="/about/education">university</LandingLink>
-                    <Emoji e="🏦" /> with a degree in Information Technology.
-                    <br />
-                    <br />
-                    From then on and to this day, I have never lost my creative interest and inspiration for
-                    programming. I love designing, sometimes spending hours fixing a single bug <Emoji e="🐞" />, but
-                    always finding a solution in the end. <Emoji e="⛅️" />
+                    <Box
+                        component="ul"
+                        sx={{
+                            listStyle: "disc",
+                            "& li": {
+                                marginTop: "15px",
+                            },
+                        }}
+                    >
+                        <li>
+                            Independently developed a <LandingLink href="/projects/auto-stock">website</LandingLink> for
+                            tracking auto parts inventory <Emoji e="🚗" />, its integration with 1C, significantly
+                            reducing manual work by approximately 60 man-hours per month.
+                        </li>
+                        <li>
+                            From scratch, created a custom{" "}
+                            <LandingLink href="/projects/suzrp">1C configuration</LandingLink> for specialized payroll
+                            accounting <Emoji e="🪙" /> for a cable manufacturing company, which has been actively used
+                            for over 4 years.
+                        </li>
+                        <li>
+                            As the lead programmer, developed a regional real estate classifieds{" "}
+                            <LandingLink href="/projects/kvll">portal</LandingLink>
+                            <Emoji e="📰" />, fully handling the business logic of the project, as well as programming
+                            the backend and frontend parts.
+                        </li>
+                    </Box>
                 </>
             )}
         </AboutBlock>

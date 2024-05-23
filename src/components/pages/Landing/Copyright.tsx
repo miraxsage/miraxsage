@@ -8,6 +8,7 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import { GitHub } from "@mui/icons-material";
 import { lighten } from "@mui/material";
 import { useThemeColor } from "@/components/contexts/Theme";
+import { useNavigate } from "react-router-dom";
 
 export default function Copyright() {
     const lang = useLanguage();
@@ -15,6 +16,13 @@ export default function Copyright() {
     const isDarkMode = useColorMode().dark;
     const color = useLandingColor("noteless");
     const accentColor = useLandingColor("accentA");
+    const navigate = useNavigate();
+    const linkClick = (link: string) => {
+        return () => {
+            if (link.startsWith("/")) navigate(link);
+            else window.open(link, "_blank");
+        };
+    };
     return (
         <Box
             sx={{
@@ -68,16 +76,16 @@ export default function Copyright() {
                     }}
                 >
                     <Box className="flex">
-                        <TransparentButton>
+                        <TransparentButton onClick={linkClick("https://t.me/miraxsage")}>
                             <TelegramIcon />
                         </TransparentButton>
-                        <TransparentButton>
+                        <TransparentButton onClick={linkClick("mailto:manin.maxim@mail.ru")}>
                             <AlternateEmailOutlinedIcon />
                         </TransparentButton>
-                        <TransparentButton>
+                        <TransparentButton onClick={linkClick("https://www.linkedin.com/in/manin-maxim-ba74a6221/")}>
                             <LinkedInIcon />
                         </TransparentButton>
-                        <TransparentButton dividerSize="collapsed">
+                        <TransparentButton onClick={linkClick("https://github.com/miraxsage/")} dividerSize="collapsed">
                             <GitHub />
                         </TransparentButton>
                     </Box>

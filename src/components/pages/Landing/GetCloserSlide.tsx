@@ -25,18 +25,26 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import { GitHub } from "@mui/icons-material";
 import { ReactNode, useState } from "react";
 import Copyright from "./Copyright";
+import { useNavigate } from "react-router-dom";
 
 type SpecialButtonProps = {
     children: ReactNode;
     sx?: SxProps;
+    link: string;
 };
-function SpecialButton({ children, sx }: SpecialButtonProps) {
+function SpecialButton({ children, link, sx }: SpecialButtonProps) {
     const isDarkMode = useColorMode().dark;
     const theme = useTheme();
     const textColor = useLandingColor("contrast");
     const paleTextColor = isDarkMode ? lighten(theme.palette.divider, 0.35) : lighten(textColor, 0.2);
+    const navigate = useNavigate();
+    const linkClick = () => {
+        if (link.startsWith("/")) navigate(link);
+        else window.open(link, "_blank");
+    };
     return (
         <TransparentButton
+            onClick={linkClick}
             dividerSize="removed"
             sx={{
                 width: "225px",
@@ -72,6 +80,7 @@ function SpecialButton({ children, sx }: SpecialButtonProps) {
 export default function GetCloserSlide() {
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;
+    const navigate = useNavigate();
     const lang = useLanguage();
     const layoutBackgroundColor = getThemeColor("layoutBackground", theme);
     const textColor = useLandingColor("contrast");
@@ -104,7 +113,7 @@ export default function GetCloserSlide() {
                     background: `linear-gradient(200deg, ${alpha(
                         mix(layoutBackgroundColor, useLandingColor("accentB"), 0.08),
                         1
-                    )}, ${layoutBackgroundColor} 50%)`,
+                    )}, ${layoutBackgroundColor} 40%)`,
                 }}
             >
                 <Box sx={{ width: "100%", height: "100%", opacity: 0.7 }}>
@@ -356,8 +365,16 @@ export default function GetCloserSlide() {
                         <Box sx={{ background: theme.palette.divider, width: "1px", gridArea: "2/5/2/5" }}></Box>
                         <AccentedTreeView
                             intend="double"
+                            selectionMode="single"
                             onToggle={(_e, toggled) => setOpenedNodes(toggled)}
-                            expandedNodes={["bio", "exp", "spec"]}
+                            onItemsSelect={(item) => {
+                                navigate(item.id);
+                            }}
+                            expandedNodes={[
+                                "/about/biography/general",
+                                "/about/experience/technologies",
+                                "/about/specifications",
+                            ]}
                             sx={{
                                 gridArea: "3/3/3/4",
                                 minWidth: "248px",
@@ -413,34 +430,58 @@ export default function GetCloserSlide() {
                         >
                             {[
                                 {
-                                    id: "bio",
+                                    id: "/about/biography/general",
                                     title: __("Biography"),
                                     icon: <PersonIcon />,
                                     children: [
-                                        { id: "edu", title: __("Education"), icon: <SchoolIcon /> },
-                                        { id: "work", title: __("Labor"), icon: <BusinessCenterIcon /> },
+                                        {
+                                            id: "/about/biography/education",
+                                            title: __("Education"),
+                                            icon: <SchoolIcon />,
+                                        },
+                                        {
+                                            id: "/about/biography/labor",
+                                            title: __("Labor"),
+                                            icon: <BusinessCenterIcon />,
+                                        },
                                     ],
                                 },
                                 {
-                                    id: "exp",
+                                    id: "/about/experience/technologies",
                                     title: __("Experience"),
                                     icon: <MusclesIcon />,
                                     children: [
-                                        { id: "ach", title: __("Achievements"), icon: <EmojiEventsIcon /> },
-                                        { id: "projs", title: __("Projects"), icon: <RocketLaunchIcon /> },
+                                        {
+                                            id: "/about/experience/achievements",
+                                            title: __("Achievements"),
+                                            icon: <EmojiEventsIcon />,
+                                        },
+                                        {
+                                            id: "/about/experience/projects",
+                                            title: __("Projects"),
+                                            icon: <RocketLaunchIcon />,
+                                        },
                                     ],
                                 },
                                 {
-                                    id: "spec",
+                                    id: "/about/specifications",
                                     title: __("Specifications"),
                                     icon: <AssessmentIcon />,
                                     children: [
-                                        { id: "soft", title: __("Soft-skills"), icon: <PsychologyAltIcon /> },
-                                        { id: "hard", title: __("Hard-skills"), icon: <PsychologyIcon /> },
+                                        {
+                                            id: "/about/specifications/soft-skills",
+                                            title: __("Soft-skills"),
+                                            icon: <PsychologyAltIcon />,
+                                        },
+                                        {
+                                            id: "/about/specifications/hard-skills",
+                                            title: __("Hard-skills"),
+                                            icon: <PsychologyIcon />,
+                                        },
                                     ],
                                 },
                                 {
-                                    id: "snip",
+                                    id: "/about/snippets",
                                     title: __("Snippets|1"),
                                     icon: <DataObjectIcon />,
                                 },
@@ -454,23 +495,26 @@ export default function GetCloserSlide() {
                                 alignItems: "start",
                             }}
                         >
-                            <SpecialButton sx={{ borderWidth: "0px 0px 1px 1px" }}>
+                            <SpecialButton link="https://t.me/miraxsage" sx={{ borderWidth: "0px 0px 1px 1px" }}>
                                 <TelegramIcon />
                                 {!sm && "Telegram"}
                             </SpecialButton>
-                            <SpecialButton sx={{ borderWidth: "0px 1px 1px 0px" }}>
+                            <SpecialButton link="mailto:manin.maxim@mail.ru" sx={{ borderWidth: "0px 1px 1px 0px" }}>
                                 <AlternateEmailOutlinedIcon />
                                 {!sm && "Email"}
                             </SpecialButton>
-                            <SpecialButton sx={{ borderWidth: "0px 0px 1px 1px" }}>
+                            <SpecialButton
+                                link="https://www.linkedin.com/in/manin-maxim-ba74a6221/"
+                                sx={{ borderWidth: "0px 0px 1px 1px" }}
+                            >
                                 <LinkedInIcon />
                                 {!sm && "LinkedIn"}
                             </SpecialButton>
-                            <SpecialButton sx={{ borderWidth: "0px 1px 0px 0px" }}>
+                            <SpecialButton link="https://github.com/miraxsage/" sx={{ borderWidth: "0px 1px 0px 0px" }}>
                                 <GitHub />
                                 {!sm && "Github"}
                             </SpecialButton>
-                            <SpecialButton>
+                            <SpecialButton link="/interact">
                                 <MessageIcon />
                                 {!sm && __("Write")}
                             </SpecialButton>

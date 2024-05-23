@@ -74,10 +74,10 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
                         } else block.style.visibility = "visible";
                         if (scroll <= halfvh) {
                             const progress = scroll / halfvh;
-                            block.style.translate = "0 " + (60 - round(60 * progress, 2)) + "%";
+                            block.style.translate = "0 " + (70 - round(70 * progress, 2)) + "%";
 
                             block.style.clipPath = `xywh(-20% -${
-                                (1 - rangeProgress(progress, 0, 1)) * 125
+                                (1 - rangeProgress(progress, 0.2, 1)) * 125
                             }% 140% 125% round 0 0 100vw 100vw)`;
                             const smoothProgress = Math.sin((progress * Math.PI) / 2);
                             const smoothInProgress = 1.5 * progress ** 0.25 - 0.5;

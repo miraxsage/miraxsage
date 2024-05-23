@@ -14,6 +14,7 @@ export default function TeamBlock({ id, sx }: { id: string; sx?: SxProps }) {
             title={lang.ru ? ["Про", "цели", "🎯"] : ["About", "objectives", "🎯"]}
             id={id}
             sx={sx}
+            squeezedImgHPos="-80% 0%"
         >
             {lang.ru ? (
                 <>
