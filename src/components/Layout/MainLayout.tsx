@@ -20,6 +20,7 @@ export default function Layout({ children }: LayoutProps) {
     ) : (
         <Box
             sx={{
+                maxHeight: "100dvh",
                 [theme.breakpoints.down("md")]: {
                     height: "100%",
                     padding: "25px",
@@ -44,6 +45,7 @@ export default function Layout({ children }: LayoutProps) {
                     background: getThemeColor("layoutBackground", theme),
                     borderColor: splashScreen ? lighten(glowColor, 0.1) : theme.palette.divider,
                     gridTemplateRows: "auto minmax(0, 1fr) auto",
+                    gridTemplateColumns: "minmax(0, 1fr)",
                 }}
                 className="border rounded-xl w-full h-full overflow-hidden grid"
             >

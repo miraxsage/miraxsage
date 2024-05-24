@@ -25,7 +25,7 @@ export function mix(color1: string, color2: string, weight: number) {
     const background = getClearHexColor(color2);
 
     weight = typeof weight !== "undefined" ? weight : 50; // set the weight to 50%, if that argument is omitted
-    if (weight < 1) weight *= 100;
+    if (weight <= 1) weight *= 100;
 
     let color = "#";
 

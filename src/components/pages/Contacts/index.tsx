@@ -1,6 +1,6 @@
 import CustomBreadcrumbs, { CustomBreadcrumbsProps } from "@/components/Breadcrumbs";
 import Thankfullness from "./Thankfullness";
-import { Box, Button, MenuItem } from "@mui/material";
+import { Box, Button, MenuItem, useMediaQuery, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import PersonIcon from "@mui/icons-material/Person";
@@ -97,6 +97,8 @@ async function sendForm(fields: { name: string; email: string; subject: string; 
 export default function Contacts() {
     const navigate = useNavigate();
     const lang = useAppearance().language;
+    const theme = useTheme();
+    const md = useMediaQuery(theme.breakpoints.down("md"));
     const [accentedSubmit, setAccentedButton] = useState(false);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -131,37 +133,40 @@ export default function Contacts() {
             const value = e.target.value;
             ({ name: setName, email: setEmail, subject: setSubject, message: setMessage })[field](value);
         };
-    const submit = async () => {
-        const fields = { name, email, subject, message };
-        const errors = validate(fields, lang);
-        if (errors.name || errors.email || errors.subject || errors.message) {
-            setErrors(errors);
-            return;
-        }
-        setFeedback({
-            status: "loading",
-            message: lang == "ru" ? "Выполняется отправка сообщения" : "Message submitting is being performed",
-        });
-        const res = await sendForm(fields);
-        //const res = await new Promise((resolve) => setTimeout(() => resolve(true), 5000));
-        if (actualFeedback.current) {
-            if (res) {
-                setName("");
-                setEmail("");
-                setSubject("");
-                setMessage("");
+    const submit = (e: React.FormEvent) => {
+        e.preventDefault();
+        (async () => {
+            const fields = { name, email, subject, message };
+            const errors = validate(fields, lang);
+            if (errors.name || errors.email || errors.subject || errors.message) {
+                setErrors(errors);
+                return;
             }
             setFeedback({
-                status: res ? "success" : "error",
-                message: res
-                    ? lang == "ru"
-                        ? "Ваше обращение успешно зарегистрировано"
-                        : "Your request has been registered"
-                    : lang == "ru"
-                    ? "При выполнении запроса произошла ошибка. Пожалуйста попробуйте позже, либо свяжитесь со мной через Telegram или по электронной почте"
-                    : "An error occurred while executing the request. Please try again later, or contact me via Telegram or Email",
+                status: "loading",
+                message: lang == "ru" ? "Выполняется отправка сообщения" : "Message submitting is being performed",
             });
-        }
+            const res = await sendForm(fields);
+            //const res = await new Promise((resolve) => setTimeout(() => resolve(true), 5000));
+            if (actualFeedback.current) {
+                if (res) {
+                    setName("");
+                    setEmail("");
+                    setSubject("");
+                    setMessage("");
+                }
+                setFeedback({
+                    status: res ? "success" : "error",
+                    message: res
+                        ? lang == "ru"
+                            ? "Ваше обращение успешно зарегистрировано"
+                            : "Your request has been registered"
+                        : lang == "ru"
+                        ? "При выполнении запроса произошла ошибка. Пожалуйста попробуйте позже, либо свяжитесь со мной через Telegram или по электронной почте"
+                        : "An error occurred while executing the request. Please try again later, or contact me via Telegram or Email",
+                });
+            }
+        })();
     };
     return (
         <Box sx={{ display: "grid", gridTemplateRows: "auto minmax(0, 1fr)", height: "100%", position: "relative" }}>
@@ -202,9 +207,18 @@ export default function Contacts() {
                     sx={{
                         padding: "15px",
                         display: "grid",
-                        gridTemplateColumns: "1fr 1fr",
+                        gridTemplateColumns: "minmax(0, 600px) minmax(0, 1fr)",
                         gap: "20px",
                         alignItems: "center",
+                        [theme.breakpoints.down("2xl")]: {
+                            gridTemplateColumns: "minmax(0, 450px) minmax(0, 1fr)",
+                        },
+                        [theme.breakpoints.down("xl")]: {
+                            gridTemplateColumns: "minmax(0, 363px) minmax(0, 1fr)",
+                        },
+                        [theme.breakpoints.down("lg")]: {
+                            gridTemplateColumns: "minmax(0, 1fr)",
+                        },
                     }}
                 >
                     <div>
@@ -226,6 +240,8 @@ export default function Contacts() {
                         </CustomAccordion>
                         <CustomAccordion expandable={false} title="Обратная связь">
                             <Box
+                                component="form"
+                                onSubmit={submit}
                                 sx={{
                                     padding: "15px",
                                     display: "flex",
@@ -235,6 +251,7 @@ export default function Contacts() {
                             >
                                 <CustomTextField
                                     size="small"
+                                    name="name"
                                     label={__("Your name")}
                                     value={name}
                                     onChange={onFieldChange("name")}
@@ -242,6 +259,7 @@ export default function Contacts() {
                                 />
                                 <CustomTextField
                                     size="small"
+                                    name="email"
                                     label={capitalize(__("email address"))}
                                     value={email}
                                     onChange={onFieldChange("email")}
@@ -249,6 +267,7 @@ export default function Contacts() {
                                 />
                                 <CustomTextField
                                     size="small"
+                                    name="subject"
                                     select
                                     label={__("Appeal's subject")}
                                     value={subject}
@@ -267,6 +286,7 @@ export default function Contacts() {
                                 </CustomTextField>
                                 <CustomTextField
                                     size="small"
+                                    name="message"
                                     label={__("Message")}
                                     value={message}
                                     onChange={onFieldChange("message")}
@@ -274,48 +294,48 @@ export default function Contacts() {
                                     rows={3}
                                     multiline
                                 />
+                                <Button
+                                    sx={{ margin: "0 auto", ":not(:hover)": { color: "inherit" } }}
+                                    type="submit"
+                                    onMouseEnter={() => setAccentedButton(true)}
+                                    onMouseLeave={() => setAccentedButton(false)}
+                                    color={accentedSubmit ? "primary" : "regular"}
+                                    variant="outlined"
+                                    onClick={submit}
+                                >
+                                    Отправить
+                                </Button>
                             </Box>
                         </CustomAccordion>
                     </div>
-                    <Box
-                        sx={{
-                            display: "grid",
-                            minHeight: "100%",
-                            gridTemplateRows: "1fr auto",
-                            alignItems: "center",
-                            width: "50%",
-                        }}
-                    >
+                    {!md && (
                         <CustomCodeEditor
                             extensions={[langs["typescript"]()]}
+                            lineWrapping={true}
                             basicSetup={{ foldGutter: false, lineNumbers: false }}
-                            value={`
-<AccentedTreeView expandedNodes={["frontend"]} disableSelection={true}>
-{[
-    {
-        id: "frontend",
-        title: "Frontend",
-        icon: <MarkupIcon />,
-        children: [
-            {
-                id: "frontend-table-details",
-                content: <TechnologiesTable data={frontendData} />,
-            },
-        ],
-    },
+                            value={`const data: Record<string, string> = { 
+    name: "${name}", 
+    email: "${email}",
+    subject: "${subject}", 
+    message: "${message}" };
+const body = Object.keys(data).reduce((acc, cur) => \`\${acc}\${acc && "&"}\${cur}=\${data[cur]}\`);
+try {
+    const res = await fetch(
+        \`https://script.google.com/macros/s/AKfycbzYYk-OXS3GTDuVA5R_1UA2Q1hqovcL5gDmZzwQe5mvIvIcEgQJ4q5WiLtqSPfr2rmxCw/exec?\${body}\`
+    );
+    if (!res.ok) throw new Error("Bad request");
+    const text = await res.text();
+    const json = JSON.parse(text);
+    if(json.success)
+        throw new Error(json.message);
+    return Boolean(json.success);
+} catch (e) {
+    if (e instanceof Error) return e.message;
+    return "Error";
+},
                     `}
                         />
-                        <Button
-                            sx={{ margin: "0 auto" }}
-                            onMouseEnter={() => setAccentedButton(true)}
-                            onMouseLeave={() => setAccentedButton(false)}
-                            color={accentedSubmit ? "primary" : "regular"}
-                            variant="outlined"
-                            onClick={submit}
-                        >
-                            Отправить
-                        </Button>
-                    </Box>
+                    )}
                 </Box>
             </CustomScrollbar>
             <AnimatePresence>

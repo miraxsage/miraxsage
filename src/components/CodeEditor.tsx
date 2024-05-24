@@ -7,9 +7,10 @@ import { Box, alpha, useTheme } from "@mui/material";
 
 type CustomCodeEditorProps = ReactCodeMirrorProps & {
     lineHighlight?: boolean;
+    lineWrapping?: boolean;
 };
 
-export default function CustomCodeEditor({ lineHighlight, ...props }: CustomCodeEditorProps) {
+export default function CustomCodeEditor({ lineHighlight, lineWrapping, ...props }: CustomCodeEditorProps) {
     const theme = useTheme();
     const isDark = useColorMode().dark;
     const regularClr = getThemeColor("regularText", theme);
@@ -51,6 +52,15 @@ export default function CustomCodeEditor({ lineHighlight, ...props }: CustomCode
                 "& .cm-gutters": {
                     backdropFilter: "blur(3px)",
                 },
+                ...(lineWrapping
+                    ? {
+                          "& .cm-content": {
+                              textWrap: "wrap !important",
+                              wordWrap: "break-word",
+                              maxWidth: "100%",
+                          },
+                      }
+                    : {}),
             }}
         >
             <CodeEditor

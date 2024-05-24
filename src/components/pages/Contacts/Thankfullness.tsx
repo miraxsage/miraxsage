@@ -59,9 +59,19 @@ function HeadlineTitleBlock({ children, background, sx }: HeadlineTitleBlockProp
 }
 
 function Headline({ sx }: { sx?: SxProps }) {
+    const theme = useTheme();
     return (
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "20px 0px", ...sx }}>
-            <Box sx={{ display: "flex", flexDirection: "column", position: "relative" }}>
+            <Box
+                sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    position: "relative",
+                    [theme.breakpoints.down("sm")]: {
+                        padding: "0 10px",
+                    },
+                }}
+            >
                 <HeadlineTitleBlock
                     background="dark-hatching"
                     sx={{
@@ -71,23 +81,49 @@ function Headline({ sx }: { sx?: SxProps }) {
                         left: "5px",
                         top: "-5px",
                         userSelect: "none",
+                        [theme.breakpoints.down("sm")]: {
+                            left: "15px",
+                        },
                     }}
                 >
                     Большое спасибо!
                 </HeadlineTitleBlock>
                 <HeadlineTitleBlock
                     background="dark-hatching"
-                    sx={{ userSelect: "none", position: "absolute", right: "-5px", bottom: "5px" }}
+                    sx={{
+                        userSelect: "none",
+                        position: "absolute",
+                        right: "-5px",
+                        bottom: "5px",
+                        [theme.breakpoints.down("sm")]: {
+                            bottom: "unset",
+                            right: "5px",
+                            top: "30px",
+                        },
+                    }}
                 >
                     за Ваше внимание
                 </HeadlineTitleBlock>
                 <HeadlineTitleBlock
                     background="light"
-                    sx={{ fontWeight: "bold", alignSelf: "start", position: "relative" }}
+                    sx={{
+                        fontWeight: "bold",
+                        alignSelf: "start",
+                        position: "relative",
+                    }}
                 >
                     Большое спасибо!
                 </HeadlineTitleBlock>
-                <HeadlineTitleBlock background="dark" sx={{ margin: "-8px 0px 0px 80px", position: "relative" }}>
+                <HeadlineTitleBlock
+                    background="dark"
+                    sx={{
+                        margin: "-8px 0px 0px 80px",
+                        position: "relative",
+                        [theme.breakpoints.down("sm")]: {
+                            margin: "-8px 0px 0px 30px",
+                        },
+                    }}
+                >
                     за Ваше внимание
                 </HeadlineTitleBlock>
             </Box>
@@ -123,12 +159,22 @@ export default function Thankfullness() {
                     position: "absolute",
                     height: "100%",
                     width: "100%",
-                    display: "flex",
-                    justifyContent: "space-between",
+                    display: "grid",
+                    overflow: "hidden",
+                    [theme.breakpoints.between("lg", "3xl")]: {
+                        "& > svg:first-of-type": {
+                            opacity: 0,
+                        },
+                    },
                 }}
             >
-                <LeftFloralBackground style={{ height: "100%" }} />
-                <RightFloralBackground style={{ height: "100%" }} />
+                <LeftFloralBackground
+                    style={{
+                        height: "100%",
+                        gridArea: "1/1/1/1",
+                    }}
+                />
+                <RightFloralBackground style={{ height: "100%", gridArea: "1/1/1/1", justifySelf: "end" }} />
             </Box>
             <Box
                 sx={{
@@ -136,6 +182,9 @@ export default function Thankfullness() {
                     gridTemplate: "1fr / 40% 45% 15%",
                     padding: "0px 0px 15px 0px",
                     overflow: "hidden",
+                    [theme.breakpoints.down("lg")]: {
+                        gridTemplate: "1fr / 1fr",
+                    },
                 }}
             >
                 <Box
@@ -143,16 +192,43 @@ export default function Thankfullness() {
                         justifySelf: "end",
                         position: "relative",
                         marginRight: "70px",
-                        translate: "0 8%",
                         scale: "1.2",
-                        aspectRatio: "504 / 336",
+                        aspectRatio: "413 / 336",
+                        [theme.breakpoints.down("2xl")]: {
+                            scale: "1.1",
+                            aspectRatio: "361 / 336",
+                        },
                     }}
                 >
                     <AgreementImage style={{ position: "absolute", height: "100%" }} />
                 </Box>
                 <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <Headline />
-                    <Box sx={{ textIndent: "40px", marginTop: "8px" }}>
+                    <Box
+                        sx={{
+                            textIndent: "40px",
+                            marginTop: "8px",
+                            position: "relative",
+                            [theme.breakpoints.down("lg")]: {
+                                padding: "0 20px",
+                                "&:before": {
+                                    content: '""',
+                                    position: "absolute",
+                                    left: 0,
+                                    top: 0,
+                                    height: "100%",
+                                    width: "100%",
+                                    display: "block",
+                                    background: getThemeColor("layoutBackground", theme),
+                                    filter: "blur(23px)",
+                                    opacity: 0.8,
+                                },
+                                "& p": {
+                                    position: "relative",
+                                },
+                            },
+                        }}
+                    >
                         <p>
                             Я Вас сердечно благодарю за посещение моего скромного сайта и очень надеюсь, что у него
                             получилось вызвать у Вас положительные эмоции визуального, эстетического, функционального
