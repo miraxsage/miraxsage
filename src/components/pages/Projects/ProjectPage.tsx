@@ -9,7 +9,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { useAppearance } from "@/store/appearanceSlice";
+import { useAppearance, useScreenMode } from "@/store/appearanceSlice";
 import { AppSpinner } from "@/components/Spinners";
 import { getLocatedProjects, getProjectsNavigationLink, useProjectsLocation } from "./projectsNavigation";
 import { getThemeColor } from "@/components/contexts/Theme";
@@ -17,10 +17,12 @@ import ProjectCarousel from "@/components/pages/Projects/ProjectCarousel";
 import ProjectImageViewer from "./ProjectImageViewer";
 import { motion, AnimatePresence } from "framer-motion";
 import __ from "@/utilities/transtation";
+import classes from "classnames";
 
 export default function ProjectPage() {
     const [refreshState, refresh] = useState<boolean>(false);
     const [beingViewedImage, setBeingViewedImage] = useState<number | undefined>();
+    const screenMode = useScreenMode();
     const slug = useParams().slug!;
     const theme = useTheme();
     const lang = useAppearance().language;
@@ -165,8 +167,12 @@ export default function ProjectPage() {
                                             <CustomScrollbar padding="5px">
                                                 {
                                                     <Box
+                                                        className={classes({ "container mx-auto": screenMode.full })}
                                                         sx={{
                                                             width: "100%",
+                                                            "&.container": {
+                                                                width: "1500px",
+                                                            },
                                                             padding: "15px",
                                                             "& p": {
                                                                 textIndent: "40px",

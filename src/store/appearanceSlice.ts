@@ -5,11 +5,17 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 interface AppearanceConfig {
     colorMode: "light" | "dark";
     language: "ru" | "en";
+    viewMode: "desktop" | "console";
+    screenMode: "full" | "window";
+    asideMenuVisibility: "shown" | "collapsed";
 }
 
 const defaultConfig: AppearanceConfig = {
     colorMode: "dark",
     language: "ru",
+    viewMode: "desktop",
+    screenMode: "window",
+    asideMenuVisibility: "shown",
 };
 
 type StateConfig = {
@@ -32,6 +38,15 @@ const slice = createSlice({
             window.cookie.set("lang", state.language);
             document.documentElement.lang = state.language;
         },
+        viewMode: (state, options: PayloadAction<AppearanceConfig["viewMode"]>) => {
+            state.viewMode = options.payload;
+        },
+        screenMode: (state, options: PayloadAction<AppearanceConfig["screenMode"]>) => {
+            state.screenMode = options.payload;
+        },
+        asideMenuVisibility: (state, options: PayloadAction<AppearanceConfig["asideMenuVisibility"]>) => {
+            state.asideMenuVisibility = options.payload;
+        },
     },
 });
 
@@ -46,7 +61,7 @@ const listener = appearanceListener.middleware;
 
 export default slice.reducer;
 
-export const { colorMode, language } = slice.actions;
+export const { colorMode, language, viewMode, screenMode, asideMenuVisibility } = slice.actions;
 
 export { listener };
 
@@ -58,7 +73,6 @@ export function useAppearance(): AppearanceConfig;
 export function useAppearance<SelectType extends TypeOrItsAnyInnerField<AppearanceConfig>>(
     selector: (state: AppearanceConfig) => SelectType
 ): SelectType;
-
 export function useAppearance<SelectType extends TypeOrItsAnyInnerField<AppearanceConfig>>(
     selector?: (state: AppearanceConfig) => SelectType | AppearanceConfig
 ) {
@@ -95,5 +109,63 @@ export function useLanguage() {
                 | ((oldLang: AppearanceConfig["language"]) => AppearanceConfig["language"])
         ) => dispatch(slice.actions.language(typeof newLang == "function" ? newLang(lang) : newLang)),
         toggle: () => dispatch(slice.actions.language(lang == "ru" ? "en" : "ru")),
+    };
+}
+
+export function useScreenMode() {
+    const screenMode = useAppearance((appearance) => appearance.screenMode);
+    const dispatch = useDispatch();
+    return {
+        full: screenMode == "full",
+        window: screenMode == "window",
+        update: (
+            newscreenMode:
+                | AppearanceConfig["screenMode"]
+                | ((oldscreenMode: AppearanceConfig["screenMode"]) => AppearanceConfig["screenMode"])
+        ) =>
+            dispatch(
+                slice.actions.screenMode(typeof newscreenMode == "function" ? newscreenMode(screenMode) : newscreenMode)
+            ),
+        toggle: () => dispatch(slice.actions.screenMode(screenMode == "window" ? "full" : "window")),
+    };
+}
+
+export function useViewMode() {
+    const viewMode = useAppearance((appearance) => appearance.viewMode);
+    const dispatch = useDispatch();
+    return {
+        desktop: viewMode == "desktop",
+        console: viewMode == "console",
+        update: (
+            newViewMode:
+                | AppearanceConfig["viewMode"]
+                | ((oldScreenMode: AppearanceConfig["viewMode"]) => AppearanceConfig["viewMode"])
+        ) => dispatch(slice.actions.viewMode(typeof newViewMode == "function" ? newViewMode(viewMode) : newViewMode)),
+        toggle: () => dispatch(slice.actions.viewMode(viewMode == "desktop" ? "console" : "desktop")),
+    };
+}
+
+export function useAsideMenuVisibility() {
+    const asideMenuVisibility = useAppearance((appearance) => appearance.asideMenuVisibility);
+    const dispatch = useDispatch();
+    return {
+        shown: asideMenuVisibility == "shown",
+        collapsed: asideMenuVisibility == "collapsed",
+        update: (
+            newAsideMenuVisibility:
+                | AppearanceConfig["asideMenuVisibility"]
+                | ((
+                      oldAsideMenuVisibility: AppearanceConfig["asideMenuVisibility"]
+                  ) => AppearanceConfig["asideMenuVisibility"])
+        ) =>
+            dispatch(
+                slice.actions.asideMenuVisibility(
+                    typeof newAsideMenuVisibility == "function"
+                        ? newAsideMenuVisibility(asideMenuVisibility)
+                        : newAsideMenuVisibility
+                )
+            ),
+        toggle: () =>
+            dispatch(slice.actions.asideMenuVisibility(asideMenuVisibility == "shown" ? "collapsed" : "shown")),
     };
 }

@@ -6,20 +6,15 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import LanguageIcon from "../icons/LanguageIcon";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import { motion } from "framer-motion";
 import { useThemeColor } from "../contexts/Theme";
-import { useColorMode, useLanguage } from "@/store/appearanceSlice";
-
-const terminalIcon = <TerminalIcon />;
-const monitorIcon = <MonitorIcon />;
-const darkModeIcon = <Brightness4Icon />;
-const lightModeIcon = <LightModeIcon />;
-const fullscreenIcon = <FullscreenIcon />;
-const foldLeftIcon = <FirstPageIcon />;
+import { useColorMode, useLanguage, useScreenMode } from "@/store/appearanceSlice";
 
 export default function AsideMenu() {
     const colorMode = useColorMode();
+    const screenMode = useScreenMode();
     const isDarkMode = colorMode.dark;
     const lang = useLanguage();
     return (
@@ -45,11 +40,11 @@ export default function AsideMenu() {
                 }}
             >
                 {[
-                    { id: "interface-mode", icon: monitorIcon },
-                    { id: "console-mode", icon: terminalIcon },
+                    { id: "interface-mode", icon: <MonitorIcon /> },
+                    { id: "console-mode", icon: <TerminalIcon /> },
                     {
                         id: "color-mode",
-                        icon: isDarkMode ? lightModeIcon : darkModeIcon,
+                        icon: isDarkMode ? <LightModeIcon /> : <Brightness4Icon />,
                         notTogglable: true,
                         onClick() {
                             colorMode.update((old) => (old == "dark" ? "light" : "dark"));
@@ -73,13 +68,16 @@ export default function AsideMenu() {
                         },
                     },
                     {
-                        id: "fullscreen-mode",
-                        icon: fullscreenIcon,
+                        id: "screen-mode",
+                        icon: screenMode.window ? <FullscreenIcon /> : <FullscreenExitIcon />,
                         notTogglable: true,
+                        onClick() {
+                            screenMode.toggle();
+                        },
                     },
                     {
-                        id: "collapsed-mode",
-                        icon: foldLeftIcon,
+                        id: "aside-menu-visibility",
+                        icon: <FirstPageIcon />,
                         notTogglable: true,
                     },
                 ]}

@@ -18,11 +18,12 @@ import CustomCodeEditor from "@/components/CodeEditor";
 import CustomScrollbar from "@/components/Scrollbar";
 import { langs } from "@uiw/codemirror-extensions-langs";
 import { useRef, useState } from "react";
-import { useAppearance } from "@/store/appearanceSlice";
+import { useAppearance, useScreenMode } from "@/store/appearanceSlice";
 import { capitalize } from "@/utilities/string";
 import { Base64 } from "@/utilities/base64";
 import { FeedbackSending } from "./FeedbackSending";
 import { AnimatePresence, motion } from "framer-motion";
+import classes from "classnames";
 
 function contactData(title: string, Icon: React.FC, link: string): DescriptionTableData[number] {
     return [
@@ -97,6 +98,7 @@ async function sendForm(fields: { name: string; email: string; subject: string; 
 export default function Contacts() {
     const navigate = useNavigate();
     const lang = useAppearance().language;
+    const screenMode = useScreenMode();
     const theme = useTheme();
     const md = useMediaQuery(theme.breakpoints.down("md"));
     const [accentedSubmit, setAccentedButton] = useState(false);
@@ -220,6 +222,7 @@ export default function Contacts() {
                             gridTemplateColumns: "minmax(0, 1fr)",
                         },
                     }}
+                    className={classes({ "container mx-auto": screenMode.full })}
                 >
                     <div>
                         <CustomAccordion expandable={false} title="Социальные сети">
