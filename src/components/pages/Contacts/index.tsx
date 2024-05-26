@@ -24,6 +24,7 @@ import { Base64 } from "@/utilities/base64";
 import { FeedbackSending } from "./FeedbackSending";
 import { AnimatePresence, motion } from "framer-motion";
 import classes from "classnames";
+import { RevealAsideMenuButton } from "@/components/layout/RevealAsideMenuButton";
 
 function contactData(title: string, Icon: React.FC, link: string): DescriptionTableData[number] {
     return [
@@ -172,37 +173,38 @@ export default function Contacts() {
     };
     return (
         <Box sx={{ display: "grid", gridTemplateRows: "auto minmax(0, 1fr)", height: "100%", position: "relative" }}>
-            <CustomBreadcrumbs
-                sx={{ padding: "6px 8px", margin: 0, flexGrow: 1, borderBottom: 1, borderColor: "divider" }}
-            >
-                {(() => {
-                    const items = [
-                        { label: "Miraxsage", link: "/" },
-                        {
-                            label: __("Interact"),
-                            onClick: () => navigate("/interact"),
-                            subitems: [
-                                {
-                                    label: __("Profile"),
-                                    icon: <AssignmentIndIcon />,
-                                    link: "/profile",
-                                },
-                                {
-                                    label: __("About"),
-                                    icon: <PersonIcon />,
-                                    link: "/about",
-                                },
-                                {
-                                    label: __("Projects"),
-                                    icon: <RocketLaunchIcon />,
-                                    link: "/projects",
-                                },
-                            ],
-                        },
-                    ];
-                    return items as CustomBreadcrumbsProps["children"];
-                })()}
-            </CustomBreadcrumbs>
+            <Box sx={{ display: "flex", borderBottom: 1, borderColor: "divider" }}>
+                <RevealAsideMenuButton />
+                <CustomBreadcrumbs sx={{ padding: "6px 8px", margin: 0, flexGrow: 1 }}>
+                    {(() => {
+                        const items = [
+                            { label: "Miraxsage", link: "/" },
+                            {
+                                label: __("Interact"),
+                                onClick: () => navigate("/interact"),
+                                subitems: [
+                                    {
+                                        label: __("Profile"),
+                                        icon: <AssignmentIndIcon />,
+                                        link: "/profile",
+                                    },
+                                    {
+                                        label: __("About"),
+                                        icon: <PersonIcon />,
+                                        link: "/about",
+                                    },
+                                    {
+                                        label: __("Projects"),
+                                        icon: <RocketLaunchIcon />,
+                                        link: "/projects",
+                                    },
+                                ],
+                            },
+                        ];
+                        return items as CustomBreadcrumbsProps["children"];
+                    })()}
+                </CustomBreadcrumbs>
+            </Box>
             <CustomScrollbar sx={{ gridArea: "2/1/2/1" }}>
                 <Thankfullness />
                 <Box

@@ -59,7 +59,7 @@ export default function Layout({ children }: LayoutProps) {
                 className={classes("overflow-hidden grid h-full", { "border rounded-xl w-full": screenMode.window })}
             >
                 <TopMenu />
-                <div className="flex overflow-hidden">
+                <div className="flex overflow-hidden relative">
                     <AsideMenu />
                     <div className="flex-grow">{children}</div>
                 </div>

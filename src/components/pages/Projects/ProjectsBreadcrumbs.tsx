@@ -9,6 +9,7 @@ import { ProjectsList, projects } from "./Projects";
 import { ToolbarButton } from "@/components/ToolbarButton";
 import { useNavigate } from "react-router-dom";
 import { useAppearance } from "@/store/appearanceSlice";
+import { RevealAsideMenuButton } from "@/components/layout/RevealAsideMenuButton";
 
 export type ProjectsBreadcrumbsProps = {
     project?: ProjectsList;
@@ -19,6 +20,7 @@ export default function ProjectsBreadcrumbs({ project }: ProjectsBreadcrumbsProp
     const lang = useAppearance().language;
     return (
         <Box sx={{ display: "flex", borderBottom: 1, borderColor: "divider" }}>
+            <RevealAsideMenuButton />
             {project && (
                 <ToolbarButton sx={{ paddingLeft: "10.5px", paddingRight: "10.5px" }} onClick={() => navigate(-1)}>
                     <ArrowBackIcon />

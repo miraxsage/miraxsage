@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { useTheme } from "@mui/material";
 import AccentedTabs from "../AccentedTabs";
 import TerminalIcon from "@mui/icons-material/Terminal";
 import MonitorIcon from "@mui/icons-material/Monitor";
@@ -8,21 +8,24 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
+import { getThemeColor } from "../contexts/Theme";
 import { motion } from "framer-motion";
-import { useThemeColor } from "../contexts/Theme";
-import { useColorMode, useLanguage, useScreenMode } from "@/store/appearanceSlice";
+import { useAsideMenuVisibility, useColorMode, useLanguage, useScreenMode } from "@/store/appearanceSlice";
 
 export default function AsideMenu() {
     const colorMode = useColorMode();
     const screenMode = useScreenMode();
+
+    const theme = useTheme();
+    const asideMenuVisibility = useAsideMenuVisibility();
     const isDarkMode = colorMode.dark;
     const lang = useLanguage();
     return (
-        <Box
-            component="aside"
-            sx={{
-                borderRight: 1,
-                borderColor: "divider",
+        <motion.aside
+            style={{ borderColor: theme.palette.divider }}
+            animate={{
+                maxWidth: asideMenuVisibility.shown ? "65px" : "0px",
+                borderRightWidth: asideMenuVisibility.shown ? "1px" : "0px",
             }}
         >
             <AccentedTabs
@@ -30,12 +33,12 @@ export default function AsideMenu() {
                 mode="full"
                 orientation="vertical"
                 sx={{
-                    "& .MuiTab-root": { color: useThemeColor("tabIcon") },
+                    "& .MuiTab-root": { color: getThemeColor("tabIcon", theme) },
                     "& .MuiTab-root:hover": {
-                        color: useThemeColor("tabHoverIcon"),
+                        color: getThemeColor("tabHoverIcon", theme),
                     },
                     "& .MuiTab-root.Mui-selected": {
-                        color: useThemeColor("tabActiveText"),
+                        color: getThemeColor("tabActiveText", theme),
                     },
                 }}
             >
@@ -79,9 +82,12 @@ export default function AsideMenu() {
                         id: "aside-menu-visibility",
                         icon: <FirstPageIcon />,
                         notTogglable: true,
+                        onClick() {
+                            asideMenuVisibility.update("collapsed");
+                        },
                     },
                 ]}
             </AccentedTabs>
-        </Box>
+        </motion.aside>
     );
 }
