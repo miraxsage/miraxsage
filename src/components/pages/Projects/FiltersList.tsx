@@ -23,7 +23,6 @@ type ProjectFiltersListProps = Omit<
     | "selectionMode"
     | "checkable"
     | "checkedAndSelected"
-    | "expandedNodes"
     | "checkedItems"
     | "selectedItems"
 > & { activeItems: string[] };
@@ -35,7 +34,7 @@ export default function ProjectFiltersList({ activeItems, ...props }: ProjectFil
             selectionMode="multiple"
             checkable={true}
             checkedAndSelected={true}
-            expandedNodes={["frontend", "backend"]}
+            initiallyExpandedNodes={["frontend", "backend"]}
             {...(activeItems ? { checkedItems: activeItems, selectedItems: activeItems } : {})}
             {...props}
         >

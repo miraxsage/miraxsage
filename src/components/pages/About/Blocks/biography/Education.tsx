@@ -70,7 +70,7 @@ export default function AboutBioEducationBlock() {
     return (
         <>
             <AccentedTreeView
-                expandedNodes={["general", "generalSges14", "high", "highTechnical", "highTechnicalKubSTU"]}
+                initiallyExpandedNodes={["general", "generalSges14", "high", "highTechnical", "highTechnicalKubSTU"]}
                 selectionMode="disable"
             >
                 {[

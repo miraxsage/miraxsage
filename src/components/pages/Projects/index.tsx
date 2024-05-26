@@ -12,6 +12,7 @@ import ProjectsBreadcrumbs from "./ProjectsBreadcrumbs";
 import { useAppearance } from "@/store/appearanceSlice";
 import { navigateToProjects, projectsOrderItems, useProjectsLocation } from "./projectsNavigation";
 import CategoriesToolbar from "@/components/CategoriesToolbar";
+import { useEffect, useState } from "react";
 
 export default function Projects() {
     const theme = useTheme();
@@ -22,20 +23,28 @@ export default function Projects() {
     const orderItem = projectsOrderItems.find((o) => o.slug == order);
     const OrderIcon = orderItem?.icon;
 
+    const [changeExpandedNodes, setChangeExpandedNodes] = useState<string[] | undefined>();
+
+    useEffect(() => {
+        if (changeExpandedNodes) setChangeExpandedNodes(undefined);
+    }, [changeExpandedNodes]);
+
     return (
         <Box className="grid h-full" sx={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
             <ProjectsBreadcrumbs />
             <Box className="flex h-full">
                 <Box className="grid h-full" sx={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
                     <CategoriesToolbar
-                        collapsed={false}
-                        onRevealCollapse={() => {}}
-                        onFold={() => {}}
-                        onUnfold={() => {}}
-                        onClose={() => {}}
+                        onFold={() => {
+                            setChangeExpandedNodes([]);
+                        }}
+                        onUnfold={() => {
+                            setChangeExpandedNodes(["frontend", "backend", "desktop"]);
+                        }}
                     />
                     <CustomScrollbar right="2px" top="2px" bottom="3px">
                         <ProjectFiltersList
+                            expandedNodes={changeExpandedNodes}
                             activeItems={techs}
                             onItemsChecked={(checkedProjects) =>
                                 navigateToProjects(

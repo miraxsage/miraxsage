@@ -7,13 +7,17 @@ import CloseIcon from "@mui/icons-material/Close";
 import { motion } from "framer-motion";
 import { Box } from "@mui/material";
 
-export type CategoriesToolbarProps = {
-    collapsed: boolean;
-    onRevealCollapse: (collapse: boolean) => void;
+type CategoriesToolbarFoldProps = {
     onUnfold: () => void;
     onFold: () => void;
-    onClose: () => void;
+    onClose?: () => void;
 };
+type CategoriesToolbarCollapseProps =
+    | ({ collapsed: boolean; onRevealCollapse: (collapse: boolean) => void } & CategoriesToolbarFoldProps)
+    | { collapsed?: never; onRevealCollapse?: never };
+
+type CategoriesToolbarProps = CategoriesToolbarFoldProps & CategoriesToolbarCollapseProps;
+
 export default function CategoriesToolbar({
     collapsed,
     onRevealCollapse,
@@ -32,25 +36,29 @@ export default function CategoriesToolbar({
                 }}
                 className="flex"
             >
-                <ToolbarButton
-                    sx={{ paddingLeft: "9px", paddingRight: "9px" }}
-                    onClick={() => onRevealCollapse(!collapsed)}
-                >
-                    {collapsed ? <LastPageIcon /> : <FirstPageIcon />}
-                </ToolbarButton>
+                {onRevealCollapse && (
+                    <ToolbarButton
+                        sx={{ paddingLeft: "9px", paddingRight: "9px" }}
+                        onClick={() => onRevealCollapse(!collapsed)}
+                    >
+                        {collapsed ? <LastPageIcon /> : <FirstPageIcon />}
+                    </ToolbarButton>
+                )}
                 <ToolbarButton onClick={onUnfold}>
                     <UnfoldMoreIcon />
                 </ToolbarButton>
                 <ToolbarButton onClick={onFold}>
                     <UnfoldLessIcon />
                 </ToolbarButton>
-                <ToolbarButton
-                    sx={{ paddingLeft: "9px", paddingRight: "9px" }}
-                    dividerSize="collapsed"
-                    onClick={onClose}
-                >
-                    <CloseIcon />
-                </ToolbarButton>
+                {onClose && (
+                    <ToolbarButton
+                        sx={{ paddingLeft: "9px", paddingRight: "9px" }}
+                        dividerSize="collapsed"
+                        onClick={onClose}
+                    >
+                        <CloseIcon />
+                    </ToolbarButton>
+                )}
             </Box>
         </motion.div>
     );

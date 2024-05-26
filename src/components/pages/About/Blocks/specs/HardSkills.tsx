@@ -8,7 +8,7 @@ import { technologies } from "./Technologies";
 export default function AboutSpecsHardSkillsBlock() {
     return (
         <>
-            <AccentedTreeView expandedNodes={["frontend"]} selectionMode="disable">
+            <AccentedTreeView initiallyExpandedNodes={["frontend"]} selectionMode="disable">
                 {[
                     {
                         id: "frontend",

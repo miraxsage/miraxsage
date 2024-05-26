@@ -1,7 +1,7 @@
 import { TreeItem, TreeView } from "@mui/x-tree-view";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import React, { CSSProperties, ReactNode, useState } from "react";
+import React, { CSSProperties, ReactNode, useEffect, useState } from "react";
 import { UseTreeViewExpansionParameters } from "@mui/x-tree-view/internals/plugins/useTreeViewExpansion";
 import { Checkbox, Collapse, SxProps, alpha, styled } from "@mui/material";
 import { motion } from "framer-motion";
@@ -36,6 +36,7 @@ export type AccentedTreeItemProps = AccentedContentedTreeItemProps | AccentedTex
 
 interface AccentedTreeViewBasicProps {
     children: AccentedTreeItemProps[];
+    initiallyExpandedNodes?: string[];
     expandedNodes?: string[];
     intend?: "small" | "regular" | "double";
     checkable?: boolean;
@@ -309,7 +310,8 @@ export default function AccentedTreeView({
     children,
     selectedItems: selectedItemsProp = [],
     checkedItems: checkedItemsProp = [],
-    expandedNodes: expandedNodesProp = [],
+    initiallyExpandedNodes: initiallyExpandedNodesProp = [],
+    expandedNodes: expandedNodesProp,
     selectionMode = "single",
     onItemsSelect,
     onItemsChecked,
@@ -323,7 +325,7 @@ export default function AccentedTreeView({
     if (selectionMode == "single" && typeof selectedItemsProp == "string") selectedItems = [selectedItemsProp];
     if (selectionMode == "multiple" && Array.isArray(selectedItemsProp)) selectedItems = selectedItemsProp;
 
-    const [expandedNodes, setExpandedNodes] = useState<string[]>(expandedNodesProp);
+    const [expandedNodes, setExpandedNodes] = useState<string[]>(initiallyExpandedNodesProp ?? expandedNodesProp ?? []);
     const [selectedNodes, setSelectedNodes] = useState<string[]>(selectedItems);
     const [checkedNodes, setCheckedNodes] = useState<string[]>(checkedItemsProp);
 
@@ -332,6 +334,12 @@ export default function AccentedTreeView({
     const accentedNodes: string[] = [];
 
     if (onItemsSelect && !areEqualShallow(selectedItems, selectedNodes)) setSelectedNodes(selectedItems);
+
+    const expandedNodesString = String(expandedNodesProp);
+    useEffect(() => {
+        if (expandedNodesProp && expandedNodesString != String(expandedNodes)) setExpandedNodes(expandedNodesProp);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [expandedNodesString]);
 
     const onCheckedChange = (nodeId: string) => (_event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
         const alreadyChecked = checkedNodes.includes(nodeId);

@@ -32,7 +32,7 @@ export default function AboutSpecsSnippetsBlock() {
             >
                 <CustomScrollbar right="2px" top="2px" bottom="3px">
                     <AccentedTreeView
-                        expandedNodes={["frontend", "backend"]}
+                        initiallyExpandedNodes={["frontend", "backend"]}
                         selectionMode="single"
                         selectedItems={lang}
                         onItemsSelect={(item) => setLang(item.id)}

@@ -370,7 +370,7 @@ export default function GetCloserSlide() {
                             onItemsSelect={(item) => {
                                 navigate(item.id);
                             }}
-                            expandedNodes={[
+                            initiallyExpandedNodes={[
                                 "/about/biography/general",
                                 "/about/experience/technologies",
                                 "/about/specifications",

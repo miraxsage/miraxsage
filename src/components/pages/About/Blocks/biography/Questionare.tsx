@@ -10,7 +10,7 @@ import SailingIcon from "@mui/icons-material/Sailing";
 export default function AboutBioQuestionaireBlock() {
     return (
         <>
-            <AccentedTreeView expandedNodes={["about"]} selectionMode="disable">
+            <AccentedTreeView initiallyExpandedNodes={["about"]} selectionMode="disable">
                 {[
                     {
                         id: "about",

@@ -66,6 +66,8 @@ export default function About() {
     const [activeCat, setActiveCat] = useState<string | null>(initialCategory);
     const [selectedCat, setSelectedCat] = useState<string | null>(initialBlock);
     const [catsCollapsed, setCatsCollapsed] = useState(false);
+    const [changeExpandedNodes, setChangeExpandedNodes] = useState<string[] | undefined>();
+
     const setActiveCatAndBlock = (
         cat: string | null,
         block: string | null = "default",
@@ -88,8 +90,10 @@ export default function About() {
             navigate(`/about${cat ? `/${cat}${block ? `/${block}` : ``}` : ``}`);
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useLayoutEffect(() => {
         if (!location.pathname.startsWith("/about")) return;
+        if (changeExpandedNodes) setChangeExpandedNodes(undefined);
         let newActiveCat = params.category ? params.category : activeCat;
         let newActiveBlock = !newActiveCat ? null : params.block ? params.block : selectedCat;
         if (newActiveCat && !Object.keys(categories).includes(newActiveCat)) newActiveCat = "biography";
@@ -139,7 +143,6 @@ export default function About() {
             ),
         };
     }
-
     return (
         <Box
             sx={{
@@ -217,9 +220,16 @@ export default function About() {
                     <CategoriesToolbar
                         collapsed={catsCollapsed}
                         onRevealCollapse={(collapse) => setCatsCollapsed(collapse)}
-                        onFold={() => {}}
-                        onUnfold={() => {}}
-                        onClose={() => {}}
+                        onFold={() => {
+                            setChangeExpandedNodes([]);
+                        }}
+                        onUnfold={() => {
+                            setChangeExpandedNodes(["biography", "experience", "specifications"]);
+                        }}
+                        onClose={() => {
+                            setOpenedCats([]);
+                            setActiveCatAndBlock(null);
+                        }}
                     />
                     <motion.div
                         initial={false}
@@ -229,6 +239,8 @@ export default function About() {
                     >
                         <CustomScrollbar right="2px" top="2px" bottom="3px">
                             <AboutCategoriesList
+                                initiallyExpandedNodes={["biography", "experience", "specifications"]}
+                                expandedNodes={changeExpandedNodes}
                                 intend={catsCollapsed ? "small" : "regular"}
                                 selectionMode="single"
                                 activeItem={activeCat}
@@ -383,7 +395,6 @@ export default function About() {
                             </Box>
                         </CustomScrollbar>
                     )}
-                    {/* </CustomScrollbar> */}
                 </Box>
             </Box>
         </Box>

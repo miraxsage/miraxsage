@@ -7,7 +7,7 @@ import PersonalVideoIcon from "@mui/icons-material/PersonalVideo";
 export default function AboutExperienceTechsBlock() {
     return (
         <>
-            <AccentedTreeView expandedNodes={["frontend", "backend"]} selectionMode="disable">
+            <AccentedTreeView initiallyExpandedNodes={["frontend", "backend"]} selectionMode="disable">
                 {[
                     {
                         id: "frontend",
