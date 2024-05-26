@@ -37,7 +37,7 @@ export type AccentedTreeItemProps = AccentedContentedTreeItemProps | AccentedTex
 interface AccentedTreeViewBasicProps {
     children: AccentedTreeItemProps[];
     expandedNodes?: string[];
-    intend?: "regular" | "double";
+    intend?: "small" | "regular" | "double";
     checkable?: boolean;
     checkedAndSelected?: boolean;
     checkedItems?: string[];
@@ -75,7 +75,7 @@ interface StyledTreeItemProps {
     isContentedItem?: boolean;
     hasIcon?: boolean;
     hasChildren?: boolean;
-    intend: "regular" | "double";
+    intend: "small" | "regular" | "double";
 }
 
 const AccentedTreeItem = styled(TreeItem, {
@@ -89,133 +89,155 @@ const AccentedTreeItem = styled(TreeItem, {
         hasIcon = false,
         hasChildren = false,
         intend = "regular",
-    }) => ({
-        position: "relative",
-        color: getThemeColor("regularText", theme),
-        "& .MuiTreeItem-content": {
-            transition: "color 0.25s, background 0.15s",
+    }) => {
+        const intendSize = intend == "double" ? 34 : intend == "regular" ? 12 : 4;
+        const smallIntend = intend == "small";
+        const dashSize = smallIntend ? "6px" : "10px";
+        return {
             position: "relative",
-            zIndex: "calc(var(--level) + 1)",
-            padding: isContentedItem ? "0px" : "3px 8px",
-            paddingLeft: `calc(${intend == "double" ? 34 : 12}px * var(--level) + 10px * var(--level) - 6px)`,
-        },
-        "&:before": {
-            content: '""',
-            display: "block",
-            height: "1px",
-            width: level > 0 ? (isContentedItem ? "14px" : "10px") : "0px",
-            position: "absolute",
-            backgroundColor: theme.palette.divider,
-            top: isContentedItem ? "50%" : "16px",
-            left: `calc(${intend == "double" ? 34 : 12}px * var(--level) + 10px * var(--level) - 6px)`,
-        },
-        "&:last-child:before": {
-            height: isContentedItem ? "50%" : "calc(100% - 16px)",
-            borderColor: theme.palette.divider,
-            backgroundColor: getThemeColor("layoutBackground", theme),
-            borderWidth: "1px 0px 0px 0px",
-            top: isContentedItem ? "50%" : "16px",
-            left: `calc(${intend == "double" ? 34 : 12}px * var(--level) + 10px * var(--level) - 7px)`,
-            zIndex: "var(--level)",
-        },
-        "& > .MuiTreeItem-content .MuiTreeItem-iconContainer": {
-            width: "auto",
-            marginLeft: level > 0 ? (hasIcon || hasChildren ? "10px" : "3px") : "4px",
-            marginRight: "0px",
-            paddingLeft: "2px",
-            paddingRight: !hasIcon && hasChildren ? "0px" : "3px",
-        },
-        "& > .MuiTreeItem-content:not(.Mui-selected) .MuiTreeItem-iconContainer": {
-            color: isAccented ? "inherit" : getThemeColor("regularIcon", theme),
-        },
-        "& .MuiTreeItem-content .MuiTreeItem-iconContainer > * + *": {
-            marginLeft: "3px",
-        },
-        "& .MuiTreeItem-content .MuiTreeItem-iconContainer svg": {
-            fontSize: "19px",
-        },
-        "& .MuiTreeItem-content .MuiTreeItem-label": {
-            paddingLeft: "5px",
-        },
-        "& .MuiTreeItem-iconContainer .MuiCheckbox-root": {
-            padding: "0px",
-            marginRight: "5px",
-            color: "currentColor",
-            ":hover": {
-                background: alpha(getThemeColor("regularText", theme), 0.2),
+            color: getThemeColor("regularText", theme),
+            "& .MuiTreeItem-content": {
+                transition: "color 0.25s, background 0.15s",
+                position: "relative",
+                zIndex: "calc(var(--level) + 1)",
+                padding: isContentedItem ? "0px" : "3px 8px",
+                paddingLeft: `calc(${intendSize}px * var(--level) + 10px * var(--level) - 6px)`,
             },
-        },
-        ...(isAccented
-            ? {
-                  "& > .MuiTreeItem-content:after": {
-                      content: '""',
-                      display: "block",
-                      background: getThemeColor("secondaryHoverText", theme),
-                      width: "2px",
-                      height: "100%",
-                      position: "absolute",
-                      right: 0,
-                  },
-                  "& > div > .MuiTreeItem-group:after": {
-                      content: '""',
-                      display: "block",
-                      position: "absolute",
-                      width: "1px",
-                      height: "100%",
-                      top: 0,
-                      right: 0,
-                      backgroundColor: getThemeColor("secondaryHoverText", theme),
-                  },
-              }
-            : {}),
-        ...(isContentedItem
-            ? {
-                  "& > .MuiTreeItem-content": {
-                      cursor: "auto",
-                      paddingTop: 0,
-                      paddingRight: 0,
-                      paddingBotton: 0,
-                      "& .MuiTreeItem-label": {
-                          paddingLeft: "6px",
+            "&:before": {
+                content: '""',
+                display: "block",
+                height: "1px",
+                width: level > 0 ? (isContentedItem ? "14px" : dashSize) : "0px",
+                position: "absolute",
+                backgroundColor: theme.palette.divider,
+                top: isContentedItem ? "50%" : "16px",
+                left: `calc(${intendSize}px * var(--level) + 10px * var(--level) - 6px)`,
+            },
+            "&:last-child:before": {
+                height: isContentedItem ? "50%" : "calc(100% - 16px)",
+                borderColor: theme.palette.divider,
+                backgroundColor: getThemeColor("layoutBackground", theme),
+                borderWidth: "1px 0px 0px 0px",
+                top: isContentedItem ? "50%" : "16px",
+                left: `calc(${intendSize}px * var(--level) + 10px * var(--level) - 7px)`,
+                zIndex: "var(--level)",
+            },
+            "& > .MuiTreeItem-content .MuiTreeItem-iconContainer": {
+                width: "auto",
+                marginLeft:
+                    level > 0
+                        ? hasIcon || hasChildren
+                            ? smallIntend
+                                ? "6px"
+                                : "10px"
+                            : "3px"
+                        : smallIntend
+                        ? "0px"
+                        : "4px",
+                marginRight: "0px",
+                paddingLeft: smallIntend ? "1px" : "2px",
+                paddingRight: !hasIcon && hasChildren ? "0px" : "3px",
+                ...(level == 0
+                    ? {
+                          "& svg:first-of-type": {
+                              marginLeft: "-1px",
+                          },
+                          ...(!hasChildren && smallIntend ? { marginLeft: "11px" } : {}),
+                      }
+                    : {}),
+            },
+            "& > .MuiTreeItem-content:not(.Mui-selected) .MuiTreeItem-iconContainer": {
+                color: isAccented ? "inherit" : getThemeColor("regularIcon", theme),
+            },
+            "& .MuiTreeItem-content .MuiTreeItem-iconContainer > * + *": {
+                marginLeft: smallIntend ? "-1.5px" : "3px",
+            },
+            "& .MuiTreeItem-content .MuiTreeItem-iconContainer svg": {
+                fontSize: "19px",
+            },
+            "& .MuiTreeItem-content .MuiTreeItem-label": {
+                paddingLeft: "5px",
+            },
+            "& .MuiTreeItem-iconContainer .MuiCheckbox-root": {
+                padding: "0px",
+                marginRight: "5px",
+                color: "currentColor",
+                ":hover": {
+                    background: alpha(getThemeColor("regularText", theme), 0.2),
+                },
+            },
+            ...(isAccented
+                ? {
+                      "& > .MuiTreeItem-content:after": {
+                          content: '""',
+                          display: "block",
+                          background: getThemeColor("secondaryHoverText", theme),
+                          width: "2px",
+                          height: "100%",
+                          position: "absolute",
+                          right: 0,
                       },
-                  },
-                  "& > .MuiTreeItem-content:hover": {
-                      background: "transparent",
-                  },
-              }
-            : {
-                  "& .MuiTreeItem-content.Mui-focused": {
-                      background: "transparent",
-                  },
-                  [`& > .MuiTreeItem-content.Mui-selected, 
+                      "& > div > .MuiTreeItem-group:after": {
+                          content: '""',
+                          display: "block",
+                          position: "absolute",
+                          width: "1px",
+                          height: "100%",
+                          top: 0,
+                          right: 0,
+                          backgroundColor: getThemeColor("secondaryHoverText", theme),
+                      },
+                  }
+                : {}),
+            ...(isContentedItem
+                ? {
+                      "& > .MuiTreeItem-content": {
+                          cursor: "auto",
+                          paddingTop: 0,
+                          paddingRight: 0,
+                          paddingBotton: 0,
+                          "& .MuiTreeItem-label": {
+                              paddingLeft: "6px",
+                          },
+                      },
+                      "& > .MuiTreeItem-content:hover": {
+                          background: "transparent",
+                      },
+                  }
+                : {
+                      "& .MuiTreeItem-content.Mui-focused": {
+                          background: "transparent",
+                      },
+                      [`& > .MuiTreeItem-content.Mui-selected, 
                     & > .MuiTreeItem-content.Mui-selected.Mui-focused
                     ${isAccented ? ", & > .MuiTreeItem-content, & > .MuiTreeItem-content.Mui-focused" : ""}`]: {
-                      color: getThemeColor(isAccented ? "secondaryHoverText" : "accentedHoverText", theme),
-                      background: getThemeColor(isAccented ? "secondaryBg" : "accentedBg", theme),
-                  },
-                  [`& > .MuiTreeItem-content.Mui-selected:hover`]: {
-                      background: getThemeColor(isAccented ? "secondaryHoverBg" : "accentedHoverBg", theme),
-                  },
-                  "& > .MuiTreeItem-content:hover": {
-                      background: getThemeColor(isAccented ? "secondaryHoverBg" : "regularHoverBg", theme),
-                  },
-              }),
-        "& .MuiTreeItem-group": {
-            margin: 0,
-            position: "relative",
-        },
-        "& .MuiTreeItem-group:before": {
-            content: '""',
-            display: "block",
-            position: "absolute",
-            width: "1px",
-            height: "calc(100% - 15px)",
-            top: 0,
-            left: `calc(${intend == "double" ? 34 : 12}px * (var(--level) + 1) + 10px * var(--level) + 3px)`,
-            backgroundColor: theme.palette.divider,
-            zIndex: "var(--level)",
-        },
-    })
+                          color: getThemeColor(isAccented ? "secondaryHoverText" : "accentedHoverText", theme),
+                          background: getThemeColor(isAccented ? "secondaryBg" : "accentedBg", theme),
+                      },
+                      [`& > .MuiTreeItem-content.Mui-selected:hover`]: {
+                          background: getThemeColor(isAccented ? "secondaryHoverBg" : "accentedHoverBg", theme),
+                      },
+                      "& > .MuiTreeItem-content:hover": {
+                          background: getThemeColor(isAccented ? "secondaryHoverBg" : "regularHoverBg", theme),
+                      },
+                  }),
+            "& .MuiTreeItem-group": {
+                margin: 0,
+                position: "relative",
+            },
+            "& .MuiTreeItem-group:before": {
+                content: '""',
+                display: "block",
+                position: "absolute",
+                width: "1px",
+                height: "calc(100% - 15px)",
+                top: 0,
+                left: `calc(${intendSize}px * (var(--level) + 1) + 10px * var(--level) + 3px)`,
+                backgroundColor: theme.palette.divider,
+                zIndex: "var(--level)",
+            },
+        };
+    }
 );
 
 function AccentedTreeItemTransitionComponent(props: TransitionProps) {
@@ -410,6 +432,11 @@ export default function AccentedTreeView({
             }
         }
     };
+    const allowSelect = (nodesIds: string | string[]) => {
+        if (Array.isArray(nodesIds)) return true;
+        const toggledNode = nodesList.find((n) => n.id == nodesIds);
+        return toggledNode && (!toggledNode.children || toggledNode.children.length == 0);
+    };
     const allowToggle = (toggledNodes: string[]) => {
         if (selectedNodes.length) {
             for (const selectedNode of selectedNodes) {
@@ -444,7 +471,7 @@ export default function AccentedTreeView({
     };
 
     const onSelect = (e: React.SyntheticEvent, nodeIds: string | string[]) => {
-        if (!(e.target as HTMLElement).closest(".MuiTreeItem-iconContainer")) {
+        if (!(e.target as HTMLElement).closest(".MuiTreeItem-iconContainer") || allowSelect(nodeIds)) {
             const newSelectedItems = typeof nodeIds == "string" ? [nodeIds] : nodeIds;
             const newSelectedNodes = nodesList.filter((c) => newSelectedItems.includes(c.id));
             const newFinallySelectedItems: string[] = [];

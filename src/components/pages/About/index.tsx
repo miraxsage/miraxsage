@@ -1,10 +1,6 @@
 import { useLanguage } from "@/store/appearanceSlice";
 import AboutCategoriesList from "./CategoriesList";
 import { Box, useTheme } from "@mui/material";
-import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
-import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import CloseIcon from "@mui/icons-material/Close";
 import AccentedTabs from "@/components/AccentedTabs";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
@@ -24,37 +20,10 @@ import CustomScrollbar from "@/components/Scrollbar";
 import { Params, useLocation, useNavigate, useParams } from "react-router-dom";
 import AboutBlocksIntegrator from "./BlocksIntegrator";
 import { motion } from "framer-motion";
-import { ToolbarButton } from "@/components/ToolbarButton";
 import CustomBreadcrumbs from "@/components/Breadcrumbs";
 import { capitalize } from "@/utilities/string";
 import { RevealAsideMenuButton } from "@/components/layout/RevealAsideMenuButton";
-
-function Toolbar() {
-    return (
-        <Box
-            sx={{
-                borderBottom: 1,
-                borderColor: "divider",
-                minWidth: "230px",
-                justifyContent: "right",
-            }}
-            className="flex"
-        >
-            <ToolbarButton sx={{ paddingLeft: "10.5px", paddingRight: "10.5px" }}>
-                <FirstPageIcon />
-            </ToolbarButton>
-            <ToolbarButton>
-                <UnfoldMoreIcon />
-            </ToolbarButton>
-            <ToolbarButton>
-                <UnfoldLessIcon />
-            </ToolbarButton>
-            <ToolbarButton sx={{ paddingLeft: "11px", paddingRight: "11px" }} dividerSize="collapsed">
-                <CloseIcon />
-            </ToolbarButton>
-        </Box>
-    );
-}
+import CategoriesToolbar from "@/components/CategoriesToolbar";
 
 export default function About() {
     useLanguage();
@@ -93,6 +62,7 @@ export default function About() {
     );
     const [activeCat, setActiveCat] = useState<string | null>(initialCategory);
     const [selectedCat, setSelectedCat] = useState<string | null>(initialBlock);
+    const [catsCollapsed, setCatsCollapsed] = useState(false);
     const setActiveCatAndBlock = (
         cat: string | null,
         block: string | null = "default",
@@ -233,37 +203,64 @@ export default function About() {
                 }}
             ></Box>
             <Box className="flex h-full" sx={{ gridColumn: "span 2" }}>
-                <Box className="grid" sx={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
-                    <Toolbar />
-                    <CustomScrollbar right="2px" top="2px" bottom="3px">
-                        <AboutCategoriesList
-                            intend="double"
-                            selectionMode="single"
-                            activeItem={activeCat}
-                            selectedItems={selectedCat ?? undefined}
-                            onItemsSelect={(item) => {
-                                const rootCats = Object.keys(categories);
-                                if (rootCats.includes(item.id)) {
-                                    if (!openedCats.includes(item.id)) setOpenedCats([...openedCats, item.id]);
-                                    setActiveCatAndBlock(
-                                        item.id,
-                                        catsBlocksIntegrators[item.id as keyof AboutCategoriesType]?.activeBlock ??
-                                            "default"
-                                    );
-                                } else {
-                                    const rootCategory = rootCats.find(
-                                        (c) => !!findCategory(item.id, categories[c as AboutContentfulCategories].items)
-                                    );
-                                    if (rootCategory) {
-                                        if (!openedCats.includes(rootCategory))
-                                            setOpenedCats([...openedCats, rootCategory]);
-                                        setActiveCatAndBlock(rootCategory, item.id);
+                <motion.div
+                    className="grid"
+                    initial={false}
+                    animate={{ maxWidth: catsCollapsed ? "39px" : "230px" }}
+                    style={{ gridTemplateRows: "auto minmax(0, 1fr)", clipPath: "xywh(0 0 100% 100%)" }}
+                >
+                    <CategoriesToolbar
+                        collapsed={catsCollapsed}
+                        onRevealCollapse={(collapse) => setCatsCollapsed(collapse)}
+                        onFold={() => {}}
+                        onUnfold={() => {}}
+                        onClose={() => {}}
+                    />
+                    <motion.div
+                        initial={false}
+                        animate={{
+                            maxWidth: catsCollapsed ? "39px" : "230px",
+                        }}
+                    >
+                        <CustomScrollbar right="2px" top="2px" bottom="3px">
+                            <AboutCategoriesList
+                                intend={catsCollapsed ? "small" : "regular"}
+                                selectionMode="single"
+                                activeItem={activeCat}
+                                selectedItems={selectedCat ?? undefined}
+                                onItemsSelect={(item) => {
+                                    const rootCats = Object.keys(categories);
+                                    if (rootCats.includes(item.id)) {
+                                        if (!openedCats.includes(item.id)) setOpenedCats([...openedCats, item.id]);
+                                        setActiveCatAndBlock(
+                                            item.id,
+                                            catsBlocksIntegrators[item.id as keyof AboutCategoriesType]?.activeBlock ??
+                                                "default"
+                                        );
+                                    } else {
+                                        const rootCategory = rootCats.find(
+                                            (c) =>
+                                                !!findCategory(
+                                                    item.id,
+                                                    categories[c as AboutContentfulCategories].items
+                                                )
+                                        );
+                                        if (rootCategory) {
+                                            if (!openedCats.includes(rootCategory))
+                                                setOpenedCats([...openedCats, rootCategory]);
+                                            setActiveCatAndBlock(rootCategory, item.id);
+                                        }
                                     }
-                                }
-                            }}
-                        />
-                    </CustomScrollbar>
-                </Box>
+                                }}
+                                sx={{
+                                    "& li": {
+                                        whiteSpace: "nowrap",
+                                    },
+                                }}
+                            />
+                        </CustomScrollbar>
+                    </motion.div>
+                </motion.div>
                 <Box className="w-px h-full" sx={{ backgroundColor: "divider" }} />
                 <Box className="grid w-full" sx={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
                     {!!openedCats.length && (
@@ -311,7 +308,7 @@ export default function About() {
                                         gridArea: "1/1/1/1",
                                         zIndex: cat == activeCat ? 1 : 0,
                                         background: getThemeColor("layoutBackground", theme),
-                                        gridTemplateRows: "auto minmax(0, 1fr)",
+                                        gridTemplateRows: "minmax(0, 1fr)",
                                     }}
                                     key={`${cat}-integrator`}
                                     data-id={`${cat}-integrator`}

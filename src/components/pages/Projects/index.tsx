@@ -1,13 +1,8 @@
 import CustomBreadcrumbs, { BreadcrumbItem } from "@/components/Breadcrumbs";
 import { Box, useTheme } from "@mui/material";
 import CustomScrollbar from "@/components/Scrollbar";
-import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
-import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import CloseIcon from "@mui/icons-material/Close";
 import DownIcon from "@mui/icons-material/South";
 import UpIcon from "@mui/icons-material/North";
-import { ToolbarButton } from "@/components/ToolbarButton";
 import ProjectFiltersList from "./FiltersList";
 import { projects } from "./Projects";
 import ProjectCard from "./ProjectCard";
@@ -16,33 +11,7 @@ import { useNavigate } from "react-router-dom";
 import ProjectsBreadcrumbs from "./ProjectsBreadcrumbs";
 import { useAppearance } from "@/store/appearanceSlice";
 import { navigateToProjects, projectsOrderItems, useProjectsLocation } from "./projectsNavigation";
-
-function Toolbar() {
-    return (
-        <Box
-            sx={{
-                borderBottom: 1,
-                borderColor: "divider",
-                minWidth: "230px",
-                justifyContent: "right",
-            }}
-            className="flex"
-        >
-            <ToolbarButton sx={{ paddingLeft: "10.5px", paddingRight: "10.5px" }}>
-                <FirstPageIcon />
-            </ToolbarButton>
-            <ToolbarButton>
-                <UnfoldMoreIcon />
-            </ToolbarButton>
-            <ToolbarButton>
-                <UnfoldLessIcon />
-            </ToolbarButton>
-            <ToolbarButton sx={{ paddingLeft: "11px", paddingRight: "11px" }} dividerSize="collapsed">
-                <CloseIcon />
-            </ToolbarButton>
-        </Box>
-    );
-}
+import CategoriesToolbar from "@/components/CategoriesToolbar";
 
 export default function Projects() {
     const theme = useTheme();
@@ -58,7 +27,13 @@ export default function Projects() {
             <ProjectsBreadcrumbs />
             <Box className="flex h-full">
                 <Box className="grid h-full" sx={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
-                    <Toolbar />
+                    <CategoriesToolbar
+                        collapsed={false}
+                        onRevealCollapse={() => {}}
+                        onFold={() => {}}
+                        onUnfold={() => {}}
+                        onClose={() => {}}
+                    />
                     <CustomScrollbar right="2px" top="2px" bottom="3px">
                         <ProjectFiltersList
                             activeItems={techs}
