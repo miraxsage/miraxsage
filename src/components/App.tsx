@@ -56,14 +56,6 @@ const router = createBrowserRouter([
                 element: <Landing />,
             },
             {
-                path: "profile",
-                lazy: async () => {
-                    const { default: Component } = await import("@/components/pages/Profile.tsx");
-                    return { Component };
-                },
-                //element: <Profile />, //<PagesIntegrator page="profile" />,
-            },
-            {
                 path: "about/:category?/:block?",
                 lazy: async () => {
                     const { default: Component } = await import("@/components/pages/About/index.tsx");

@@ -27,18 +27,12 @@ export default function TopMenu() {
             <HorizontalPanelButton iconMode={true}>
                 <MenuIcon />
             </HorizontalPanelButton>
-            <AccentedTabs
-                underline={false}
-                mode="full"
-                onTabSelect={onTabSelect}
-            >
-                {["miraxsage", "profile", "about", "projects", "interact"].map(
-                    (id) => ({
-                        id,
-                        title: `_${__(id)}`,
-                        active: location.pathname.startsWith(`/${id}`),
-                    })
-                )}
+            <AccentedTabs underline={false} mode="full" onTabSelect={onTabSelect}>
+                {["miraxsage", "about", "projects", "interact"].map((id) => ({
+                    id,
+                    title: `_${__(id)}`,
+                    active: location.pathname.startsWith(`/${id}`),
+                }))}
             </AccentedTabs>
         </Box>
     );
