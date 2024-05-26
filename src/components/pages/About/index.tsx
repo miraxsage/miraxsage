@@ -1,6 +1,6 @@
 import { useLanguage } from "@/store/appearanceSlice";
 import AboutCategoriesList from "./CategoriesList";
-import { Box, useTheme } from "@mui/material";
+import { Alert, Box, useTheme } from "@mui/material";
 import AccentedTabs from "@/components/AccentedTabs";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
@@ -24,6 +24,7 @@ import CustomBreadcrumbs from "@/components/Breadcrumbs";
 import { capitalize } from "@/utilities/string";
 import { RevealAsideMenuButton } from "@/components/layout/RevealAsideMenuButton";
 import CategoriesToolbar from "@/components/CategoriesToolbar";
+import PersonalDataIllustration from "./PersonalDataIllustration";
 
 export default function About() {
     useLanguage();
@@ -33,6 +34,8 @@ export default function About() {
     const params = useParams();
     const navigate = useNavigate();
     const location = useLocation();
+
+    const lang = useLanguage();
 
     const blocksIntegratorContainer = useRef<HTMLDivElement>();
 
@@ -91,6 +94,7 @@ export default function About() {
         let newActiveBlock = !newActiveCat ? null : params.block ? params.block : selectedCat;
         if (newActiveCat && !Object.keys(categories).includes(newActiveCat)) newActiveCat = "biography";
         if (
+            newActiveCat &&
             hasSubcategories(newActiveCat as AboutCategories) &&
             newActiveBlock &&
             newActiveBlock != newActiveCat &&
@@ -170,7 +174,7 @@ export default function About() {
                             ],
                         },
                     ];
-                    if (activeCat)
+                    if (activeCat) {
                         items.push({
                             label: __(capitalize(activeCat)),
                             subitems: Object.entries(categories)
@@ -181,18 +185,19 @@ export default function About() {
                                     link: "/about/" + key,
                                 })),
                         });
-                    const activeCategory = activeCat as AboutCategories;
-                    if (selectedCat && hasSubcategories(activeCategory))
-                        items.push({
-                            label: __(capitalize(selectedCat)),
-                            subitems: Object.entries(categories[activeCategory]["items"])
-                                .filter(([key]) => key != selectedCat)
-                                .map(([key, val]) => ({
-                                    label: __(capitalize(key)),
-                                    icon: val.icon,
-                                    link: "/about/" + activeCategory + "/" + key,
-                                })),
-                        });
+                        const activeCategory = activeCat as AboutCategories;
+                        if (selectedCat && hasSubcategories(activeCategory))
+                            items.push({
+                                label: __(capitalize(selectedCat)),
+                                subitems: Object.entries(categories[activeCategory]["items"])
+                                    .filter(([key]) => key != selectedCat)
+                                    .map(([key, val]) => ({
+                                        label: __(capitalize(key)),
+                                        icon: val.icon,
+                                        link: "/about/" + activeCategory + "/" + key,
+                                    })),
+                            });
+                    }
                     return items;
                 })()}
             </CustomBreadcrumbs>
@@ -293,7 +298,7 @@ export default function About() {
                             }))}
                         </AccentedTabs>
                     )}{" "}
-                    {activeCat && (
+                    {activeCat ? (
                         <Box
                             sx={{
                                 display: "grid",
@@ -347,6 +352,36 @@ export default function About() {
                                 </motion.div>
                             ))}
                         </Box>
+                    ) : (
+                        <CustomScrollbar sx={{ gridRow: "span 2" }}>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    height: "100%",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <Box
+                                    sx={{
+                                        width: "600px",
+                                        [theme.breakpoints.down("xl")]: {
+                                            width: "400px",
+                                        },
+                                        [theme.breakpoints.down("lg")]: {
+                                            width: "300px",
+                                        },
+                                    }}
+                                >
+                                    <PersonalDataIllustration />
+                                    <Alert variant="outlined" severity="info" sx={{ marginTop: "20px" }}>
+                                        {lang.ru
+                                            ? `Выберите один из пунктов анкеты в меню слева чтобы посмотреть что нибудь о моей биографии, опыте, характеристиках или интересных сниппетах`
+                                            : `Select an item in the menu on the left to learn something about my biography, experience, characteristics, or interesting snippets.`}
+                                    </Alert>
+                                </Box>
+                            </Box>
+                        </CustomScrollbar>
                     )}
                     {/* </CustomScrollbar> */}
                 </Box>
