@@ -1,23 +1,19 @@
 import "../style.css";
 import "@/utilities/cookie";
-import { SxProps } from "@mui/material";
+import { SxProps, useMediaQuery, useTheme } from "@mui/material";
 import MainLayout from "./layout/MainLayout";
 import { useThemeColor } from "./contexts/Theme";
-import { useLanguage } from "@/store/appearanceSlice";
+import { useAsideMenuVisibility, useLanguage, useScreenMode } from "@/store/appearanceSlice";
 import { ReactContentProps } from "@/types/react";
 import { Link, Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Link as MuiLink } from "@mui/material";
-//import PagesIntegrator from "./pages/PagesIntegrator";
 import { AppSpinner } from "./Spinners";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Provider } from "react-redux";
 import ThemeContext from "./contexts/ThemeContext";
 import store from "@/store";
 import Landing from "./pages/Landing";
 import OverlapedChildrenContainer from "./OverlapedChildrenContainer";
-//import Projects from "./pages/Projects";
-//import About from "./pages/About";
-//import Profile from "./pages/Profile";
 
 function AppLayout({ children, sx }: { sx?: SxProps } & ReactContentProps) {
     return (
@@ -61,7 +57,6 @@ const router = createBrowserRouter([
                     const { default: Component } = await import("@/components/pages/About/index.tsx");
                     return { Component };
                 },
-                //element: <About />, //<PagesIntegrator page="about" />,
             },
             {
                 path: "projects",
@@ -69,7 +64,6 @@ const router = createBrowserRouter([
                     const { default: Component } = await import("@/components/pages/Projects/index.tsx");
                     return { Component };
                 },
-                //element: <Projects />, //<PagesIntegrator page="projects" />,
             },
             {
                 path: `projects/:slug`,
@@ -81,7 +75,6 @@ const router = createBrowserRouter([
                     const { default: Component } = await import("@/components/pages/Contacts/index.tsx");
                     return { Component };
                 },
-                //element: <PagesIntegrator page="contacts" />,
             },
         ],
     },
@@ -101,20 +94,23 @@ export function App() {
 
 function AppContent() {
     useLanguage();
-    // const isLandingPage = window.location.pathname == "/";
-    // return (
-    //     <AppLayout>
-    //         {!isLandingPage ? (
-    //             <AppLayout sx={{ background: "unset" }}>
-    //                 <RouterProvider router={router} fallbackElement={<AppSpinner />} />
-    //             </AppLayout>
-    //         ) : (
-    //             <AppLayout sx={{ background: "unset" }}>
-    //                 <Landing />
-    //             </AppLayout>
-    //         )}
-    //     </AppLayout>
-    // );
+    const theme = useTheme();
+    const sm = useMediaQuery(theme.breakpoints.down("md"));
+    const asideMenuVisibility = useAsideMenuVisibility();
+    const screenMode = useScreenMode();
+    const appearanceBeforeSmallScreen = useRef({
+        asideMenuVisibility: asideMenuVisibility.value,
+        screenMode: screenMode.value,
+    });
+    useEffect(() => {
+        if (sm) {
+            appearanceBeforeSmallScreen.current.asideMenuVisibility = asideMenuVisibility.value;
+            appearanceBeforeSmallScreen.current.screenMode = screenMode.value;
+        }
+        asideMenuVisibility.update(sm ? "collapsed" : appearanceBeforeSmallScreen.current.asideMenuVisibility);
+        screenMode.update(sm ? "full" : appearanceBeforeSmallScreen.current.screenMode);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sm]);
     return (
         <AppLayout>
             <RouterProvider router={router} fallbackElement={<AppSpinner />} />

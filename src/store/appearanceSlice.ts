@@ -116,6 +116,7 @@ export function useScreenMode() {
     const screenMode = useAppearance((appearance) => appearance.screenMode);
     const dispatch = useDispatch();
     return {
+        value: screenMode,
         full: screenMode == "full",
         window: screenMode == "window",
         update: (
@@ -134,6 +135,7 @@ export function useViewMode() {
     const viewMode = useAppearance((appearance) => appearance.viewMode);
     const dispatch = useDispatch();
     return {
+        value: viewMode,
         desktop: viewMode == "desktop",
         console: viewMode == "console",
         update: (
@@ -149,6 +151,7 @@ export function useAsideMenuVisibility() {
     const asideMenuVisibility = useAppearance((appearance) => appearance.asideMenuVisibility);
     const dispatch = useDispatch();
     return {
+        value: asideMenuVisibility,
         shown: asideMenuVisibility == "shown",
         collapsed: asideMenuVisibility == "collapsed",
         update: (

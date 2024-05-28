@@ -4,7 +4,7 @@ import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import CallIcon from "@mui/icons-material/Call";
 import PersonIcon from "@mui/icons-material/Person";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Box } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { ProjectsList, projects } from "./Projects";
 import { ToolbarButton } from "@/components/ToolbarButton";
 import { useNavigate } from "react-router-dom";
@@ -13,44 +13,54 @@ import { RevealAsideMenuButton } from "@/components/layout/RevealAsideMenuButton
 
 export type ProjectsBreadcrumbsProps = {
     project?: ProjectsList;
+    onBack?: () => void;
 };
 
-export default function ProjectsBreadcrumbs({ project }: ProjectsBreadcrumbsProps) {
+export default function ProjectsBreadcrumbs({ project, onBack }: ProjectsBreadcrumbsProps) {
     const navigate = useNavigate();
+    const theme = useTheme();
+    const lessSm = useMediaQuery(theme.breakpoints.down("sm"));
     const lang = useAppearance().language;
     return (
         <Box sx={{ display: "flex", borderBottom: 1, borderColor: "divider" }}>
             <RevealAsideMenuButton />
             {project && (
-                <ToolbarButton sx={{ paddingLeft: "10.5px", paddingRight: "10.5px" }} onClick={() => navigate(-1)}>
+                <ToolbarButton
+                    sx={{ paddingLeft: "10.5px", paddingRight: "10.5px" }}
+                    onClick={onBack ? onBack : () => navigate(-1)}
+                >
                     <ArrowBackIcon />
                 </ToolbarButton>
             )}
             <CustomBreadcrumbs sx={{ padding: "6px 8px", margin: 0, flexGrow: 1 }}>
                 {(() => {
                     const items = [
-                        { label: "Miraxsage", link: "/" },
-                        {
-                            label: __("Projects"),
-                            onClick: () => navigate("/projects"),
-                            subitems: [
-                                {
-                                    label: __("Profile"),
-                                    icon: <AssignmentIndIcon />,
-                                    link: "/profile",
-                                },
-                                {
-                                    label: __("About"),
-                                    icon: <PersonIcon />,
-                                    link: "/about",
-                                },
-                                {
-                                    label: __("Interact"),
-                                    icon: <CallIcon />,
-                                    link: "/interact",
-                                },
-                            ],
-                        },
+                        ...(lessSm ? [] : [{ label: "Miraxsage", link: "/" }]),
+                        ...(lessSm && project
+                            ? []
+                            : [
+                                  {
+                                      label: __("Projects"),
+                                      onClick: () => navigate("/projects"),
+                                      subitems: [
+                                          {
+                                              label: __("Profile"),
+                                              icon: <AssignmentIndIcon />,
+                                              link: "/profile",
+                                          },
+                                          {
+                                              label: __("About"),
+                                              icon: <PersonIcon />,
+                                              link: "/about",
+                                          },
+                                          {
+                                              label: __("Interact"),
+                                              icon: <CallIcon />,
+                                              link: "/interact",
+                                          },
+                                      ],
+                                  },
+                              ]),
                         ...(project
                             ? [
                                   {

@@ -30,10 +30,21 @@ export default function Projects() {
     }, [changeExpandedNodes]);
 
     return (
-        <Box className="grid h-full" sx={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
+        <Box
+            className="grid h-full"
+            sx={{ gridTemplateRows: "auto minmax(0, 1fr)", gridTemplateColumns: "minmax(0, 1fr)" }}
+        >
             <ProjectsBreadcrumbs />
-            <Box className="flex h-full">
-                <Box className="grid h-full" sx={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
+            <Box
+                sx={{
+                    display: "grid",
+                    gridTemplate: "minmax(0, 1fr) / 230px 1px minmax(0, 1fr)",
+                }}
+            >
+                <Box
+                    className="grid h-full"
+                    sx={{ gridTemplateRows: "auto minmax(0, 1fr)", gridTemplateColumns: "minmax(0, 1fr)" }}
+                >
                     <CategoriesToolbar
                         onFold={() => {
                             setChangeExpandedNodes([]);
@@ -139,6 +150,9 @@ export default function Projects() {
                                 justifyContent: "center",
                                 gap: "25px",
                                 padding: "25px",
+                                [theme.breakpoints.down("lg")]: {
+                                    padding: "20px",
+                                },
                             }}
                         >
                             {projects

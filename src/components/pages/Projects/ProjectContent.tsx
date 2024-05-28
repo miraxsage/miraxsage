@@ -31,6 +31,16 @@ export function ProjectContentImage({ img, side = "left", slug }: ProjectContent
                 margin: side == "left" ? "15px 25px 15px 0px" : "15px 0px 15px 25px",
                 borderRadius: "4px",
                 border: `1px solid ${theme.palette.divider}`,
+                "@media (max-width: 520px)": {
+                    float: "none",
+                    clear: "both",
+                    margin: "15px auto",
+                    display: "block",
+                },
+                [theme.breakpoints.down("sm")]: {
+                    width: "340px",
+                    height: "179px",
+                },
             }}
         />
     );

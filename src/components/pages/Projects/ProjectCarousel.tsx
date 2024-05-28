@@ -70,10 +70,20 @@ export default function ProjectCarousel({ project, onImageClick }: ProjectCarous
     useEffect(() => {
         const swiperParams = {
             lazy: true,
-            slidesPerView: 3,
             grabCursor: true,
             pagination: {
                 el: ".swiper-pagination",
+            },
+            breakpoints: {
+                0: {
+                    slidesPerView: 1,
+                },
+                [theme.breakpoints.values.lg]: {
+                    slidesPerView: 2,
+                },
+                [theme.breakpoints.values["2xl"]]: {
+                    slidesPerView: 3,
+                },
             },
         };
         let swiper: SwiperElement["swiper"] | null = null;
@@ -90,6 +100,7 @@ export default function ProjectCarousel({ project, onImageClick }: ProjectCarous
             });
         }
         return () => swiper?.destroy();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     const slides = Array.from(new Array(project.images)).map((_e, i) => (
         <swiper-slide>
@@ -105,26 +116,18 @@ export default function ProjectCarousel({ project, onImageClick }: ProjectCarous
                 <Box className="loader-container" sx={{ position: "absolute", width: "100%", height: "100%" }}>
                     <SimpleSpinner />
                 </Box>
-                {/* <Box
-                    sx={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        objectPosition: "center",
-                        marginLeft: "-1px",
-                    }}
-                    component="img"
-                    src={`/img/projects/${project.slug}/${i + 1}.jpg`}
-                    loading="lazy"
-                    onLoad={(e) => {
-                        if (e.target) (e.target as HTMLElement).parentElement?.querySelector(":scope > div")?.remove();
-                    }}
-                /> */}
                 <ProjectCardImage
                     slug={project.slug as ProjectsList}
                     img={i + 1}
                     lazyLoading={true}
                     sx={{
+                        height: "100%",
+                        "&  img": {
+                            height: "100%",
+                            width: "100%",
+                            objectFit: "cover",
+                            objectPosition: "center",
+                        },
                         "&:after": {
                             content: '""',
                             display: "block",
@@ -170,6 +173,10 @@ export default function ProjectCarousel({ project, onImageClick }: ProjectCarous
                     "--swiper-navigation-size": "25px",
                     overflow: "hidden",
                     flexGrow: 1,
+                },
+                [theme.breakpoints.down("md")]: {
+                    borderTopWidth: 0,
+                    borderRadius: 0,
                 },
             }}
         >

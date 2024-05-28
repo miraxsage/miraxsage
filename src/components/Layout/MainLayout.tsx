@@ -59,10 +59,17 @@ export default function Layout({ children }: LayoutProps) {
                 className={classes("overflow-hidden grid h-full", { "border rounded-xl w-full": screenMode.window })}
             >
                 <TopMenu />
-                <div className="flex overflow-hidden relative">
+                <Box
+                    sx={{
+                        display: "grid",
+                        gridTemplate: "minmax(0, 1fr) / auto minmax(0, 1fr)",
+                        overflow: "hidden",
+                        position: "relative",
+                    }}
+                >
                     <AsideMenu />
-                    <div className="flex-grow">{children}</div>
-                </div>
+                    <div className="flex-grow max-w-[100dvw]">{children}</div>
+                </Box>
                 <BottomBar />
             </Box>
         </Box>

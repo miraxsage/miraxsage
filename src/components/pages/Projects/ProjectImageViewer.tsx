@@ -1,4 +1,4 @@
-import { Box, alpha, useTheme } from "@mui/material";
+import { Box, alpha, useMediaQuery, useTheme } from "@mui/material";
 import { ProjectInterface } from "./Projects";
 import { LinkButton } from "@/components/DescriptionPanel";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -76,6 +76,8 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
     const curImage = imageSource.current?.cur.num ?? image;
     const isFirstImage = curImage == 1;
     const isLastImage = curImage == project.images;
+    const lessLg = useMediaQuery(theme.breakpoints.down("lg"));
+    const muchSmall = useMediaQuery("@media (max-width: 520px)");
 
     const setCurImage = (img: number, initial?: boolean) => {
         if (img == imageSource.current?.cur.num) return;
@@ -143,42 +145,44 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
                         borders="right-bottom"
                         sx={{
                             textAlign: "right",
+                            ...(lessLg ? { padding: "9px 4px 0px 9px" } : {}),
                         }}
                         onClick={!isFirstImage ? () => navigate("prev") : undefined}
                     >
                         <div style={{ opacity: !isFirstImage ? 1 : 0.5 }}>
                             <ArrowBackIcon />
-                            {__("Previous|1")}
+                            {!lessLg && __("Previous|1")}
                         </div>
                     </LinkButton>
                     <LinkButton borders="bottom" onClick={scale > 0.5 ? () => setScale(scale - 0.1) : undefined}>
                         <div style={{ opacity: scale > 0.5 ? 1 : 0.5 }}>
                             <ZoomOutIcon />
-                            {__("Zoom_out")}
+                            {lessLg ? "-" : __("Zoom_out")}
                         </div>
                     </LinkButton>
                     <LinkButton borders="right-bottom-left" onClick={onClose}>
                         <RocketLaunchIcon />
-                        {__("To description")}
+                        {muchSmall ? __("Back") : __("To description")}
                     </LinkButton>
                     <LinkButton borders="bottom" onClick={scale < 1.5 ? () => setScale(scale + 0.1) : undefined}>
                         <div style={{ opacity: scale < 1.5 ? 1 : 0.5 }}>
                             <ZoomInIcon />
-                            {__("Zoom_in")}
+                            {lessLg ? "+" : __("Zoom_in")}
                         </div>
                     </LinkButton>
 
                     <LinkButton
                         borders="bottom-left"
                         sx={{
+                            ...(lessLg ? { padding: "9px 9px 0px 9px" } : {}),
                             "& .MuiSvgIcon-root": {
-                                margin: "0px 0px 0px 8px",
+                                margin: !lessLg ? "0px 0px 0px 8px" : "0px",
                             },
                         }}
                         onClick={!isLastImage ? () => navigate("next") : undefined}
                     >
                         <div style={{ opacity: !isLastImage ? 1 : 0.5 }}>
-                            {__("Next|1")}
+                            {!lessLg && __("Next|1")}
                             <ArrowForwardIcon />
                         </div>
                     </LinkButton>

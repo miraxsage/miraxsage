@@ -440,7 +440,11 @@ export default function AccentedTreeView({
             }
         }
     };
-    const allowSelect = (nodesIds: string | string[]) => {
+    const allowSelect = (target: object, nodesIds: string | string[]) => {
+        if (target instanceof SVGElement) {
+            const svg = target.closest("svg");
+            if (svg?.matches(":scope:first-child")) return false;
+        } else return false;
         if (Array.isArray(nodesIds)) return true;
         const toggledNode = nodesList.find((n) => n.id == nodesIds);
         return toggledNode && (!toggledNode.children || toggledNode.children.length == 0);
@@ -479,7 +483,7 @@ export default function AccentedTreeView({
     };
 
     const onSelect = (e: React.SyntheticEvent, nodeIds: string | string[]) => {
-        if (!(e.target as HTMLElement).closest(".MuiTreeItem-iconContainer") || allowSelect(nodeIds)) {
+        if (!(e.target as HTMLElement).closest(".MuiTreeItem-iconContainer") || allowSelect(e.target, nodeIds)) {
             const newSelectedItems = typeof nodeIds == "string" ? [nodeIds] : nodeIds;
             const newSelectedNodes = nodesList.filter((c) => newSelectedItems.includes(c.id));
             const newFinallySelectedItems: string[] = [];
