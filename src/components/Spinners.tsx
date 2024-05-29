@@ -93,6 +93,7 @@ export function SimpleSpinner() {
         }
         .loader-element .loader-animator{
             width: 25px;
+            display: block;
             aspect-ratio: 5/4;
             --c: no-repeat linear-gradient(${fg} 0 0);
             background: var(--c), var(--c), var(--c);
@@ -111,8 +112,8 @@ export function SimpleSpinner() {
     }, []);
 
     return (
-        <div className="loader-element">
-            <div className="loader-animator"></div>
-        </div>
+        <span className="loader-element">
+            <span className="loader-animator"></span>
+        </span>
     );
 }

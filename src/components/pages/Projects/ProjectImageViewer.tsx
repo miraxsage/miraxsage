@@ -26,9 +26,10 @@ type ProjectImageProps = {
     source?: ImageSource;
     scale: number;
     loading?: boolean;
+    appearSide?: "left" | "right";
     onClose?: () => void;
 };
-function ProjectImage({ source, scale, loading }: ProjectImageProps) {
+function ProjectImage({ source, scale, loading, appearSide }: ProjectImageProps) {
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;
     return (
@@ -46,8 +47,35 @@ function ProjectImage({ source, scale, loading }: ProjectImageProps) {
             {loading ? (
                 <SimpleSpinner />
             ) : (
-                <img
+                <motion.img
+                    animate={{
+                        ...(!appearSide
+                            ? {}
+                            : {
+                                  clipPath: [
+                                      appearSide == "left"
+                                          ? "xywh(-100% calc(-1 * min(30%, 30vh)) 100% calc(min(160%, 160vh)) round 0 100vmin 100vmin 0)"
+                                          : "xywh(100% calc(-1 * min(30%, 30vh)) 100% calc(min(160%, 160vh)) round 100vmin 0 0 100vmin)",
+                                      appearSide == "left"
+                                          ? "xywh(-50% calc(-1 * min(30%, 30vh)) 250% calc(min(160%, 160vh)) round 0 100vmin 100vmin 0)"
+                                          : "xywh(-50% calc(-1 * min(30%, 30vh)) 250% calc(min(160%, 160vh)) round 100vmin 0 0 100vmin)",
+                                      "xywh(-50% -50% 200% 200% round 0 0 0 0)",
+                                  ],
+                                  transition: {
+                                      opacity: { duration: 0.45 },
+                                      clipPath: { duration: 0.5, times: [0, 0.9999, 1] },
+                                  },
+                              }),
+                    }}
                     style={{
+                        ...(!appearSide
+                            ? {}
+                            : {
+                                  clipPath:
+                                      appearSide == "left"
+                                          ? "xywh(-100% 0% 100% 100% round 0 0 100vw 100vw)"
+                                          : "xywh(100% 0% 100% 100% round 0 0 100vw 100vw)",
+                              }),
                         height: source?.height ? source.height * scale : "unset",
                         width: source?.width ? source.width * scale : "unset",
                         position: "relative",
@@ -57,7 +85,7 @@ function ProjectImage({ source, scale, loading }: ProjectImageProps) {
                         )}, 0px 0px 100px ${getThemeColor(isDarkMode ? "layoutBackground" : "layoutGlow", theme)}`,
                     }}
                     src={source?.src}
-                />
+                ></motion.img>
             )}
         </Box>
     );
@@ -83,7 +111,6 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
         if (img == imageSource.current?.cur.num) return;
         if (!initial) {
             setLoading(true);
-            //setScale(1);
         }
         const newImageSource = new Image();
         newImageSource.onload = (e) => {
@@ -214,14 +241,16 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
                             <motion.div
                                 style={{
                                     minHeight: "100%",
-
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
                                 }}
+                                animate={{
+                                    opacity: 0,
+                                    transition: { duration: 0.4 },
+                                }}
                                 exit={{
                                     opacity: 0,
-                                    clipPath: "circle(1000% at 50% 50%)",
                                     transition: { duration: 0.4 },
                                 }}
                             >
@@ -244,21 +273,12 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
                             initial={{ opacity: 0 }}
                             animate={{
                                 opacity: 1,
-                                clipPath: [
-                                    (imageSource.current?.prev?.num ?? -1) > (imageSource.current?.cur?.num ?? -1)
-                                        ? "circle(75% at -300% 50%)"
-                                        : "circle(75% at 300% 50%)",
-                                    "circle(75% at 50% 50%)",
-                                    "circle(1000% at 50% 50%)",
-                                ],
                                 transition: {
-                                    opacity: { duration: 0.45 },
-                                    clipPath: { duration: 0.5, times: [0, 0.99, 1] },
+                                    duration: 0.45,
                                 },
                             }}
                             exit={{
                                 opacity: 0,
-                                clipPath: "circle(1000% at 50% 50%)",
                                 transition: { duration: 0.4 },
                             }}
                         >
@@ -267,6 +287,11 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
                                 scale={scale}
                                 loading={loading}
                                 onClose={onClose}
+                                appearSide={
+                                    (imageSource.current?.prev?.num ?? -1) > (imageSource.current?.cur?.num ?? -1)
+                                        ? "left"
+                                        : "right"
+                                }
                                 key={`${project.slug}-${imageSource.current?.cur.num}`}
                             />
                         </motion.div>

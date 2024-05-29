@@ -60,7 +60,7 @@ export default function ProjectPage() {
         slug,
     });
     const muchSmall = useMediaQuery("@media (max-width: 450px)");
-    const lessMd = useMediaQuery(theme.breakpoints.down("md"));
+    const lessMd = useMediaQuery(theme.breakpoints.down("lg"));
     const lessLg = useMediaQuery(theme.breakpoints.down("lg"));
     const lessXl = useMediaQuery(theme.breakpoints.down("xl"));
     const navigate = useNavigate();
@@ -188,7 +188,7 @@ export default function ProjectPage() {
     return (
         slug &&
         isProjectSlug(slug) && (
-            <Box className="grid h-full" sx={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
+            <Box className="grid h-full relative" sx={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
                 <ProjectsBreadcrumbs
                     project={slug}
                     onBack={
@@ -246,7 +246,7 @@ export default function ProjectPage() {
                                                     },
                                                 }}
                                                 exit={{
-                                                    opacity: 0.2,
+                                                    opacity: 0,
                                                     clipPath: "circle(1000% at 50% 50%)",
                                                     transition: { duration: 0.5 },
                                                 }}

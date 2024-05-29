@@ -4,8 +4,10 @@ import StarIcon from "@mui/icons-material/Star";
 import CustomScrollbar from "@/components/Scrollbar";
 import { ProjectInterface, ProjectsList, projects } from "./Projects";
 import { getThemeColor } from "@/components/contexts/Theme";
-import { useId } from "react";
+import { useId, useState } from "react";
 import { useAppearance, useColorMode } from "@/store/appearanceSlice";
+import { motion } from "framer-motion";
+import { SimpleSpinner } from "@/components/Spinners";
 
 type ProjectCardProps = {
     project: ProjectInterface;
@@ -98,6 +100,7 @@ export type ProjectCardImageProps = {
 export function ProjectCardImage({ slug, img, component, lazyLoading, onImageLoad, sx }: ProjectCardImageProps) {
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;
+    const [loading, setLoading] = useState(true);
     const project: ProjectInterface | undefined = projects.find((p) => p.slug == slug);
     if (!slug || !project) return null;
     return (
@@ -139,10 +142,27 @@ export function ProjectCardImage({ slug, img, component, lazyLoading, onImageLoa
         >
             <img
                 {...(lazyLoading ? { loading: "lazy" } : {})}
-                {...(onImageLoad ? { onLoad: onImageLoad } : {})}
+                onLoad={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                    setLoading(false);
+                    if (onImageLoad) onImageLoad(e);
+                }}
                 data-img-num={img}
                 src={`/img/projects/${slug}/${img ? img + "_preview" : "cover"}.jpg`}
             />
+            <motion.span
+                style={{
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    width: "100%",
+                    height: "100%",
+                    opacity: 0,
+                }}
+                animate={{ opacity: loading ? 1 : 0 }}
+                transition={{ delay: loading ? 0.15 : 0 }}
+            >
+                <SimpleSpinner />
+            </motion.span>
             <img data-img-num={img} src={`/img/projects/${slug}/${img ? img + "_preview" : "cover"}.jpg`} />
         </Box>
     );

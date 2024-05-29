@@ -78,7 +78,7 @@ export default function ProjectCarousel({ project, onImageClick }: ProjectCarous
                 0: {
                     slidesPerView: 1,
                 },
-                [theme.breakpoints.values.lg]: {
+                [theme.breakpoints.values.sm]: {
                     slidesPerView: 2,
                 },
                 [theme.breakpoints.values["2xl"]]: {
@@ -174,7 +174,10 @@ export default function ProjectCarousel({ project, onImageClick }: ProjectCarous
                     overflow: "hidden",
                     flexGrow: 1,
                 },
-                [theme.breakpoints.down("md")]: {
+                [theme.breakpoints.between("md", "lg")]: {
+                    borderWidth: "0 0 1px 0",
+                },
+                [theme.breakpoints.down("lg")]: {
                     borderTopWidth: 0,
                     borderRadius: 0,
                 },

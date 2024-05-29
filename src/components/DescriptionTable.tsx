@@ -302,7 +302,7 @@ export default function DescriptionTable({
                         display: "flex",
                         alignItems: "center",
                         "&.grid-first-title": {
-                            padding: "5.5px 16px",
+                            padding: "5.5px 12px",
                         },
                     },
                     "& > .grid-title": {
