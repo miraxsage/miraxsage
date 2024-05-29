@@ -258,6 +258,7 @@ export default function ProjectCard({ project, sx, style, onClick }: ProjectCard
             <Box
                 sx={{
                     display: "grid",
+                    height: "100%",
                     gridTemplateRows: "200px auto 102px",
                     cursor: "pointer",
                     transition: "color 0.3s",
@@ -291,12 +292,13 @@ export default function ProjectCard({ project, sx, style, onClick }: ProjectCard
                     sx={{ border: "1px solid" + theme.palette.divider, borderWidth: "1px 0px 1px 0px" }}
                 >
                     <Box
-                        className="flex flex-grow justify-center"
+                        className="flex flex-grow justify-start flex-wrap"
                         sx={{
-                            padding: "5px",
+                            padding: "5px 5px 0px 5px",
                             borderRight: "1px solid " + theme.palette.divider,
-                            "& .MuiSvgIcon-root:not(:first-of-type)": {
-                                marginLeft: "10px",
+                            "& .MuiSvgIcon-root:not(:last-of-type)": {
+                                marginRight: "10px",
+                                marginBottom: "5px",
                             },
                         }}
                     >
@@ -307,6 +309,11 @@ export default function ProjectCard({ project, sx, style, onClick }: ProjectCard
                     <Box
                         sx={{
                             padding: "3px 11px 2px 12px",
+                            minWidth: "85px",
+                            justifyContent: "center",
+                            gap: "5px",
+                            display: "flex",
+                            alignItems: "center",
                             verticalAlign: "top",
                             "& .MuiSvgIcon-root": {
                                 marginTop: "-2px",

@@ -341,6 +341,23 @@ export default function AccentedTreeView({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [expandedNodesString]);
 
+    const selectedNodesString = String(selectedItemsProp);
+    useEffect(() => {
+        if (selectedItemsProp && selectedNodesString != String(selectedNodes)) {
+            const newSelectedNodes = Array.isArray(selectedItemsProp) ? selectedItemsProp : [selectedItemsProp];
+            setSelectedNodes(newSelectedNodes);
+            if (checkedAndSelected) setCheckedNodes(newSelectedNodes);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedNodesString]);
+
+    const checkedNodesString = String(checkedItemsProp);
+    useEffect(() => {
+        if (checkable && !checkedAndSelected && checkedItemsProp && checkedNodesString != String(checkedNodes))
+            setCheckedNodes(checkedItemsProp);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedNodesString]);
+
     const onCheckedChange = (nodeId: string) => (_event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
         const alreadyChecked = checkedNodes.includes(nodeId);
         let newCheckedNodes: string[] | null = null;

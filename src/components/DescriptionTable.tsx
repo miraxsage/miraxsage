@@ -296,13 +296,13 @@ export default function DescriptionTable({
                         },
                     },
                     "& > div:not(.avatar)": {
-                        padding: "6px 14px",
+                        padding: "5.5px 14px",
                         borderColor: theme.palette.divider,
                         borderStyle: "solid",
                         display: "flex",
                         alignItems: "center",
                         "&.grid-first-title": {
-                            padding: "6px 16px",
+                            padding: "5.5px 16px",
                         },
                     },
                     "& > .grid-title": {

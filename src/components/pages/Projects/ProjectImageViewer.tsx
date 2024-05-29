@@ -124,7 +124,9 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
             }}
         >
             <motion.div
-                style={{ backgroundColor: alpha(getThemeColor("layoutBackground", theme), isDarkMode ? 0.95 : 0.8) }}
+                style={{
+                    backgroundColor: alpha(getThemeColor("layoutBackground", theme), isDarkMode ? 0.95 : 0.8),
+                }}
                 exit={{ opacity: 0, transition: { duration: 0 } }}
             >
                 <Box
@@ -190,10 +192,15 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
             </motion.div>
             <motion.div
                 initial={{ opacity: 1, backgroundColor: alpha(getThemeColor("layoutBackground", theme), 0) }}
-                animate={{ backgroundColor: alpha(getThemeColor("layoutBackground", theme), isDarkMode ? 0.95 : 0.8) }}
+                animate={{ backgroundColor: alpha(getThemeColor("layoutBackground", theme), isDarkMode ? 0.8 : 0.8) }}
                 transition={{ duration: 0.3 }}
                 exit={{ opacity: 0 }}
-                style={{ display: "grid", height: "100%", gridTemplateRows: "minmax(0,1fr)" }}
+                style={{
+                    display: "grid",
+                    height: "100%",
+                    gridTemplateRows: "minmax(0,1fr)",
+                    backdropFilter: "blur(3px)",
+                }}
                 onClick={(e) => {
                     if (!loading && !(e.target instanceof HTMLImageElement)) onClose?.();
                 }}
