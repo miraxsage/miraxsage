@@ -278,7 +278,7 @@ export default function About() {
                         </CustomScrollbar>
                     </motion.div>
                 </motion.div>
-                <Box className="w-px h-full" sx={{ backgroundColor: "divider" }} />
+                <Box className="h-full" sx={{ backgroundColor: "divider", minWidth: "1px" }} />
                 <Box className="grid w-full" sx={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
                     {!!openedCats.length && (
                         <AccentedTabs

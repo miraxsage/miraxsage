@@ -20,7 +20,7 @@ import {
 import { getThemeColor } from "@/components/contexts/Theme";
 import ProjectCarousel from "@/components/pages/Projects/ProjectCarousel";
 import ProjectImageViewer from "./ProjectImageViewer";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 import __ from "@/utilities/transtation";
 import classes from "classnames";
 
@@ -60,7 +60,6 @@ export default function ProjectPage() {
         slug,
     });
     const muchSmall = useMediaQuery("@media (max-width: 450px)");
-    const lessMd = useMediaQuery(theme.breakpoints.down("lg"));
     const lessLg = useMediaQuery(theme.breakpoints.down("lg"));
     const lessXl = useMediaQuery(theme.breakpoints.down("xl"));
     const navigate = useNavigate();
@@ -185,6 +184,21 @@ export default function ProjectPage() {
         </Box>
     );
 
+    const projDetailsSize = useMotionValue(325);
+    const projDetailsSizeValue = useTransform(projDetailsSize, (initValue) =>
+        lessLg
+            ? `minmax(0, 1fr) / 1fr`
+            : `minmax(0, 1fr) / ${
+                  initValue < 325 && lessXl
+                      ? initValue + "px " + (initValue == 0 ? "0px" : "1px") + " 3fr"
+                      : `minmax(325px, 1fr) 1px 3fr`
+              }`
+    );
+    useEffect(() => {
+        animate(projDetailsSize, beingViewedImage ? 0 : 325, { duration: 0.4 });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [beingViewedImage]);
+
     return (
         slug &&
         isProjectSlug(slug) && (
@@ -199,16 +213,18 @@ export default function ProjectPage() {
                               }
                     }
                 />
-                <Box
+                <motion.div
                     className="grid h-full"
-                    sx={{
-                        gridTemplate: lessMd
-                            ? `minmax(0, 1fr) / 1fr`
-                            : `minmax(0, 1fr) / ${beingViewedImage && lessXl ? "0 0" : "minmax(325px, 1fr) 1px"} 3fr`,
+                    transition={{ duration: 1 }}
+                    style={{
+                        gridTemplate: projDetailsSizeValue,
+                        // gridTemplate: lessLg
+                        //     ? `minmax(0, 1fr) / 1fr`
+                        //     : `minmax(0, 1fr) / ${beingViewedImage && lessXl ? "0 0" : "minmax(325px, 1fr) 1px"} 3fr`,
                     }}
                 >
-                    <OptionalCustomScrollbar useScrollbar={lessMd}>
-                        {lessMd ? (
+                    <OptionalCustomScrollbar useScrollbar={lessLg}>
+                        {lessLg ? (
                             <>
                                 {projectsNavigationElement}
                                 {projectCarousel}
@@ -219,10 +235,10 @@ export default function ProjectPage() {
                                 <ProjectInfoTable project={slug} />
                             </CustomScrollbar>
                         )}
-                        {!lessMd && <Box sx={{ background: theme.palette.divider }}></Box>}
-                        <Box sx={{ position: lessMd ? "static" : "relative" }}>
+                        {!lessLg && <Box sx={{ background: theme.palette.divider }}></Box>}
+                        <Box sx={{ position: lessLg ? "static" : "relative" }}>
                             <Box className="grid" sx={{ gridTemplateRows: "auto minmax(0, 1fr)", height: "100%" }}>
-                                {!lessMd && projectsNavigationElement}
+                                {!lessLg && projectsNavigationElement}
                                 <Box sx={{ display: "grid", gridTemplateRows: "minmax(0, 1fr)", height: "100%" }}>
                                     <AnimatePresence mode="sync">
                                         {content.current[lang] ? (
@@ -273,7 +289,7 @@ export default function ProjectPage() {
                                                                 },
                                                             }}
                                                         >
-                                                            {!lessMd && projectCarousel}
+                                                            {!lessLg && projectCarousel}
                                                             {content.current[lang]}
                                                         </Box>
                                                     }
@@ -294,11 +310,11 @@ export default function ProjectPage() {
                                     </AnimatePresence>
                                 </Box>
                             </Box>
-                            {!lessMd && projectViewer}
+                            {!lessLg && projectViewer}
                         </Box>
                     </OptionalCustomScrollbar>
-                </Box>
-                {lessMd && projectViewer}
+                </motion.div>
+                {lessLg && projectViewer}
             </Box>
         )
     );

@@ -26,6 +26,7 @@ export default function Projects() {
     const orderItem = projectsOrderItems.find((o) => o.slug == order);
     const OrderIcon = orderItem?.icon;
     const lessMd = useMediaQuery(theme.breakpoints.down("md"));
+    const lessLg = useMediaQuery(theme.breakpoints.down("lg"));
 
     const [changeExpandedNodes, setChangeExpandedNodes] = useState<string[] | undefined>();
     const [filterMenuShown, setFilterMenuShown] = useState(false);
@@ -43,8 +44,9 @@ export default function Projects() {
             <Box
                 sx={{
                     display: "grid",
+                    position: "relative",
                     gridTemplate: "minmax(0, 1fr) / 250px 1px minmax(0, 1fr)",
-                    [theme.breakpoints.down("md")]: {
+                    [theme.breakpoints.down("lg")]: {
                         gridTemplate: "minmax(0, 1fr) / minmax(0, 1fr)",
                     },
                 }}
@@ -72,16 +74,16 @@ export default function Projects() {
                 <motion.div
                     className="grid h-full"
                     initial={false}
-                    animate={{ width: lessMd && !filterMenuShown ? "0px" : "250px" }}
+                    animate={{ width: lessLg && !filterMenuShown ? "0px" : "250px" }}
                     style={{
                         gridTemplate: "auto minmax(0, 1fr) / minmax(0, 1fr)",
                         overflow: "hidden",
-                        ...(lessMd
+                        ...(lessLg
                             ? {
                                   position: "absolute",
                                   zIndex: 1,
                                   background: getThemeColor("layoutBackground", theme),
-                                  borderRight: `1px solid ${theme.palette.divider}`,
+                                  borderRight: lessMd || filterMenuShown ? `1px solid ${theme.palette.divider}` : 0,
                               }
                             : {}),
                     }}
@@ -93,7 +95,7 @@ export default function Projects() {
                         onUnfold={() => {
                             setChangeExpandedNodes(["frontend", "backend", "desktop"]);
                         }}
-                        onFilter={lessMd ? () => setFilterMenuShown(false) : undefined}
+                        onFilter={lessLg ? () => setFilterMenuShown(false) : undefined}
                         onFilterClear={() => navigateToProjects(navigate, { techs: [] }, projectsLocation)}
                     />
                     <CustomScrollbar right="2px" top="2px" bottom="3px">
@@ -110,7 +112,7 @@ export default function Projects() {
                         />
                     </CustomScrollbar>
                 </motion.div>
-                {!lessMd && <Box className="w-px h-full" sx={{ backgroundColor: "divider" }} />}
+                {!lessLg && <Box className="h-full" sx={{ backgroundColor: "divider", minWidth: "1px" }} />}
                 <Box
                     className="grid h-full w-full"
                     sx={{
@@ -118,7 +120,7 @@ export default function Projects() {
                     }}
                 >
                     <Box className="flex">
-                        {lessMd && (
+                        {lessLg && (
                             <ToolbarButton
                                 onClick={() => {
                                     setFilterMenuShown(true);
