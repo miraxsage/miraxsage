@@ -71,6 +71,9 @@ const StyledAccordion = styled(Accordion, {
         "& .MuiAccordionSummary-content": {
             margin: "8px 0px",
         },
+        [theme.breakpoints.down("sm")]: {
+            margin: "8px 0",
+        },
     },
     "&.next-expanded": {
         borderBottomLeftRadius: "6px",

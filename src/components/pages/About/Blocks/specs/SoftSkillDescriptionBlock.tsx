@@ -166,6 +166,9 @@ export default function SoftSkillDescriptionBlock({
                 height: "100%",
                 border: `1px solid ${theme.palette.divider}`,
                 borderRadius: "6px",
+                ["@media (max-width: 450px)"]: {
+                    gridTemplateColumns: "auto 1fr",
+                },
             }}
         >
             <Box
@@ -177,6 +180,9 @@ export default function SoftSkillDescriptionBlock({
                     alignItems: "center",
                     borderWidth: "0px 1px 0px 0px",
                     gridRow: "span " + (belowlg ? 2 : 1),
+                    ["@media (max-width: 450px)"]: {
+                        gridRow: "span 3",
+                    },
                 }}
             >
                 {number}
@@ -202,14 +208,36 @@ export default function SoftSkillDescriptionBlock({
                 </div>
                 {!belowlg && description}
             </div>
-            <Diagramm
-                icon={icon}
-                level={level}
-                averageLevel={averageLevel}
-                totalLevel={totalLevel}
-                accentedElement={accentedElement}
-            />
-            {belowlg && <Box sx={{ gridColumn: "span 2", padding: "5px 8px 8px 8px" }}>{description}</Box>}
+            <Box
+                sx={{
+                    display: "flex",
+                    ["@media (max-width: 450px)"]: {
+                        justifyContent: "center",
+                    },
+                }}
+            >
+                <Diagramm
+                    icon={icon}
+                    level={level}
+                    averageLevel={averageLevel}
+                    totalLevel={totalLevel}
+                    accentedElement={accentedElement}
+                />
+            </Box>
+
+            {belowlg && (
+                <Box
+                    sx={{
+                        gridColumn: "span 2",
+                        padding: "5px 8px 8px 8px",
+                        ["@media (max-width: 450px)"]: {
+                            gridColumn: "span 1",
+                        },
+                    }}
+                >
+                    {description}
+                </Box>
+            )}
         </Box>
     );
 }

@@ -12,6 +12,7 @@ import { TechnologyInterface } from "./Technologies";
 
 export type TechnologiesTableProps = {
     data: TechnologyInterface[];
+    withoutBottomBorder?: boolean;
 };
 
 type TechnologiesChartProps = {
@@ -130,7 +131,7 @@ function TechnologiesChart({ data, currentChart, onCurrentChartChange, sx }: Tec
     );
 }
 
-export default function TechnologiesTable({ data }: TechnologiesTableProps) {
+export default function TechnologiesTable({ data, withoutBottomBorder }: TechnologiesTableProps) {
     const theme = useTheme();
     const abovexl = useMediaQuery(theme.breakpoints.up("2xl"));
     const belowlg = useMediaQuery(theme.breakpoints.down("lg"));
@@ -146,7 +147,7 @@ export default function TechnologiesTable({ data }: TechnologiesTableProps) {
                     userSelect: "text",
                     borderColor: theme.palette.divider,
                     borderStyle: "solid",
-                    borderWidth: "0px 0px 1px 0px",
+                    borderWidth: withoutBottomBorder ? "0px" : "0px 0px 1px 0px",
                     [theme.breakpoints.up("2xl")]: {
                         gridTemplateColumns: "repeat(5, auto) 1fr",
                     },

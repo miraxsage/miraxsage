@@ -57,7 +57,7 @@ export default function Projects() {
                         opacity: filterMenuShown ? 1 : 0,
                         visibility: filterMenuShown ? "visible" : "collapse",
                         transition: {
-                            duration: 0.4,
+                            duration: 0.3,
                             ease: "easeOut",
                             visibility: { delay: filterMenuShown ? 0 : 0.3 },
                         },

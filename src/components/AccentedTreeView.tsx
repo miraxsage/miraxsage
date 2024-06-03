@@ -125,6 +125,8 @@ const AccentedTreeItem = styled(TreeItem, {
             },
             "& > .MuiTreeItem-content .MuiTreeItem-iconContainer": {
                 width: "auto",
+                alignSelf: "flex-start",
+                marginTop: "4px",
                 marginLeft:
                     level > 0
                         ? hasIcon || hasChildren
@@ -198,7 +200,8 @@ const AccentedTreeItem = styled(TreeItem, {
                           paddingRight: 0,
                           paddingBotton: 0,
                           "& .MuiTreeItem-label": {
-                              paddingLeft: "6px",
+                              paddingLeft: intend == "small" ? "0px" : "6px",
+                              background: getThemeColor("layoutBackground", theme),
                           },
                       },
                       "& > .MuiTreeItem-content:hover": {
@@ -460,7 +463,9 @@ export default function AccentedTreeView({
     const allowSelect = (target: object, nodesIds: string | string[]) => {
         if (target instanceof SVGElement) {
             const svg = target.closest("svg");
-            if (svg?.matches(":scope:first-child")) return false;
+            if (!svg) return false;
+            if (svg.matches(":scope:first-child") && svg.parentElement?.querySelectorAll(":scope > svg")?.length == 2)
+                return false;
         } else return false;
         if (Array.isArray(nodesIds)) return true;
         const toggledNode = nodesList.find((n) => n.id == nodesIds);

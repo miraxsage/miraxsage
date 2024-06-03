@@ -8,6 +8,7 @@ import HighEducationIcon from "@/components/icons/HighEducationIcon";
 import AdditionalEducationIcon from "@/components/icons/AdditionalEducationIcon";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import SchoolIcon from "@/components/icons/SchoolIcon";
+import { useMediaQuery, useTheme } from "@mui/material";
 
 type Data = [string, string, DescriptionTableRowOptions?][];
 
@@ -67,9 +68,12 @@ function DataTable({ data, withoutBottomBorder = false }: { data: Data; withoutB
 }
 
 export default function AboutBioEducationBlock() {
+    const theme = useTheme();
+    const lessSm = useMediaQuery(theme.breakpoints.down("sm"));
     return (
         <>
             <AccentedTreeView
+                intend={lessSm ? "small" : "regular"}
                 initiallyExpandedNodes={["general", "generalSges14", "high", "highTechnical", "highTechnicalKubSTU"]}
                 selectionMode="disable"
             >

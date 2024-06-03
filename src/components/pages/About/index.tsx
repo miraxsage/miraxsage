@@ -1,6 +1,6 @@
 import { useLanguage } from "@/store/appearanceSlice";
 import AboutCategoriesList from "./CategoriesList";
-import { Alert, Box, useTheme } from "@mui/material";
+import { Alert, Box, useMediaQuery, useTheme } from "@mui/material";
 import AccentedTabs from "@/components/AccentedTabs";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
@@ -25,6 +25,7 @@ import { capitalize } from "@/utilities/string";
 import { RevealAsideMenuButton } from "@/components/layout/RevealAsideMenuButton";
 import CategoriesToolbar from "@/components/CategoriesToolbar";
 import PersonalDataIllustration from "./PersonalDataIllustration";
+import { alpha } from "@mui/material";
 
 export default function About() {
     useLanguage();
@@ -36,6 +37,11 @@ export default function About() {
     const location = useLocation();
 
     const lang = useLanguage();
+
+    const lessSm = useMediaQuery(theme.breakpoints.down("sm"));
+    const lessLg = useMediaQuery(theme.breakpoints.down("lg"));
+    const lastScreenLessLgRef = useRef(lessLg);
+    const catsCollapsedBeforeResizeRef = useRef(false);
 
     const blocksIntegratorContainer = useRef<HTMLDivElement>();
 
@@ -57,15 +63,16 @@ export default function About() {
     const initialBlock = params.block ?? "default";
 
     const [openedCats, setOpenedCats] = useReducer(
-        (_oldState: unknown, newState: string[]) =>
-            Object.keys(categories)
+        (_oldState: string[], newState: string[]) => {
+            return Object.keys(categories)
                 .map((k) => (newState.includes(k) ? k : false))
-                .filter(Boolean) as string[],
+                .filter(Boolean) as string[];
+        },
         [initialCategory]
     );
     const [activeCat, setActiveCat] = useState<string | null>(initialCategory);
     const [selectedCat, setSelectedCat] = useState<string | null>(initialBlock);
-    const [catsCollapsed, setCatsCollapsed] = useState(false);
+    const [catsCollapsed, setCatsCollapsed] = useState(lessLg);
     const [changeExpandedNodes, setChangeExpandedNodes] = useState<string[] | undefined>();
 
     const setActiveCatAndBlock = (
@@ -93,6 +100,17 @@ export default function About() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useLayoutEffect(() => {
         if (!location.pathname.startsWith("/about")) return;
+        if (lessLg != lastScreenLessLgRef.current) {
+            lastScreenLessLgRef.current = lessLg;
+            if (lessLg) {
+                catsCollapsedBeforeResizeRef.current = catsCollapsed;
+                setCatsCollapsed(true);
+            } else setCatsCollapsed(catsCollapsedBeforeResizeRef.current);
+        }
+        if (lessSm && openedCats.length > 1 && activeCat) {
+            setOpenedCats([activeCat]);
+        }
+
         if (changeExpandedNodes) setChangeExpandedNodes(undefined);
         let newActiveCat = params.category ? params.category : activeCat;
         let newActiveBlock = !newActiveCat ? null : params.block ? params.block : selectedCat;
@@ -210,13 +228,55 @@ export default function About() {
                     gridColumn: "span 2",
                 }}
             ></Box>
-            <Box className="flex h-full" sx={{ gridColumn: "span 2" }}>
+            <Box className="flex h-full relative" sx={{ gridColumn: "span 2" }}>
+                <motion.div
+                    onClick={() => setCatsCollapsed(true)}
+                    animate={{
+                        opacity: !catsCollapsed && lessLg ? 1 : 0,
+                        visibility: !catsCollapsed && lessLg ? "visible" : "collapse",
+                        transition: {
+                            duration: 0.3,
+                            ease: "easeOut",
+                            visibility: { delay: !catsCollapsed ? 0 : 0.3 },
+                        },
+                    }}
+                    style={{
+                        position: "absolute",
+                        width: "100%",
+                        height: "100%",
+                        zIndex: 3,
+                        background: alpha(getThemeColor("barBackground", theme), 0.8),
+                        backdropFilter: "blur(3px)",
+                    }}
+                ></motion.div>
                 <motion.div
                     className="grid"
                     initial={false}
                     animate={{ maxWidth: catsCollapsed ? "39px" : "230px" }}
-                    style={{ gridTemplateRows: "auto minmax(0, 1fr)", clipPath: "xywh(0 0 100% 100%)" }}
+                    style={{
+                        ...(lessLg
+                            ? {
+                                  position: lessLg ? "absolute" : "static",
+                                  zIndex: 3,
+                                  height: "100%",
+                              }
+                            : {}),
+                        gridTemplateRows: "auto minmax(0, 1fr)",
+                        clipPath: "xywh(0 0 calc(100% + 1.5px) 100%)",
+                    }}
                 >
+                    {lessLg && (
+                        <Box
+                            sx={{
+                                minWidth: "1px",
+                                height: "100%",
+                                background: theme.palette.divider,
+                                position: "absolute",
+                                right: "-1px",
+                                zIndex: 3,
+                            }}
+                        ></Box>
+                    )}
                     <CategoriesToolbar
                         collapsed={catsCollapsed}
                         onRevealCollapse={(collapse) => setCatsCollapsed(collapse)}
@@ -229,15 +289,22 @@ export default function About() {
                         onClose={() => {
                             setOpenedCats([]);
                             setActiveCatAndBlock(null);
+                            if (lessLg) setCatsCollapsed(true);
                         }}
                     />
-                    <motion.div
-                        initial={false}
-                        animate={{
-                            maxWidth: catsCollapsed ? "39px" : "230px",
-                        }}
-                    >
-                        <CustomScrollbar right="2px" top="2px" bottom="3px">
+
+                    <CustomScrollbar right="2px" top="2px" bottom="3px">
+                        <motion.div
+                            initial={false}
+                            style={{
+                                height: "100%",
+                                background: getThemeColor("layoutBackground", theme),
+                                overflow: "hidden",
+                            }}
+                            animate={{
+                                maxWidth: catsCollapsed ? "39px" : "230px",
+                            }}
+                        >
                             <AboutCategoriesList
                                 initiallyExpandedNodes={["biography", "experience", "specifications"]}
                                 expandedNodes={changeExpandedNodes}
@@ -246,6 +313,7 @@ export default function About() {
                                 activeItem={activeCat}
                                 selectedItems={selectedCat ?? undefined}
                                 onItemsSelect={(item) => {
+                                    if (lessLg) setCatsCollapsed(true);
                                     const rootCats = Object.keys(categories);
                                     if (rootCats.includes(item.id)) {
                                         if (!openedCats.includes(item.id)) setOpenedCats([...openedCats, item.id]);
@@ -275,9 +343,10 @@ export default function About() {
                                     },
                                 }}
                             />
-                        </CustomScrollbar>
-                    </motion.div>
+                        </motion.div>
+                    </CustomScrollbar>
                 </motion.div>
+                {lessLg && <Box sx={{ minWidth: "39px", height: "100%" }}></Box>}
                 <Box className="h-full" sx={{ backgroundColor: "divider", minWidth: "1px" }} />
                 <Box className="grid w-full" sx={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
                     {!!openedCats.length && (

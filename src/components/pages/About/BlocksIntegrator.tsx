@@ -13,7 +13,7 @@ import AboutSpecsSoftSkillsBlock from "./Blocks/specs/SoftSkills";
 import AboutSpecsHardSkillsBlock from "./Blocks/specs/HardSkills";
 import AboutSpecsMetricsBlock from "./Blocks/specs/Metrics";
 import AboutSpecsSnippetsBlock from "./Blocks/snippets/Snippets";
-import { Box } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import CustomScrollbar from "@/components/Scrollbar";
 
 export type AboutBlocksIntegratorProps<K extends keyof AboutCategoriesType> = {
@@ -49,6 +49,8 @@ export default function AboutBlocksIntegrator<K extends keyof AboutCategoriesTyp
     onSelectedBlockChanged,
     isSwitchingRender = false,
 }: AboutBlocksIntegratorProps<K>) {
+    const theme = useTheme();
+    const lessSm = useMediaQuery(theme.breakpoints.down("sm"));
     const [activeCat] = useState(category);
     const [expandedBlocks, setExpandedBlocks] = useState<string[]>([]);
     if (!selectedBlock || !hasSubcategories(activeCat) || blocks[activeCat].every(([b]) => b != selectedBlock))
@@ -66,7 +68,7 @@ export default function AboutBlocksIntegrator<K extends keyof AboutCategoriesTyp
         <div style={{ height: "100%" }}>
             {hasSubcategories(activeCat) && (
                 <CustomScrollbar right="4.5px" bottom="5px" top="5px">
-                    <Box sx={{ padding: "17px 15px 17px 14px" }}>
+                    <Box sx={{ padding: lessSm ? "8px 15px 8px 7px" : "17px 15px 17px 14px" }}>
                         {blocks[activeCat].map(([block, Control], i) => {
                             const subBlocks = blocks[activeCat];
                             const prevExpanded = i > 0 && expandedBlocks.includes(subBlocks[i - 1][0]);

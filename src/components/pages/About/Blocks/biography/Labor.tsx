@@ -3,6 +3,7 @@ import DescriptionTable, { DescriptionTableRowOptions } from "@/components/Descr
 import __ from "@/utilities/transtation";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import MemoryIcon from "@mui/icons-material/Memory";
+import { useMediaQuery, useTheme } from "@mui/material";
 
 type Data = [string, string, DescriptionTableRowOptions?][];
 
@@ -78,9 +79,15 @@ function DataTable({ data, withoutBottomBorder = false }: { data: Data; withoutB
 }
 
 export default function AboutBioLaborBlock() {
+    const theme = useTheme();
+    const lessSm = useMediaQuery(theme.breakpoints.down("sm"));
     return (
         <>
-            <AccentedTreeView initiallyExpandedNodes={["it", "itKubanskieProdukty"]} selectionMode="disable">
+            <AccentedTreeView
+                intend={lessSm ? "small" : "regular"}
+                initiallyExpandedNodes={["it", "itKubanskieProdukty"]}
+                selectionMode="disable"
+            >
                 {[
                     {
                         id: "it",

@@ -6,11 +6,18 @@ import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
 import BadgeIcon from "@mui/icons-material/Badge";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import SailingIcon from "@mui/icons-material/Sailing";
+import { useMediaQuery, useTheme } from "@mui/material";
 
 export default function AboutBioQuestionaireBlock() {
+    const theme = useTheme();
+    const lessSm = useMediaQuery(theme.breakpoints.down("sm"));
     return (
         <>
-            <AccentedTreeView initiallyExpandedNodes={["about"]} selectionMode="disable">
+            <AccentedTreeView
+                intend={lessSm ? "small" : "regular"}
+                initiallyExpandedNodes={["about"]}
+                selectionMode="disable"
+            >
                 {[
                     {
                         id: "about",

@@ -36,8 +36,11 @@ export default function CategoriesToolbar({
     return (
         <motion.div
             initial={false}
-            style={{ borderBottom: `1px solid ${theme.palette.divider}` }}
-            animate={{ maxWidth: collapsed ? "0px" : "250px" }}
+            style={{
+                borderBottom: `1px solid ${theme.palette.divider}`,
+                background: getThemeColor("layoutBackground", theme),
+            }}
+            animate={{ maxWidth: collapsed ? "39px" : "250px" }}
             className="flex"
         >
             {onFilter && (

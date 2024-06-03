@@ -73,6 +73,9 @@ export default function AboutSpecsSoftSkillsBlock() {
                 display: "grid",
                 gridTemplate: twoCols ? "1fr / 1fr 1fr" : "1fr / 1fr",
                 gap: "25px",
+                [theme.breakpoints.down("sm")]: {
+                    padding: "6.5px",
+                },
                 [twoCols
                     ? "& .description-block:nth-of-type(even):not(:last-of-type) .connector"
                     : "& .description-block:not(:last-of-type) .connector"]: {

@@ -4,11 +4,19 @@ import TerminalIcon from "@/components/icons/TerminalIcon";
 import PersonalVideoIcon from "@mui/icons-material/PersonalVideo";
 import TechnologiesTable from "./TechnologiesTable";
 import { technologies } from "./Technologies";
+import { useMediaQuery } from "@mui/material";
+import { useTheme } from "@mui/material";
 
 export default function AboutSpecsHardSkillsBlock() {
+    const theme = useTheme();
+    const lessSm = useMediaQuery(theme.breakpoints.down("sm"));
     return (
         <>
-            <AccentedTreeView initiallyExpandedNodes={["frontend"]} selectionMode="disable">
+            <AccentedTreeView
+                intend={lessSm ? "small" : "regular"}
+                initiallyExpandedNodes={["frontend"]}
+                selectionMode="disable"
+            >
                 {[
                     {
                         id: "frontend",
@@ -39,7 +47,7 @@ export default function AboutSpecsHardSkillsBlock() {
                         children: [
                             {
                                 id: "desktop-datails",
-                                content: <TechnologiesTable data={technologies.desktop} />,
+                                content: <TechnologiesTable withoutBottomBorder={true} data={technologies.desktop} />,
                             },
                         ],
                     },
