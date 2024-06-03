@@ -173,27 +173,31 @@ export default function About() {
             <CustomBreadcrumbs sx={{ padding: "6px 8px", margin: 0 }}>
                 {(() => {
                     const items = [
-                        { label: "Miraxsage", link: "/" },
-                        {
-                            label: __("About"),
-                            subitems: [
-                                {
-                                    label: __("Profile"),
-                                    icon: <AssignmentIndIcon />,
-                                    link: "/profile",
-                                },
-                                {
-                                    label: __("Projects"),
-                                    icon: <RocketLaunchIcon />,
-                                    link: "/projects",
-                                },
-                                {
-                                    label: __("Interact"),
-                                    icon: <CallIcon />,
-                                    link: "/interact",
-                                },
-                            ],
-                        },
+                        ...(lessSm
+                            ? []
+                            : [
+                                  { label: "Miraxsage", link: "/" },
+                                  {
+                                      label: __("About"),
+                                      subitems: [
+                                          {
+                                              label: __("Profile"),
+                                              icon: <AssignmentIndIcon />,
+                                              link: "/profile",
+                                          },
+                                          {
+                                              label: __("Projects"),
+                                              icon: <RocketLaunchIcon />,
+                                              link: "/projects",
+                                          },
+                                          {
+                                              label: __("Interact"),
+                                              icon: <CallIcon />,
+                                              link: "/interact",
+                                          },
+                                      ],
+                                  },
+                              ]),
                     ];
                     if (activeCat) {
                         items.push({
@@ -225,7 +229,7 @@ export default function About() {
             <Box
                 sx={{
                     borderBottom: `1px solid ${theme.palette.divider}`,
-                    gridColumn: "span 2",
+                    gridColumn: "span 3",
                 }}
             ></Box>
             <Box className="flex h-full relative" sx={{ gridColumn: "span 2" }}>
@@ -286,11 +290,15 @@ export default function About() {
                         onUnfold={() => {
                             setChangeExpandedNodes(["biography", "experience", "specifications"]);
                         }}
-                        onClose={() => {
-                            setOpenedCats([]);
-                            setActiveCatAndBlock(null);
-                            if (lessLg) setCatsCollapsed(true);
-                        }}
+                        onClose={
+                            lessSm
+                                ? undefined
+                                : () => {
+                                      setOpenedCats([]);
+                                      setActiveCatAndBlock(null);
+                                      if (lessLg) setCatsCollapsed(true);
+                                  }
+                        }
                     />
 
                     <CustomScrollbar right="2px" top="2px" bottom="3px">

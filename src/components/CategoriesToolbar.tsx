@@ -9,6 +9,8 @@ import { motion } from "framer-motion";
 import { Box, useTheme } from "@mui/material";
 import { getThemeColor } from "./contexts/Theme";
 import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
+import { SxProps } from "@mui/material";
+import { CSSProperties } from "react";
 
 type CategoriesToolbarFoldProps = {
     onUnfold: () => void;
@@ -16,6 +18,7 @@ type CategoriesToolbarFoldProps = {
     onClose?: () => void;
     onFilter?: () => void;
     onFilterClear?: () => void;
+    style?: CSSProperties;
 };
 type CategoriesToolbarCollapseProps =
     | ({ collapsed: boolean; onRevealCollapse: (collapse: boolean) => void } & CategoriesToolbarFoldProps)
@@ -31,6 +34,7 @@ export default function CategoriesToolbar({
     onClose,
     onFilter,
     onFilterClear,
+    style,
 }: CategoriesToolbarProps) {
     const theme = useTheme();
     return (
@@ -39,6 +43,7 @@ export default function CategoriesToolbar({
             style={{
                 borderBottom: `1px solid ${theme.palette.divider}`,
                 background: getThemeColor("layoutBackground", theme),
+                ...style,
             }}
             animate={{ maxWidth: collapsed ? "39px" : "250px" }}
             className="flex"

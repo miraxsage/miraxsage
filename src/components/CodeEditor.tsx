@@ -49,6 +49,13 @@ export default function CustomCodeEditor({ lineHighlight, lineWrapping, ...props
     return (
         <Box
             sx={{
+                height: "100%",
+                "& .cm-theme": {
+                    height: "100%",
+                    "& .cm-editor": {
+                        height: "100%",
+                    },
+                },
                 "& .cm-gutters": {
                     backdropFilter: "blur(3px)",
                 },

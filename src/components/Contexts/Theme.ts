@@ -295,9 +295,9 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
         case "layoutBackground":
             return isDarkMode ? theme.palette.bg.dark : theme.palette.bg.light;
         case "tabRegularText":
-            return isDarkMode ? lighten(theme.palette.divider, 0.26) : darken(theme.palette.contrast.main, 0.1);
+            return isDarkMode ? lighten(theme.palette.divider, 0.26) : darken(theme.palette.contrast.main, 0.25);
         case "tabHoverText":
-            return isDarkMode ? theme.palette.contrast.main : darken(theme.palette.contrast.main, 0.2);
+            return isDarkMode ? theme.palette.contrast.main : darken(theme.palette.contrast.main, 0.3);
         case "tabActiveText":
             return isDarkMode ? theme.palette.contrast.light : theme.palette.primary.main;
         case "tabHoverBg":
@@ -307,9 +307,9 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
         case "scrollbarHoverHandle":
             return isDarkMode ? alpha(theme.palette.divider, 1) : alpha(theme.palette.divider, 1);
         case "tabIcon":
-            return isDarkMode ? lighten(theme.palette.divider, 0.25) : darken(theme.palette.contrast.dark, 0.08);
+            return isDarkMode ? lighten(theme.palette.divider, 0.25) : darken(theme.palette.contrast.dark, 0.1);
         case "tabHoverIcon":
-            return isDarkMode ? theme.palette.contrast.main : theme.palette.contrast.main;
+            return isDarkMode ? theme.palette.contrast.main : darken(theme.palette.contrast.main, 0.1);
 
         case "layoutGlow":
             return isDarkMode ? alpha(theme.palette.bg.light, 0.5) : theme.palette.bg.dark;
@@ -349,13 +349,13 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
                 0.15
             )});`;
         case "regularText":
-            return isDarkMode ? lighten(theme.palette.divider, 0.4) : darken(theme.palette.contrast.main, 0.6);
+            return isDarkMode ? lighten(theme.palette.divider, 0.4) : darken(theme.palette.contrast.main, 0.8);
         case "notelessText":
             return isDarkMode ? lighten(theme.palette.divider, 0.07) : lighten(theme.palette.contrast.main, 0.15);
         case "menuText":
-            return isDarkMode ? lighten(theme.palette.divider, 0.65) : darken(theme.palette.contrast.main, 0.15);
+            return isDarkMode ? lighten(theme.palette.divider, 0.65) : darken(theme.palette.contrast.main, 0.3);
         case "regularIcon":
-            return isDarkMode ? lighten(theme.palette.divider, 0.35) : darken(theme.palette.contrast.main, 0.05);
+            return isDarkMode ? lighten(theme.palette.divider, 0.35) : darken(theme.palette.contrast.main, 0.15);
         case "regularHoverText":
             return isDarkMode ? lighten(theme.palette.divider, 0.65) : darken(theme.palette.contrast.main, 0.8);
         case "regularHoverIcon":
