@@ -3,7 +3,6 @@ import AboutCategoriesList from "./CategoriesList";
 import { Alert, Box, useMediaQuery, useTheme } from "@mui/material";
 import AccentedTabs from "@/components/AccentedTabs";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
-import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import CallIcon from "@mui/icons-material/Call";
 import __ from "@/utilities/transtation";
 import React, { NamedExoticComponent, useLayoutEffect, useReducer, useRef, useState } from "react";
@@ -180,11 +179,6 @@ export default function About() {
                                   {
                                       label: __("About"),
                                       subitems: [
-                                          {
-                                              label: __("Profile"),
-                                              icon: <AssignmentIndIcon />,
-                                              link: "/profile",
-                                          },
                                           {
                                               label: __("Projects"),
                                               icon: <RocketLaunchIcon />,

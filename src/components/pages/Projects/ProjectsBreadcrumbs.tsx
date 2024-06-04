@@ -1,6 +1,5 @@
 import CustomBreadcrumbs, { CustomBreadcrumbsProps } from "@/components/Breadcrumbs";
 import __ from "@/utilities/transtation";
-import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import CallIcon from "@mui/icons-material/Call";
 import PersonIcon from "@mui/icons-material/Person";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -43,11 +42,6 @@ export default function ProjectsBreadcrumbs({ project, onBack }: ProjectsBreadcr
                                       label: __("Projects"),
                                       onClick: () => navigate("/projects"),
                                       subitems: [
-                                          {
-                                              label: __("Profile"),
-                                              icon: <AssignmentIndIcon />,
-                                              link: "/profile",
-                                          },
                                           {
                                               label: __("About"),
                                               icon: <PersonIcon />,

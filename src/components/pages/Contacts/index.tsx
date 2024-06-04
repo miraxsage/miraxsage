@@ -1,8 +1,7 @@
 import CustomBreadcrumbs, { CustomBreadcrumbsProps } from "@/components/Breadcrumbs";
 import Thankfullness from "./Thankfullness";
-import { Box, Button, MenuItem, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Button, MenuItem, Theme, useMediaQuery, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import PersonIcon from "@mui/icons-material/Person";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import __ from "@/utilities/transtation";
@@ -25,8 +24,9 @@ import { FeedbackSending } from "./FeedbackSending";
 import { AnimatePresence, motion } from "framer-motion";
 import classes from "classnames";
 import { RevealAsideMenuButton } from "@/components/layout/RevealAsideMenuButton";
+import { getThemeColor } from "@/components/contexts/Theme";
 
-function contactData(title: string, Icon: React.FC, link: string): DescriptionTableData[number] {
+function contactData(title: string, Icon: React.FC, link: string, theme: Theme): DescriptionTableData[number] {
     return [
         {
             title: title,
@@ -36,6 +36,7 @@ function contactData(title: string, Icon: React.FC, link: string): DescriptionTa
                         "& .MuiSvgIcon-root": {
                             fontSize: "20px",
                             marginRight: "8px",
+                            color: getThemeColor("regularHoverIcon", theme),
                             marginTop: title == "GitHub" ? "-3px" : "0px",
                         },
                     }}
@@ -184,11 +185,6 @@ export default function Contacts() {
                                 onClick: () => navigate("/interact"),
                                 subitems: [
                                     {
-                                        label: __("Profile"),
-                                        icon: <AssignmentIndIcon />,
-                                        link: "/profile",
-                                    },
-                                    {
                                         label: __("About"),
                                         icon: <PersonIcon />,
                                         link: "/about",
@@ -227,23 +223,29 @@ export default function Contacts() {
                     className={classes({ "container mx-auto": screenMode.full })}
                 >
                     <div>
-                        <CustomAccordion expandable={false} title="Социальные сети">
+                        <CustomAccordion expandable={false} title={__("Social networks")}>
                             <Box sx={{ marginLeft: "-1px" }}>
                                 <DescriptionTable withoutBottomBorder={true} withoutTopBorder={true}>
                                     {[
-                                        contactData("Telegram", TelegramIcon, "https://t.me/miraxsage"),
-                                        contactData("Email", AlternateEmailOutlinedIcon, "mailto:manin.maxim@mail.ru"),
+                                        contactData("Telegram", TelegramIcon, "https://t.me/miraxsage", theme),
+                                        contactData(
+                                            "Email",
+                                            AlternateEmailOutlinedIcon,
+                                            "mailto:manin.maxim@mail.ru",
+                                            theme
+                                        ),
                                         contactData(
                                             "LinkedIn",
                                             LinkedInIcon,
-                                            "https://www.linkedin.com/in/manin-maxim-ba74a6221/"
+                                            "https://www.linkedin.com/in/manin-maxim-ba74a6221/",
+                                            theme
                                         ),
-                                        contactData("GitHub", GitHub, "https://github.com/miraxsage/"),
+                                        contactData("GitHub", GitHub, "https://github.com/miraxsage/", theme),
                                     ]}
                                 </DescriptionTable>
                             </Box>
                         </CustomAccordion>
-                        <CustomAccordion expandable={false} title="Обратная связь">
+                        <CustomAccordion expandable={false} title={__("Feedback")}>
                             <Box
                                 component="form"
                                 onSubmit={submit}
@@ -308,7 +310,7 @@ export default function Contacts() {
                                     variant="outlined"
                                     onClick={submit}
                                 >
-                                    Отправить
+                                    {__("Submit")}
                                 </Button>
                             </Box>
                         </CustomAccordion>

@@ -148,7 +148,7 @@ export default function Projects() {
                             {
                                 [
                                     {
-                                        label: orderItem?.name,
+                                        label: orderItem?.name[lang],
                                         icon: OrderIcon ? (
                                             <Box
                                                 sx={{
@@ -183,16 +183,18 @@ export default function Projects() {
                                             .map((o) => {
                                                 const Icon = o.icon;
                                                 return {
-                                                    label: o.name,
+                                                    label: o.name[lang],
                                                     icon: <Icon />,
                                                     onClick: (item) =>
                                                         navigateToProjects(
                                                             navigate,
                                                             {
                                                                 order:
-                                                                    item.label == "По наименованию"
+                                                                    item.label ==
+                                                                    (lang == "ru" ? "По наименованию" : "By name")
                                                                         ? "name"
-                                                                        : item.label == "По рейтингу"
+                                                                        : item.label ==
+                                                                          (lang == "ru" ? "По рейтингу" : "By rating")
                                                                         ? "rating"
                                                                         : "techs",
                                                             },

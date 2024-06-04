@@ -4,6 +4,7 @@ import { getThemeColor } from "@/components/contexts/Theme";
 import RightFloralBackground from "./RightFloralBackground";
 import AgreementImage from "./AgreementImage";
 import GeometryWavesBackground from "./GeometryWavesBackground";
+import { useLanguage } from "@/store/appearanceSlice";
 
 type HeadlineTitleBlockProps = {
     children: string;
@@ -60,6 +61,7 @@ function HeadlineTitleBlock({ children, background, sx }: HeadlineTitleBlockProp
 
 function Headline({ sx }: { sx?: SxProps }) {
     const theme = useTheme();
+    const lang = useLanguage();
     return (
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "20px 0px", ...sx }}>
             <Box
@@ -86,7 +88,7 @@ function Headline({ sx }: { sx?: SxProps }) {
                         },
                     }}
                 >
-                    Большое спасибо!
+                    {lang.ru ? "Большое спасибо!" : "Thank you!"}
                 </HeadlineTitleBlock>
                 <HeadlineTitleBlock
                     background="dark-hatching"
@@ -102,7 +104,7 @@ function Headline({ sx }: { sx?: SxProps }) {
                         },
                     }}
                 >
-                    за Ваше внимание
+                    {lang.ru ? " за Ваше внимание" : "for Your attention"}
                 </HeadlineTitleBlock>
                 <HeadlineTitleBlock
                     background="light"
@@ -112,7 +114,7 @@ function Headline({ sx }: { sx?: SxProps }) {
                         position: "relative",
                     }}
                 >
-                    Большое спасибо!
+                    {lang.ru ? "Большое спасибо!" : "Thank you!"}
                 </HeadlineTitleBlock>
                 <HeadlineTitleBlock
                     background="dark"
@@ -124,7 +126,7 @@ function Headline({ sx }: { sx?: SxProps }) {
                         },
                     }}
                 >
-                    за Ваше внимание
+                    {lang.ru ? " за Ваше внимание" : "for Your attention"}
                 </HeadlineTitleBlock>
             </Box>
         </Box>
@@ -133,6 +135,7 @@ function Headline({ sx }: { sx?: SxProps }) {
 
 export default function Thankfullness() {
     const theme = useTheme();
+    const lang = useLanguage();
     return (
         <Box
             sx={{
@@ -229,16 +232,34 @@ export default function Thankfullness() {
                             },
                         }}
                     >
-                        <p>
-                            Я Вас сердечно благодарю за посещение моего скромного сайта и очень надеюсь, что у него
-                            получилось вызвать у Вас положительные эмоции визуального, эстетического, функционального
-                            плана и, возможно, Вам захотелось написать мне, задать вопрос или сделать предложение.
-                            Честно говоря, я буду очень рад получить от Вас обратную связь.
-                        </p>
-                        <p>
-                            Вы можете отправить мне сообщение в одной из указанных соцсетей (я чаще использую Telegram),
-                            по электронной почте или написать его прямо на этой станице через форму обратной связи ниже.
-                        </p>
+                        {lang.ru ? (
+                            <>
+                                <p>
+                                    Я Вас сердечно благодарю за посещение моего скромного сайта и очень надеюсь, что у
+                                    него получилось вызвать у Вас положительные эмоции визуального, эстетического,
+                                    функционального плана и, возможно, Вам захотелось написать мне, задать вопрос или
+                                    сделать предложение. Честно говоря, я буду очень рад получить от Вас обратную связь.
+                                </p>
+                                <p>
+                                    Вы можете отправить мне сообщение в одной из указанных соцсетей (я чаще использую
+                                    Telegram), по электронной почте или написать его прямо на этой станице через форму
+                                    обратной связи ниже.
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <p>
+                                    I sincerely thank you for visiting my humble website and I truly hope it has managed
+                                    to evoke positive visual, aesthetic, and functional emotions in you. Perhaps you
+                                    might even feel inclined to write to me, ask a question, or make a suggestion.
+                                    Honestly, I would be very happy to receive your feedback.
+                                </p>
+                                <p>
+                                    You can send me a message via one of the listed social networks (I use Telegram more
+                                    often), by email, or directly on this page using the feedback form below.
+                                </p>
+                            </>
+                        )}
                     </Box>
                 </Box>
             </Box>

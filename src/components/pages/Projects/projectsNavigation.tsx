@@ -6,9 +6,9 @@ import { NavigateFunction, useLocation, useParams } from "react-router-dom";
 import { findTechnology, isCategoryTechnology, isTechnology, technologies } from "../About/Blocks/specs/Technologies";
 
 export const projectsOrderItems = [
-    { slug: "name", name: "По наименованию", icon: PersonIcon },
-    { slug: "rating", name: "По рейтингу", icon: StarIcon },
-    { slug: "techs", name: "По технологиям", icon: WebhookIcon },
+    { slug: "name", name: { ru: "По наименованию", en: "By name" }, icon: PersonIcon },
+    { slug: "rating", name: { ru: "По рейтингу", en: "By rating" }, icon: StarIcon },
+    { slug: "techs", name: { ru: "По технологиям", en: "By technology" }, icon: WebhookIcon },
 ] as const;
 
 export type ProjectsLocation = {

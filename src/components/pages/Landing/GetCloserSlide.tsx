@@ -77,6 +77,10 @@ function SpecialButton({ children, link, sx }: SpecialButtonProps) {
     );
 }
 
+function arrayContainsSubstring(array: string[], substring: string) {
+    return array.some((item) => item.includes(substring));
+}
+
 export default function GetCloserSlide() {
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;
@@ -90,7 +94,11 @@ export default function GetCloserSlide() {
     const sm = useMediaQuery(theme.breakpoints.down("sm"));
     const lg = useMediaQuery(theme.breakpoints.down("lg"));
     const _2xl = useMediaQuery(theme.breakpoints.down("2xl"));
-    const [openedNodes, setOpenedNodes] = useState(["bio", "exp", "spec"]);
+    const [openedNodes, setOpenedNodes] = useState([
+        "/about/biography/general",
+        "/about/experience/technologies",
+        "/about/specifications",
+    ]);
 
     return (
         <Box
@@ -328,8 +336,8 @@ export default function GetCloserSlide() {
                     >
                         <Box
                             sx={{
-                                ...(openedNodes.includes("bio")
-                                    ? openedNodes.includes("exp")
+                                ...(arrayContainsSubstring(openedNodes, "biography")
+                                    ? arrayContainsSubstring(openedNodes, "experience")
                                         ? {
                                               height: sm ? "258.5px" : lg ? "281.5px" : _2xl ? "296.5px" : "311.5px",
                                               width: "95px",
@@ -338,7 +346,7 @@ export default function GetCloserSlide() {
                                               height: sm ? "178.5px" : lg ? "193.5px" : _2xl ? "201.5px" : "214px",
                                               width: "53px",
                                           }
-                                    : openedNodes.includes("exp")
+                                    : arrayContainsSubstring(openedNodes, "experience")
                                     ? { height: sm ? "187px" : lg ? "201px" : _2xl ? "209px" : "219px", width: "95px" }
                                     : {
                                           height: sm ? "106px" : lg ? "112px" : _2xl ? "117px" : "120px",

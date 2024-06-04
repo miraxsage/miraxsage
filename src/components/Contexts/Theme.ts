@@ -359,7 +359,7 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
         case "regularHoverText":
             return isDarkMode ? lighten(theme.palette.divider, 0.65) : darken(theme.palette.contrast.main, 0.8);
         case "regularHoverIcon":
-            return isDarkMode ? lighten(theme.palette.divider, 0.55) : darken(theme.palette.contrast.main, 0.5);
+            return isDarkMode ? lighten(theme.palette.divider, 0.55) : darken(theme.palette.contrast.main, 0.25);
         case "accentedText":
             return alpha(theme.palette.primary.main, 0.75);
         case "accentedHoverText":
