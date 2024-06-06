@@ -10,7 +10,7 @@ import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import { getThemeColor } from "../contexts/Theme";
 import { motion } from "framer-motion";
-import { useAsideMenuVisibility, useColorMode, useLanguage, useScreenMode } from "@/store/appearanceSlice";
+import { useAsideMenuVisibility, useColorMode, useLanguage, useScreenMode, useViewMode } from "@/store/appearanceSlice";
 
 export default function AsideMenu() {
     const colorMode = useColorMode();
@@ -18,6 +18,7 @@ export default function AsideMenu() {
 
     const theme = useTheme();
     const asideMenuVisibility = useAsideMenuVisibility();
+    const viewMode = useViewMode();
     const isDarkMode = colorMode.dark;
     const lang = useLanguage();
     return (
@@ -29,6 +30,8 @@ export default function AsideMenu() {
             }}
         >
             <AccentedTabs
+                activeTab={viewMode.value}
+                onTabSelect={(tab) => viewMode.update(tab.id as "desktop" | "console")}
                 underline={false}
                 mode="full"
                 orientation="vertical"
@@ -43,8 +46,8 @@ export default function AsideMenu() {
                 }}
             >
                 {[
-                    { id: "interface-mode", icon: <MonitorIcon /> },
-                    { id: "console-mode", icon: <TerminalIcon /> },
+                    { id: "desktop", icon: <MonitorIcon /> },
+                    { id: "console", icon: <TerminalIcon /> },
                     {
                         id: "color-mode",
                         icon: isDarkMode ? <LightModeIcon /> : <Brightness4Icon />,

@@ -218,10 +218,10 @@ const AccentedTreeItem = styled(TreeItem, {
                           color: getThemeColor(isAccented ? "secondaryHoverText" : "accentedHoverText", theme),
                           background: getThemeColor(isAccented ? "secondaryBg" : "accentedBg", theme),
                       },
-                      [`& > .MuiTreeItem-content.Mui-selected:hover`]: {
+                      [`&.MuiTreeItem-root > .MuiTreeItem-content.Mui-selected:hover`]: {
                           background: getThemeColor(isAccented ? "secondaryHoverBg" : "accentedHoverBg", theme),
                       },
-                      "& > .MuiTreeItem-content:hover": {
+                      "&.MuiTreeItem-root > .MuiTreeItem-content:hover": {
                           background: getThemeColor(isAccented ? "secondaryHoverBg" : "regularHoverBg", theme),
                       },
                   }),

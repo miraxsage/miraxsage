@@ -6,6 +6,7 @@ import { getThemeColor } from "../contexts/Theme";
 import { useLocation } from "react-router-dom";
 import { useScreenMode } from "@/store/appearanceSlice";
 import classes from "classnames";
+import SiteMap from "./SiteMap";
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -68,7 +69,10 @@ export default function Layout({ children }: LayoutProps) {
                     }}
                 >
                     <AsideMenu />
-                    <div className="flex-grow max-w-[100dvw]">{children}</div>
+                    <div className="flex-grow max-w-[100dvw] relative">
+                        {children}
+                        <SiteMap />
+                    </div>
                 </Box>
                 <BottomBar />
             </Box>

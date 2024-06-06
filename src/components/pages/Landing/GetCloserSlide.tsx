@@ -32,7 +32,7 @@ type SpecialButtonProps = {
     sx?: SxProps;
     link: string;
 };
-function SpecialButton({ children, link, sx }: SpecialButtonProps) {
+export function SpecialButton({ children, link, sx }: SpecialButtonProps) {
     const isDarkMode = useColorMode().dark;
     const theme = useTheme();
     const textColor = useLandingColor("contrast");

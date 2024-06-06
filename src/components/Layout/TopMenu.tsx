@@ -1,17 +1,23 @@
 import AccentedTabs, { AccentedTabProps } from "../AccentedTabs";
 import { HorizontalPanelButton } from "@/components/PanelButtons";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Box } from "@mui/material";
-import { useThemeColor } from "../contexts/Theme";
+import { Box, alpha, useTheme } from "@mui/material";
+import { getThemeColor, useThemeColor } from "../contexts/Theme";
 import __ from "@/utilities/transtation";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSiteMapVisibility } from "@/store/appearanceSlice";
 
 export default function TopMenu() {
     const navigate = useNavigate();
     const location = useLocation();
+    const theme = useTheme();
+    const siteMapVisibility = useSiteMapVisibility();
 
     const onTabSelect = (tab: AccentedTabProps) => {
-        navigate(`/${tab.id == "miraxsage" ? "" : tab.id}`);
+        if (siteMapVisibility.shown) {
+            siteMapVisibility.update("collapsed");
+            setTimeout(() => navigate(`/${tab.id == "miraxsage" ? "" : tab.id}`), 300);
+        } else navigate(`/${tab.id == "miraxsage" ? "" : tab.id}`);
     };
 
     return (
@@ -24,7 +30,25 @@ export default function TopMenu() {
             }}
             className="flex"
         >
-            <HorizontalPanelButton iconMode={true}>
+            <HorizontalPanelButton
+                iconMode={true}
+                onClick={siteMapVisibility.toggle}
+                sx={{
+                    transition: "all 0.4s",
+                    ...(siteMapVisibility.shown
+                        ? {
+                              "&.MuiButton-root": {
+                                  color: getThemeColor("accentedText", theme),
+                                  backgroundColor: alpha(getThemeColor("accentedBg", theme), 0.07),
+                                  "&:hover": {
+                                      backgroundColor: getThemeColor("accentedHoverBg", theme),
+                                      color: getThemeColor("accentedHoverText", theme),
+                                  },
+                              },
+                          }
+                        : {}),
+                }}
+            >
                 <MenuIcon />
             </HorizontalPanelButton>
             <AccentedTabs underline={false} mode="full" onTabSelect={onTabSelect}>

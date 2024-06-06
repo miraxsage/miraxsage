@@ -33,6 +33,11 @@ type AboutCategoriesListProps = {
     | Omit<AccentedTreeViewUnselectableProps, "children">
 );
 
+// eslint-disable-next-line react-refresh/only-export-components
+export function abouteCategoriesTreeViewData() {
+    return categoriesToTreeItems(categories);
+}
+
 export default function AboutCategoriesList({ activeItem, ...props }: AboutCategoriesListProps) {
     useLanguage();
     return (

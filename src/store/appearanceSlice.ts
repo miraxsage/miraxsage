@@ -8,6 +8,7 @@ interface AppearanceConfig {
     viewMode: "desktop" | "console";
     screenMode: "full" | "window";
     asideMenuVisibility: "shown" | "collapsed";
+    siteMapVisibility: "shown" | "collapsed";
 }
 
 const defaultConfig: AppearanceConfig = {
@@ -16,6 +17,7 @@ const defaultConfig: AppearanceConfig = {
     viewMode: "desktop",
     screenMode: "window",
     asideMenuVisibility: "shown",
+    siteMapVisibility: "collapsed",
 };
 
 type StateConfig = {
@@ -47,6 +49,9 @@ const slice = createSlice({
         asideMenuVisibility: (state, options: PayloadAction<AppearanceConfig["asideMenuVisibility"]>) => {
             state.asideMenuVisibility = options.payload;
         },
+        siteMapVisibility: (state, options: PayloadAction<AppearanceConfig["siteMapVisibility"]>) => {
+            state.siteMapVisibility = options.payload;
+        },
     },
 });
 
@@ -54,7 +59,10 @@ const appearanceListener = createListenerMiddleware<StateConfig>();
 appearanceListener.startListening({
     predicate: (action) => action.type.startsWith("appearance"),
     effect(_action, api) {
-        localStorage.setItem("appearanceConfig", JSON.stringify(api.getState().appearance));
+        localStorage.setItem(
+            "appearanceConfig",
+            JSON.stringify({ ...api.getState().appearance, siteMapVisibility: "collapsed" })
+        );
     },
 });
 const listener = appearanceListener.middleware;
@@ -170,5 +178,30 @@ export function useAsideMenuVisibility() {
             ),
         toggle: () =>
             dispatch(slice.actions.asideMenuVisibility(asideMenuVisibility == "shown" ? "collapsed" : "shown")),
+    };
+}
+
+export function useSiteMapVisibility() {
+    const siteMapVisibility = useAppearance((appearance) => appearance.siteMapVisibility);
+    const dispatch = useDispatch();
+    return {
+        value: siteMapVisibility,
+        shown: siteMapVisibility == "shown",
+        collapsed: siteMapVisibility == "collapsed",
+        update: (
+            newSiteMapVisibility:
+                | AppearanceConfig["siteMapVisibility"]
+                | ((
+                      oldAsideMenuVisibility: AppearanceConfig["siteMapVisibility"]
+                  ) => AppearanceConfig["siteMapVisibility"])
+        ) =>
+            dispatch(
+                slice.actions.siteMapVisibility(
+                    typeof newSiteMapVisibility == "function"
+                        ? newSiteMapVisibility(siteMapVisibility)
+                        : newSiteMapVisibility
+                )
+            ),
+        toggle: () => dispatch(slice.actions.siteMapVisibility(siteMapVisibility == "shown" ? "collapsed" : "shown")),
     };
 }

@@ -1,4 +1,4 @@
-import { Box, alpha, useMediaQuery, useTheme } from "@mui/material";
+import { Box, alpha, useTheme } from "@mui/material";
 import { HorizontalPanelButton } from "../PanelButtons";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
@@ -6,13 +6,11 @@ import VKIcon from "../icons/VKIcon";
 import TelegramIcon from "../icons/TelegramIcon";
 import { GitHub as GithubIcon } from "@mui/icons-material";
 import { useThemeColor } from "../contexts/Theme";
-import { useColorMode, useLanguage } from "@/store/appearanceSlice";
+import { useColorMode } from "@/store/appearanceSlice";
 
 export default function BottomBar() {
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;
-    const lessSm = useMediaQuery(theme.breakpoints.down("sm"));
-    const lang = useLanguage();
     return (
         <Box
             component="footer"
@@ -30,11 +28,7 @@ export default function BottomBar() {
                 className="flex-grow flex items-center px-[22px] py-[18px] leading-[1.2rem] justify-center"
                 style={{ color: alpha(theme.palette.divider, isDarkMode ? 0.5 : 1) }}
             >
-                {lessSm
-                    ? ""
-                    : lang.ru
-                    ? "© 2024 Miraxsage. Все права защищены."
-                    : "© 2024 Miraxsage. All rights reserved."}
+                © 2024 Miraxsage
             </div>
             <HorizontalPanelButton dividerSide="left" iconMode={true}>
                 <TelegramIcon />

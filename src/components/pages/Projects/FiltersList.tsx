@@ -6,14 +6,20 @@ import { capitalize } from "@/utilities/string";
 import AccentedTreeView, { AccentedTreeItemProps, AccentedTreeViewMultipleProps } from "@/components/AccentedTreeView";
 import filters, { ProjectsFiltersInterface } from "./Filters";
 
-function filtersToTreeItems(filters: ProjectsFiltersInterface): AccentedTreeItemProps[] {
+function filtersToTreeItems(filters: ProjectsFiltersInterface, activeItem?: string): AccentedTreeItemProps[] {
     const res = Object.entries(filters).map(([id, details]) => ({
         id,
+        isAccented: id == activeItem,
         title: __(capitalize(id)),
         icon: details.icon,
         children: details.items ? filtersToTreeItems(details.items) : undefined,
     }));
     return res;
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function projectsCategoriesTreeViewData() {
+    return filtersToTreeItems(filters);
 }
 
 type ProjectFiltersListProps = Omit<
@@ -25,20 +31,24 @@ type ProjectFiltersListProps = Omit<
     | "checkedAndSelected"
     | "checkedItems"
     | "selectedItems"
-> & { activeItems: string[] };
+> & { selectedItems?: string[]; activeItem?: string; checkable?: boolean };
 
-export default function ProjectFiltersList({ activeItems, ...props }: ProjectFiltersListProps) {
+export default function ProjectFiltersList({
+    selectedItems,
+    activeItem,
+    checkable,
+    ...props
+}: ProjectFiltersListProps) {
     useLanguage();
     return (
         <AccentedTreeView
             selectionMode="multiple"
-            checkable={true}
-            checkedAndSelected={true}
+            {...(checkable !== false ? { checkable: true, checkedAndSelected: true } : {})}
             initiallyExpandedNodes={["frontend", "backend"]}
-            {...(activeItems ? { checkedItems: activeItems, selectedItems: activeItems } : {})}
+            {...(selectedItems ? { checkedItems: selectedItems, selectedItems } : {})}
             {...props}
         >
-            {filtersToTreeItems(filters)}
+            {filtersToTreeItems(filters, activeItem)}
         </AccentedTreeView>
     );
 }

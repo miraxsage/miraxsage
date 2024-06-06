@@ -101,7 +101,7 @@ export default function Projects() {
                     <CustomScrollbar right="2px" top="2px" bottom="3px">
                         <ProjectFiltersList
                             expandedNodes={changeExpandedNodes}
-                            activeItems={techs}
+                            selectedItems={techs}
                             onItemsChecked={(checkedProjects) =>
                                 navigateToProjects(
                                     navigate,
