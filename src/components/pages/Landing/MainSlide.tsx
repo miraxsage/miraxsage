@@ -3,7 +3,7 @@ import FloatingLine from "./FloatingLine";
 import FloatingBlock from "./FloatingBlock";
 import { getThemeColor } from "@/components/contexts/Theme";
 import { mix } from "@/utilities/colors";
-import PersonIcon from "@mui/icons-material/Person";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import LanguageIcon from "@/components/icons/LanguageIcon";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
@@ -297,7 +297,7 @@ function SlideContent() {
                         >
                             {!smallScreen && (
                                 <TransparentButton onClick={linkClick("/about")}>
-                                    <PersonIcon />
+                                    <AssignmentIndIcon />
                                     {"\u00A0"}_{__("about")}
                                 </TransparentButton>
                             )}

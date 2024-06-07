@@ -3,7 +3,7 @@ import "@/utilities/cookie";
 import { SxProps, useMediaQuery, useTheme } from "@mui/material";
 import MainLayout from "./layout/MainLayout";
 import { useThemeColor } from "./contexts/Theme";
-import { useAsideMenuVisibility, useLanguage, useScreenMode } from "@/store/appearanceSlice";
+import { useAsideMenuVisibility, useLanguage, useScreenMode, useViewMode } from "@/store/appearanceSlice";
 import { ReactContentProps } from "@/types/react";
 import { Link, Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Link as MuiLink } from "@mui/material";
@@ -98,17 +98,21 @@ function AppContent() {
     const sm = useMediaQuery(theme.breakpoints.down("md"));
     const asideMenuVisibility = useAsideMenuVisibility();
     const screenMode = useScreenMode();
+    const viewMode = useViewMode();
     const appearanceBeforeSmallScreen = useRef({
         asideMenuVisibility: asideMenuVisibility.value,
         screenMode: screenMode.value,
+        viewMode: viewMode.value,
     });
     useEffect(() => {
         if (sm) {
             appearanceBeforeSmallScreen.current.asideMenuVisibility = asideMenuVisibility.value;
             appearanceBeforeSmallScreen.current.screenMode = screenMode.value;
+            appearanceBeforeSmallScreen.current.viewMode = viewMode.value;
         }
         asideMenuVisibility.update(sm ? "collapsed" : appearanceBeforeSmallScreen.current.asideMenuVisibility);
         screenMode.update(sm ? "full" : appearanceBeforeSmallScreen.current.screenMode);
+        viewMode.update(sm ? "desktop" : appearanceBeforeSmallScreen.current.viewMode);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sm]);
     return (

@@ -183,7 +183,6 @@ function MobileSiteMapTreeView() {
         <Box sx={{ display: "flex", flexDirection: "column" }}>
             <ColorModeButton sx={{ gridArea: "1/5/1/5" }} />
             <LanguageButton sx={{ gridArea: "2/5/2/5" }} />
-            <ViewModeButton sx={{ gridArea: "4/5/4/5" }} />
             <AccentedTreeView
                 intend="double"
                 initiallyExpandedNodes={["resume", "portfolio", "contacts"]}
@@ -325,7 +324,6 @@ function ContactButton({
             </>
         );
     }
-
     const theme = useTheme();
     const contactBorderColor = accented ? getThemeColor("secondaryText", theme) : theme.palette.divider;
     const contactsColor = getThemeColor(accented ? "secondaryHoverText" : "regularText", theme);
@@ -558,8 +556,8 @@ export default function SiteMap() {
                                     </SpecialButton>
                                     <ColorModeButton sx={{ gridArea: "1/5/1/5" }} />
                                     <LanguageButton sx={{ gridArea: "2/5/2/5" }} />
-                                    <ScreenModeButton sx={{ gridArea: "3/5/3/5" }} />
-                                    <ViewModeButton sx={{ gridArea: "4/5/4/5" }} />
+                                    {!lessMdScreen && <ScreenModeButton sx={{ gridArea: "3/5/3/5" }} />}
+                                    {!lessMdScreen && <ViewModeButton sx={{ gridArea: "4/5/4/5" }} />}
                                 </Box>
                                 <Box
                                     sx={{

@@ -2,7 +2,7 @@ import CustomBreadcrumbs, { CustomBreadcrumbsProps } from "@/components/Breadcru
 import Thankfullness from "./Thankfullness";
 import { Box, Button, MenuItem, Theme, useMediaQuery, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import PersonIcon from "@mui/icons-material/Person";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import __ from "@/utilities/transtation";
 import CustomAccordion from "@/components/Accordion";
@@ -186,7 +186,7 @@ export default function Contacts() {
                                 subitems: [
                                     {
                                         label: __("About"),
-                                        icon: <PersonIcon />,
+                                        icon: <AssignmentIndIcon />,
                                         link: "/about",
                                     },
                                     {
