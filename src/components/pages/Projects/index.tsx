@@ -40,7 +40,7 @@ export default function Projects() {
             className="grid h-full"
             sx={{ gridTemplateRows: "auto minmax(0, 1fr)", gridTemplateColumns: "minmax(0, 1fr)" }}
         >
-            <ProjectsBreadcrumbs />
+            {!lessMd && <ProjectsBreadcrumbs />}
             <Box
                 sx={{
                     display: "grid",

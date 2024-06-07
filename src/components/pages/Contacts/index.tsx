@@ -174,33 +174,35 @@ export default function Contacts() {
     };
     return (
         <Box sx={{ display: "grid", gridTemplateRows: "auto minmax(0, 1fr)", height: "100%", position: "relative" }}>
-            <Box sx={{ display: "flex", borderBottom: 1, borderColor: "divider" }}>
-                <RevealAsideMenuButton />
-                <CustomBreadcrumbs sx={{ padding: "6px 8px", margin: 0, flexGrow: 1 }}>
-                    {(() => {
-                        const items = [
-                            { label: "Miraxsage", link: "/" },
-                            {
-                                label: __("Interact"),
-                                onClick: () => navigate("/interact"),
-                                subitems: [
-                                    {
-                                        label: __("About"),
-                                        icon: <AssignmentIndIcon />,
-                                        link: "/about",
-                                    },
-                                    {
-                                        label: __("Projects"),
-                                        icon: <RocketLaunchIcon />,
-                                        link: "/projects",
-                                    },
-                                ],
-                            },
-                        ];
-                        return items as CustomBreadcrumbsProps["children"];
-                    })()}
-                </CustomBreadcrumbs>
-            </Box>
+            {!md && (
+                <Box sx={{ display: "flex", borderBottom: 1, borderColor: "divider" }}>
+                    <RevealAsideMenuButton />
+                    <CustomBreadcrumbs sx={{ padding: "6px 8px", margin: 0, flexGrow: 1 }}>
+                        {(() => {
+                            const items = [
+                                { label: "Miraxsage", link: "/" },
+                                {
+                                    label: __("Interact"),
+                                    onClick: () => navigate("/interact"),
+                                    subitems: [
+                                        {
+                                            label: __("About"),
+                                            icon: <AssignmentIndIcon />,
+                                            link: "/about",
+                                        },
+                                        {
+                                            label: __("Projects"),
+                                            icon: <RocketLaunchIcon />,
+                                            link: "/projects",
+                                        },
+                                    ],
+                                },
+                            ];
+                            return items as CustomBreadcrumbsProps["children"];
+                        })()}
+                    </CustomBreadcrumbs>
+                </Box>
+            )}
             <CustomScrollbar sx={{ gridArea: "2/1/2/1" }}>
                 <Thankfullness />
                 <Box
