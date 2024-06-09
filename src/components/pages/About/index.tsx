@@ -260,7 +260,6 @@ export default function About() {
                               }
                             : {}),
                         gridTemplateRows: "auto minmax(0, 1fr)",
-                        clipPath: "xywh(0 0 calc(100% + 1.5px) 100%)",
                     }}
                 >
                     {lessLg && (
@@ -293,15 +292,16 @@ export default function About() {
                                       if (lessLg) setCatsCollapsed(true);
                                   }
                         }
+                        style={{ overflow: "hidden" }}
                     />
 
                     <CustomScrollbar right="2px" top="2px" bottom="3px">
                         <motion.div
                             initial={false}
                             style={{
-                                height: "100%",
                                 background: getThemeColor("layoutBackground", theme),
                                 overflow: "hidden",
+                                minHeight: "100%",
                             }}
                             animate={{
                                 maxWidth: catsCollapsed ? "39px" : "230px",

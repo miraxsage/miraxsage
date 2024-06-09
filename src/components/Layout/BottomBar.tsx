@@ -2,7 +2,7 @@ import { Box, alpha, useMediaQuery, useTheme } from "@mui/material";
 import { HorizontalPanelButton } from "../PanelButtons";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
-import VKIcon from "../icons/VKIcon";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import TelegramIcon from "../icons/TelegramIcon";
 import { GitHub as GithubIcon } from "@mui/icons-material";
 import { useThemeColor } from "../contexts/Theme";
@@ -10,6 +10,9 @@ import { useColorMode } from "@/store/appearanceSlice";
 
 export default function BottomBar() {
     const theme = useTheme();
+    const goTo = (link: string) => () => {
+        window.open(link, "_blank");
+    };
     const isDarkMode = useColorMode().dark;
     const smScreen = useMediaQuery(theme.breakpoints.down("sm"));
     return (
@@ -36,16 +39,36 @@ export default function BottomBar() {
                     </div>
                 </>
             )}
-            <HorizontalPanelButton dividerSide="left" dividerSize={smScreen ? "removed" : "full"} iconMode={true}>
+            <HorizontalPanelButton
+                onClick={goTo("https://t.me/miraxsage")}
+                dividerSide="left"
+                dividerSize={smScreen ? "removed" : "full"}
+                iconMode={true}
+            >
                 <TelegramIcon />
             </HorizontalPanelButton>
-            <HorizontalPanelButton dividerSide="left" dividerSize="squeezed" iconMode={true}>
+            <HorizontalPanelButton
+                onClick={goTo("mailto:manin.maxim@mail.ru")}
+                dividerSide="left"
+                dividerSize="squeezed"
+                iconMode={true}
+            >
                 <AlternateEmailOutlinedIcon />
             </HorizontalPanelButton>
-            <HorizontalPanelButton dividerSide="left" dividerSize="squeezed" iconMode={true}>
-                <VKIcon />
+            <HorizontalPanelButton
+                onClick={goTo("https://www.linkedin.com/in/manin-maxim-ba74a6221/")}
+                dividerSide="left"
+                dividerSize="squeezed"
+                iconMode={true}
+            >
+                <LinkedInIcon />
             </HorizontalPanelButton>
-            <HorizontalPanelButton dividerSide="left" dividerSize="squeezed" iconMode={true}>
+            <HorizontalPanelButton
+                onClick={goTo("https://github.com/miraxsage/")}
+                dividerSide="left"
+                dividerSize="squeezed"
+                iconMode={true}
+            >
                 <GithubIcon />
             </HorizontalPanelButton>
         </Box>

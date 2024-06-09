@@ -40,11 +40,12 @@ export default function Projects() {
             className="grid h-full"
             sx={{ gridTemplateRows: "auto minmax(0, 1fr)", gridTemplateColumns: "minmax(0, 1fr)" }}
         >
-            {!lessMd && <ProjectsBreadcrumbs />}
+            {!lessMd ? <ProjectsBreadcrumbs /> : <div></div>}
             <Box
                 sx={{
                     display: "grid",
                     position: "relative",
+                    height: "100%",
                     gridTemplate: "minmax(0, 1fr) / 250px 1px minmax(0, 1fr)",
                     [theme.breakpoints.down("lg")]: {
                         gridTemplate: "minmax(0, 1fr) / minmax(0, 1fr)",
@@ -226,6 +227,10 @@ export default function Projects() {
                                 "@media (max-width: 450px)": {
                                     padding: "15px",
                                     gridTemplateColumns: "340px",
+                                },
+                                "@media (max-width: 375px)": {
+                                    padding: "15px",
+                                    gridTemplateColumns: "330px",
                                 },
                                 justifyContent: "center",
                                 gap: "25px",

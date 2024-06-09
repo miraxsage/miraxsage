@@ -110,6 +110,12 @@ export default function ProjectPage() {
                     position: "relative",
                     top: "-2px",
                 },
+                [theme.breakpoints.down("sm")]: {
+                    gridTemplateColumns: "auto auto auto",
+                    "& a": {
+                        padding: "8px 10px",
+                    },
+                },
             }}
         >
             <LinkButton
@@ -286,6 +292,11 @@ export default function ProjectPage() {
                                                                 },
                                                                 [theme.breakpoints.down("md")]: {
                                                                     padding: "0 15px 15px",
+                                                                },
+                                                                "@media (max-width: 500px)": {
+                                                                    "& p": {
+                                                                        hyphens: "auto",
+                                                                    },
                                                                 },
                                                             }}
                                                         >

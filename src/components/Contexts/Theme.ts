@@ -90,6 +90,8 @@ const basicTheme = {
                             fontStyle: "normal",
                             fontDisplay: "swap",
                             fontWight: 400,
+                            ascentOverride: "100%",
+                            descentOverride: "30%",
                             src: `url("${NeueMachinaRegular}")`,
                         },
                     ],

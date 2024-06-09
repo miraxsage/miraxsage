@@ -151,7 +151,6 @@ export default function Contacts() {
                 message: lang == "ru" ? "Выполняется отправка сообщения" : "Message submitting is being performed",
             });
             const res = await sendForm(fields);
-            //const res = await new Promise((resolve) => setTimeout(() => resolve(true), 5000));
             if (actualFeedback.current) {
                 if (res) {
                     setName("");

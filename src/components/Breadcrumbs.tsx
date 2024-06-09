@@ -88,8 +88,9 @@ export default function CustomBreadcrumbs({
                                 : revealMenuHandler(breadcrumb)
                         }
                         onClick={(e: React.MouseEventHandler) => {
-                            if (breadcrumb.subitems && breadcrumb.subitems.length && withoutExpandIcon)
-                                revealMenuHandler(breadcrumb)(e);
+                            if (breadcrumb.link && breadcrumb.link != window.location.pathname)
+                                return navigate(breadcrumb.link);
+                            if (breadcrumb.subitems && breadcrumb.subitems.length) revealMenuHandler(breadcrumb)(e);
                             if (breadcrumb.onClick) breadcrumb.onClick(breadcrumb);
                         }}
                     />

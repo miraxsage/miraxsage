@@ -7,6 +7,7 @@ function Image({ img, side }: Omit<ProjectContentImageProps, "slug">) {
 export function Component({ onImageClick }: ProjectContentProps) {
     return (
         <ProjectContent onImageClick={onImageClick}>
+            <br />
             <p>
                 <Image img={1} />
                 ПМК Комплектация – приложение необходимое для учета документооборота на кафедре. Оно позволяет вести

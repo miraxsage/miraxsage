@@ -41,6 +41,10 @@ export function ProjectContentImage({ img, side = "left", slug }: ProjectContent
                     width: "340px",
                     height: "179px",
                 },
+                "@media (max-width: 375px)": {
+                    width: "330px",
+                    height: "173px",
+                },
             }}
         />
     );

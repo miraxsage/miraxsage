@@ -290,32 +290,25 @@ function SlideContent() {
                                     width: "100%",
                                     height: "100%",
                                     borderRadius: "50%",
-                                    filter: "blur(25px)",
                                     background: getThemeColor("barBackground", theme),
+                                    filter: "blur(25px)",
                                 },
                             }}
                         >
-                            {!smallScreen && (
-                                <TransparentButton onClick={linkClick("/about")}>
-                                    <AssignmentIndIcon />
-                                    {"\u00A0"}_{__("about")}
-                                </TransparentButton>
-                            )}
+                            <TransparentButton onClick={linkClick("/about")}>
+                                <AssignmentIndIcon />
+                                {!smallScreen && "\u00A0_" + __("about")}
+                            </TransparentButton>
                             <TransparentButton onClick={langHook.toggle}>
                                 <LanguageIcon language={lang} />
                             </TransparentButton>
-                            <TransparentButton
-                                onClick={colorModeHook.toggle}
-                                dividerSize={smallScreen ? "collapsed" : "squeezed"}
-                            >
+                            <TransparentButton onClick={colorModeHook.toggle}>
                                 {!isDarkMode ? <Brightness4Icon /> : <LightModeIcon />}
                             </TransparentButton>
-                            {!smallScreen && (
-                                <TransparentButton onClick={linkClick("/projects")} dividerSize="collapsed">
-                                    <RocketLaunchIcon />
-                                    {"\u00A0"}_{__("projects")}
-                                </TransparentButton>
-                            )}
+                            <TransparentButton onClick={linkClick("/projects")} dividerSize="collapsed">
+                                <RocketLaunchIcon />
+                                {!smallScreen && "\u00A0_" + __("projects")}
+                            </TransparentButton>
                         </Box>
                     </Box>
                     <Box
@@ -444,6 +437,7 @@ export default function MainSlide({ scrollObservable }: MainSlideProps) {
     const pageBgColor = getThemeColor("pageBgColor", theme);
     const colorMode = useColorMode().mode;
     const rootRef = useRef<HTMLDivElement | undefined>();
+    const smallScreen = useMediaQuery(theme.breakpoints.down("sm"));
     useEffect(() => {
         if (!scrollObservable) return;
         scrollObservable.onChange(() => {
@@ -452,10 +446,12 @@ export default function MainSlide({ scrollObservable }: MainSlideProps) {
             rootRef.current.style.opacity = (
                 1 - rangeProgress(scrollObservable.scrollTop, vh * 0.1, vh * 0.5)
             ).toString();
-            rootRef.current.style.filter = `blur(${
-                rangeProgress(scrollObservable.scrollTop, vh * 0.25, vh * 0.5) * 10
-            }px)`;
+            if (!smallScreen)
+                rootRef.current.style.filter = `blur(${
+                    rangeProgress(scrollObservable.scrollTop, vh * 0.25, vh * 0.5) * 10
+                }px)`;
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scrollObservable]);
     return (
         <Box

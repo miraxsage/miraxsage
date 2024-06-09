@@ -1,6 +1,6 @@
 import { getThemeColor } from "@/components/contexts/Theme";
 import { mix } from "@/utilities/colors";
-import { Box, useTheme } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import CodeBackground from "../CodeBackground";
 import FloatingLine from "../FloatingLine";
 import HelloBlock from "./HelloBlock";
@@ -32,6 +32,7 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
     const isDarkMode = useColorMode().dark;
     const layoutBackgroundColor = getThemeColor("layoutBackground", theme);
     const rootRef = useRef<HTMLDivElement | undefined>();
+    const smallScreen = useMediaQuery(theme.breakpoints.down("sm"));
     useEffect(() => {
         if (!scrollObservable) return;
         scrollObservable.onChange(() => {
@@ -85,7 +86,8 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
                                 "0 -" + (halfvh * 0.7 * smoothProgress + blocksInnerScrollHeights[i - 1]) + "px";
                             prevBlock!.style.scale = (1 - 0.05 * smoothProgress).toString();
                             prevBlock!.style.opacity = (1 - Math.max(0, smoothInProgress * 1.5 - 0.5)).toString();
-                            prevBlock!.style.filter = `blur(${rangeProgress(progress, 0.4, 1) * 10}px)`;
+                            if (!smallScreen)
+                                prevBlock!.style.filter = `blur(${rangeProgress(progress, 0.4, 1) * 10}px)`;
                             prevBlock!.style.zIndex = !hideRemined && progress < 0.5 ? "1" : "";
                             hideRemined = true;
                         } else {
@@ -123,6 +125,7 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
             rootRef.current.style.top = round(mainPos, 2) + "px";
             rootRef.current.style.margin = margin;
         });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scrollObservable]);
     return (
         <>
@@ -159,13 +162,15 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
                             )}, ${layoutBackgroundColor} 50%)`,
                         }}
                     >
-                        <Box sx={{ width: "100%", height: "100%", opacity: 0.7 }}>
-                            <FloatingLine shift={-25} />
-                            <FloatingLine shift={-10} />
-                            <FloatingLine shift={0} />
-                            <FloatingLine shift={15} />
-                            <FloatingLine shift={25} />
-                        </Box>
+                        {!smallScreen && (
+                            <Box sx={{ width: "100%", height: "100%", opacity: 0.7 }}>
+                                <FloatingLine shift={-25} />
+                                <FloatingLine shift={-10} />
+                                <FloatingLine shift={0} />
+                                <FloatingLine shift={15} />
+                                <FloatingLine shift={25} />
+                            </Box>
+                        )}
                         <CodeBackground
                             sx={{
                                 left: "unset",

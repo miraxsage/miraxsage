@@ -7,6 +7,7 @@ function Image({ img, side }: Omit<ProjectContentImageProps, "slug">) {
 export function Component({ onImageClick }: ProjectContentProps) {
     return (
         <ProjectContent onImageClick={onImageClick}>
+            <br />
             <p>
                 <Image img={1} />
                 PMK Complectation is an application essential for managing document workflow within a department. It

@@ -131,29 +131,34 @@ export default function AboutBlock({
                         lineHeight: 1,
                         [theme.breakpoints.down("md")]: {
                             fontSize: "42px",
-                            justifySelf: "stretch",
+                            justifySelf: "center",
+                        },
+                        [theme.breakpoints.down("sm")]: {
+                            maxWidth: "100%",
                         },
                     }}
                 >
-                    {titleA}{" "}
-                    <Box
-                        sx={{
-                            display: "inline-block",
-                            background: `linear-gradient(25deg, ${useLandingColor("accentA")}, ${useLandingColor(
-                                "accentB"
-                            )})`,
-                            lineHeight: 1.25,
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                        }}
-                    >
-                        {titleB}
-                    </Box>
-                    {titleD && titleC}
-                    <Box component="span" sx={{ fontSize: "45px", position: "relative", top: "-4px" }}>
-                        {" "}
-                        {titleD ? titleD : titleC}
-                    </Box>
+                    <div className="text-center">
+                        {titleA}{" "}
+                        <Box
+                            sx={{
+                                display: "inline-block",
+                                background: `linear-gradient(25deg, ${useLandingColor("accentA")}, ${useLandingColor(
+                                    "accentB"
+                                )})`,
+                                lineHeight: 1.25,
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                            }}
+                        >
+                            {titleB}
+                        </Box>
+                        {titleD && titleC}
+                        <Box component="span" sx={{ fontSize: "45px", position: "relative", top: "-4px" }}>
+                            {" "}
+                            {titleD ? titleD : titleC}
+                        </Box>
+                    </div>
                     <Box sx={{ height: "25px" }}></Box>
                     <Box
                         sx={{
@@ -178,7 +183,7 @@ export default function AboutBlock({
                             },
                             [theme.breakpoints.down("sm")]: {
                                 fontSize: "20px",
-                                width: "365px",
+                                maxWidth: "100%",
                             },
                         }}
                     >

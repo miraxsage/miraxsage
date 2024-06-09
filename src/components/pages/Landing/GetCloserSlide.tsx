@@ -91,6 +91,10 @@ export default function GetCloserSlide() {
     const accentColor = useLandingColor("accentA");
     const darkPaleAccent = mix(accentColor, "#777777", 0.6);
     const paleTextColor = isDarkMode ? lighten(theme.palette.divider, 0.35) : lighten(textColor, 0.2);
+    const textGradiend = `linear-gradient(200deg, ${alpha(
+        mix(layoutBackgroundColor, useLandingColor("accentB"), 0.08),
+        1
+    )}, ${layoutBackgroundColor} 40%)`;
     const sm = useMediaQuery(theme.breakpoints.down("sm"));
     const lg = useMediaQuery(theme.breakpoints.down("lg"));
     const _2xl = useMediaQuery(theme.breakpoints.down("2xl"));
@@ -118,20 +122,20 @@ export default function GetCloserSlide() {
                     transformOrigin: "0% 0%",
                     transform: "skew(0, -10deg) translateY(calc(0.1763269807 * 100dvw))",
                     borderTop: `1px solid ${theme.palette.divider}`,
-                    background: `linear-gradient(200deg, ${alpha(
-                        mix(layoutBackgroundColor, useLandingColor("accentB"), 0.08),
-                        1
-                    )}, ${layoutBackgroundColor} 40%)`,
+                    background: textGradiend,
                 }}
             >
-                <Box sx={{ width: "100%", height: "100%", opacity: 0.7 }}>
-                    <FloatingLine shift={-25} />
-                    <FloatingLine shift={-10} />
-                    <FloatingLine shift={0} />
-                    <FloatingLine shift={15} />
-                    <FloatingLine shift={25} />
-                </Box>
+                {!sm && (
+                    <Box sx={{ width: "100%", height: "100%", opacity: 0.7 }}>
+                        <FloatingLine shift={-25} />
+                        <FloatingLine shift={-10} />
+                        <FloatingLine shift={0} />
+                        <FloatingLine shift={15} />
+                        <FloatingLine shift={25} />
+                    </Box>
+                )}
             </Box>
+
             <Box
                 className="container"
                 sx={{
@@ -465,7 +469,7 @@ export default function GetCloserSlide() {
                                             icon: <EmojiEventsIcon />,
                                         },
                                         {
-                                            id: "/about/experience/projects",
+                                            id: "/projects",
                                             title: __("Projects"),
                                             icon: <RocketLaunchIcon />,
                                         },

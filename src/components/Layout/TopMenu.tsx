@@ -14,22 +14,22 @@ import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 
 const breadcrumbsItems = [
     {
-        label: __("Home"),
+        label: "Home",
         icon: <HomeIcon />,
         link: "/",
     },
     {
-        label: __("About"),
+        label: "About",
         icon: <AssignmentIndIcon />,
         link: "/about",
     },
     {
-        label: __("Projects"),
+        label: "Projects",
         icon: <RocketLaunchIcon />,
         link: "/projects",
     },
     {
-        label: __("Interact"),
+        label: "Interact",
         icon: <CallIcon />,
         link: "/interact",
     },
@@ -58,8 +58,11 @@ function MobileRootBreadcrumb() {
         >
             {[
                 {
-                    label: currentItem.label,
-                    subitems: breadcrumbsItems.filter((bc) => bc != currentItem),
+                    label: __(currentItem.label),
+                    link: currentItem.link,
+                    subitems: breadcrumbsItems
+                        .filter((bc) => bc != currentItem)
+                        .map((bc) => ({ ...bc, label: __(bc.label) })),
                 },
             ]}
         </CustomBreadcrumbs>

@@ -226,6 +226,7 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
                     display: "grid",
                     height: "100%",
                     gridTemplateRows: "minmax(0,1fr)",
+                    gridTemplateColumns: "minmax(0,1fr)",
                     backdropFilter: "blur(3px)",
                 }}
                 onClick={(e) => {
@@ -242,6 +243,7 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
                                 style={{
                                     minHeight: "100%",
                                     display: "flex",
+                                    width: "max(100%, " + (imageSource.current?.prev?.width ?? 0) * scale + "px)",
                                     alignItems: "center",
                                     justifyContent: "center",
                                 }}

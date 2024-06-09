@@ -183,6 +183,10 @@ function MobileSiteMapTreeView() {
         <Box sx={{ display: "flex", flexDirection: "column" }}>
             <ColorModeButton sx={{ gridArea: "1/5/1/5" }} />
             <LanguageButton sx={{ gridArea: "2/5/2/5" }} />
+            <SpecialButton action="/">
+                <HomeIcon />
+                {__("Home")}
+            </SpecialButton>
             <AccentedTreeView
                 intend="double"
                 initiallyExpandedNodes={["resume", "portfolio", "contacts"]}
