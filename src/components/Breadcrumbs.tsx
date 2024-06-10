@@ -14,7 +14,7 @@ type BasicBreadcrumbItem = {
     iconColor?: string;
     icon?: React.ReactElement;
     link?: string;
-    onClick?: (item: BasicBreadcrumbItem) => void;
+    onClick?: (item: BasicBreadcrumbItem) => boolean | undefined;
     subitems?: AtLeastOneImportantFieldFromGiven<Omit<BasicBreadcrumbItem, "subitems">, "link" | "onClick">[];
 };
 
@@ -88,10 +88,10 @@ export default function CustomBreadcrumbs({
                                 : revealMenuHandler(breadcrumb)
                         }
                         onClick={(e: React.MouseEventHandler) => {
-                            if (breadcrumb.link && breadcrumb.link != window.location.pathname)
-                                return navigate(breadcrumb.link);
+                            if (breadcrumb.onClick) {
+                                if (breadcrumb.onClick(breadcrumb) === false) return;
+                            }
                             if (breadcrumb.subitems && breadcrumb.subitems.length) revealMenuHandler(breadcrumb)(e);
-                            if (breadcrumb.onClick) breadcrumb.onClick(breadcrumb);
                         }}
                     />
                 ))}

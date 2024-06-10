@@ -1,7 +1,7 @@
-import { SvgIcon } from "@mui/material";
+import { SvgIcon, SxProps } from "@mui/material";
 
-const MusclesIcon: React.FC = (props) => (
-    <SvgIcon>
+const MusclesIcon = ({ sx, ...props }: { sx?: SxProps }) => (
+    <SvgIcon sx={sx}>
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlSpace="preserve"

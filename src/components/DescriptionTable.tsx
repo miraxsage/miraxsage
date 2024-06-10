@@ -8,6 +8,7 @@ import __ from "@/utilities/transtation";
 import { capitalize } from "@/utilities/string";
 import classes from "classnames";
 import Link from "./Link";
+import { useLanguage } from "@/store/appearanceSlice";
 
 export type DescriptionTableRowOptions = {
     fullLine?: boolean;
@@ -16,7 +17,7 @@ export type DescriptionTableRowOptions = {
 
 export type DescriptionTableData = [
     string | { title: string; icon: ReactNode },
-    string | ReactNode,
+    string | { ru: string; en: string } | ReactNode,
     DescriptionTableRowOptions?
 ][];
 
@@ -129,9 +130,11 @@ export function ForbiddenModifier({ length }: { length: number }) {
     );
 }
 
-export function DescriptionTableValue({ name, value }: { name?: string; value: string }) {
+export function DescriptionTableValue({ name, value }: { name?: string; value: string | { ru: string; en: string } }) {
     const result = [];
+    const lang = useLanguage();
     let index = 0;
+    if (typeof value == "object") value = value[lang.lang];
     const matches = value.matchAll(/\[[^\]]+?\]/g);
     let elementNum = 0;
     for (const match of matches) {
@@ -200,7 +203,7 @@ function DescriptionTableRow({
 }: {
     index: number;
     name: string | { title: string; icon: ReactNode };
-    value: string | ReactNode;
+    value: string | { ru: string; en: string } | ReactNode;
     opts?: DescriptionTableRowOptions;
 }) {
     return (
@@ -231,7 +234,8 @@ function DescriptionTableRow({
                 }}
             >
                 <div>
-                    {typeof value == "string" ? (
+                    {typeof value == "string" ||
+                    (typeof value == "object" && value && "ru" in value && "en" in value) ? (
                         <DescriptionTableValue name={typeof name == "string" ? name : name.title} value={value} />
                     ) : (
                         value

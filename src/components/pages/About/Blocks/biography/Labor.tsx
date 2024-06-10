@@ -5,7 +5,7 @@ import ApartmentIcon from "@mui/icons-material/Apartment";
 import MemoryIcon from "@mui/icons-material/Memory";
 import { useMediaQuery, useTheme } from "@mui/material";
 
-type Data = [string, string, DescriptionTableRowOptions?][];
+type Data = [string, string | { ru: string; en: string }, DescriptionTableRowOptions?][];
 
 const kubanskieProduktyData: Data = [
     ["[Full name|1]", "[Limited liability company] «[Kubanskie produkty]»", { fullLine: true }],
@@ -13,12 +13,18 @@ const kubanskieProduktyData: Data = [
     ["[City]", "[Forbidden 7]"],
     [
         "[Responsibilities]",
-        "Кроме прочих обязанностей поддержки информационной инфрастуктуры предприятия занимался разработкой отдельных программных модулей системы бухгалтерского учета, сайта, выполнял их интеграцию",
+        {
+            ru: "Кроме прочих обязанностей поддержки информационной инфраструктуры предприятия занимался разработкой отдельных программных модулей системы бухгалтерского учета, сайта, выполнял их интеграцию.",
+            en: "In addition to supporting the company's information infrastructure, I developed individual software modules for the accounting system and the website, and performed their integration.",
+        },
         { fullLine: true, showLastInCompactMode: true },
     ],
     [
         "[Achievements]",
-        "самостоятельно разработал сайт учета остатков автомобильных деталей на базе CMS Wordpress, React, Bootstrap, позволяющий интегрировать работу транспортного участка и бухгалтерии, синхронизируя данные на сайте, формируемые через мобильную версию сайта, с конфигурацией 1С Бухгалтерия, что существенно сократило объем двойной ручной работы, автоматизировало процесс документооборота и позволило существенно разгрузить штатную занятость",
+        {
+            ru: "Самостоятельно разработал сайт учета остатков автомобильных деталей на базе CMS Wordpress, React, Bootstrap, позволяющий интегрировать работу транспортного участка и бухгалтерии, синхронизируя данные на сайте, формируемые через мобильную версию сайта, с конфигурацией 1С Бухгалтерия, что существенно сократило объем двойной ручной работы, автоматизировало процесс документооборота и позволило существенно разгрузить штатную занятость.",
+            en: "I independently developed a website for tracking automotive parts inventory using CMS WordPress, React, and Bootstrap. This website integrates the operations of the transportation department and the accounting department by synchronizing data generated through the mobile version of the website with the 1C Accounting configuration. This significantly reduced the amount of duplicate manual work, automated the document workflow process, and substantially relieved staff workload.",
+        },
         { fullLine: true, showLastInCompactMode: true },
     ],
     ["[Position]", "[Software engineer]"],
@@ -30,12 +36,18 @@ const kubankabelData: Data = [
     ["[City]", "[Forbidden 7]"],
     [
         "[Responsibilities]",
-        "Кроме прочих обязанностей поддержки информационной инфрастуктуры предприятия занимался доработкой, редизайном и сопровождением официального сайта. Разработал ряд специализированных программ для автоматизированного учета производства, бухгалтерского учета, учета и оформления данных приборов промышленного электрооборудования и пр.",
+        {
+            ru: "Кроме прочих обязанностей поддержки информационной инфраструктуры предприятия занимался доработкой, редизайном и сопровождением официального сайта. Разработал ряд специализированных программ для автоматизированного учета производства, бухгалтерского учета, учета и оформления данных приборов промышленного электрооборудования и пр.",
+            en: "In addition to supporting the company's information infrastructure, I handled the improvement, redesign, and maintenance of the official website. I developed several specialized programs for automated production accounting, financial accounting, and the recording and management of data from industrial electrical equipment, among other tasks.",
+        },
         { fullLine: true, showLastInCompactMode: true },
     ],
     [
         "[Achievements]",
-        "Внес весомый вклад в повышение производительности бухгалтерских и инженерно-технических расчетов благодаря разработке комплекса вспомогательных приложений и интеграционных программ с использованием технологий с использованием технологий 1С:Предприятие, .NET Framework (C#), WEB, Excel VBA, за что неоднократно получал высокие оценки руководства. С нуля была разработана собственная конфигурация на платформе 1С:Предприятие для сдельного учета заработной платы работников кабельного производства с учетом индивидуальной специфики и особенностей предприятия, которая по настоящий момент является основным инструментом планово-экономического отдела",
+        {
+            ru: "Внес весомый вклад в повышение производительности бухгалтерских и инженерно-технических расчетов благодаря разработке комплекса вспомогательных приложений и интеграционных программ с использованием технологий с использованием технологий 1С:Предприятие, .NET Framework (C#), WEB, Excel VBA, за что неоднократно получал высокие оценки руководства. С нуля была разработана собственная конфигурация на платформе 1С:Предприятие для сдельного учета заработной платы работников кабельного производства с учетом индивидуальной специфики и особенностей предприятия, которая по настоящий момент является основным инструментом планово-экономического отдела.",
+            en: "I made a significant contribution to improving the efficiency of accounting and engineering calculations by developing a suite of auxiliary applications and integration programs using 1C, .NET Framework (C#), WEB, and Excel VBA technologies. For this work, I repeatedly received high praise from management. From scratch, I developed a custom configuration on the 1C platform for piece-rate payroll accounting for cable production workers, considering the unique specifics and features of the company. This configuration remains the primary tool for the planning and economic department to this day.",
+        },
         { fullLine: true, showLastInCompactMode: true },
     ],
     ["[Position]", "[Software engineer]"],
@@ -48,12 +60,18 @@ const administationData: Data = [
     ["[City]", "[Forbidden 7]"],
     [
         "[Responsibilities]",
-        "Сопровождение официального информационного сайта администрации",
+        {
+            ru: "Сопровождение официального информационного сайта администрации.",
+            en: "Maintenance of the official informational website of the administration.",
+        },
         { fullLine: true, showLastInCompactMode: true },
     ],
     [
         "[Achievements]",
-        "Совместными усилиями разработал и внедрил собственную тему на Wordpress, реализующую специализированные инструменты администрирования и автоматизации, связанные с оформлением и публикацией материалов делопроизводства, новостных сводок и пр.",
+        {
+            ru: "Совместными усилиями разработал и внедрил собственную тему на Wordpress, реализующую специализированные инструменты администрирования и автоматизации, связанные с оформлением и публикацией материалов делопроизводства, новостных сводок и пр.",
+            en: "Collaboratively developed and implemented a custom WordPress theme that provides specialized tools for administration and automation related to the formatting and publication of documentation, news bulletins, and more.",
+        },
         { fullLine: true, showLastInCompactMode: true },
     ],
     ["[Position]", "[Information technology sector specialist]"],
@@ -66,10 +84,17 @@ const bedrosovaData: Data = [
     ["[City]", "[Forbidden 7]"],
     [
         "[Responsibilities]",
-        "Разработка интерактивного сайта по направлению учебной подготовки «Информатика и вычислительная техника»",
+        {
+            ru: "Разработка интерактивного сайта по направлению учебной подготовки «Информатика и вычислительная техника».",
+            en: "Development of an interactive website for the educational program «Computer Science and Engineering».",
+        },
         { fullLine: true, showLastInCompactMode: true },
     ],
-    ["[Achievements]", "Приобретен опыт работы в команде", { fullLine: true, showLastInCompactMode: true }],
+    [
+        "[Achievements]",
+        { ru: "Приобретен опыт работы в команде.", en: "Gained experience working in a team." },
+        { fullLine: true, showLastInCompactMode: true },
+    ],
     ["[Position]", "[Trainee]"],
     ["[Type of employment]", "[Internship]"],
 ];

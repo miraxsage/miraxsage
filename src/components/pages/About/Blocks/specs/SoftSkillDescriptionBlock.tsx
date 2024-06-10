@@ -6,11 +6,11 @@ import { CustomChip } from "@/components/Chip";
 import GrowingMetricIcon from "@/components/icons/GrowingMetricIcon";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import AverageMetricIcon from "@/components/icons/AverageMetricIcon";
-import { useColorMode } from "@/store/appearanceSlice";
+import { useColorMode, useLanguage } from "@/store/appearanceSlice";
 
 type SoftSkillDescriptionBlockProps = {
     label: string;
-    description: string;
+    description: { ru: string; en: string };
     number: number;
 } & DiagrammProps;
 
@@ -153,6 +153,7 @@ export default function SoftSkillDescriptionBlock({
     averageLevel,
 }: SoftSkillDescriptionBlockProps) {
     const theme = useTheme();
+    const lang = useLanguage();
     const belowlg = useMediaQuery(theme.breakpoints.down("lg"));
     const [accentedElement, setAccentedElement] = useState<DiagrammProps["accentedElement"]>();
     const levelPercent = Math.round((100 * level) / totalLevel);
@@ -206,7 +207,7 @@ export default function SoftSkillDescriptionBlock({
                         <MetricChip data-kind="level" label={`${levelPercent}%`} icon={<BarChartIcon />} />
                     </div>
                 </div>
-                {!belowlg && description}
+                {!belowlg && description[lang.lang]}
             </div>
             <Box
                 sx={{
@@ -235,7 +236,7 @@ export default function SoftSkillDescriptionBlock({
                         },
                     }}
                 >
-                    {description}
+                    {description[lang.lang]}
                 </Box>
             )}
         </Box>

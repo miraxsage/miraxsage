@@ -87,8 +87,10 @@ export function LinkButton({ link, children, sx, borders, onClick }: LinkButton)
     );
 }
 
-const DescriptionButtonsContainer = styled(Box)(() => ({
+const DescriptionButtonsContainer = styled(Box)(({ theme }) => ({
     display: "flex",
+    border: `1px solid ${theme.palette.divider}`,
+    borderWidth: "1px 0px 0px 0px",
 }));
 
 export type DescriptionPanelProps = {
@@ -127,7 +129,7 @@ export default function DescriptionPanel({
             {buttons && buttons.length ? (
                 <DescriptionButtonsContainer>
                     {buttons.map((b, i) => (
-                        <LinkButton key={i} link={b.link}>
+                        <LinkButton key={i} link={b.link} borders="right" sx={{ textAlign: "center" }}>
                             {b.icon && (
                                 <Box
                                     component="span"

@@ -5,6 +5,7 @@ import CustomBreadcrumbs from "./Breadcrumbs";
 import { TechnologiesList, technologies } from "./pages/About/Blocks/specs/Technologies";
 import { Box, SxProps } from "@mui/material";
 import { useThemeColor } from "./contexts/Theme";
+import { useLanguage } from "@/store/appearanceSlice";
 
 function Separator() {
     return <Box sx={{ color: useThemeColor("regularText"), opacity: 0.5 }}>+</Box>;
@@ -23,6 +24,7 @@ export default function TechnologiesCrumbs({
 }) {
     const techsItems =
         typeof techs == "string" ? technologies[techs] : wholeTechnologiesList.filter(([name]) => techs.includes(name));
+    const lang = useLanguage();
     return (
         <CustomBreadcrumbs
             sx={{
@@ -42,17 +44,17 @@ export default function TechnologiesCrumbs({
                 icon: <Icon />,
                 subitems: [
                     {
-                        label: tech + "-проекты",
+                        label: tech + (lang.ru ? "-проекты" : "-projects"),
                         icon: <RocketLaunchIcon />,
                         link: "/projects?techs=" + encodeURIComponent(tech.toLowerCase()),
                     },
                     {
-                        label: tech + "-навыки",
+                        label: tech + (lang.ru ? "-навыки" : "-skills"),
                         icon: <MusclesIcon />,
                         link: "/about/specifications/hard-skills",
                     },
                     {
-                        label: "Документация",
+                        label: lang.ru ? "Документация" : "Documentation",
                         icon: <MenuBookIcon />,
                         link: datalink,
                     },

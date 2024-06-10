@@ -38,6 +38,7 @@ const breadcrumbsItems = [
 function MobileRootBreadcrumb() {
     const currentItem = breadcrumbsItems.find((bc) => bc.link != "/" && location.pathname.startsWith(bc.link));
     const theme = useTheme();
+    const navigate = useNavigate();
     if (!currentItem) return;
     return (
         <CustomBreadcrumbs
@@ -59,7 +60,12 @@ function MobileRootBreadcrumb() {
             {[
                 {
                     label: __(currentItem.label),
-                    link: currentItem.link,
+                    onClick: () => {
+                        if (currentItem.link == "/projects" && location.pathname != currentItem.link) {
+                            navigate(currentItem.link);
+                            return false;
+                        }
+                    },
                     subitems: breadcrumbsItems
                         .filter((bc) => bc != currentItem)
                         .map((bc) => ({ ...bc, label: __(bc.label) })),

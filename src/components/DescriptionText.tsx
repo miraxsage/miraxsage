@@ -1,7 +1,8 @@
 import { Box, useTheme } from "@mui/material";
+import { ReactNode } from "react";
 
 type DescriptionTextProps = {
-    children: string;
+    children: string | ReactNode;
     withoutBottomBorder?: boolean;
 };
 

@@ -157,6 +157,9 @@ export default function TechnologiesTable({ data, withoutBottomBorder }: Technol
                     [theme.breakpoints.down("lg")]: {
                         gridTemplateColumns: "auto auto 1fr",
                     },
+                    "@media (max-width: 375px)": {
+                        hyphens: "auto",
+                    },
                     "& > div, & > a": {
                         padding: "6px 12px",
                         borderColor: theme.palette.divider,
