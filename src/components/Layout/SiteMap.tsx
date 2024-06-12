@@ -40,7 +40,7 @@ const TransparentButton = styled(Button)(({ theme }) => ({
     transition: "all 0.2s",
     borderColor: `transparent`,
     "&:hover": {
-        background: alpha(theme.palette.divider, 0.15),
+        background: alpha(theme.palette.divider, 0.3),
         borderColor: theme.palette.divider,
     },
     "& > .MuiSvgIcon-root": {
@@ -51,6 +51,7 @@ const TransparentButton = styled(Button)(({ theme }) => ({
     "&.accented": {
         color: getThemeColor("secondaryHoverText", theme),
         background: getThemeColor("secondaryBg", theme),
+        border: `1px solid ${getThemeColor("secondaryHoverText", theme)}`,
         "& > .MuiSvgIcon-root": {
             color: getThemeColor("secondaryHoverText", theme),
         },
@@ -331,7 +332,7 @@ function ContactButton({
     const theme = useTheme();
     const contactBorderColor = accented ? getThemeColor("secondaryText", theme) : theme.palette.divider;
     const contactsColor = getThemeColor(accented ? "secondaryHoverText" : "regularText", theme);
-    const contactsBackground = accented ? getThemeColor("secondaryHoverBg", theme) : alpha(theme.palette.divider, 0.15);
+    const contactsBackground = accented ? getThemeColor("secondaryHoverBg", theme) : alpha(theme.palette.divider, 0.3);
     return (
         <SpecialButton
             action={details.action}
@@ -341,9 +342,11 @@ function ContactButton({
                     borderColor: hoverBorders.replaceAll("0", "transparent").replaceAll("1", contactBorderColor),
                     color: contactsColor,
                     background: contactsBackground,
-                    "& .MuiSvgIcon-root": {
-                        color: contactsColor,
-                    },
+                    "& .MuiSvgIcon-root": accented
+                        ? {
+                              color: contactsColor,
+                          }
+                        : {},
                 },
             }}
         >
@@ -680,7 +683,7 @@ export default function SiteMap() {
                                         }
                                         sx={{
                                             minWidth: "230px",
-                                            "& .MuiTreeItem-root .MuiTreeItem-content": {
+                                            "& .MuiTreeItem-content": {
                                                 outline: `0px solid ${theme.palette.divider}`,
                                                 "&:hover": {
                                                     background: alpha(theme.palette.divider, 0.15),

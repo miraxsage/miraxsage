@@ -105,7 +105,7 @@ export const lightTheme = createTheme(
     deepMerge(basicTheme, {
         palette: {
             mode: "light",
-            divider: "#d1d1d1",
+            divider: "#c7c7c7",
             regular: {
                 light: "#f9f9f9",
                 main: "#a4a4a4",
@@ -175,7 +175,7 @@ export const darkTheme = createTheme(
     deepMerge(basicTheme, {
         palette: {
             mode: "dark",
-            divider: "#2c2f3e",
+            divider: "#2f314a",
             regular: {
                 light: "#a0a3b1",
                 main: "#676a78",
@@ -189,7 +189,7 @@ export const darkTheme = createTheme(
             bg: {
                 light: "#1f2943",
                 main: "#1d1f2d",
-                dark: "#151722",
+                dark: "#151724",
             },
             secondary: {
                 light: "#8173ab",
@@ -351,7 +351,7 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
                 0.15
             )});`;
         case "regularText":
-            return isDarkMode ? lighten(theme.palette.divider, 0.4) : darken(theme.palette.contrast.main, 0.8);
+            return isDarkMode ? lighten(theme.palette.divider, 0.5) : darken(theme.palette.contrast.main, 0.8);
         case "notelessText":
             return isDarkMode ? lighten(theme.palette.divider, 0.07) : lighten(theme.palette.contrast.main, 0.15);
         case "menuText":
