@@ -6,7 +6,29 @@ import MemoryIcon from "@mui/icons-material/Memory";
 import { useMediaQuery, useTheme } from "@mui/material";
 
 type Data = [string, string | { ru: string; en: string }, DescriptionTableRowOptions?][];
-
+const webarchitectData: Data = [
+    ["[Full name|1]", "Webarchitect.ru", { fullLine: true }],
+    ["[Region]", "[Krasnodar region]"],
+    ["[City]", "[Forbidden 7]"],
+    [
+        "[Responsibilities]",
+        {
+            ru: "Занимался ключевыми задачами проектирования архитектуры и командной реализацией больших проектов, разработкой backend-частей на PHP, Yii2, Laravel, MySQL, CMS Wordpress, реализацией сложной динамической frontend логики на React и Redux.",
+            en: "Handled key tasks in architecture design and team implementation of large projects, developed backend components using PHP, Yii2, Laravel, MySQL, CMS WordPress, and implemented complex dynamic frontend logic with React and Redux.",
+        },
+        { fullLine: true, showLastInCompactMode: true },
+    ],
+    [
+        "[Achievements]",
+        {
+            ru: "За длительный срок работы в команде с моим ведущим участием было разработано множество проектов. Одними из самых больших и интересных остаются краевой портал недвижимости Краснодара, ряд специализированных сервисов цифровых услуг, по настоящий день активно привлекающих пользователей и находящихся на поддержке.",
+            en: "Over a long period of working with the team, with my leading involvement, many projects have been developed. Among the largest and most interesting are the Krasnodar regional real estate portal, a number of specialized digital service platforms, which continue to actively attract users and are still maintained.",
+        },
+        { fullLine: true, showLastInCompactMode: true },
+    ],
+    ["[Position]", "[Software engineer]"],
+    ["[Years of experience]", "2 [years|2]"],
+];
 const kubanskieProduktyData: Data = [
     ["[Full name|1]", "[Limited liability company] «[Kubanskie produkty]»", { fullLine: true }],
     ["[Region]", "[Krasnodar region]"],
@@ -45,7 +67,7 @@ const kubankabelData: Data = [
     [
         "[Achievements]",
         {
-            ru: "Внес весомый вклад в повышение производительности бухгалтерских и инженерно-технических расчетов благодаря разработке комплекса вспомогательных приложений и интеграционных программ с использованием технологий с использованием технологий 1С:Предприятие, .NET Framework (C#), WEB, Excel VBA, за что неоднократно получал высокие оценки руководства. С нуля была разработана собственная конфигурация на платформе 1С:Предприятие для сдельного учета заработной платы работников кабельного производства с учетом индивидуальной специфики и особенностей предприятия, которая по настоящий момент является основным инструментом планово-экономического отдела.",
+            ru: "Внес весомый вклад в повышение производительности бухгалтерских и инженерно-технических расчетов благодаря разработке комплекса вспомогательных приложений и интеграционных программ с использованием технологий 1С:Предприятие, .NET Framework (C#), WEB, Excel VBA, за что неоднократно получал высокие оценки руководства. С нуля была разработана собственная конфигурация на платформе 1С:Предприятие для сдельного учета заработной платы работников кабельного производства с учетом индивидуальной специфики и особенностей предприятия, которая по настоящий момент является основным инструментом планово-экономического отдела.",
             en: "I made a significant contribution to improving the efficiency of accounting and engineering calculations by developing a suite of auxiliary applications and integration programs using 1C, .NET Framework (C#), WEB, and Excel VBA technologies. For this work, I repeatedly received high praise from management. From scratch, I developed a custom configuration on the 1C platform for piece-rate payroll accounting for cable production workers, considering the unique specifics and features of the company. This configuration remains the primary tool for the planning and economic department to this day.",
         },
         { fullLine: true, showLastInCompactMode: true },
@@ -110,7 +132,7 @@ export default function AboutBioLaborBlock() {
         <>
             <AccentedTreeView
                 intend={lessSm ? "small" : "regular"}
-                initiallyExpandedNodes={["it", "itKubanskieProdukty"]}
+                initiallyExpandedNodes={["it", "itWebarchitect"]}
                 selectionMode="disable"
             >
                 {[
@@ -119,6 +141,17 @@ export default function AboutBioLaborBlock() {
                         title: __("Information technology"),
                         icon: <MemoryIcon />,
                         children: [
+                            {
+                                id: "itWebarchitect",
+                                title: `Webarchitect.ru (2010 - ${__("present time")})`,
+                                icon: <ApartmentIcon />,
+                                children: [
+                                    {
+                                        id: "itWebarchitect-datails",
+                                        content: <DataTable data={webarchitectData} />,
+                                    },
+                                ],
+                            },
                             {
                                 id: "itKubanskieProdukty",
                                 title: `${__("LLC")} «${__("Kubanskie produkty")}» (09.2022 - ${__("present time")})`,
