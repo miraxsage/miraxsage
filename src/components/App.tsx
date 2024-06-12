@@ -5,8 +5,7 @@ import MainLayout from "./layout/MainLayout";
 import { useThemeColor } from "./contexts/Theme";
 import { useAsideMenuVisibility, useLanguage, useScreenMode, useViewMode } from "@/store/appearanceSlice";
 import { ReactContentProps } from "@/types/react";
-import { Link, Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
-import { Link as MuiLink } from "@mui/material";
+import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { AppSpinner } from "./Spinners";
 import React, { useEffect, useRef } from "react";
 import { Provider } from "react-redux";
@@ -14,6 +13,7 @@ import ThemeContext from "./contexts/ThemeContext";
 import store from "@/store";
 import Landing from "./pages/Landing";
 import OverlapedChildrenContainer from "./OverlapedChildrenContainer";
+import { NotFoundPage } from "./pages/NotFound";
 
 function AppLayout({ children, sx }: { sx?: SxProps } & ReactContentProps) {
     return (
@@ -38,14 +38,7 @@ const router = createBrowserRouter([
                 <Outlet />
             </MainLayout>
         ),
-        errorElement: (
-            <div>
-                404 Page not found <br /> Let`s go{" "}
-                <Link to="/">
-                    <MuiLink>home</MuiLink>
-                </Link>
-            </div>
-        ),
+        errorElement: <NotFoundPage />,
         children: [
             {
                 path: "/",
