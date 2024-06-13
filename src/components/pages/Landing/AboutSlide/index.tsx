@@ -115,7 +115,8 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
                     const vhProgress = rangeProgress(scroll, 0, vh);
                     lastBlock.style.translate = "0 -" + (blocksInnerScrollHeights.at(-1)! + scroll * 0.5) + "px";
                     lastBlock.style.opacity = (1 - vhProgress).toString();
-                    lastBlock.style.filter = `blur(${rangeProgress(scroll, halfvh * 0.5, vh) * 10}px)`;
+                    if (!smallScreen)
+                        lastBlock.style.filter = `blur(${rangeProgress(scroll, halfvh * 0.5, vh) * 10}px)`;
                     lastBlock.style.scale = (1 - 0.1 * vhProgress).toString();
                 }
 
@@ -125,7 +126,7 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
             rootRef.current.style.top = round(mainPos, 2) + "px";
             rootRef.current.style.margin = margin;
         });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scrollObservable]);
     return (
         <>

@@ -23,6 +23,7 @@ import MonitorIcon from "@mui/icons-material/Monitor";
 import HomeIcon from "@mui/icons-material/Home";
 import CloseIcon from "@mui/icons-material/Close";
 import PhoneIcon from "@mui/icons-material/Phone";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import { useColorMode, useLanguage, useScreenMode, useSiteMapVisibility, useViewMode } from "@/store/appearanceSlice";
 import { cubicBezier, motion } from "framer-motion";
 import AccentedTreeView, { AccentedTreeItemProps } from "../AccentedTreeView";
@@ -126,6 +127,10 @@ function navigateToSection(
         if (link.match("^(https?:|mailto:)")) window.open(link, "_blank");
         else return navigate(links[section as keyof typeof links]);
     }
+    if (section == "download-pdf") {
+        window.open("/Resume (Miraxsage).pdf", "_blank");
+        return;
+    }
     navigate(`/projects?techs=${section.toLowerCase()}`);
 }
 
@@ -143,7 +148,15 @@ function findActiveCategoriesData(data: AccentedTreeItemProps[], matches: Accent
 
 function allCategoriesTreeViewData(selectedItems?: string[], activePathData?: AccentedTreeItemProps[]) {
     const data = [
-        { id: "resume", title: __("Resume"), icon: <AssignmentIndIcon />, children: abouteCategoriesTreeViewData() },
+        {
+            id: "resume",
+            title: __("Resume"),
+            icon: <AssignmentIndIcon />,
+            children: [
+                { id: "download-pdf", title: __("Download PDF"), icon: <PictureAsPdfIcon /> },
+                ...abouteCategoriesTreeViewData(),
+            ],
+        },
         { id: "portfolio", title: __("Portfolio"), children: projectsCategoriesTreeViewData() },
         {
             id: "contacts",
