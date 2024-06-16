@@ -32,34 +32,69 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
     const isDarkMode = useColorMode().dark;
     const layoutBackgroundColor = getThemeColor("layoutBackground", theme);
     const rootRef = useRef<HTMLDivElement | undefined>();
+    const screenVarsRef = useRef<
+        | {
+              vw: number;
+              vh: number;
+              halfvh: number;
+              pxToAboutSlide: number;
+              blocksKeys: string[];
+              blocksElements: (HTMLElement | null)[];
+              blocksInnerScrollHeights: number[];
+              scollingPlaceholder: HTMLElement;
+              scrollingPlaceholderHeight: number;
+          }
+        | undefined
+    >();
     const smallScreen = useMediaQuery(theme.breakpoints.down("sm"));
     useEffect(() => {
         if (!scrollObservable) return;
         scrollObservable.onChange(() => {
             if (!rootRef.current) return;
+
             const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
             const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
-            const halfvh = vh / 2;
-            const pxToAboutSlide = halfvh + 0.1763269807 * vw;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            if (!screenVarsRef.current) screenVarsRef.current = { vh: 0, vw: 0 };
+            const vars = screenVarsRef.current!;
+            if (vars.vh != vh || vars.vw != vw) {
+                vars.vh = vh;
+                vars.vw = vw;
+                vars.halfvh = vh / 2;
+                vars.pxToAboutSlide = vars.halfvh + 0.1763269807 * vw;
+                vars.blocksKeys = Object.keys(blocks);
+                vars.blocksElements = [];
+                vars.blocksInnerScrollHeights = vars.blocksKeys.map((id) => {
+                    const block = rootRef.current?.querySelector(`#${id}-block`);
+                    vars.blocksElements.push((block as HTMLElement) ?? null);
+                    if (!block) return 0;
+                    const delta = vh - block.children[0].getBoundingClientRect().height;
+                    return delta < 0 ? -1 * delta : 0;
+                });
+                vars.scollingPlaceholder = document.querySelector("#about-scrolling-placeholder") as HTMLElement;
+                vars.scrollingPlaceholderHeight =
+                    vars.blocksInnerScrollHeights.reduce((sum, cur) => sum + cur) +
+                    (vars.blocksKeys.length - 1) * vars.halfvh -
+                    vw * 0.1763269807;
+            }
+            vars.scollingPlaceholder.style.height = vars.scrollingPlaceholderHeight + "px";
+            const {
+                halfvh,
+                pxToAboutSlide,
+                blocksKeys,
+                blocksElements,
+                blocksInnerScrollHeights,
+                scollingPlaceholder,
+            } = screenVarsRef.current!;
+
             let mainPos = 0;
             let margin = "";
-
-            const blocksKeys = Object.keys(blocks);
-            const blocksElements: (HTMLElement | null)[] = [];
-            const blocksInnerScrollHeights = blocksKeys.map((id) => {
-                const block = rootRef.current?.querySelector(`#${id}-block`);
-                blocksElements.push((block as HTMLElement) ?? null);
-                if (!block) return 0;
-                const delta = vh - block.children[0].getBoundingClientRect().height - 100;
-                return delta < 0 ? -1 * delta : 0;
-            });
-            const scollingPlaceholder = document.querySelector("#about-scrolling-placeholder") as HTMLElement;
-            scollingPlaceholder.style.height =
-                blocksInnerScrollHeights.reduce((sum, cur) => sum + cur) + (blocksKeys.length - 1) * halfvh + "px";
 
             if (scrollObservable.scrollTop < halfvh) {
                 mainPos = -rangeProgress(scrollObservable.scrollTop, 0, halfvh) * pxToAboutSlide;
                 rootRef.current.style.position = "relative";
+                blocksElements[0]!.style.translate = "0 0";
                 blocksElements.forEach((el, i) => (el!.style.visibility = i == 0 ? "visible" : "hidden"));
             } else {
                 let scroll = scrollObservable.scrollTop - halfvh;
@@ -75,8 +110,8 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
                         } else block.style.visibility = "visible";
                         if (scroll <= halfvh) {
                             const progress = scroll / halfvh;
-                            block.style.translate = "0 " + (70 - round(70 * progress, 2)) + "%";
-
+                            block.style.translate = "0 " + (80 - round(80 * progress, 2)) + "%";
+                            block.style.opacity = "1";
                             block.style.clipPath = `xywh(-20% -${
                                 (1 - rangeProgress(progress, 0.2, 1)) * 125
                             }% 140% 125% round 0 0 100vw 100vw)`;
@@ -85,7 +120,9 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
                             prevBlock!.style.translate =
                                 "0 -" + (halfvh * 0.7 * smoothProgress + blocksInnerScrollHeights[i - 1]) + "px";
                             prevBlock!.style.scale = (1 - 0.05 * smoothProgress).toString();
-                            prevBlock!.style.opacity = (1 - Math.max(0, smoothInProgress * 1.5 - 0.5)).toString();
+                            prevBlock!.style.opacity = (
+                                1 - rangeProgress(Math.max(0, smoothInProgress), 0.6, 1)
+                            ).toString();
                             if (!smallScreen)
                                 prevBlock!.style.filter = `blur(${rangeProgress(progress, 0.4, 1) * 10}px)`;
                             prevBlock!.style.zIndex = !hideRemined && progress < 0.5 ? "1" : "";
@@ -112,12 +149,25 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
                 }
                 if (scroll > 0 && !hideRemined) {
                     const lastBlock = blocksElements.at(-1)!;
-                    const vhProgress = rangeProgress(scroll, 0, vh);
-                    lastBlock.style.translate = "0 -" + (blocksInnerScrollHeights.at(-1)! + scroll * 0.5) + "px";
-                    lastBlock.style.opacity = (1 - vhProgress).toString();
-                    if (!smallScreen)
-                        lastBlock.style.filter = `blur(${rangeProgress(scroll, halfvh * 0.5, vh) * 10}px)`;
-                    lastBlock.style.scale = (1 - 0.1 * vhProgress).toString();
+                    const progress = rangeProgress(scroll, 0, halfvh * 1.2);
+                    const smoothProgress = Math.sin((progress * Math.PI) / 2);
+                    const smoothInProgress = 1.5 * progress ** 0.25 - 0.5;
+                    lastBlock!.style.translate =
+                        "0 -" + (halfvh * 0.7 * smoothProgress + blocksInnerScrollHeights.at(-1)!) + "px";
+                    lastBlock!.style.scale = (1 - 0.05 * smoothProgress).toString();
+                    lastBlock!.style.opacity = (1 - rangeProgress(Math.max(0, smoothInProgress), 0.5, 1)).toString();
+                    if (!smallScreen) lastBlock!.style.filter = `blur(${rangeProgress(progress, 0.4, 1) * 10}px)`;
+
+                    scollingPlaceholder.style.height =
+                        vars.scrollingPlaceholderHeight -
+                        rangeProgress(
+                            scroll,
+                            0,
+                            scrollObservable.totalScroll -
+                                (vars.scrollingPlaceholderHeight + halfvh + vw * 0.1763269807)
+                        ) *
+                            halfvh +
+                        "px";
                 }
 
                 margin = -round(pxToAboutSlide, 2) + "px 0 0 0";

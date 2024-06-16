@@ -7,8 +7,8 @@ import __ from "@/utilities/transtation";
 import { Box, SxProps, alpha, useMediaQuery, useTheme } from "@mui/material";
 import { BarChart, PieChart } from "@mui/x-charts";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { TechnologyInterface } from "./Technologies";
+import { useNavigate } from "@/utilities/common";
 
 export type TechnologiesTableProps = {
     data: TechnologyInterface[];

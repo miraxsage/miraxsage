@@ -29,7 +29,7 @@ export default function FloatingLine({ shift }: FloatingLineProps) {
             <Box
                 sx={{
                     position: "absolute",
-                    height: "200vmax",
+                    height: "300vmax",
                     width: "1px",
                     left: "50%",
                     top: "50%",

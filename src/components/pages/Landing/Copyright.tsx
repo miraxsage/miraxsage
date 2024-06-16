@@ -8,7 +8,7 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import { GitHub } from "@mui/icons-material";
 import { lighten } from "@mui/material";
 import { useThemeColor } from "@/components/contexts/Theme";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/utilities/common";
 
 export default function Copyright() {
     const lang = useLanguage();

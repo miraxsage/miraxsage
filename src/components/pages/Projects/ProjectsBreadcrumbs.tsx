@@ -6,9 +6,9 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { ProjectsList, projects } from "./Projects";
 import { ToolbarButton } from "@/components/ToolbarButton";
-import { useNavigate } from "react-router-dom";
 import { useAppearance } from "@/store/appearanceSlice";
 import { RevealAsideMenuButton } from "@/components/layout/RevealAsideMenuButton";
+import { useNavigate } from "@/utilities/common";
 
 export type ProjectsBreadcrumbsProps = {
     project?: ProjectsList;

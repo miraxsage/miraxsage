@@ -1,4 +1,6 @@
+import { showLoadingShield } from "@/components/App";
 import { AnyObject, isAnyObject } from "@/types/common";
+import { NavigateOptions, To, useLocation, useNavigate as useReactRouterNavigate } from "react-router-dom";
 
 export default function deepMerge(obj1: unknown, obj2: unknown): AnyObject | null {
     if (!isAnyObject(obj1)) {
@@ -46,4 +48,30 @@ export function debounce(id: string, handler: () => void, delay: number = 100, i
         if (immidiateLaunch) handler();
         debounceIds.push({ id, timerId: immidiateLaunch ? null : setTimeout(handler, delay), time: Date.now(), delay });
     }
+}
+
+export function useNavigate() {
+    const navigate = useReactRouterNavigate();
+    const location = useLocation();
+    function customNavigate(delta: number): void;
+    function customNavigate(to: To, options?: NavigateOptions): void;
+    function customNavigate(toOrDelta: To | number, options?: NavigateOptions): void {
+        if (typeof toOrDelta == "string") {
+            const root = toOrDelta.match("^(/projects/?)|(/[^/]*)");
+            if (
+                !root ||
+                (location.pathname.startsWith(root[0]) && (root[0] != "/projects" || location.pathname == "/projects"))
+            ) {
+                console.log("not shield");
+                navigate(toOrDelta, options);
+                return;
+            }
+        }
+        showLoadingShield();
+        setTimeout(() => {
+            if (typeof toOrDelta == "number") navigate(toOrDelta);
+            else navigate(toOrDelta, options);
+        }, 10);
+    }
+    return customNavigate;
 }

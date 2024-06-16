@@ -1,4 +1,5 @@
 import DescriptionPanel from "@/components/DescriptionPanel";
+import Link from "@/components/Link";
 import { useLanguage } from "@/store/appearanceSlice";
 import { Box } from "@mui/material";
 
@@ -16,7 +17,20 @@ export default function AboutExperienceProjectsBlock() {
     return (
         <DescriptionPanel withoutBorders={true}>
             {{
-                elements: data[lang.lang].map((d) => <Box sx={{ textIndent: "0px", padding: "6px 14px" }}>{d}</Box>),
+                elements: [
+                    ...data[lang.lang].map((d) => <Box sx={{ textIndent: "0px", padding: "6px 14px" }}>{d}</Box>),
+                    <Box sx={{ textIndent: "0px", padding: "6px 14px" }}>
+                        {lang.ru ? (
+                            <>
+                                Подробнее в <Link href="/projects">портфолио</Link>
+                            </>
+                        ) : (
+                            <>
+                                More in <Link href="/projects">portfolio</Link>
+                            </>
+                        )}
+                    </Box>,
+                ],
             }}
         </DescriptionPanel>
     );

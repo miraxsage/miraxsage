@@ -5,7 +5,7 @@ import AccentedTabs from "@/components/AccentedTabs";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import CallIcon from "@mui/icons-material/Call";
 import __ from "@/utilities/transtation";
-import React, { NamedExoticComponent, useLayoutEffect, useReducer, useRef, useState } from "react";
+import React, { NamedExoticComponent, useEffect, useLayoutEffect, useReducer, useRef, useState } from "react";
 import { getThemeColor } from "@/components/contexts/Theme";
 import categories, {
     AboutCategories,
@@ -16,7 +16,7 @@ import categories, {
     hasSubcategories,
 } from "./Categories";
 import CustomScrollbar from "@/components/Scrollbar";
-import { Params, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Params, useLocation, useParams } from "react-router-dom";
 import AboutBlocksIntegrator from "./BlocksIntegrator";
 import { motion } from "framer-motion";
 import CustomBreadcrumbs from "@/components/Breadcrumbs";
@@ -25,17 +25,21 @@ import { RevealAsideMenuButton } from "@/components/layout/RevealAsideMenuButton
 import CategoriesToolbar from "@/components/CategoriesToolbar";
 import PersonalDataIllustration from "./PersonalDataIllustration";
 import { alpha } from "@mui/material";
+import { hideLoadingShield } from "@/components/App";
+import { useNavigate } from "@/utilities/common";
 
 export default function About() {
-    useLanguage();
+    const lang = useLanguage();
+    useEffect(() => {
+        document.title = __("About") + " | Miraxsage";
+        hideLoadingShield();
+    }, [lang.lang]);
 
     const theme = useTheme();
 
     const params = useParams();
     const navigate = useNavigate();
     const location = useLocation();
-
-    const lang = useLanguage();
 
     const lessSm = useMediaQuery(theme.breakpoints.down("sm"));
     const lessLg = useMediaQuery(theme.breakpoints.down("lg"));
@@ -471,3 +475,5 @@ export default function About() {
         </Box>
     );
 }
+
+export const Component = About;

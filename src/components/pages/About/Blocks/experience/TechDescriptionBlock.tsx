@@ -21,7 +21,7 @@ const data: { [k: string]: { description: { ru: string; en: string } } } = {
     backend: {
         description: {
             ru: `С учетом личного интереса и силы исторических обстоятельств я активно занимался и занимаюсь самостоятельной разработкой
-            полноценных веб решений в том числе и backend-части. На настоящее время мой самый распространенный базовый стек здесь это PHP, MySQL, 
+            полноценных веб решений в том числе и backend-части. Сегодня мой самый распространенный базовый стек здесь это PHP, MySQL, 
             CMS Wordpress, Laravel Framework. 
             В настоящее время интересуюсь Node.JS и связанными технологии относительно backend-разработки на JavaScript.`,
             en: `Taking into account my personal interest and the influence of historical circumstances, I have been actively involved in 

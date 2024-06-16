@@ -231,6 +231,9 @@ function DescriptionTableRow({
                 className={classes("grid-value", { "full-line": opts?.fullLine })}
                 sx={{
                     borderWidth: "0px 0px 1px 1px",
+                    "@media (max-width: 375px)": {
+                        hyphens: "auto",
+                    },
                 }}
             >
                 <div>

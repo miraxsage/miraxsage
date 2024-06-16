@@ -4,13 +4,14 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { Box, alpha, useMediaQuery, useTheme } from "@mui/material";
 import { getThemeColor, useThemeColor } from "../contexts/Theme";
 import __ from "@/utilities/transtation";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useSiteMapVisibility } from "@/store/appearanceSlice";
 import CustomBreadcrumbs from "../Breadcrumbs";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import CallIcon from "@mui/icons-material/Call";
 import HomeIcon from "@mui/icons-material/Home";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
+import { useNavigate } from "@/utilities/common";
 
 const breadcrumbsItems = [
     {
@@ -96,6 +97,15 @@ export default function TopMenu() {
                 borderBottom: 1,
                 borderColor: "divider",
                 backgroundColor: useThemeColor("barBackground"),
+                "@media (max-height: 450px)": {
+                    "& button": {
+                        padding: "5px 15px",
+                        minHeight: "38px",
+                    },
+                    "& .MuiTabs-root": {
+                        minHeight: 0,
+                    },
+                },
             }}
             className="flex"
         >

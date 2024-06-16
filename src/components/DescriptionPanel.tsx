@@ -1,7 +1,7 @@
 import { Box, SxProps, styled, useTheme } from "@mui/material";
 import { getThemeColor } from "@/components/contexts/Theme";
-import { useNavigate } from "react-router-dom";
 import { MouseEventHandler, ReactNode } from "react";
+import { useNavigate } from "@/utilities/common";
 
 const DescriptionElement = styled(Box, { shouldForwardProp: (prop) => prop != "withoutPadding" })<{
     withoutPadding?: boolean;
@@ -11,6 +11,9 @@ const DescriptionElement = styled(Box, { shouldForwardProp: (prop) => prop != "w
         borderStyle: "solid",
         borderTopWidth: "1px",
         borderColor: theme.palette.divider,
+    },
+    "@media (max-width: 375px)": {
+        hyphens: "auto",
     },
 }));
 

@@ -351,7 +351,7 @@ export function getThemeColor(color: ThemeColors, theme: Theme) {
                 0.15
             )});`;
         case "regularText":
-            return isDarkMode ? lighten(theme.palette.divider, 0.5) : darken(theme.palette.contrast.main, 0.8);
+            return isDarkMode ? lighten(theme.palette.divider, 0.53) : darken(theme.palette.contrast.main, 0.8);
         case "notelessText":
             return isDarkMode ? lighten(theme.palette.divider, 0.07) : lighten(theme.palette.contrast.main, 0.15);
         case "menuText":

@@ -12,7 +12,7 @@ const data = [
     ["[Telegram]", "[Link https://t.me/miraxsage] [Priority Connection]"],
     ["[Email]", "[Link mailto:manin.maxim@mail.ru manin.maxim@mail.ru]"],
     ["[Education]", "[General] [secondary] [Score (4.3/5)] [Higher][Nbsp][specialized] [Score (5.0/5)]"],
-    ["[Foreign languages]", "[Language EN (B1)]"],
+    ["[Foreign languages]", "[Language EN (~B2)]"],
     ["[Citizenship]", "[Language RU - onlyIcon] [Russian Federation]"],
     ["[Region]", "[Krasnodar region]"],
     ["[City]", "[Forbidden 7]"],

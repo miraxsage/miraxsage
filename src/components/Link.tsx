@@ -1,6 +1,6 @@
 import { Box, BoxProps, alpha, useTheme } from "@mui/material";
 import { getThemeColor } from "./contexts/Theme";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/utilities/common";
 
 export default function Link({ sx, children, href, ...props }: BoxProps<"a">) {
     const theme = useTheme();

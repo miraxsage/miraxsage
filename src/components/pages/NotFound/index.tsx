@@ -4,8 +4,14 @@ import { Box, alpha, lighten } from "@mui/material";
 import { useLandingColor } from "../Landing";
 import { useTheme } from "@mui/material";
 import { mix } from "@/utilities/colors";
+import { useEffect } from "react";
+import { hideLoadingShield } from "@/components/App";
 
 export function NotFoundPage() {
+    useEffect(() => {
+        document.title = "404 | Miraxsage";
+        hideLoadingShield();
+    }, []);
     const lang = useLanguage();
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;

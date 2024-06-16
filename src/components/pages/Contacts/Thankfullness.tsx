@@ -196,6 +196,7 @@ export default function Thankfullness() {
                         position: "relative",
                         marginRight: "70px",
                         scale: "1.2",
+                        height: "100%",
                         aspectRatio: "413 / 336",
                         [theme.breakpoints.down("2xl")]: {
                             scale: "1.1",

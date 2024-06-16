@@ -1,7 +1,7 @@
 import { Box, SxProps, useMediaQuery, useTheme } from "@mui/material";
 import ProjectsBreadcrumbs from "./ProjectsBreadcrumbs";
 import { isProjectSlug, projects } from "./Projects";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ProjectInfoTable from "./ProjectInfoTable";
 import CustomScrollbar from "@/components/Scrollbar";
 import { LinkButton } from "@/components/DescriptionPanel";
@@ -23,6 +23,8 @@ import ProjectImageViewer from "./ProjectImageViewer";
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 import __ from "@/utilities/transtation";
 import classes from "classnames";
+import { hideLoadingShield } from "@/components/App";
+import { useNavigate } from "@/utilities/common";
 
 function OptionalCustomScrollbar({
     useScrollbar,
@@ -93,6 +95,7 @@ export default function ProjectPage() {
             } catch {
                 content.current[lang] = lang == "ru" ? "Описание проекта отсутствует" : "Project's description absents";
             }
+            hideLoadingShield();
             refresh(!refreshState);
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps

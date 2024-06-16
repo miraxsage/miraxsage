@@ -9,7 +9,6 @@ import { motion } from "framer-motion";
 import { Box, useTheme } from "@mui/material";
 import { getThemeColor } from "./contexts/Theme";
 import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
-import { SxProps } from "@mui/material";
 import { CSSProperties } from "react";
 
 type CategoriesToolbarFoldProps = {

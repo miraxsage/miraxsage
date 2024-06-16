@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import MainSlide from "./MainSlide";
 import { AboutSlide } from "./AboutSlide";
 import GetCloserSlide from "./GetCloserSlide";
+import { hideLoadingShield } from "@/components/App";
 
 type LandingColor = "accentA" | "accentAPale" | "accentB" | "contrast" | "noteless";
 
@@ -35,6 +36,10 @@ export type ScrollObservable = {
 };
 
 export default function Landing() {
+    useEffect(() => {
+        document.title = "Miraxsage";
+        hideLoadingShield();
+    }, []);
     const rootRef = useRef<HTMLDivElement>();
     const [scrollObservable, setScrollObservable] = useState<ScrollObservable | undefined>();
     useEffect(() => {
@@ -80,10 +85,10 @@ export default function Landing() {
             setScrollObservable(observable);
             return () => scrollContainer?.removeEventListener("scroll", scrollHandler);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (
         <CustomScrollbar ref={rootRef} className="landing-background-scroll-view" sx={{ width: "100%" }}>
-            <Box sx={{ zIndex: 111, right: 0, position: "fixed" }}>{scrollObservable?.scrollProgress} %</Box>
             <Box sx={{ position: "absolute", width: "100%", top: 0, left: 0 }}>
                 <MainSlide scrollObservable={scrollObservable} />
                 <AboutSlide scrollObservable={scrollObservable} />
@@ -92,3 +97,5 @@ export default function Landing() {
         </CustomScrollbar>
     );
 }
+
+export const Component = Landing;

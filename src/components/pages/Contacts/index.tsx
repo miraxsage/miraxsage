@@ -1,7 +1,6 @@
 import CustomBreadcrumbs, { CustomBreadcrumbsProps } from "@/components/Breadcrumbs";
 import Thankfullness from "./Thankfullness";
 import { Box, Button, MenuItem, Theme, useMediaQuery, useTheme } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import __ from "@/utilities/transtation";
@@ -16,7 +15,7 @@ import CustomTextField from "@/components/TextInput";
 import CustomCodeEditor from "@/components/CodeEditor";
 import CustomScrollbar from "@/components/Scrollbar";
 import { langs } from "@uiw/codemirror-extensions-langs";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAppearance, useScreenMode } from "@/store/appearanceSlice";
 import { capitalize } from "@/utilities/string";
 import { Base64 } from "@/utilities/base64";
@@ -25,6 +24,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import classes from "classnames";
 import { RevealAsideMenuButton } from "@/components/layout/RevealAsideMenuButton";
 import { getThemeColor } from "@/components/contexts/Theme";
+import { hideLoadingShield } from "@/components/App";
+import { useNavigate } from "@/utilities/common";
 
 function contactData(title: string, Icon: React.FC, link: string, theme: Theme): DescriptionTableData[number] {
     return [
@@ -113,6 +114,10 @@ export default function Contacts() {
     >();
     const actualFeedback = useRef<{ status: "loading" | "success" | "error"; message: string } | undefined>();
     actualFeedback.current = feedback;
+    useEffect(() => {
+        document.title = __("Interact") + " | Miraxsage";
+        hideLoadingShield();
+    }, [lang]);
     const [errors, setErrors] = useState<{ name?: string; email?: string; subject?: string; message?: string }>({});
     const validateField = (field: "name" | "email" | "subject" | "message", value?: string) => {
         if (!value) {
@@ -203,125 +208,126 @@ export default function Contacts() {
                 </Box>
             )}
             <CustomScrollbar sx={{ gridArea: "2/1/2/1" }}>
-                <Thankfullness />
-                <Box
-                    sx={{
-                        padding: "15px",
-                        display: "grid",
-                        gridTemplateColumns: "minmax(0, 600px) minmax(0, 1fr)",
-                        gap: "20px",
-                        alignItems: "center",
-                        [theme.breakpoints.down("2xl")]: {
-                            gridTemplateColumns: "minmax(0, 450px) minmax(0, 1fr)",
-                        },
-                        [theme.breakpoints.down("xl")]: {
-                            gridTemplateColumns: "minmax(0, 363px) minmax(0, 1fr)",
-                        },
-                        [theme.breakpoints.down("lg")]: {
-                            gridTemplateColumns: "minmax(0, 1fr)",
-                        },
-                    }}
-                    className={classes({ "container mx-auto": screenMode.full })}
-                >
-                    <div>
-                        <CustomAccordion expandable={false} title={__("Social networks")}>
-                            <Box sx={{ marginLeft: "-1px" }}>
-                                <DescriptionTable withoutBottomBorder={true} withoutTopBorder={true}>
-                                    {[
-                                        contactData("Telegram", TelegramIcon, "https://t.me/miraxsage", theme),
-                                        contactData(
-                                            "Email",
-                                            AlternateEmailOutlinedIcon,
-                                            "mailto:manin.maxim@mail.ru",
-                                            theme
-                                        ),
-                                        contactData(
-                                            "LinkedIn",
-                                            LinkedInIcon,
-                                            "https://www.linkedin.com/in/manin-maxim-ba74a6221/",
-                                            theme
-                                        ),
-                                        contactData("GitHub", GitHub, "https://github.com/miraxsage/", theme),
-                                    ]}
-                                </DescriptionTable>
-                            </Box>
-                        </CustomAccordion>
-                        <CustomAccordion expandable={false} title={__("Feedback")}>
-                            <Box
-                                component="form"
-                                onSubmit={submit}
-                                sx={{
-                                    padding: "15px",
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    "& > .MuiFormControl-root + *": { marginTop: "15px" },
-                                }}
-                            >
-                                <CustomTextField
-                                    size="small"
-                                    name="name"
-                                    label={__("Your name")}
-                                    value={name}
-                                    onChange={onFieldChange("name")}
-                                    {...fieldValidationProps("name")}
-                                />
-                                <CustomTextField
-                                    size="small"
-                                    name="email"
-                                    label={capitalize(__("email address"))}
-                                    value={email}
-                                    onChange={onFieldChange("email")}
-                                    {...fieldValidationProps("email")}
-                                />
-                                <CustomTextField
-                                    size="small"
-                                    name="subject"
-                                    select
-                                    label={__("Appeal's subject")}
-                                    value={subject}
-                                    onChange={onFieldChange("subject")}
-                                    {...fieldValidationProps("subject")}
+                <Box sx={{ display: "grid", gridTemplate: "auto 1fr", minHeight: "100%" }}>
+                    <Thankfullness />
+                    <Box
+                        sx={{
+                            padding: "15px",
+                            display: "grid",
+                            gridTemplateColumns: "minmax(0, 600px) minmax(0, 1fr)",
+                            gap: "20px",
+                            alignItems: "center",
+                            [theme.breakpoints.down("2xl")]: {
+                                gridTemplateColumns: "minmax(0, 450px) minmax(0, 1fr)",
+                            },
+                            [theme.breakpoints.down("xl")]: {
+                                gridTemplateColumns: "minmax(0, 363px) minmax(0, 1fr)",
+                            },
+                            [theme.breakpoints.down("lg")]: {
+                                gridTemplateColumns: "minmax(0, 1fr)",
+                            },
+                        }}
+                        className={classes({ "container mx-auto": screenMode.full })}
+                    >
+                        <div>
+                            <CustomAccordion expandable={false} title={__("Social networks")}>
+                                <Box sx={{ marginLeft: "-1px" }}>
+                                    <DescriptionTable withoutBottomBorder={true} withoutTopBorder={true}>
+                                        {[
+                                            contactData("Telegram", TelegramIcon, "https://t.me/miraxsage", theme),
+                                            contactData(
+                                                "Email",
+                                                AlternateEmailOutlinedIcon,
+                                                "mailto:manin.maxim@mail.ru",
+                                                theme
+                                            ),
+                                            contactData(
+                                                "LinkedIn",
+                                                LinkedInIcon,
+                                                "https://www.linkedin.com/in/manin-maxim-ba74a6221/",
+                                                theme
+                                            ),
+                                            contactData("GitHub", GitHub, "https://github.com/miraxsage/", theme),
+                                        ]}
+                                    </DescriptionTable>
+                                </Box>
+                            </CustomAccordion>
+                            <CustomAccordion expandable={false} title={__("Feedback")}>
+                                <Box
+                                    component="form"
+                                    onSubmit={submit}
+                                    sx={{
+                                        padding: "15px",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        "& > .MuiFormControl-root + *": { marginTop: "15px" },
+                                    }}
                                 >
-                                    <MenuItem value={__("Partnership proposition")}>
-                                        {__("Partnership proposition")}
-                                    </MenuItem>
-                                    <MenuItem value={__("Job offer")}>{__("Job offer")}</MenuItem>
-                                    <MenuItem value={__("Thanks letter")}>{__("Thanks letter")}</MenuItem>
-                                    <MenuItem value={capitalize(__("resume / portfolio question"))}>
-                                        {capitalize(__("resume / portfolio question"))}
-                                    </MenuItem>
-                                    <MenuItem value={__("Other")}>{__("Other")}</MenuItem>
-                                </CustomTextField>
-                                <CustomTextField
-                                    size="small"
-                                    name="message"
-                                    label={__("Message")}
-                                    value={message}
-                                    onChange={onFieldChange("message")}
-                                    {...fieldValidationProps("message")}
-                                    rows={3}
-                                    multiline
-                                />
-                                <Button
-                                    sx={{ margin: "0 auto", ":not(:hover)": { color: "inherit" } }}
-                                    type="submit"
-                                    onMouseEnter={() => setAccentedButton(true)}
-                                    onMouseLeave={() => setAccentedButton(false)}
-                                    color={accentedSubmit ? "primary" : "regular"}
-                                    variant="outlined"
-                                    onClick={submit}
-                                >
-                                    {__("Submit")}
-                                </Button>
-                            </Box>
-                        </CustomAccordion>
-                    </div>
-                    {!md && (
-                        <CustomCodeEditor
-                            extensions={[langs["typescript"]()]}
-                            lineWrapping={true}
-                            basicSetup={{ foldGutter: false, lineNumbers: false }}
-                            value={`const data: Record<string, string> = { 
+                                    <CustomTextField
+                                        size="small"
+                                        name="name"
+                                        label={__("Your name")}
+                                        value={name}
+                                        onChange={onFieldChange("name")}
+                                        {...fieldValidationProps("name")}
+                                    />
+                                    <CustomTextField
+                                        size="small"
+                                        name="email"
+                                        label={capitalize(__("email address"))}
+                                        value={email}
+                                        onChange={onFieldChange("email")}
+                                        {...fieldValidationProps("email")}
+                                    />
+                                    <CustomTextField
+                                        size="small"
+                                        name="subject"
+                                        select
+                                        label={__("Appeal's subject")}
+                                        value={subject}
+                                        onChange={onFieldChange("subject")}
+                                        {...fieldValidationProps("subject")}
+                                    >
+                                        <MenuItem value={__("Partnership proposition")}>
+                                            {__("Partnership proposition")}
+                                        </MenuItem>
+                                        <MenuItem value={__("Job offer")}>{__("Job offer")}</MenuItem>
+                                        <MenuItem value={__("Thanks letter")}>{__("Thanks letter")}</MenuItem>
+                                        <MenuItem value={capitalize(__("resume / portfolio question"))}>
+                                            {capitalize(__("resume / portfolio question"))}
+                                        </MenuItem>
+                                        <MenuItem value={__("Other")}>{__("Other")}</MenuItem>
+                                    </CustomTextField>
+                                    <CustomTextField
+                                        size="small"
+                                        name="message"
+                                        label={__("Message")}
+                                        value={message}
+                                        onChange={onFieldChange("message")}
+                                        {...fieldValidationProps("message")}
+                                        rows={3}
+                                        multiline
+                                    />
+                                    <Button
+                                        sx={{ margin: "0 auto", ":not(:hover)": { color: "inherit" } }}
+                                        type="submit"
+                                        onMouseEnter={() => setAccentedButton(true)}
+                                        onMouseLeave={() => setAccentedButton(false)}
+                                        color={accentedSubmit ? "primary" : "regular"}
+                                        variant="outlined"
+                                        onClick={submit}
+                                    >
+                                        {__("Submit")}
+                                    </Button>
+                                </Box>
+                            </CustomAccordion>
+                        </div>
+                        {!md && (
+                            <CustomCodeEditor
+                                extensions={[langs["typescript"]()]}
+                                lineWrapping={true}
+                                basicSetup={{ foldGutter: false, lineNumbers: false }}
+                                value={`const data: Record<string, string> = { 
     name: "${name}", 
     email: "${email}",
     subject: "${subject}", 
@@ -342,8 +348,9 @@ try {
     return "Error";
 },
                     `}
-                        />
-                    )}
+                            />
+                        )}
+                    </Box>
                 </Box>
             </CustomScrollbar>
             <AnimatePresence>
@@ -365,3 +372,5 @@ try {
         </Box>
     );
 }
+
+export const Component = Contacts;

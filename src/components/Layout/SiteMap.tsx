@@ -6,7 +6,7 @@ import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlin
 import MessageIcon from "@mui/icons-material/Message";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import { GitHub } from "@mui/icons-material";
-import { NavigateFunction, useNavigate } from "react-router-dom";
+import { NavigateFunction } from "react-router-dom";
 import { getThemeColor } from "../contexts/Theme";
 import ProjectFiltersList, { projectsCategoriesTreeViewData } from "../pages/Projects/FiltersList";
 import CustomScrollbar from "../Scrollbar";
@@ -28,6 +28,7 @@ import { useColorMode, useLanguage, useScreenMode, useSiteMapVisibility, useView
 import { cubicBezier, motion } from "framer-motion";
 import AccentedTreeView, { AccentedTreeItemProps } from "../AccentedTreeView";
 import classes from "classnames";
+import { useNavigate } from "@/utilities/common";
 
 const TransparentButton = styled(Button)(({ theme }) => ({
     color: getThemeColor("regularText", theme),

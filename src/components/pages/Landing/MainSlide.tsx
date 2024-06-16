@@ -21,7 +21,7 @@ import __ from "@/utilities/transtation";
 import { ScrollObservable, getLandingColor, useLandingColor } from ".";
 import TransparentButton from "./TransparentButton";
 import { rangeProgress } from "@/utilities/math";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/utilities/common";
 
 function TypingShield({ titles }: { titles: string[] }) {
     const [currentTitle, setCurrentTitle] = useState(0);
@@ -245,7 +245,7 @@ function SlideContent() {
             sx={{
                 position: "relative",
                 margin: "0 auto",
-                minHeight: "calc(100vh + 0.1763269807 * 100vw)",
+                minHeight: "calc(100dvh + 0.1763269807 * 100vw)",
             }}
         >
             <Box

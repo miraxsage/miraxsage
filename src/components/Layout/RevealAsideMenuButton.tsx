@@ -9,6 +9,7 @@ export function RevealAsideMenuButton() {
     const asideMenuVisibility = useAsideMenuVisibility();
     const theme = useTheme();
     const lessMd = useMediaQuery(theme.breakpoints.down("md"));
+    const smallHeight = useMediaQuery("@media (max-height: 500px)");
     return (
         <motion.div
             style={{
@@ -17,7 +18,7 @@ export function RevealAsideMenuButton() {
             }}
             initial={false}
             animate={{
-                maxWidth: asideMenuVisibility.collapsed && !lessMd ? "40px" : "0px",
+                maxWidth: asideMenuVisibility.collapsed && !lessMd && !smallHeight ? "40px" : "0px",
             }}
         >
             <ToolbarButton dividerSize="full" onClick={() => asideMenuVisibility.update("shown")}>

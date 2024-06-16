@@ -1,4 +1,4 @@
-import { Box, useTheme } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import TopMenu from "./TopMenu";
 import BottomBar from "./BottomBar";
 import AsideMenu from "./AsideMenu";
@@ -15,6 +15,7 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode == "dark";
+    const smallHeight = useMediaQuery("@media (max-height:450px)");
     const glowColor = getThemeColor("layoutGlow", theme);
     const screenMode = useScreenMode();
     const location = useLocation();
@@ -74,7 +75,7 @@ export default function Layout({ children }: LayoutProps) {
                         <SiteMap />
                     </div>
                 </Box>
-                <BottomBar />
+                {!smallHeight && <BottomBar />}
             </Box>
         </Box>
     );

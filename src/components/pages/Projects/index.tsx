@@ -8,19 +8,25 @@ import { motion } from "framer-motion";
 import { projects } from "./Projects";
 import ProjectCard from "./ProjectCard";
 import { getThemeColor } from "@/components/contexts/Theme";
-import { useNavigate } from "react-router-dom";
 import ProjectsBreadcrumbs from "./ProjectsBreadcrumbs";
-import { useAppearance } from "@/store/appearanceSlice";
+import { useLanguage } from "@/store/appearanceSlice";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { navigateToProjects, projectsOrderItems, useProjectsLocation } from "./projectsNavigation";
 import CategoriesToolbar from "@/components/CategoriesToolbar";
 import { useEffect, useState } from "react";
 import { ToolbarButton } from "@/components/ToolbarButton";
+import __ from "@/utilities/transtation";
+import { hideLoadingShield } from "@/components/App";
+import { useNavigate } from "@/utilities/common";
 
 export default function Projects() {
+    const lang = useLanguage().lang;
+    useEffect(() => {
+        document.title = __("Projects") + " | Miraxsage";
+        hideLoadingShield();
+    }, [lang]);
     const theme = useTheme();
     const navigate = useNavigate();
-    const lang = useAppearance().language;
     const projectsLocation = useProjectsLocation()!;
     const { techs, order, orderDirection } = projectsLocation;
     const orderItem = projectsOrderItems.find((o) => o.slug == order);
@@ -84,7 +90,7 @@ export default function Projects() {
                                   position: "absolute",
                                   zIndex: 1,
                                   background: getThemeColor("layoutBackground", theme),
-                                  borderRight: lessMd || filterMenuShown ? `1px solid ${theme.palette.divider}` : 0,
+                                  borderRight: filterMenuShown ? `1px solid ${theme.palette.divider}` : 0,
                               }
                             : {}),
                     }}
@@ -270,3 +276,5 @@ export default function Projects() {
         </Box>
     );
 }
+
+export const Component = Projects;

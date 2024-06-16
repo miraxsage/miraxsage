@@ -18,6 +18,9 @@ export default function DescriptionText({ children, withoutBottomBorder }: Descr
                 borderColor: theme.palette.divider,
                 borderWidth: withoutBottomBorder ? "1px 0px 0px 1px" : "1px 0px 1px 1px",
                 padding: "6px 14px",
+                "@media (max-width: 375px)": {
+                    hyphens: "auto",
+                },
             }}
         >
             {children}

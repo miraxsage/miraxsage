@@ -165,5 +165,6 @@
     "cancel": "отмена",
     "close": "закрыть",
     "back": "назад",
-    "download pdf": "скачать pdf"
+    "download pdf": "скачать pdf",
+    "loading": "загрузка"
 }

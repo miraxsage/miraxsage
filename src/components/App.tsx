@@ -1,8 +1,8 @@
 import "../style.css";
 import "@/utilities/cookie";
-import { SxProps, useMediaQuery, useTheme } from "@mui/material";
+import { Box, SxProps, useMediaQuery, useTheme } from "@mui/material";
 import MainLayout from "./layout/MainLayout";
-import { useThemeColor } from "./contexts/Theme";
+import { getThemeColor, useThemeColor } from "./contexts/Theme";
 import { useAsideMenuVisibility, useLanguage, useScreenMode, useViewMode } from "@/store/appearanceSlice";
 import { ReactContentProps } from "@/types/react";
 import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
@@ -11,16 +11,16 @@ import React, { useEffect, useRef } from "react";
 import { Provider } from "react-redux";
 import ThemeContext from "./contexts/ThemeContext";
 import store from "@/store";
-import Landing from "./pages/Landing";
 import OverlapedChildrenContainer from "./OverlapedChildrenContainer";
 import { NotFoundPage } from "./pages/NotFound";
+import __ from "@/utilities/transtation";
 
 function AppLayout({ children, sx }: { sx?: SxProps } & ReactContentProps) {
     return (
         <OverlapedChildrenContainer
             sx={{
                 background: useThemeColor("pageBg"),
-                minHeight: "calc(max(500px, 100dvh))",
+                minHeight: "calc(max(250px, 100dvh))",
                 height: 0,
                 ...sx,
             }}
@@ -28,6 +28,17 @@ function AppLayout({ children, sx }: { sx?: SxProps } & ReactContentProps) {
             {children}
         </OverlapedChildrenContainer>
     );
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function showLoadingShield(show: boolean = true) {
+    const shield = document.querySelector("#loading-shield") as HTMLElement | null;
+    if (!shield) return;
+    shield.style.display = show ? "block" : "none";
+}
+// eslint-disable-next-line react-refresh/only-export-components
+export function hideLoadingShield() {
+    showLoadingShield(false);
 }
 
 const router = createBrowserRouter([
@@ -42,32 +53,23 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "/",
-                element: <Landing />,
+                lazy: () => import("@/components/pages/Landing/index.tsx"),
             },
             {
                 path: "about/:category?/:block?",
-                lazy: async () => {
-                    const { default: Component } = await import("@/components/pages/About/index.tsx");
-                    return { Component };
-                },
+                lazy: () => import("@/components/pages/About/index.tsx"),
             },
             {
                 path: "projects",
-                lazy: async () => {
-                    const { default: Component } = await import("@/components/pages/Projects/index.tsx");
-                    return { Component };
-                },
+                lazy: () => import("@/components/pages/Projects/index.tsx"),
             },
             {
-                path: `projects/:slug`,
-                lazy: () => import(`@/components/pages/Projects/ProjectPage.tsx`),
+                path: "projects/:slug",
+                lazy: () => import("@/components/pages/Projects/ProjectPage.tsx"),
             },
             {
                 path: "interact",
-                lazy: async () => {
-                    const { default: Component } = await import("@/components/pages/Contacts/index.tsx");
-                    return { Component };
-                },
+                lazy: () => import("@/components/pages/Contacts/index.tsx"),
             },
         ],
     },
@@ -88,7 +90,8 @@ export function App() {
 function AppContent() {
     useLanguage();
     const theme = useTheme();
-    const sm = useMediaQuery(theme.breakpoints.down("md"));
+    const smallHeight = useMediaQuery("@media (max-height: 500px)");
+    const sm = useMediaQuery(theme.breakpoints.down("md")) || smallHeight;
     const asideMenuVisibility = useAsideMenuVisibility();
     const screenMode = useScreenMode();
     const viewMode = useViewMode();
@@ -111,6 +114,20 @@ function AppContent() {
     return (
         <AppLayout>
             <RouterProvider router={router} fallbackElement={<AppSpinner />} />
+            <Box
+                id="loading-shield"
+                sx={{
+                    display: "none",
+                    zIndex: 1,
+                    position: "absolute",
+                    background: getThemeColor("barBackground", theme),
+                    borderRadius: "5px",
+                    border: "1px solid " + theme.palette.divider,
+                    padding: "7px 15px",
+                }}
+            >
+                {__("Loading")}...
+            </Box>
         </AppLayout>
     );
 }

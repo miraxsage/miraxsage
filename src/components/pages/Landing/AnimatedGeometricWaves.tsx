@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-nocheck
+/* eslint-disable */
 import { useEffect, useId } from "react";
 import { Box, SxProps, alpha, darken } from "@mui/material";
 import "./SimplexNoise.min.js";
@@ -13,11 +16,12 @@ export function AnimatedGeometricWaves({ sx, singleRender }: { sx?: SxProps; sin
     let notelessColor = useLandingColor(isDarkMode ? "noteless" : "contrast");
     notelessColor = isDarkMode ? alpha(notelessColor, 0.4) : lighten(notelessColor, 0.8);
     useEffect(() => {
-        const canvas = document.getElementById(id);
+        const canvas = document.getElementById(id) as HTMLCanvasElement;
+        if (!canvas) return;
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
-        let { PI, cos } = Math;
-        let colors = {
+        const { PI, cos } = Math;
+        const colors = {
             accent: "#19232a",
             base: "#5c8abd",
             dark: "#504e4e",

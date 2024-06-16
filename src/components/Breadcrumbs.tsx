@@ -6,8 +6,9 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { getThemeColor } from "./contexts/Theme";
 import { ListItemIcon, Menu, MenuItem, BreadcrumbsProps } from "@mui/material";
 import { AtLeastOneImportantFieldFromGiven } from "@/types/common";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import { CustomChip } from "./Chip";
+import { useNavigate } from "@/utilities/common";
 
 type BasicBreadcrumbItem = {
     label: string;

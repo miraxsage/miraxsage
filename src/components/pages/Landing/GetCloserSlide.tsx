@@ -25,7 +25,7 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import { GitHub } from "@mui/icons-material";
 import { ReactNode, useState } from "react";
 import Copyright from "./Copyright";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/utilities/common";
 
 type SpecialButtonProps = {
     children: ReactNode;
@@ -48,22 +48,16 @@ export function SpecialButton({ children, link, sx }: SpecialButtonProps) {
             dividerSize="removed"
             sx={{
                 width: "225px",
-                fontSize: "27px",
+                fontSize: "22px",
                 justifyContent: "start",
                 "& .MuiSvgIcon-root": {
-                    fontSize: "30px",
+                    fontSize: "25px",
                     marginRight: "10px",
                 },
                 border: "1px solid white",
                 padding: "5px 20px",
                 color: paleTextColor,
                 borderColor: theme.palette.divider,
-                [theme.breakpoints.down("2xl")]: {
-                    fontSize: "25px",
-                },
-                [theme.breakpoints.down("lg")]: {
-                    fontSize: "23px",
-                },
                 [theme.breakpoints.down("sm")]: {
                     fontSize: "20px",
                     width: "auto",
@@ -96,8 +90,6 @@ export default function GetCloserSlide() {
         1
     )}, ${layoutBackgroundColor} 40%)`;
     const sm = useMediaQuery(theme.breakpoints.down("sm"));
-    const lg = useMediaQuery(theme.breakpoints.down("lg"));
-    const _2xl = useMediaQuery(theme.breakpoints.down("2xl"));
     const [openedNodes, setOpenedNodes] = useState([
         "/about/biography/general",
         "/about/experience/technologies",
@@ -200,7 +192,7 @@ export default function GetCloserSlide() {
                             background: `linear-gradient(90deg, ${textColor} 30%, ${darkPaleAccent})`,
                             fontFamily: "Cascadia",
                             lineHeight: 1.5,
-                            fontSize: "27px",
+                            fontSize: "22px",
                             fontWeight: "500",
                             WebkitBackgroundClip: "text",
                             WebkitTextFillColor: "transparent",
@@ -222,12 +214,6 @@ export default function GetCloserSlide() {
                                     background: theme.palette.divider,
                                     borderRadius: "50%",
                                 },
-                            },
-                            [theme.breakpoints.down("2xl")]: {
-                                fontSize: "25px",
-                            },
-                            [theme.breakpoints.down("lg")]: {
-                                fontSize: "23px",
                             },
                             [theme.breakpoints.down("sm")]: {
                                 fontSize: "20px",
@@ -343,17 +329,17 @@ export default function GetCloserSlide() {
                                 ...(arrayContainsSubstring(openedNodes, "biography")
                                     ? arrayContainsSubstring(openedNodes, "experience")
                                         ? {
-                                              height: sm ? "258.5px" : lg ? "281.5px" : _2xl ? "296.5px" : "311.5px",
+                                              height: sm ? "258.5px" : "274.5px",
                                               width: "95px",
                                           }
                                         : {
-                                              height: sm ? "178.5px" : lg ? "193.5px" : _2xl ? "201.5px" : "214px",
+                                              height: sm ? "176.5px" : "187.5px",
                                               width: "53px",
                                           }
                                     : arrayContainsSubstring(openedNodes, "experience")
-                                    ? { height: sm ? "187px" : lg ? "201px" : _2xl ? "209px" : "219px", width: "95px" }
+                                    ? { height: sm ? "187px" : "196px", width: "95px" }
                                     : {
-                                          height: sm ? "106px" : lg ? "112px" : _2xl ? "117px" : "120px",
+                                          height: sm ? "104px" : "109px",
                                           width: "53px",
                                       }),
                                 transition: "all 0.3s",
@@ -405,14 +391,14 @@ export default function GetCloserSlide() {
                                         },
                                         "& .MuiTreeItem-label": {
                                             transition: "color 0.2s",
-                                            fontSize: "27px",
+                                            fontSize: "22px",
                                             marginLeft: "5px",
                                             color: paleTextColor + " !important",
                                         },
                                     },
                                 },
                                 "& .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-iconContainer svg": {
-                                    fontSize: "27px",
+                                    fontSize: "25px",
                                     transition: "color 0.2s",
                                     color: paleTextColor + " !important",
                                 },
@@ -420,18 +406,6 @@ export default function GetCloserSlide() {
                                     {
                                         marginLeft: "5px",
                                     },
-                                [theme.breakpoints.down("2xl")]: {
-                                    [`& .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-iconContainer svg,
-                                        & .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-label`]: {
-                                        fontSize: "25px",
-                                    },
-                                },
-                                [theme.breakpoints.down("lg")]: {
-                                    [`& .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-iconContainer svg,
-                                        & .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-label`]: {
-                                        fontSize: "23px",
-                                    },
-                                },
                                 [theme.breakpoints.down("sm")]: {
                                     [`& .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-iconContainer svg,
                                         & .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-label`]: {
