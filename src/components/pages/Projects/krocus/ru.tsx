@@ -30,7 +30,7 @@ export function Component({ onImageClick }: ProjectContentProps) {
                 топлива предоставляемых компанией в данный момент числится у него на балансе.
             </p>
             <p>
-                Разработка велась на базе CMS Wordpress, а также с использованим библиотеки JQuery, JQuery UI и
+                Разработка велась на базе CMS Wordpress, а также с использованим библиотеки jQuery, jQuery UI и
                 собственной стилизацией соответственно оформлению фирменного стиля компании.
             </p>
         </ProjectContent>

@@ -56,7 +56,7 @@ export default function BottomBar() {
                 <AlternateEmailOutlinedIcon />
             </HorizontalPanelButton>
             <HorizontalPanelButton
-                onClick={goTo("https://www.linkedin.com/in/manin-maxim-ba74a6221/")}
+                onClick={goTo("https://www.linkedin.com/in/miraxsage")}
                 dividerSide="left"
                 dividerSize="squeezed"
                 iconMode={true}

@@ -244,7 +244,7 @@ export default function Contacts() {
                                             contactData(
                                                 "LinkedIn",
                                                 LinkedInIcon,
-                                                "https://www.linkedin.com/in/manin-maxim-ba74a6221/",
+                                                "https://www.linkedin.com/in/miraxsage",
                                                 theme
                                             ),
                                             contactData("GitHub", GitHub, "https://github.com/miraxsage/", theme),

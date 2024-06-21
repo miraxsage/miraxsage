@@ -83,18 +83,12 @@
     "kub": "куб",
     "stu": "гту",
     "kuban state technological university": "кубанский государственный технологический университет",
-
     "information technology": "информационные технологии",
-    "llc": "ооо",
-    "limited liability company": "общество с ограниченной ответственностью",
-    "kubanskie produkty": "кубанские продукты",
-    "cjsc": "зао",
-    "closed joint stock company": "закрытое акционерное общество",
-    "kubankabel": "кубанькабель",
     "municipal administration": "администрация муниципального образования",
     "present time": "настоящее время",
     "position": "должность",
     "software engineer": "инженер-программист",
+    "fullstack developer": "fullstack-разработчик",
     "information technology sector specialist": "специалист сектора информационных технологий",
     "responsibilities": "обязанности",
     "ie": "ип",
@@ -166,5 +160,6 @@
     "close": "закрыть",
     "back": "назад",
     "download pdf": "скачать pdf",
-    "loading": "загрузка"
+    "loading": "загрузка",
+    "resume (miraxsage)": "резюме (miraxsage)"
 }

@@ -1,5 +1,6 @@
 import AccentedTreeView from "@/components/AccentedTreeView";
 import DescriptionTable, { DescriptionTableRowOptions } from "@/components/DescriptionTable";
+import { useLanguage } from "@/store/appearanceSlice";
 import __ from "@/utilities/transtation";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import MemoryIcon from "@mui/icons-material/Memory";
@@ -26,11 +27,18 @@ const webarchitectData: Data = [
         },
         { fullLine: true, showLastInCompactMode: true },
     ],
-    ["[Position]", "[Software engineer]"],
+    ["[Position]", "[Fullstack developer]"],
     ["[Years of experience]", "2 [years|2]"],
 ];
 const kubanskieProduktyData: Data = [
-    ["[Full name|1]", "[Limited liability company] «[Kubanskie produkty]»", { fullLine: true }],
+    [
+        "[Full name|1]",
+        {
+            en: "OOO Kuban products (Limited Liability Company)",
+            ru: "Общество с ограниченной ответственностью «Кубанские продукты»",
+        },
+        { fullLine: true },
+    ],
     ["[Region]", "[Krasnodar region]"],
     ["[City]", "[Forbidden 7]"],
     [
@@ -53,7 +61,14 @@ const kubanskieProduktyData: Data = [
     ["[Years of experience]", "2 [years|2]"],
 ];
 const kubankabelData: Data = [
-    ["[Full name|1]", "[Closed joint stock company] «[Kubankabel]»", { fullLine: true }],
+    [
+        "[Full name|1]",
+        {
+            en: "ZAO Kuban cable factory (Сlosed Joint-Stock Company)",
+            ru: "Закрытое акционерное общество «Кабельный завод «Кубанькабель»",
+        },
+        { fullLine: true },
+    ],
     ["[Region]", "[Krasnodar region]"],
     ["[City]", "[Forbidden 7]"],
     [
@@ -127,6 +142,7 @@ function DataTable({ data, withoutBottomBorder = false }: { data: Data; withoutB
 
 export default function AboutBioLaborBlock() {
     const theme = useTheme();
+    const lang = useLanguage();
     const lessSm = useMediaQuery(theme.breakpoints.down("sm"));
     return (
         <>
@@ -143,7 +159,7 @@ export default function AboutBioLaborBlock() {
                         children: [
                             {
                                 id: "itWebarchitect",
-                                title: `Webarchitect.ru (2010 - ${__("present time")})`,
+                                title: `Webarchitect.ru (2015 - ${__("present time")})`,
                                 icon: <ApartmentIcon />,
                                 children: [
                                     {
@@ -154,7 +170,9 @@ export default function AboutBioLaborBlock() {
                             },
                             {
                                 id: "itKubanskieProdukty",
-                                title: `${__("LLC")} «${__("Kubanskie produkty")}» (09.2022 - ${__("present time")})`,
+                                title: `${
+                                    lang.en ? "OOO Kuban products (LLC)" : "ООО «Кубанские продукты»"
+                                } (09.2022 - ${__("present time")})`,
                                 icon: <ApartmentIcon />,
                                 children: [
                                     {
@@ -165,7 +183,9 @@ export default function AboutBioLaborBlock() {
                             },
                             {
                                 id: "itKubankabel",
-                                title: `${__("CJSC")} «${__("Kubankabel")}» (04.2017 - 09.2022)`,
+                                title: `${
+                                    lang.en ? "ZAO Kuban cable (CJSC)" : "ЗАО «Кубанькабель»"
+                                } (04.2017 - 09.2022)`,
                                 icon: <ApartmentIcon />,
                                 children: [
                                     {

@@ -118,7 +118,7 @@ export const technologies = {
         ["CSS", "https://www.w3.org/TR/?tags%5B0%5D=css", CSSIcon, 78, 11, 25, "#264de4"],
         ["JS", "https://tc39.es/ecma262/", JSIcon, 87, 11, 25, "#e4b900"],
         ["Typescript", "https://www.typescriptlang.org/", TSIcon, 71, 3.5, 6, "#3179c6"],
-        ["JQuery", "https://jquery.com/", JQueryIcon, 91, 8, 23, "#0773b4"],
+        ["jQuery", "https://jquery.com/", JQueryIcon, 91, 8, 23, "#0773b4"],
         ["React", "https://react.dev/", ReactIcon, 74, 3.5, 8, "#00baed"],
         ["Redux", "https://redux.js.org/", ReduxIcon, 68, 2.5, 7, "#764abc"],
         ["ReactRouter", "https://reactrouter.com/en/main", ReactRouterIcon, 65, 2.5, 6, "#d0021b"],

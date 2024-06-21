@@ -225,11 +225,14 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
                         <CodeBackground
                             sx={{
                                 left: "unset",
-                                maxHeight: "calc(0.1763269807 * 100vw * 1.5)",
+                                height: "calc(0.1763269807 * 100vw + max(20dvh, 10dvw))",
                                 textAlign: "right",
                                 right: "-1%",
                                 transformOrigin: "100% 0%",
                                 transform: "skew(0, 10deg)",
+                                [theme.breakpoints.down("md")]: {
+                                    visibility: "hidden",
+                                },
                             }}
                         />
                     </Box>
@@ -239,9 +242,12 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
                     sx={{
                         top: "unset",
                         bottom: 0,
-                        maxHeight: "calc(0.1763269807 * 100vw * 1.5)",
+                        height: "calc(0.1763269807 * 100vw + max(20dvh, 10dvw))",
                         left: "-1%",
                         transform: "translateY(0%)",
+                        [theme.breakpoints.down("md")]: {
+                            visibility: "hidden",
+                        },
                     }}
                 />
                 <Box

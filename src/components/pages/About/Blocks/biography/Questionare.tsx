@@ -42,9 +42,9 @@ export default function AboutBioQuestionaireBlock() {
                                                 кружки и спортивные секции, самым любимым занятиям кроме исследований для меня
                                                 всегда было создание собственных произведений. Увлекался рисованием, плотницким
                                                 делом, сочинял электронную музыку, паял электронные устройства на базе Arduino,
-                                                в 9 классе познакомился с программированием, в чем нашел для себя безграничную
+                                                в 9 классе познакомился с программированием, где нашел для себя безграничную
                                                 возможность реализации собственного творческого потенциала, в связи с чем решил
-                                                связать с данным направлением свою будущую сферу деятельности поступив в
+                                                связать с данным направлением свою будущую сферу деятельности, поступив в
                                                 Кубанский государственный технологический университет по направлению
                                                 «Информатика и вычислительная техника», окончив его впоследствии с отличием. В
                                                 настоящее время активно занимаюсь прикладной и веб-разработкой в
@@ -76,24 +76,19 @@ export default function AboutBioQuestionaireBlock() {
                                     <DescriptionText>
                                         {lang.ru
                                             ? `
-                                                Из положительных личных качеств основными считаю ответственность,
-                                                добросовестность и терпение, что иногда может служить фактором некоторых
-                                                задержек в работе, однако для меня важно проверить решение не один раз, чтобы
-                                                быть уверенным в результате. Стремление к постоянному увеличению качества работы
-                                                до идеального, что можно считать в некоторой степени перфекционизмом, который
-                                                некоторые считают отрицательным, для меня же при наличии ресурсов и обоснования
-                                                — это ключевой фактор конкурентоспособности. Особенным мотиватором для меня
-                                                является видимость практического результата и работа над реальными проектами,
-                                                которыми будут пользоваться многие люди.`
+                                                Среди недостающих качеств, над которыми я продолжаю работать, признаюсь в некоторой, 
+                                                возможно, излишней самокритичности и неуверенности до конца, что тем не менее чаще
+                                                удается преодолеть, видя результат и получая обратную связь. Часто приходится себя
+                                                проверять и тщательнее продумывать решения из-за порой некоторой невнимательности,
+                                                сложности учесть больше условий, с чем, могу сказать, всегда удается справиться
+                                                личным упорством и настойчивостью.`
                                             : `
-                                                From positive personal qualities, I consider responsibility, conscientiousness,
-                                                and patience to be the main ones, which sometimes may cause delays in work, as
-                                                I find it important to double-check solutions to ensure the result. I strive
-                                                for constant improvement in the quality of work towards perfection, which
-                                                some may consider perfectionism, but for me, given the resources and 
-                                                justification, it is a key factor of competitiveness. A special motivator
-                                                for me is the visibility of practical results and working on real projects
-                                                that will benefit many people.`}
+                                                Among the qualities I continue to work on, I acknowledge a tendency toward excessive 
+                                                self-criticism and occasional lack of confidence. However, I often overcome these 
+                                                challenges by seeing results and receiving feedback. I frequently need to double-check
+                                                myself and think through solutions more carefully due to occasional inattention and 
+                                                difficulty in considering multiple factors. Nevertheless, I am able to address these 
+                                                issues through personal persistence and determination.`}
                                     </DescriptionText>
                                 ),
                             },

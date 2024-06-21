@@ -41,7 +41,7 @@ export const projects = [
         status: "completed",
         participating: "team",
         devTimeMonths: 14,
-        technologies: ["HTML", "CSS", "JS", "JQuery", "PHP", "Yii2", "MySQL"],
+        technologies: ["HTML", "CSS", "JS", "jQuery", "PHP", "Yii2", "MySQL"],
         images: 18,
     },
     {
@@ -79,7 +79,7 @@ export const projects = [
         status: "completed",
         participating: "selfown",
         devTimeMonths: 2,
-        technologies: ["HTML", "CSS", "JS", "Bootstrap", "JQuery", "PHP", "Wordpress", "MySQL", "1C"],
+        technologies: ["HTML", "CSS", "JS", "Bootstrap", "jQuery", "PHP", "Wordpress", "MySQL", "1C"],
         images: 6,
     },
     {
@@ -96,7 +96,7 @@ export const projects = [
         status: "completed",
         participating: "team",
         devTimeMonths: 4,
-        technologies: ["HTML", "CSS", "JS", "JQuery", "PHP", "Wordpress"],
+        technologies: ["HTML", "CSS", "JS", "jQuery", "PHP", "Wordpress"],
         images: 9,
     },
     {
@@ -113,7 +113,7 @@ export const projects = [
         status: "completed",
         participating: "team",
         devTimeMonths: 3,
-        technologies: ["HTML", "CSS", "JS", "JQuery", "PHP", "Wordpress", "MySQL"],
+        technologies: ["HTML", "CSS", "JS", "jQuery", "PHP", "Wordpress", "MySQL"],
         images: 11,
     },
     {
@@ -130,7 +130,7 @@ export const projects = [
         status: "completed",
         participating: "team",
         devTimeMonths: 4,
-        technologies: ["HTML", "CSS", "JS", "JQuery", "PHP", "Wordpress", "MySQL"],
+        technologies: ["HTML", "CSS", "JS", "jQuery", "PHP", "Wordpress", "MySQL"],
         images: 7,
     },
     {
@@ -147,7 +147,7 @@ export const projects = [
         status: "completed",
         participating: "team",
         devTimeMonths: 3,
-        technologies: ["HTML", "CSS", "JS", "JQuery", "PHP", "Yii2", "MySQL"],
+        technologies: ["HTML", "CSS", "JS", "jQuery", "PHP", "Yii2", "MySQL"],
         images: 4,
         coverBrightmess: "dark",
     },
@@ -165,7 +165,7 @@ export const projects = [
         status: "completed",
         participating: "team",
         devTimeMonths: 2,
-        technologies: ["HTML", "CSS", "JS", "JQuery", "PHP", "Wordpress"],
+        technologies: ["HTML", "CSS", "JS", "jQuery", "PHP", "Wordpress"],
         images: 4,
     },
     {

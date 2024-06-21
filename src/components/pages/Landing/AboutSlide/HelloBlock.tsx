@@ -6,6 +6,7 @@ import LandingLink from "../LandingLink";
 import { useLanguage } from "@/store/appearanceSlice";
 import AboutBlock from "./AboutBlock";
 import { SxProps } from "@mui/material";
+import Emoji from "../Emoji";
 
 export default function HelloBlock({ id, sx }: { id: string; sx?: SxProps }) {
     const lang = useLanguage();
@@ -23,11 +24,9 @@ export default function HelloBlock({ id, sx }: { id: string; sx?: SxProps }) {
             <Box component="span" sx={{ textDecoration: "line-through", textDecorationColor: textColor }}>
                 {lang.ru ? "трудоголик" : "workaholic"}
             </Box>
-            {lang.ru ? " веб-разработчик " : " web-developer "}
-            <Box component="span" sx={{ WebkitBackgroundClip: "unset", WebkitTextFillColor: "white" }}>
-                🙂‍
-            </Box>
-            .
+            {lang.ru ? " веб-разработчик" : " web-developer"}
+            {"\u00A0"}
+            <Emoji e="🙂‍" />.
             <br />
             {lang.ru ? (
                 <>
@@ -47,14 +46,10 @@ export default function HelloBlock({ id, sx }: { id: string; sx?: SxProps }) {
                 </>
             )}{" "}
             <LandingLink href="/about">{__("resume")}</LandingLink>
-            <Box component="span" sx={{ WebkitBackgroundClip: "unset", WebkitTextFillColor: "white" }}>
-                📜
-            </Box>{" "}
-            {lang.ru ? "и" : "and"} <LandingLink href="/projects">{__("portfolio")}</LandingLink>
-            <Box component="span" sx={{ WebkitBackgroundClip: "unset", WebkitTextFillColor: "white" }}>
-                💼
-            </Box>
-            ,
+            {"\u00A0"}
+            <Emoji e="📜‍" /> {lang.ru ? "и" : "and"} <LandingLink href="/projects">{__("portfolio")}</LandingLink>
+            {"\u00A0"}
+            <Emoji e="💼‍" />,
             {lang.ru ? (
                 <> перейдя по соответствующим ссылкам в каждом из блоков или начале страницы.</>
             ) : (

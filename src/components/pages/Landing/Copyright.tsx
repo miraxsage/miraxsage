@@ -82,7 +82,7 @@ export default function Copyright() {
                         <TransparentButton onClick={linkClick("mailto:manin.maxim@mail.ru")}>
                             <AlternateEmailOutlinedIcon />
                         </TransparentButton>
-                        <TransparentButton onClick={linkClick("https://www.linkedin.com/in/manin-maxim-ba74a6221/")}>
+                        <TransparentButton onClick={linkClick("https://www.linkedin.com/in/miraxsage")}>
                             <LinkedInIcon />
                         </TransparentButton>
                         <TransparentButton onClick={linkClick("https://github.com/miraxsage/")} dividerSize="collapsed">

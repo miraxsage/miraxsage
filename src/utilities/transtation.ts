@@ -1,8 +1,17 @@
 import ru from "@/assets/transtations/ru.json";
 
 function copyWordCasing(initialWord: string, targetWord: string) {
-    if (initialWord.search(/^[-_"'A-ZА-Я\s]+$/) >= 0) return targetWord.toUpperCase();
-    if (initialWord.search(/^[A-ZА-Я]/) >= 0) return targetWord[0].toUpperCase() + targetWord.slice(1);
+    if (initialWord.match(/^[-_()[\]"'A-ZА-Я\s]+$/u)) return targetWord.toUpperCase();
+    for (let i = 0; i < Math.min(initialWord.length, targetWord.length); i++) {
+        const letter = initialWord[i];
+        if (letter.match(/[a-zа-я]/iu))
+            return (
+                initialWord.slice(0, i) +
+                targetWord[i][letter == letter.toUpperCase() ? "toUpperCase" : "toLowerCase"]() +
+                targetWord.slice(i + 1)
+            );
+        else if (!letter.match(/^[-_()[\]"'\s]+$/u)) break;
+    }
     return targetWord;
 }
 function copyTextCasing(initialText: string, targetText: string) {

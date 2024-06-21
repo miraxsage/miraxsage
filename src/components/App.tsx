@@ -118,7 +118,7 @@ function AppContent() {
                 id="loading-shield"
                 sx={{
                     display: "none",
-                    zIndex: 1,
+                    zIndex: 999,
                     position: "absolute",
                     background: getThemeColor("barBackground", theme),
                     borderRadius: "5px",

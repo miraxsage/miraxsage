@@ -490,7 +490,7 @@ export default function GetCloserSlide() {
                                 {!sm && "Email"}
                             </SpecialButton>
                             <SpecialButton
-                                link="https://www.linkedin.com/in/manin-maxim-ba74a6221/"
+                                link="https://www.linkedin.com/in/miraxsage"
                                 sx={{ borderWidth: "0px 0px 1px 1px" }}
                             >
                                 <LinkedInIcon />

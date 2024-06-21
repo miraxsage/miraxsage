@@ -198,7 +198,14 @@ export default function AboutSpecsSnippetsBlock() {
                         right: "5px",
                         bottom: "5px",
                     }}
-                    sx={{ borderLeft: `1px solid ${theme.palette.divider}`, "& .cm-scroller": { overflow: "visible" } }}
+                    sx={{
+                        borderLeft: `1px solid ${theme.palette.divider}`,
+                        "& .cm-scroller": { overflow: "visible" },
+                        fontSize: "1.07rem",
+                        [theme.breakpoints.down("sm")]: {
+                            fontSize: "1rem",
+                        },
+                    }}
                 >
                     <SnippetEditor lang={lang} />
                 </CustomScrollbar>

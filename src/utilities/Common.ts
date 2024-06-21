@@ -62,7 +62,6 @@ export function useNavigate() {
                 !root ||
                 (location.pathname.startsWith(root[0]) && (root[0] != "/projects" || location.pathname == "/projects"))
             ) {
-                console.log("not shield");
                 navigate(toOrDelta, options);
                 return;
             }

@@ -29,11 +29,13 @@ export default function SkillsBlock({ id, sx }: { id: string; sx?: SxProps }) {
                         .NET Framework 3.0-4.5 на С#, Android на Java до 1С:Предприятие.
                         <br />
                         <br />
-                        Хотя я не скрываю свою особенную любовь <Emoji e="✨" /> к веб и фронтенд-разработке, я не
-                        останавливаюсь в совершенствовании своих{" "}
+                        Хотя я не скрываю свою особенную любовь{"\u00A0"}
+                        <Emoji e="✨" /> к веб и фронтенд-разработке, я не останавливаюсь в совершенствовании своих{" "}
                         <LandingLink href="/about/specifications/soft-skills">навыков</LandingLink>
-                        <Emoji e="🤸‍♀️" /> и новых{" "}
+                        {"\u00A0"}
+                        <Emoji e="🤸‍♀️" /> и изучении новых{" "}
                         <LandingLink href="/about/specifications/hard-skills">технологий</LandingLink>
+                        {"\u00A0"}
                         <Emoji e="🏋️‍♀️" />. Те из них, с которыми я работаю в последнее время особенно часто:
                     </>
                 ) : (
@@ -41,10 +43,13 @@ export default function SkillsBlock({ id, sx }: { id: string; sx?: SxProps }) {
                         For over 10 years, I have had the opportunity to work with a wide range of languages, platforms,
                         and tools, from .NET Framework 3.0-4.5 in C# and Android in Java to 1C:Enterprise. <br />
                         <br />
-                        Despite this, my particular passion <Emoji e="✨" /> lies in web and frontend development, I
-                        never stop improving my{" "}
-                        <LandingLink href="/about/specifications/soft-skills">skills</LandingLink> <Emoji e="🤸‍♀️" /> and
-                        exploring new <LandingLink href="/about/specifications/hard-skills">technologies</LandingLink>{" "}
+                        Despite this, my particular passion{"\u00A0"}
+                        <Emoji e="✨" /> lies in web and frontend development, I never stop improving my{" "}
+                        <LandingLink href="/about/specifications/soft-skills">skills</LandingLink>
+                        {"\u00A0"}
+                        <Emoji e="🤸‍♀️" /> and exploring new{" "}
+                        <LandingLink href="/about/specifications/hard-skills">technologies</LandingLink>
+                        {"\u00A0"}
                         <Emoji e="🏋️‍♀️" />. Here are some of the technologies I frequently work with nowadays:
                     </>
                 ),

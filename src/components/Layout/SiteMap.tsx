@@ -107,7 +107,7 @@ const links: Record<string, string> = {
     snippets: "/about/snippets",
     telegram: "https://t.me/miraxsage",
     email: "mailto:manin.maxim@mail.ru",
-    linkedin: "https://www.linkedin.com/in/manin-maxim-ba74a6221/",
+    linkedin: "https://www.linkedin.com/in/miraxsage",
     github: "https://github.com/miraxsage/",
     frontend: "/projects?techs=frontend",
     backend: "/projects?techs=backend",
@@ -129,7 +129,7 @@ function navigateToSection(
         else return navigate(links[section as keyof typeof links]);
     }
     if (section == "download-pdf") {
-        window.open("/Resume (Miraxsage).pdf", "_blank");
+        window.open(`/${__("Resume (Miraxsage)")}.pdf`, "_blank");
         return;
     }
     navigate(`/projects?techs=${section.toLowerCase()}`);
@@ -317,7 +317,7 @@ function ContactButton({
         );
     }
     if (contact == "linkedin") {
-        details.action = "https://www.linkedin.com/in/manin-maxim-ba74a6221/";
+        details.action = "https://www.linkedin.com/in/miraxsage";
         details.content = (
             <>
                 <LinkedInIcon />

@@ -59,7 +59,7 @@ export default function AboutCategoriesList({ ...props }: AboutCategoriesListPro
                   isPdfItemClick = true;
               }
               if (isPdfItemClick) {
-                  window.open("/Resume (Miraxsage).pdf", "_blank");
+                  window.open(`/${__("Resume (Miraxsage)")}.pdf`, "_blank");
                   return;
               }
               if (selectedItems)
