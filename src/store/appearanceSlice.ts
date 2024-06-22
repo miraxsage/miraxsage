@@ -11,9 +11,16 @@ interface AppearanceConfig {
     siteMapVisibility: "shown" | "collapsed";
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore:next-line
+let userLang = (navigator.language || navigator.userLanguage) ?? "ru";
+if (!userLang) userLang = "ru";
+userLang = userLang.slice(0, 2).toLowerCase();
+if (!userLang.match(/^ru|en$/)) userLang = "ru";
+
 const defaultConfig: AppearanceConfig = {
     colorMode: "dark",
-    language: "ru",
+    language: userLang,
     viewMode: "desktop",
     screenMode: "window",
     asideMenuVisibility: "shown",

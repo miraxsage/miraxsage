@@ -36,12 +36,12 @@ export default function Layout({ children }: LayoutProps) {
                           },
                           [theme.breakpoints.up("md")]: {
                               minHeight: "500px",
-                              height: "95%",
+                              height: "calc(max(95%, 100dvh - (100dvw - var(--container-width))))",
                               padding: "25px",
                           },
                           [theme.breakpoints.up("xl")]: {
                               minHeight: "500px",
-                              height: "90%",
+                              height: "calc(max(90%, 100dvh - (100dvw - var(--container-width))))",
                           },
                       }),
             }}
