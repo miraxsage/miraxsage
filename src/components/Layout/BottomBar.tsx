@@ -35,7 +35,7 @@ export default function BottomBar() {
                         className="flex-grow flex items-center px-[22px] py-[18px] leading-[1.2rem] justify-center"
                         style={{ color: alpha(theme.palette.divider, isDarkMode ? 0.5 : 1) }}
                     >
-                        © 2024 Miraxsage
+                        © 2024-{new Date().getFullYear()} Miraxsage
                     </div>
                 </>
             )}
