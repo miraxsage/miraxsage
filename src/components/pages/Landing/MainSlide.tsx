@@ -22,6 +22,7 @@ import { ScrollObservable, getLandingColor, useLandingColor } from ".";
 import TransparentButton from "./TransparentButton";
 import { rangeProgress } from "@/utilities/math";
 import { useNavigate } from "@/utilities/common";
+import RudderIcon from "@/components/icons/RudderIcon";
 
 function TypingShield({ titles }: { titles: string[] }) {
     const [currentTitle, setCurrentTitle] = useState(0);
@@ -305,10 +306,15 @@ function SlideContent() {
                             <TransparentButton onClick={colorModeHook.toggle}>
                                 {!isDarkMode ? <Brightness4Icon /> : <LightModeIcon />}
                             </TransparentButton>
-                            <TransparentButton onClick={linkClick("/projects")} dividerSize="collapsed">
+                            <TransparentButton onClick={linkClick("/projects")}>
                                 <RocketLaunchIcon />
                                 {!smallScreen && "\u00A0_" + __("projects")}
                             </TransparentButton>
+                            <a href="https://cosmic-front.miraxsage.ru" target="_blank">
+                                <TransparentButton dividerSize="collapsed" sx={{ height: "100%" }}>
+                                    <RudderIcon />
+                                </TransparentButton>
+                            </a>
                         </Box>
                     </Box>
                     <Box

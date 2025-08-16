@@ -9,6 +9,8 @@ services:
             - ./data/certbot/conf:/etc/letsencrypt
             - ./data/certbot/www:/var/www/certbot
         command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
+        networks:
+            - app-network
     certbot:
         image: certbot/certbot
         restart: always
@@ -16,5 +18,20 @@ services:
             - ./data/certbot/conf:/etc/letsencrypt
             - ./data/certbot/www:/var/www/certbot
         entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-    # warships-battle:
-    #     image: miraxsage/warships-battle
+        networks:
+            - app-network
+    warships-battle:
+        image: miraxsage/warships-battle
+        restart: always
+        expose:
+            - 3000
+        environment:
+            - NODE_ENV=production
+        volumes:
+            - /miraxsage/data/warships-battle:/app/data
+        networks:
+            - app-network
+
+networks:
+    app-network:
+        driver: bridge
