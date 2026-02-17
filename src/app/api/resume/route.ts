@@ -1,0 +1,115 @@
+import { NextRequest } from "next/server";
+import { revalidatePath } from "next/cache";
+import { getDb } from "@/db";
+import { requireAuth } from "@/shared/api/auth";
+import { jsonResponse, errorResponse, successResponse } from "@/shared/api/response";
+
+const SECTION_TABLES: Record<string, string> = {
+    categories: "resume_categories",
+    general_data: "resume_general_data",
+    education_items: "resume_education_items",
+    education_data: "resume_education_data",
+    labor_items: "resume_labor_items",
+    labor_data: "resume_labor_data",
+    questionnaire_items: "resume_questionnaire_items",
+    achievements: "resume_achievements",
+    soft_skills: "resume_soft_skills",
+    metrics: "resume_metrics",
+};
+
+export async function GET() {
+    try {
+        const db = getDb();
+
+        const categories = db
+            .prepare("SELECT * FROM resume_categories ORDER BY sort_order")
+            .all();
+        const general_data = db
+            .prepare("SELECT * FROM resume_general_data ORDER BY sort_order")
+            .all();
+        const education_items = db
+            .prepare("SELECT * FROM resume_education_items ORDER BY sort_order")
+            .all();
+        const education_data = db
+            .prepare("SELECT * FROM resume_education_data ORDER BY sort_order")
+            .all();
+        const labor_items = db
+            .prepare("SELECT * FROM resume_labor_items ORDER BY sort_order")
+            .all();
+        const labor_data = db
+            .prepare("SELECT * FROM resume_labor_data ORDER BY sort_order")
+            .all();
+        const questionnaire_items = db
+            .prepare("SELECT * FROM resume_questionnaire_items ORDER BY sort_order")
+            .all();
+        const achievements = db
+            .prepare("SELECT * FROM resume_achievements ORDER BY sort_order")
+            .all();
+        const soft_skills = db.prepare("SELECT * FROM resume_soft_skills").all();
+        const metrics = db.prepare("SELECT * FROM resume_metrics").all();
+
+        return jsonResponse({
+            categories,
+            general_data,
+            education_items,
+            education_data,
+            labor_items,
+            labor_data,
+            questionnaire_items,
+            achievements,
+            soft_skills,
+            metrics,
+        });
+    } catch (error) {
+        console.error("Resume GET error:", error);
+        return errorResponse("Internal server error", 500);
+    }
+}
+
+export async function PUT(request: NextRequest) {
+    try {
+        await requireAuth(request);
+
+        const { section, data } = await request.json();
+
+        if (!section || !data) {
+            return errorResponse("Section and data are required");
+        }
+
+        const tableName = SECTION_TABLES[section];
+        if (!tableName) {
+            return errorResponse(
+                `Invalid section. Valid sections: ${Object.keys(SECTION_TABLES).join(", ")}`,
+            );
+        }
+
+        const db = getDb();
+        const items = Array.isArray(data) ? data : [data];
+
+        const transaction = db.transaction(() => {
+            db.prepare(`DELETE FROM ${tableName}`).run();
+
+            if (items.length === 0) return;
+
+            const columns = Object.keys(items[0]);
+            const placeholders = columns.map(() => "?").join(", ");
+            const stmt = db.prepare(
+                `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${placeholders})`,
+            );
+
+            for (const item of items) {
+                stmt.run(...columns.map((col) => item[col] ?? null));
+            }
+        });
+
+        transaction();
+
+        revalidatePath("/about", "layout");
+
+        return successResponse(`Section "${section}" updated successfully`);
+    } catch (error) {
+        if (error instanceof Response) throw error;
+        console.error("Resume PUT error:", error);
+        return errorResponse("Internal server error", 500);
+    }
+}

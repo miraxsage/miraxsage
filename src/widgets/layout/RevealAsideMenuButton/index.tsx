@@ -1,0 +1,30 @@
+"use client";
+
+import LastPageIcon from "@mui/icons-material/LastPage";
+import { useAsideMenuVisibility } from "@/shared/lib/store/appearanceSlice";
+import { motion } from "framer-motion";
+import { ToolbarButton } from "@/shared/ui/ToolbarButton";
+import { useMediaQuery, useTheme } from "@mui/material";
+
+export function RevealAsideMenuButton() {
+    const asideMenuVisibility = useAsideMenuVisibility();
+    const theme = useTheme();
+    const lessMd = useMediaQuery(theme.breakpoints.down("md"));
+    const smallHeight = useMediaQuery("@media (max-height: 500px)");
+    return (
+        <motion.div
+            style={{
+                overflow: "hidden",
+                display: "flex",
+            }}
+            initial={false}
+            animate={{
+                maxWidth: asideMenuVisibility.collapsed && !lessMd && !smallHeight ? "40px" : "0px",
+            }}
+        >
+            <ToolbarButton dividerSize="full" onClick={() => asideMenuVisibility.update("shown")}>
+                <LastPageIcon />
+            </ToolbarButton>
+        </motion.div>
+    );
+}

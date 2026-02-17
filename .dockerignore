@@ -1,1 +1,9 @@
 node_modules
+.next
+.git
+_old_src
+upgrade
+data
+*.md
+.env
+.env.local
