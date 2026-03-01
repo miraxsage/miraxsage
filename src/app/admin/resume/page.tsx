@@ -19,7 +19,8 @@ import {
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import { SortableList, AdminSection, useAdminData } from "@/features/admin-editor";
+import { SortableList, AdminSection, useAdminData, useLocalizedField } from "@/features/admin-editor";
+import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
 
 // ---------------------------------------------------------------------------
@@ -207,6 +208,8 @@ interface SubDataEditorProps<D extends { id: number; sort_order: number; field_k
     allData: D[];
     setAllData: (updater: (prev: D[]) => D[]) => void;
     onAutoSave?: () => void;
+    lang: "en" | "ru";
+    lk: (base: string) => string;
 }
 
 function SubDataEditor<D extends { id: number; sort_order: number; field_key: string; label_en: string; label_ru: string; value_en: string; value_ru: string }>({
@@ -215,6 +218,8 @@ function SubDataEditor<D extends { id: number; sort_order: number; field_key: st
     allData,
     setAllData,
     onAutoSave,
+    lang,
+    lk,
 }: SubDataEditorProps<D>) {
     const items = useMemo(
         () => allData.filter((d) => (d as Record<string, unknown>)[foreignKey] === parentId),
@@ -251,24 +256,25 @@ function SubDataEditor<D extends { id: number; sort_order: number; field_key: st
         onAutoSave?.();
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const lv = (item: any, base: string): string => (item[`${base}_${lang}`] as string) ?? "";
+
     return (
         <Box sx={{ mt: 1, pl: 2, borderLeft: "2px solid", borderColor: "divider" }}>
             <Typography variant="caption" sx={{ mb: 1, display: "block", fontWeight: 600 }}>
-                Data rows
+                {__("Data rows", lang)}
             </Typography>
             <SortableList
                 items={items}
                 onReorder={handleReorder}
                 onDelete={handleDelete}
                 onAdd={handleAdd}
-                addLabel="Add Data Row"
+                addLabel={__("Add Data Row", lang)}
                 renderItem={(item) => (
                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                        <Field label="Key" value={item.field_key} onChange={(v) => updateField(item.id, "field_key" as keyof D, v)} onBlur={onAutoSave} sx={{ flex: "1 1 120px" }} />
-                        <Field label="Label EN" value={item.label_en} onChange={(v) => updateField(item.id, "label_en" as keyof D, v)} onBlur={onAutoSave} sx={{ flex: "1 1 140px" }} />
-                        <Field label="Label RU" value={item.label_ru} onChange={(v) => updateField(item.id, "label_ru" as keyof D, v)} onBlur={onAutoSave} sx={{ flex: "1 1 140px" }} />
-                        <Field label="Value EN" value={item.value_en} onChange={(v) => updateField(item.id, "value_en" as keyof D, v)} onBlur={onAutoSave} sx={{ flex: "1 1 180px" }} />
-                        <Field label="Value RU" value={item.value_ru} onChange={(v) => updateField(item.id, "value_ru" as keyof D, v)} onBlur={onAutoSave} sx={{ flex: "1 1 180px" }} />
+                        <Field label={__("Key", lang)} value={item.field_key} onChange={(v) => updateField(item.id, "field_key" as keyof D, v)} onBlur={onAutoSave} sx={{ flex: "1 1 120px" }} />
+                        <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateField(item.id, lk("label") as keyof D, v)} onBlur={onAutoSave} sx={{ flex: "1 1 180px" }} />
+                        <Field label={__("Value", lang)} value={lv(item, "value")} onChange={(v) => updateField(item.id, lk("value") as keyof D, v)} onBlur={onAutoSave} sx={{ flex: "1 1 220px" }} />
                     </Box>
                 )}
             />
@@ -304,6 +310,7 @@ function ExpandableItem({ label, children }: { label: string; children: React.Re
 export default function AdminResumePage() {
     const theme = useTheme();
     const menuText = getThemeColor("menuText", theme);
+    const { lang, lk, lv } = useLocalizedField();
 
     const { data, setData, loading, saving, error, success, save } = useAdminData<ResumeData>({
         url: "/api/resume",
@@ -448,7 +455,7 @@ export default function AdminResumePage() {
             case 0:
                 return (
                     <AdminSection
-                        title="Categories"
+                        title={__("Categories", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -468,15 +475,14 @@ export default function AdminResumePage() {
                                     parent_id: null,
                                 } as Category)
                             }
-                            addLabel="Add Category"
+                            addLabel={__("Add Category", lang)}
                             renderItem={(item) => (
                                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                    <Field label="Slug" value={item.slug} onChange={(v) => updateItem("categories", item.id, "slug", v)} onBlur={() => saveSection("categories")} sx={{ flex: "1 1 120px" }} />
-                                    <Field label="Icon" value={item.icon} onChange={(v) => updateItem("categories", item.id, "icon", v)} onBlur={() => saveSection("categories")} sx={{ flex: "1 1 100px" }} />
-                                    <Field label="Label EN" value={item.label_en} onChange={(v) => updateItem("categories", item.id, "label_en", v)} onBlur={() => saveSection("categories")} sx={{ flex: "1 1 160px" }} />
-                                    <Field label="Label RU" value={item.label_ru} onChange={(v) => updateItem("categories", item.id, "label_ru", v)} onBlur={() => saveSection("categories")} sx={{ flex: "1 1 160px" }} />
+                                    <Field label={__("Slug", lang)} value={item.slug} onChange={(v) => updateItem("categories", item.id, "slug", v)} onBlur={() => saveSection("categories")} sx={{ flex: "1 1 120px" }} />
+                                    <Field label={__("Icon", lang)} value={item.icon} onChange={(v) => updateItem("categories", item.id, "icon", v)} onBlur={() => saveSection("categories")} sx={{ flex: "1 1 100px" }} />
+                                    <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("categories", item.id, lk("label"), v)} onBlur={() => saveSection("categories")} sx={{ flex: "1 1 200px" }} />
                                     <Field
-                                        label="Parent ID"
+                                        label={__("Parent ID", lang)}
                                         value={item.parent_id != null ? String(item.parent_id) : ""}
                                         onChange={(v) => updateItem("categories", item.id, "parent_id", v)}
                                         onBlur={() => saveSection("categories")}
@@ -492,7 +498,7 @@ export default function AdminResumePage() {
             case 1:
                 return (
                     <AdminSection
-                        title="General Data"
+                        title={__("General Data", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -513,15 +519,13 @@ export default function AdminResumePage() {
                                     value_format: "",
                                 } as GeneralDataItem)
                             }
-                            addLabel="Add Field"
+                            addLabel={__("Add Field", lang)}
                             renderItem={(item) => (
                                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                    <Field label="Key" value={item.field_key} onChange={(v) => updateItem("general_data", item.id, "field_key", v)} onBlur={() => saveSection("general_data")} sx={{ flex: "1 1 120px" }} />
-                                    <Field label="Label EN" value={item.label_en} onChange={(v) => updateItem("general_data", item.id, "label_en", v)} onBlur={() => saveSection("general_data")} sx={{ flex: "1 1 150px" }} />
-                                    <Field label="Label RU" value={item.label_ru} onChange={(v) => updateItem("general_data", item.id, "label_ru", v)} onBlur={() => saveSection("general_data")} sx={{ flex: "1 1 150px" }} />
-                                    <Field label="Value EN" value={item.value_en} onChange={(v) => updateItem("general_data", item.id, "value_en", v)} onBlur={() => saveSection("general_data")} sx={{ flex: "1 1 180px" }} />
-                                    <Field label="Value RU" value={item.value_ru} onChange={(v) => updateItem("general_data", item.id, "value_ru", v)} onBlur={() => saveSection("general_data")} sx={{ flex: "1 1 180px" }} />
-                                    <Field label="Format" value={item.value_format} onChange={(v) => updateItem("general_data", item.id, "value_format", v)} onBlur={() => saveSection("general_data")} sx={{ flex: "0 0 120px" }} />
+                                    <Field label={__("Key", lang)} value={item.field_key} onChange={(v) => updateItem("general_data", item.id, "field_key", v)} onBlur={() => saveSection("general_data")} sx={{ flex: "1 1 120px" }} />
+                                    <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("general_data", item.id, lk("label"), v)} onBlur={() => saveSection("general_data")} sx={{ flex: "1 1 180px" }} />
+                                    <Field label={__("Value", lang)} value={lv(item, "value")} onChange={(v) => updateItem("general_data", item.id, lk("value"), v)} onBlur={() => saveSection("general_data")} sx={{ flex: "1 1 220px" }} />
+                                    <Field label={__("Format", lang)} value={item.value_format} onChange={(v) => updateItem("general_data", item.id, "value_format", v)} onBlur={() => saveSection("general_data")} sx={{ flex: "0 0 120px" }} />
                                 </Box>
                             )}
                         />
@@ -532,7 +536,7 @@ export default function AdminResumePage() {
             case 2:
                 return (
                     <AdminSection
-                        title="Education"
+                        title={__("Education", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -554,28 +558,29 @@ export default function AdminResumePage() {
                                     parent_id: null,
                                 } as EducationItem)
                             }
-                            addLabel="Add Education Item"
+                            addLabel={__("Add Education Item", lang)}
                             renderItem={(item) => (
                                 <Box>
                                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1 }}>
-                                        <Field label="Label EN" value={item.label_en} onChange={(v) => updateItem("education_items", item.id, "label_en", v)} onBlur={() => saveSection("education_items")} sx={{ flex: "1 1 180px" }} />
-                                        <Field label="Label RU" value={item.label_ru} onChange={(v) => updateItem("education_items", item.id, "label_ru", v)} onBlur={() => saveSection("education_items")} sx={{ flex: "1 1 180px" }} />
-                                        <Field label="Icon" value={item.icon} onChange={(v) => updateItem("education_items", item.id, "icon", v)} onBlur={() => saveSection("education_items")} sx={{ flex: "0 0 140px" }} />
+                                        <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("education_items", item.id, lk("label"), v)} onBlur={() => saveSection("education_items")} sx={{ flex: "1 1 220px" }} />
+                                        <Field label={__("Icon", lang)} value={item.icon} onChange={(v) => updateItem("education_items", item.id, "icon", v)} onBlur={() => saveSection("education_items")} sx={{ flex: "0 0 140px" }} />
                                         <Field
-                                            label="Parent ID"
+                                            label={__("Parent ID", lang)}
                                             value={item.parent_id != null ? String(item.parent_id) : ""}
                                             onChange={(v) => updateItem("education_items", item.id, "parent_id", v)}
                                             onBlur={() => saveSection("education_items")}
                                             sx={{ flex: "0 0 100px" }}
                                         />
                                     </Box>
-                                    <ExpandableItem label={`Data rows for "${item.label_en || "Untitled"}"`}>
+                                    <ExpandableItem label={`${__("Data rows", lang)}: ${lv(item, "label") || "Untitled"}`}>
                                         <SubDataEditor
                                             parentId={item.id as number}
                                             foreignKey="education_item_id"
                                             allData={data.education_data}
                                             setAllData={setEducationData}
                                             onAutoSave={saveEducationData}
+                                            lang={lang}
+                                            lk={lk}
                                         />
                                     </ExpandableItem>
                                 </Box>
@@ -588,7 +593,7 @@ export default function AdminResumePage() {
             case 3:
                 return (
                     <AdminSection
-                        title="Labor"
+                        title={__("Labor", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -610,28 +615,29 @@ export default function AdminResumePage() {
                                     parent_id: null,
                                 } as LaborItem)
                             }
-                            addLabel="Add Labor Item"
+                            addLabel={__("Add Labor Item", lang)}
                             renderItem={(item) => (
                                 <Box>
                                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1 }}>
-                                        <Field label="Label EN" value={item.label_en} onChange={(v) => updateItem("labor_items", item.id, "label_en", v)} onBlur={() => saveSection("labor_items")} sx={{ flex: "1 1 180px" }} />
-                                        <Field label="Label RU" value={item.label_ru} onChange={(v) => updateItem("labor_items", item.id, "label_ru", v)} onBlur={() => saveSection("labor_items")} sx={{ flex: "1 1 180px" }} />
-                                        <Field label="Icon" value={item.icon} onChange={(v) => updateItem("labor_items", item.id, "icon", v)} onBlur={() => saveSection("labor_items")} sx={{ flex: "0 0 140px" }} />
+                                        <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("labor_items", item.id, lk("label"), v)} onBlur={() => saveSection("labor_items")} sx={{ flex: "1 1 220px" }} />
+                                        <Field label={__("Icon", lang)} value={item.icon} onChange={(v) => updateItem("labor_items", item.id, "icon", v)} onBlur={() => saveSection("labor_items")} sx={{ flex: "0 0 140px" }} />
                                         <Field
-                                            label="Parent ID"
+                                            label={__("Parent ID", lang)}
                                             value={item.parent_id != null ? String(item.parent_id) : ""}
                                             onChange={(v) => updateItem("labor_items", item.id, "parent_id", v)}
                                             onBlur={() => saveSection("labor_items")}
                                             sx={{ flex: "0 0 100px" }}
                                         />
                                     </Box>
-                                    <ExpandableItem label={`Data rows for "${item.label_en || "Untitled"}"`}>
+                                    <ExpandableItem label={`${__("Data rows", lang)}: ${lv(item, "label") || "Untitled"}`}>
                                         <SubDataEditor
                                             parentId={item.id as number}
                                             foreignKey="labor_item_id"
                                             allData={data.labor_data}
                                             setAllData={setLaborData}
                                             onAutoSave={saveLaborData}
+                                            lang={lang}
+                                            lk={lk}
                                         />
                                     </ExpandableItem>
                                 </Box>
@@ -644,7 +650,7 @@ export default function AdminResumePage() {
             case 4:
                 return (
                     <AdminSection
-                        title="Questionnaire"
+                        title={__("Questionnaire", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -665,27 +671,21 @@ export default function AdminResumePage() {
                                     parent_id: null,
                                 } as QuestionnaireItem)
                             }
-                            addLabel="Add Question"
+                            addLabel={__("Add Question", lang)}
                             renderItem={(item) => (
                                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                        <Field label="Icon" value={item.icon} onChange={(v) => updateItem("questionnaire_items", item.id, "icon", v)} onBlur={() => saveSection("questionnaire_items")} sx={{ flex: "0 0 140px" }} />
+                                        <Field label={__("Icon", lang)} value={item.icon} onChange={(v) => updateItem("questionnaire_items", item.id, "icon", v)} onBlur={() => saveSection("questionnaire_items")} sx={{ flex: "0 0 140px" }} />
                                         <Field
-                                            label="Parent ID"
+                                            label={__("Parent ID", lang)}
                                             value={item.parent_id != null ? String(item.parent_id) : ""}
                                             onChange={(v) => updateItem("questionnaire_items", item.id, "parent_id", v)}
                                             onBlur={() => saveSection("questionnaire_items")}
                                             sx={{ flex: "0 0 100px" }}
                                         />
                                     </Box>
-                                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                        <Field label="Question EN" value={item.question_en} onChange={(v) => updateItem("questionnaire_items", item.id, "question_en", v)} onBlur={() => saveSection("questionnaire_items")} multiline sx={{ flex: "1 1 300px" }} />
-                                        <Field label="Question RU" value={item.question_ru} onChange={(v) => updateItem("questionnaire_items", item.id, "question_ru", v)} onBlur={() => saveSection("questionnaire_items")} multiline sx={{ flex: "1 1 300px" }} />
-                                    </Box>
-                                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                        <Field label="Answer EN" value={item.answer_en} onChange={(v) => updateItem("questionnaire_items", item.id, "answer_en", v)} onBlur={() => saveSection("questionnaire_items")} multiline sx={{ flex: "1 1 300px" }} />
-                                        <Field label="Answer RU" value={item.answer_ru} onChange={(v) => updateItem("questionnaire_items", item.id, "answer_ru", v)} onBlur={() => saveSection("questionnaire_items")} multiline sx={{ flex: "1 1 300px" }} />
-                                    </Box>
+                                    <Field label={__("Question", lang)} value={lv(item, "question")} onChange={(v) => updateItem("questionnaire_items", item.id, lk("question"), v)} onBlur={() => saveSection("questionnaire_items")} multiline sx={{ flex: "1 1 100%" }} />
+                                    <Field label={__("Answer", lang)} value={lv(item, "answer")} onChange={(v) => updateItem("questionnaire_items", item.id, lk("answer"), v)} onBlur={() => saveSection("questionnaire_items")} multiline sx={{ flex: "1 1 100%" }} />
                                 </Box>
                             )}
                         />
@@ -696,7 +696,7 @@ export default function AdminResumePage() {
             case 5:
                 return (
                     <AdminSection
-                        title="Achievements"
+                        title={__("Achievements", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -713,11 +713,10 @@ export default function AdminResumePage() {
                                     content_ru: "",
                                 } as AchievementItem)
                             }
-                            addLabel="Add Achievement"
+                            addLabel={__("Add Achievement", lang)}
                             renderItem={(item) => (
                                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                    <Field label="Content EN" value={item.content_en} onChange={(v) => updateItem("achievements", item.id, "content_en", v)} onBlur={() => saveSection("achievements")} multiline sx={{ flex: "1 1 300px" }} />
-                                    <Field label="Content RU" value={item.content_ru} onChange={(v) => updateItem("achievements", item.id, "content_ru", v)} onBlur={() => saveSection("achievements")} multiline sx={{ flex: "1 1 300px" }} />
+                                    <Field label={__("Content", lang)} value={lv(item, "content")} onChange={(v) => updateItem("achievements", item.id, lk("content"), v)} onBlur={() => saveSection("achievements")} multiline sx={{ flex: "1 1 100%" }} />
                                 </Box>
                             )}
                         />
@@ -728,7 +727,7 @@ export default function AdminResumePage() {
             case 6:
                 return (
                     <AdminSection
-                        title="Soft Skills"
+                        title={__("Soft Skills", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -749,20 +748,16 @@ export default function AdminResumePage() {
                                     level_values: "[]",
                                 } as SoftSkillItem)
                             }
-                            addLabel="Add Soft Skill"
+                            addLabel={__("Add Soft Skill", lang)}
                             renderItem={(item) => (
                                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                        <Field label="Slug" value={item.slug} onChange={(v) => updateItem("soft_skills", item.id, "slug", v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 120px" }} />
-                                        <Field label="Icon" value={item.icon} onChange={(v) => updateItem("soft_skills", item.id, "icon", v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "0 0 140px" }} />
-                                        <Field label="Label EN" value={item.label_en} onChange={(v) => updateItem("soft_skills", item.id, "label_en", v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 160px" }} />
-                                        <Field label="Label RU" value={item.label_ru} onChange={(v) => updateItem("soft_skills", item.id, "label_ru", v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 160px" }} />
+                                        <Field label={__("Slug", lang)} value={item.slug} onChange={(v) => updateItem("soft_skills", item.id, "slug", v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 120px" }} />
+                                        <Field label={__("Icon", lang)} value={item.icon} onChange={(v) => updateItem("soft_skills", item.id, "icon", v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "0 0 140px" }} />
+                                        <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("soft_skills", item.id, lk("label"), v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 200px" }} />
                                     </Box>
-                                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                        <Field label="Description EN" value={item.description_en} onChange={(v) => updateItem("soft_skills", item.id, "description_en", v)} onBlur={() => saveSection("soft_skills")} multiline sx={{ flex: "1 1 300px" }} />
-                                        <Field label="Description RU" value={item.description_ru} onChange={(v) => updateItem("soft_skills", item.id, "description_ru", v)} onBlur={() => saveSection("soft_skills")} multiline sx={{ flex: "1 1 300px" }} />
-                                    </Box>
-                                    <Field label="Level Values (JSON)" value={item.level_values} onChange={(v) => updateItem("soft_skills", item.id, "level_values", v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 100%" }} />
+                                    <Field label={__("Description", lang)} value={lv(item, "description")} onChange={(v) => updateItem("soft_skills", item.id, lk("description"), v)} onBlur={() => saveSection("soft_skills")} multiline sx={{ flex: "1 1 100%" }} />
+                                    <Field label={__("Level Values (JSON)", lang)} value={item.level_values} onChange={(v) => updateItem("soft_skills", item.id, "level_values", v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 100%" }} />
                                 </Box>
                             )}
                         />
@@ -773,7 +768,7 @@ export default function AdminResumePage() {
             case 7:
                 return (
                     <AdminSection
-                        title="Metrics"
+                        title={__("Metrics", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -792,17 +787,16 @@ export default function AdminResumePage() {
                                     chart_data: "{}",
                                 } as MetricItem)
                             }
-                            addLabel="Add Metric"
+                            addLabel={__("Add Metric", lang)}
                             renderItem={(item) => (
                                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                        <Field label="Slug" value={item.slug} onChange={(v) => updateItem("metrics", item.id, "slug", v)} onBlur={() => saveSection("metrics")} sx={{ flex: "1 1 120px" }} />
-                                        <Field label="Label EN" value={item.label_en} onChange={(v) => updateItem("metrics", item.id, "label_en", v)} onBlur={() => saveSection("metrics")} sx={{ flex: "1 1 180px" }} />
-                                        <Field label="Label RU" value={item.label_ru} onChange={(v) => updateItem("metrics", item.id, "label_ru", v)} onBlur={() => saveSection("metrics")} sx={{ flex: "1 1 180px" }} />
+                                        <Field label={__("Slug", lang)} value={item.slug} onChange={(v) => updateItem("metrics", item.id, "slug", v)} onBlur={() => saveSection("metrics")} sx={{ flex: "1 1 120px" }} />
+                                        <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("metrics", item.id, lk("label"), v)} onBlur={() => saveSection("metrics")} sx={{ flex: "1 1 220px" }} />
                                         <FormControl size="small" sx={{ flex: "0 0 140px" }}>
-                                            <InputLabel>Chart Type</InputLabel>
+                                            <InputLabel>{__("Chart Type", lang)}</InputLabel>
                                             <Select
-                                                label="Chart Type"
+                                                label={__("Chart Type", lang)}
                                                 value={item.chart_type ?? "bar"}
                                                 onChange={(e) =>
                                                     updateItemAndSave("metrics", item.id, "chart_type", e.target.value)
@@ -817,7 +811,7 @@ export default function AdminResumePage() {
                                             </Select>
                                         </FormControl>
                                     </Box>
-                                    <Field label="Chart Data (JSON)" value={item.chart_data} onChange={(v) => updateItem("metrics", item.id, "chart_data", v)} onBlur={() => saveSection("metrics")} multiline />
+                                    <Field label={__("Chart Data (JSON)", lang)} value={item.chart_data} onChange={(v) => updateItem("metrics", item.id, "chart_data", v)} onBlur={() => saveSection("metrics")} multiline />
                                 </Box>
                             )}
                         />
@@ -834,7 +828,7 @@ export default function AdminResumePage() {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
                 <AssignmentIndIcon sx={{ color: theme.palette.primary.main, fontSize: 28 }} />
                 <Typography variant="h5" sx={{ fontWeight: 600, color: menuText }}>
-                    Resume Management
+                    {__("Resume Management", lang)}
                 </Typography>
             </Box>
 
@@ -851,7 +845,7 @@ export default function AdminResumePage() {
                 }}
             >
                 {TAB_LABELS.map((label) => (
-                    <Tab key={label} label={label} />
+                    <Tab key={label} label={__(label, lang)} />
                 ))}
             </Tabs>
 

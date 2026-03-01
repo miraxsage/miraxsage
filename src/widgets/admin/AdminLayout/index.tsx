@@ -22,7 +22,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
                 <Box
                     sx={{
                         flexShrink: 0,
-                        width: "fit-content",
+                        width: 248,
                         height: "100vh",
                         background: getThemeColor("barBackground", theme),
                         borderRight: `1px solid ${theme.palette.divider}`,

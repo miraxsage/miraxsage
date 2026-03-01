@@ -6,6 +6,11 @@ import { getThemeColor, getLandingColor, useLandingColor } from "@/shared/lib/th
 import { mix } from "@/shared/lib/colors";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
+import PersonIcon from "@mui/icons-material/Person";
+import HomeIcon from "@mui/icons-material/Home";
+import WorkIcon from "@mui/icons-material/Work";
+import CodeIcon from "@mui/icons-material/Code";
+import type { SvgIconComponent } from "@mui/icons-material";
 import LanguageIcon from "@/shared/icons/LanguageIcon";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import LightModeIcon from "@mui/icons-material/LightMode";
@@ -24,6 +29,24 @@ import TransparentButton from "./TransparentButton";
 import { rangeProgress } from "@/shared/lib/math";
 import { useRouter } from "next/navigation";
 import RudderIcon from "@/shared/icons/RudderIcon";
+
+export interface LandingButton {
+    id: number;
+    sort_order: number;
+    label_en: string;
+    label_ru: string;
+    icon: string;
+    url: string;
+}
+
+const ICON_MAP: Record<string, SvgIconComponent> = {
+    AssignmentIndIcon,
+    PersonIcon,
+    RocketLaunchIcon,
+    HomeIcon,
+    WorkIcon,
+    CodeIcon,
+};
 
 function TypingShield({ titles }: { titles: string[] }) {
     const [currentTitle, setCurrentTitle] = useState(0);
@@ -226,7 +249,7 @@ function WebDeveloperShield() {
     );
 }
 
-function SlideContent() {
+function SlideContent({ buttons }: { buttons: LandingButton[] }) {
     const theme = useTheme();
     const lang = useAppearance().language;
     const isDarkMode = useColorMode().dark;
@@ -241,6 +264,25 @@ function SlideContent() {
             else window.open(link, "_blank");
         };
     };
+
+    const firstButtons = buttons.slice(0, 1);
+    const restButtons = buttons.slice(1);
+
+    const renderButton = (btn: LandingButton, isLast: boolean) => {
+        const IconComp = ICON_MAP[btn.icon];
+        const label = lang === "en" ? btn.label_en : btn.label_ru;
+        return (
+            <TransparentButton
+                key={btn.id}
+                onClick={linkClick(btn.url)}
+                dividerSize={isLast ? "collapsed" : undefined}
+            >
+                {IconComp && <IconComp />}
+                {!smallScreen && "\u00A0_" + label}
+            </TransparentButton>
+        );
+    };
+
     return (
         <Box
             className="container"
@@ -297,20 +339,14 @@ function SlideContent() {
                                 },
                             }}
                         >
-                            <TransparentButton onClick={linkClick("/about")}>
-                                <AssignmentIndIcon />
-                                {!smallScreen && "\u00A0_" + __("about")}
-                            </TransparentButton>
+                            {firstButtons.map((btn) => renderButton(btn, false))}
                             <TransparentButton onClick={langHook.toggle}>
                                 <LanguageIcon language={lang} />
                             </TransparentButton>
                             <TransparentButton onClick={colorModeHook.toggle}>
                                 {!isDarkMode ? <Brightness4Icon /> : <LightModeIcon />}
                             </TransparentButton>
-                            <TransparentButton onClick={linkClick("/projects")}>
-                                <RocketLaunchIcon />
-                                {!smallScreen && "\u00A0_" + __("projects")}
-                            </TransparentButton>
+                            {restButtons.map((btn) => renderButton(btn, false))}
                             <a href="https://cosmic-front.miraxsage.ru" target="_blank">
                                 <TransparentButton dividerSize="collapsed" sx={{ height: "100%" }}>
                                     <RudderIcon />
@@ -434,9 +470,10 @@ function SlideContent() {
 
 type MainSlideProps = {
     scrollObservable?: ScrollObservable;
+    buttons: LandingButton[];
 };
 
-export default function MainSlide({ scrollObservable }: MainSlideProps) {
+export default function MainSlide({ scrollObservable, buttons }: MainSlideProps) {
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;
     const pageBgColor = getThemeColor("pageBgColor", theme);
@@ -540,7 +577,7 @@ export default function MainSlide({ scrollObservable }: MainSlideProps) {
                     height: "100vh",
                 }}
             />
-            <SlideContent />
+            <SlideContent buttons={buttons} />
         </Box>
     );
 }

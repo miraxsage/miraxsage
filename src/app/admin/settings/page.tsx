@@ -3,11 +3,14 @@
 import { useState, FormEvent } from "react";
 import { Box, TextField, Button, Typography, Alert, Card, CardContent, useTheme } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { __ } from "@/shared/lib/i18n";
+import { useLanguage } from "@/shared/lib/store/appearanceSlice";
 import { getThemeColor } from "@/shared/lib/theme";
 
 export default function AdminSettingsPage() {
     const theme = useTheme();
     const menuText = getThemeColor("menuText", theme);
+    const { lang } = useLanguage();
 
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
@@ -22,12 +25,12 @@ export default function AdminSettingsPage() {
         setError("");
 
         if (newPassword !== confirmPassword) {
-            setError("New passwords do not match");
+            setError(__("New passwords do not match", lang));
             return;
         }
 
         if (newPassword.length < 6) {
-            setError("New password must be at least 6 characters");
+            setError(__("New password must be at least 6 characters", lang));
             return;
         }
 
@@ -45,7 +48,7 @@ export default function AdminSettingsPage() {
                 throw new Error(data?.error || "Failed to update password");
             }
 
-            setSuccess("Password updated successfully");
+            setSuccess(__("Password updated successfully", lang));
             setCurrentPassword("");
             setNewPassword("");
             setConfirmPassword("");
@@ -61,7 +64,7 @@ export default function AdminSettingsPage() {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 4 }}>
                 <SettingsIcon sx={{ color: theme.palette.primary.main, fontSize: 28 }} />
                 <Typography variant="h5" sx={{ fontWeight: 600, color: menuText }}>
-                    Settings
+                    {__("Settings", lang)}
                 </Typography>
             </Box>
 
@@ -75,7 +78,7 @@ export default function AdminSettingsPage() {
             >
                 <CardContent sx={{ p: 3 }}>
                     <Typography variant="h6" sx={{ fontWeight: 600, color: menuText, mb: 2 }}>
-                        Change Password
+                        {__("Change Password", lang)}
                     </Typography>
 
                     {success && (
@@ -92,7 +95,7 @@ export default function AdminSettingsPage() {
                     <Box component="form" onSubmit={handleSubmit}>
                         <TextField
                             fullWidth
-                            label="Current Password"
+                            label={__("Current Password", lang)}
                             type="password"
                             value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
@@ -103,7 +106,7 @@ export default function AdminSettingsPage() {
                         />
                         <TextField
                             fullWidth
-                            label="New Password"
+                            label={__("New Password", lang)}
                             type="password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
@@ -114,7 +117,7 @@ export default function AdminSettingsPage() {
                         />
                         <TextField
                             fullWidth
-                            label="Confirm New Password"
+                            label={__("Confirm New Password", lang)}
                             type="password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
@@ -130,7 +133,7 @@ export default function AdminSettingsPage() {
                             disabled={loading}
                             sx={{ mt: 2 }}
                         >
-                            {loading ? "Updating..." : "Update Password"}
+                            {loading ? __("Updating...", lang) : __("Update Password", lang)}
                         </Button>
                     </Box>
                 </CardContent>

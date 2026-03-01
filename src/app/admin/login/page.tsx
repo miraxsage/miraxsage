@@ -4,11 +4,14 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Card, CardContent, TextField, Button, Typography, Alert, useTheme } from "@mui/material";
 import LogoIcon from "@/shared/icons/Logo";
+import { __ } from "@/shared/lib/i18n";
+import { useLanguage } from "@/shared/lib/store/appearanceSlice";
 import { getThemeColor } from "@/shared/lib/theme";
 
 export default function AdminLoginPage() {
     const theme = useTheme();
     const router = useRouter();
+    const { lang } = useLanguage();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -79,7 +82,7 @@ export default function AdminLoginPage() {
                                 color: getThemeColor("menuText", theme),
                             }}
                         >
-                            Admin Panel
+                            {__("Administration", lang)}
                         </Typography>
                     </Box>
 
@@ -92,7 +95,7 @@ export default function AdminLoginPage() {
                     <Box component="form" onSubmit={handleSubmit}>
                         <TextField
                             fullWidth
-                            label="Username"
+                            label={__("Username", lang)}
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             margin="dense"
@@ -103,7 +106,7 @@ export default function AdminLoginPage() {
                         />
                         <TextField
                             fullWidth
-                            label="Password"
+                            label={__("Password", lang)}
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -120,7 +123,7 @@ export default function AdminLoginPage() {
                             disabled={loading}
                             sx={{ mt: 2 }}
                         >
-                            {loading ? "Signing in..." : "Sign In"}
+                            {loading ? __("Signing in...", lang) : __("Sign In", lang)}
                         </Button>
                     </Box>
                 </CardContent>

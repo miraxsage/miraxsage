@@ -4,6 +4,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { Box, Typography, useTheme } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import HomeIcon from "@mui/icons-material/Home";
+import TuneIcon from "@mui/icons-material/Tune";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import CallIcon from "@mui/icons-material/Call";
@@ -13,15 +14,17 @@ import LogoIcon from "@/shared/icons/Logo";
 import LanguageIcon from "@/shared/icons/LanguageIcon";
 import AccentedTabs from "@/shared/ui/AccentedTabs";
 import { useLanguage } from "@/shared/lib/store/appearanceSlice";
+import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
 import { motion } from "framer-motion";
 
 const NAV_ITEMS = [
     { label: "Dashboard", icon: <DashboardIcon />, path: "/admin/dashboard" },
     { label: "Landing", icon: <HomeIcon />, path: "/admin/landing" },
-    { label: "Resume", icon: <AssignmentIndIcon />, path: "/admin/resume" },
-    { label: "Projects", icon: <RocketLaunchIcon />, path: "/admin/projects" },
-    { label: "Contacts", icon: <CallIcon />, path: "/admin/contacts" },
+    { label: "Details", icon: <TuneIcon />, path: "/admin/details" },
+    { label: "Resume", icon: <AssignmentIndIcon />, path: "/admin/resume", sub: true },
+    { label: "Projects", icon: <RocketLaunchIcon />, path: "/admin/projects", sub: true },
+    { label: "Contacts", icon: <CallIcon />, path: "/admin/contacts", sub: true },
     { label: "Settings", icon: <SettingsIcon />, path: "/admin/settings" },
 ];
 
@@ -36,8 +39,19 @@ export default function AdminSidebar({ onNavigate }: AdminSidebarProps) {
     const { lang, update: updateLanguage } = useLanguage();
     const isDarkMode = theme.palette.mode === "dark";
 
-    const activeNavItem = NAV_ITEMS.find(
+    const activePath = NAV_ITEMS.find(
         ({ path }) => pathname === path || pathname.startsWith(path + "/")
+    )?.path ?? null;
+
+    // +2: +1 for the language toggle at children[0], +1 because AccentedTabs uses i+1 for data-tab-id
+    const subPaddingSx = Object.fromEntries(
+        NAV_ITEMS
+            .map((n, i) => ({ ...n, tabIndex: i + 2 }))
+            .filter((n) => n.sub)
+            .map(({ tabIndex }) => [
+                `& .MuiTab-root[data-tab-id="${tabIndex}"]`,
+                { padding: "12px 38px 12px 34px !important" },
+            ]),
     );
 
     const handleLogout = async () => {
@@ -91,14 +105,14 @@ export default function AdminSidebar({ onNavigate }: AdminSidebarProps) {
                         whiteSpace: "nowrap",
                     }}
                 >
-                    Admin Panel
+                    {__("Administration", lang)}
                 </Typography>
             </Box>
 
             {/* Navigation */}
             <Box sx={{ flex: 1, overflow: "auto" }}>
                 <AccentedTabs
-                    activeTab={activeNavItem?.path ?? null}
+                    activeTab={activePath}
                     orientation="vertical"
                     mode="full"
                     underline={false}
@@ -106,7 +120,7 @@ export default function AdminSidebar({ onNavigate }: AdminSidebarProps) {
                         router.push(tab.id as string);
                         onNavigate?.();
                     }}
-                    sx={tabColorsSx}
+                    sx={{ ...tabColorsSx, ...subPaddingSx }}
                 >
                     {[
                         {
@@ -129,7 +143,7 @@ export default function AdminSidebar({ onNavigate }: AdminSidebarProps) {
                         },
                         ...NAV_ITEMS.map(({ label, icon, path }) => ({
                             id: path,
-                            title: label,
+                            title: __(label, lang),
                             icon,
                         })),
                     ]}
@@ -157,7 +171,7 @@ export default function AdminSidebar({ onNavigate }: AdminSidebarProps) {
                 }}
             >
                 <LogoutIcon />
-                <span>Logout</span>
+                <span>{__("Logout", lang)}</span>
             </Box>
         </Box>
     );

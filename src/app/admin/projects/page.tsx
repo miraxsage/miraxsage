@@ -32,7 +32,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import DoneIcon from "@mui/icons-material/Done";
 import CodeIcon from "@mui/icons-material/Code";
-import { useAdminData } from "@/features/admin-editor";
+import { useAdminData, useLocalizedField } from "@/features/admin-editor";
+import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
 
 // ---------------------------------------------------------------------------
@@ -140,6 +141,7 @@ function ProjectsTab() {
     const menuText = getThemeColor("menuText", theme);
     const regularText = getThemeColor("regularText", theme);
     const barBg = getThemeColor("barBackground", theme);
+    const { lang, lk, lv } = useLocalizedField();
 
     const {
         data: projects,
@@ -287,7 +289,7 @@ function ProjectsTab() {
                 onClick={handleAdd}
                 sx={{ mb: 2 }}
             >
-                Add Project
+                {__("Add Project", lang)}
             </Button>
 
             {(projects ?? []).map((project) => {
@@ -316,7 +318,7 @@ function ProjectsTab() {
                             >
                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flex: 1 }}>
                                     <Typography sx={{ fontWeight: 600, color: menuText }}>
-                                        {project.name_en || "(untitled)"}
+                                        {lv(project, "name") || "(untitled)"}
                                     </Typography>
                                     {project.slug && (
                                         <Chip
@@ -369,7 +371,7 @@ function ProjectsTab() {
                                     }}
                                 >
                                     <TextField
-                                        label="Slug"
+                                        label={__("Slug", lang)}
                                         size="small"
                                         fullWidth
                                         value={project.slug ?? ""}
@@ -377,43 +379,25 @@ function ProjectsTab() {
                                         onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
-                                        label="Name (EN)"
+                                        label={__("Name", lang)}
                                         size="small"
                                         fullWidth
-                                        value={project.name_en ?? ""}
-                                        onChange={(e) => updateField(project.id, "name_en", e.target.value)}
+                                        value={lv(project, "name")}
+                                        onChange={(e) => updateField(project.id, lk("name") as keyof Project, e.target.value)}
                                         onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
-                                        label="Name (RU)"
+                                        label={__("Short Name", lang)}
                                         size="small"
                                         fullWidth
-                                        value={project.name_ru ?? ""}
-                                        onChange={(e) => updateField(project.id, "name_ru", e.target.value)}
-                                        onBlur={() => autoSaveProject(project.id)}
-                                    />
-                                    <TextField
-                                        label="Short Name (EN)"
-                                        size="small"
-                                        fullWidth
-                                        value={project.short_name_en ?? ""}
+                                        value={lv(project, "short_name")}
                                         onChange={(e) =>
-                                            updateField(project.id, "short_name_en", e.target.value)
+                                            updateField(project.id, lk("short_name") as keyof Project, e.target.value)
                                         }
                                         onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
-                                        label="Short Name (RU)"
-                                        size="small"
-                                        fullWidth
-                                        value={project.short_name_ru ?? ""}
-                                        onChange={(e) =>
-                                            updateField(project.id, "short_name_ru", e.target.value)
-                                        }
-                                        onBlur={() => autoSaveProject(project.id)}
-                                    />
-                                    <TextField
-                                        label="Domain"
+                                        label={__("Domain", lang)}
                                         size="small"
                                         fullWidth
                                         value={project.domain ?? ""}
@@ -421,27 +405,14 @@ function ProjectsTab() {
                                         onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
-                                        label="Description (EN)"
+                                        label={__("Description", lang)}
                                         size="small"
                                         fullWidth
                                         multiline
                                         minRows={2}
-                                        value={project.description_en ?? ""}
+                                        value={lv(project, "description")}
                                         onChange={(e) =>
-                                            updateField(project.id, "description_en", e.target.value)
-                                        }
-                                        onBlur={() => autoSaveProject(project.id)}
-                                        sx={{ gridColumn: { md: "1 / -1" } }}
-                                    />
-                                    <TextField
-                                        label="Description (RU)"
-                                        size="small"
-                                        fullWidth
-                                        multiline
-                                        minRows={2}
-                                        value={project.description_ru ?? ""}
-                                        onChange={(e) =>
-                                            updateField(project.id, "description_ru", e.target.value)
+                                            updateField(project.id, lk("description") as keyof Project, e.target.value)
                                         }
                                         onBlur={() => autoSaveProject(project.id)}
                                         sx={{ gridColumn: { md: "1 / -1" } }}
@@ -467,7 +438,7 @@ function ProjectsTab() {
                                         onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
-                                        label="Status"
+                                        label={__("Status", lang)}
                                         size="small"
                                         fullWidth
                                         value={project.status ?? ""}
@@ -487,7 +458,7 @@ function ProjectsTab() {
                                         onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
-                                        label="Dev Time (months)"
+                                        label={__("Dev Time (months)", lang)}
                                         size="small"
                                         type="number"
                                         value={project.dev_time_months ?? 0}
@@ -511,7 +482,7 @@ function ProjectsTab() {
                                         onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
-                                        label="Images Count"
+                                        label={__("Images Count", lang)}
                                         size="small"
                                         type="number"
                                         value={project.images_count ?? 0}
@@ -525,7 +496,7 @@ function ProjectsTab() {
                                         onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
-                                        label="Cover Brightness"
+                                        label={__("Cover Brightness", lang)}
                                         size="small"
                                         type="number"
                                         value={project.cover_brightness ?? 50}
@@ -539,7 +510,7 @@ function ProjectsTab() {
                                         onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
-                                        label="Sort Order"
+                                        label={__("Sort Order", lang)}
                                         size="small"
                                         type="number"
                                         value={project.sort_order ?? 0}
@@ -559,7 +530,7 @@ function ProjectsTab() {
                                             variant="subtitle2"
                                             sx={{ fontWeight: 600, color: menuText, mb: 1 }}
                                         >
-                                            Technologies
+                                            {__("Technologies", lang)}
                                         </Typography>
                                         {techCategories.map((cat) => (
                                             <Box key={cat.id} sx={{ mb: 1.5 }}>
@@ -572,7 +543,7 @@ function ProjectsTab() {
                                                         letterSpacing: 0.5,
                                                     }}
                                                 >
-                                                    {cat.label_en}
+                                                    {lang === "en" ? cat.label_en : cat.label_ru}
                                                 </Typography>
                                                 <Box
                                                     sx={{
@@ -609,6 +580,7 @@ function ProjectsTab() {
                                                                 }
                                                                 label={tech.name}
                                                                 sx={{
+                                                                    gap: 0.5,
                                                                     "& .MuiTypography-root": {
                                                                         fontSize: "0.85rem",
                                                                     },
@@ -631,7 +603,7 @@ function ProjectsTab() {
                                                 disabled={isSaving}
                                                 startIcon={isSaving ? <CircularProgress size={16} /> : undefined}
                                             >
-                                                {isSaving ? "Creating..." : "Create Project"}
+                                                {isSaving ? __("Creating...", lang) : __("Create Project", lang)}
                                             </Button>
                                         </Box>
                                     )}
@@ -652,8 +624,8 @@ function ProjectsTab() {
 function TechnologiesTab() {
     const theme = useTheme();
     const menuText = getThemeColor("menuText", theme);
-    const regularText = getThemeColor("regularText", theme);
     const barBg = getThemeColor("barBackground", theme);
+    const { lang } = useLocalizedField();
 
     const {
         data: categories,
@@ -758,10 +730,7 @@ function TechnologiesTab() {
                         }}
                     >
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, color: menuText }}>
-                            {cat.label_en}{" "}
-                            <Typography component="span" variant="body2" sx={{ color: regularText }}>
-                                ({cat.label_ru})
-                            </Typography>
+                            {lang === "en" ? cat.label_en : cat.label_ru}
                         </Typography>
                         <Button
                             size="small"
@@ -770,7 +739,7 @@ function TechnologiesTab() {
                             startIcon={<AddIcon />}
                             onClick={() => handleAddTech(cat.id)}
                         >
-                            Add Technology
+                            {__("Add Technology", lang)}
                         </Button>
                     </Box>
 
@@ -913,6 +882,7 @@ function TechEditForm({
     onClose: () => void;
     saving: boolean;
 }) {
+    const { lang } = useLocalizedField();
     const isNew = tech.id < 0;
 
     const update = (field: keyof Technology, value: unknown) => {
@@ -939,7 +909,7 @@ function TechEditForm({
             }}
         >
             <TextField
-                label="Name"
+                label={__("Name", lang)}
                 size="small"
                 fullWidth
                 value={tech.name ?? ""}
@@ -947,21 +917,21 @@ function TechEditForm({
                 onBlur={() => !isNew && onSave()}
             />
             <FormControl size="small" fullWidth>
-                <InputLabel>Category</InputLabel>
+                <InputLabel>{__("Category", lang)}</InputLabel>
                 <Select
                     value={tech.category_id}
-                    label="Category"
+                    label={__("Category", lang)}
                     onChange={(e) => updateAndSave("category_id", Number(e.target.value))}
                 >
                     {categories.map((c) => (
                         <MenuItem key={c.id} value={c.id}>
-                            {c.label_en}
+                            {lang === "en" ? c.label_en : c.label_ru}
                         </MenuItem>
                     ))}
                 </Select>
             </FormControl>
             <TextField
-                label="Docs Link"
+                label={__("Docs Link", lang)}
                 size="small"
                 fullWidth
                 value={tech.docs_link ?? ""}
@@ -969,7 +939,7 @@ function TechEditForm({
                 onBlur={() => !isNew && onSave()}
             />
             <TextField
-                label="Icon"
+                label={__("Icon", lang)}
                 size="small"
                 fullWidth
                 value={tech.icon ?? ""}
@@ -978,7 +948,7 @@ function TechEditForm({
             />
             <Box>
                 <Typography variant="caption" sx={{ mb: 0.5, display: "block" }}>
-                    Skill Level: {tech.skill_level}%
+                    {__("Skill Level", lang)}: {tech.skill_level}%
                 </Typography>
                 <Slider
                     value={tech.skill_level}
@@ -990,7 +960,7 @@ function TechEditForm({
                 />
             </Box>
             <TextField
-                label="Experience (years)"
+                label={__("Experience (years)", lang)}
                 size="small"
                 type="number"
                 fullWidth
@@ -999,7 +969,7 @@ function TechEditForm({
                 onBlur={() => !isNew && onSave()}
             />
             <TextField
-                label="Projects Count"
+                label={__("Projects Count", lang)}
                 size="small"
                 type="number"
                 fullWidth
@@ -1008,7 +978,7 @@ function TechEditForm({
                 onBlur={() => !isNew && onSave()}
             />
             <TextField
-                label="Color"
+                label={__("Color", lang)}
                 size="small"
                 fullWidth
                 value={tech.color ?? ""}
@@ -1030,7 +1000,7 @@ function TechEditForm({
                 }}
             />
             <TextField
-                label="Sort Order"
+                label={__("Sort Order", lang)}
                 size="small"
                 type="number"
                 fullWidth
@@ -1056,10 +1026,10 @@ function TechEditForm({
                             disabled={saving}
                             startIcon={saving ? <CircularProgress size={14} /> : undefined}
                         >
-                            {saving ? "Creating..." : "Create"}
+                            {saving ? __("Creating...", lang) : __("Create", lang)}
                         </Button>
                         <Button variant="outlined" color="regular" size="small" onClick={onClose}>
-                            Cancel
+                            {__("Cancel", lang)}
                         </Button>
                     </>
                 ) : (
@@ -1071,7 +1041,7 @@ function TechEditForm({
                         onClick={onClose}
                         disabled={saving}
                     >
-                        {saving ? "Saving..." : "Done"}
+                        {saving ? __("Saving...", lang) : __("Done", lang)}
                     </Button>
                 )}
             </Box>
@@ -1086,6 +1056,7 @@ function TechEditForm({
 export default function AdminProjectsPage() {
     const theme = useTheme();
     const menuText = getThemeColor("menuText", theme);
+    const { lang } = useLocalizedField();
     const [tab, setTab] = useState(0);
 
     return (
@@ -1093,7 +1064,7 @@ export default function AdminProjectsPage() {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
                 <RocketLaunchIcon sx={{ color: theme.palette.primary.main, fontSize: 28 }} />
                 <Typography variant="h5" sx={{ fontWeight: 600, color: menuText }}>
-                    Projects &amp; Technologies
+                    {__("Projects & Technologies", lang)}
                 </Typography>
             </Box>
 
@@ -1106,8 +1077,8 @@ export default function AdminProjectsPage() {
                     "& .MuiTab-root": { textTransform: "none", fontWeight: 500 },
                 }}
             >
-                <Tab label="Projects" icon={<RocketLaunchIcon />} iconPosition="start" />
-                <Tab label="Technologies" icon={<CodeIcon />} iconPosition="start" />
+                <Tab label={__("Projects", lang)} icon={<RocketLaunchIcon />} iconPosition="start" />
+                <Tab label={__("Technologies", lang)} icon={<CodeIcon />} iconPosition="start" />
             </Tabs>
 
             {tab === 0 && <ProjectsTab />}

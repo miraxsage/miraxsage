@@ -17,7 +17,8 @@ import CallIcon from "@mui/icons-material/Call";
 import LinkIcon from "@mui/icons-material/Link";
 import ArticleIcon from "@mui/icons-material/Article";
 import AddIcon from "@mui/icons-material/Add";
-import { SortableList, AdminSection, useAdminData } from "@/features/admin-editor";
+import { SortableList, AdminSection, useAdminData, useLocalizedField } from "@/features/admin-editor";
+import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
 
 // ---------------------------------------------------------------------------
@@ -98,6 +99,7 @@ function ContactLinksTab({
     success: string;
 }) {
     const theme = useTheme();
+    const { lang } = useLocalizedField();
 
     const handleReorder = (reordered: ContactInfo[]) => {
         const newItems = reordered.map((item, i) => ({ ...item, sort_order: i + 1 }));
@@ -129,7 +131,7 @@ function ContactLinksTab({
 
     return (
         <AdminSection
-            title="Contact Links"
+            title={__("Contact Links", lang)}
             icon={<LinkIcon sx={{ color: theme.palette.primary.main, fontSize: 22 }} />}
             saving={saving}
             error={error}
@@ -140,52 +142,9 @@ function ContactLinksTab({
                 onReorder={handleReorder}
                 onDelete={handleDelete}
                 onAdd={handleAdd}
-                addLabel="Add Contact Link"
+                addLabel={__("Add Contact Link", lang)}
                 renderItem={(item) => (
-                    <Box
-                        sx={{
-                            display: "grid",
-                            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr 1fr auto" },
-                            gap: 1.5,
-                            alignItems: "center",
-                            width: "100%",
-                        }}
-                    >
-                        <TextField
-                            label="Type"
-                            size="small"
-                            fullWidth
-                            value={item.type}
-                            onChange={(e) => updateItem(item.id, "type", e.target.value)}
-                            onBlur={() => onSave(items)}
-                            placeholder="email, phone, telegram..."
-                        />
-                        <TextField
-                            label="Title"
-                            size="small"
-                            fullWidth
-                            value={item.title}
-                            onChange={(e) => updateItem(item.id, "title", e.target.value)}
-                            onBlur={() => onSave(items)}
-                        />
-                        <TextField
-                            label="Icon"
-                            size="small"
-                            fullWidth
-                            value={item.icon}
-                            onChange={(e) => updateItem(item.id, "icon", e.target.value)}
-                            onBlur={() => onSave(items)}
-                            placeholder="MUI icon name or emoji"
-                        />
-                        <TextField
-                            label="URL"
-                            size="small"
-                            fullWidth
-                            value={item.url}
-                            onChange={(e) => updateItem(item.id, "url", e.target.value)}
-                            onBlur={() => onSave(items)}
-                            placeholder="https://..."
-                        />
+                    <Box sx={{ width: "100%" }}>
                         <FormControlLabel
                             control={
                                 <Switch
@@ -196,12 +155,58 @@ function ContactLinksTab({
                                     size="small"
                                 />
                             }
-                            label="Visible"
+                            label={__("Visible", lang)}
                             sx={{
+                                gap: 0.5,
+                                mb: "12px",
                                 "& .MuiTypography-root": { fontSize: "0.8rem" },
                                 whiteSpace: "nowrap",
                             }}
                         />
+                        <Box
+                            sx={{
+                                display: "grid",
+                                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr 1fr" },
+                                gap: 1.5,
+                                alignItems: "center",
+                            }}
+                        >
+                            <TextField
+                                label={__("Type", lang)}
+                                size="small"
+                                fullWidth
+                                value={item.type}
+                                onChange={(e) => updateItem(item.id, "type", e.target.value)}
+                                onBlur={() => onSave(items)}
+                                placeholder="email, phone, telegram..."
+                            />
+                            <TextField
+                                label={__("Title", lang)}
+                                size="small"
+                                fullWidth
+                                value={item.title}
+                                onChange={(e) => updateItem(item.id, "title", e.target.value)}
+                                onBlur={() => onSave(items)}
+                            />
+                            <TextField
+                                label={__("Icon", lang)}
+                                size="small"
+                                fullWidth
+                                value={item.icon}
+                                onChange={(e) => updateItem(item.id, "icon", e.target.value)}
+                                onBlur={() => onSave(items)}
+                                placeholder="MUI icon name or emoji"
+                            />
+                            <TextField
+                                label="URL"
+                                size="small"
+                                fullWidth
+                                value={item.url}
+                                onChange={(e) => updateItem(item.id, "url", e.target.value)}
+                                onBlur={() => onSave(items)}
+                                placeholder="https://..."
+                            />
+                        </Box>
                     </Box>
                 )}
             />
@@ -232,8 +237,9 @@ function PageContentTab({
 }) {
     const theme = useTheme();
     const barBg = getThemeColor("barBackground", theme);
+    const { lang, lk, lv } = useLocalizedField();
 
-    const updateItem = (id: number, field: keyof ContactPageContent, value: string) => {
+    const updateItem = (id: number, field: keyof ContactPageContent | string, value: string) => {
         setItems(items.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
     };
 
@@ -251,7 +257,7 @@ function PageContentTab({
 
     return (
         <AdminSection
-            title="Page Content"
+            title={__("Page Content", lang)}
             icon={<ArticleIcon sx={{ color: theme.palette.primary.main, fontSize: 22 }} />}
             saving={saving}
             error={error}
@@ -277,7 +283,7 @@ function PageContentTab({
                         }}
                     >
                         <TextField
-                            label="Section Name"
+                            label={__("Section Name", lang)}
                             size="small"
                             value={item.section}
                             onChange={(e) => updateItem(item.id, "section", e.target.value)}
@@ -289,37 +295,19 @@ function PageContentTab({
                             color="error"
                             onClick={() => handleDelete(item.id)}
                         >
-                            Remove
+                            {__("Remove", lang)}
                         </Button>
                     </Box>
-                    <Box
-                        sx={{
-                            display: "grid",
-                            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                            gap: 2,
-                        }}
-                    >
-                        <TextField
-                            label="Content (EN)"
-                            size="small"
-                            fullWidth
-                            multiline
-                            minRows={3}
-                            value={item.content_en}
-                            onChange={(e) => updateItem(item.id, "content_en", e.target.value)}
-                            onBlur={() => onSave(items)}
-                        />
-                        <TextField
-                            label="Content (RU)"
-                            size="small"
-                            fullWidth
-                            multiline
-                            minRows={3}
-                            value={item.content_ru}
-                            onChange={(e) => updateItem(item.id, "content_ru", e.target.value)}
-                            onBlur={() => onSave(items)}
-                        />
-                    </Box>
+                    <TextField
+                        label={__("Content", lang)}
+                        size="small"
+                        fullWidth
+                        multiline
+                        minRows={3}
+                        value={lv(item, "content")}
+                        onChange={(e) => updateItem(item.id, lk("content"), e.target.value)}
+                        onBlur={() => onSave(items)}
+                    />
                 </Box>
             ))}
 
@@ -330,7 +318,7 @@ function PageContentTab({
                 onClick={handleAdd}
                 sx={{ mt: 1 }}
             >
-                Add Content Section
+                {__("Add Content Section", lang)}
             </Button>
         </AdminSection>
     );
@@ -343,6 +331,7 @@ function PageContentTab({
 export default function AdminContactsPage() {
     const theme = useTheme();
     const menuText = getThemeColor("menuText", theme);
+    const { lang } = useLocalizedField();
     const [tab, setTab] = useState(0);
 
     const { data, setData, loading, saving, error, success, save } =
@@ -383,7 +372,7 @@ export default function AdminContactsPage() {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
                 <CallIcon sx={{ color: theme.palette.primary.main, fontSize: 28 }} />
                 <Typography variant="h5" sx={{ fontWeight: 600, color: menuText }}>
-                    Contacts
+                    {__("Contacts", lang)}
                 </Typography>
             </Box>
 
@@ -396,8 +385,8 @@ export default function AdminContactsPage() {
                     "& .MuiTab-root": { textTransform: "none", fontWeight: 500 },
                 }}
             >
-                <Tab label="Contact Links" icon={<LinkIcon />} iconPosition="start" />
-                <Tab label="Page Content" icon={<ArticleIcon />} iconPosition="start" />
+                <Tab label={__("Contact Links", lang)} icon={<LinkIcon />} iconPosition="start" />
+                <Tab label={__("Page Content", lang)} icon={<ArticleIcon />} iconPosition="start" />
             </Tabs>
 
             {tab === 0 && (

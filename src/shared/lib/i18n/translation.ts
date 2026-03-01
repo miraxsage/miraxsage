@@ -8,7 +8,8 @@ export function setTranslationsMap(map: TranslationsMap) {
 }
 
 function getTranslationsSource(): Record<string, string | string[]> {
-    return dynamicMap ?? (staticRu as Record<string, string | string[]>);
+    if (!dynamicMap) return staticRu as Record<string, string | string[]>;
+    return { ...(staticRu as Record<string, string | string[]>), ...dynamicMap };
 }
 
 function copyWordCasing(initialWord: string, targetWord: string) {
