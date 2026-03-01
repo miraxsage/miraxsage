@@ -1,7 +1,6 @@
 "use client";
 
-import { Box, Typography, Button, Alert, CircularProgress, useTheme } from "@mui/material";
-import SaveIcon from "@mui/icons-material/Save";
+import { Box, Typography, Alert, CircularProgress, useTheme } from "@mui/material";
 import { getThemeColor } from "@/shared/lib/theme";
 
 interface AdminSectionProps {
@@ -10,7 +9,6 @@ interface AdminSectionProps {
     saving?: boolean;
     error?: string;
     success?: string;
-    onSave?: () => void;
     children: React.ReactNode;
 }
 
@@ -20,7 +18,6 @@ export default function AdminSection({
     saving,
     error,
     success,
-    onSave,
     children,
 }: AdminSectionProps) {
     const theme = useTheme();
@@ -32,28 +29,21 @@ export default function AdminSection({
                 sx={{
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "space-between",
                     mb: 3,
-                    flexWrap: "wrap",
-                    gap: 1,
+                    gap: 1.5,
                 }}
             >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                    {icon}
-                    <Typography variant="h5" sx={{ fontWeight: 600, color: menuText }}>
-                        {title}
-                    </Typography>
-                </Box>
-                {onSave && (
-                    <Button
-                        variant="contained"
-                        startIcon={saving ? <CircularProgress size={16} /> : <SaveIcon />}
-                        onClick={onSave}
-                        disabled={saving}
-                        sx={{ py: 1 }}
-                    >
-                        {saving ? "Saving..." : "Save Changes"}
-                    </Button>
+                {icon}
+                <Typography variant="h5" sx={{ fontWeight: 600, color: menuText }}>
+                    {title}
+                </Typography>
+                {saving && (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, ml: 0.5 }}>
+                        <CircularProgress size={14} color="inherit" />
+                        <Typography variant="caption" color="text.secondary">
+                            Saving...
+                        </Typography>
+                    </Box>
                 )}
             </Box>
             {error && (

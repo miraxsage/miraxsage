@@ -96,7 +96,8 @@ export default function AdminSettingsPage() {
                             type="password"
                             value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
-                            margin="normal"
+                            margin="dense"
+                            size="small"
                             autoComplete="current-password"
                             required
                         />
@@ -106,7 +107,8 @@ export default function AdminSettingsPage() {
                             type="password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
-                            margin="normal"
+                            margin="dense"
+                            size="small"
                             autoComplete="new-password"
                             required
                         />
@@ -116,15 +118,17 @@ export default function AdminSettingsPage() {
                             type="password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            margin="normal"
+                            margin="dense"
+                            size="small"
                             autoComplete="new-password"
                             required
                         />
                         <Button
                             type="submit"
-                            variant="contained"
+                            variant="outlined"
+                            color="regular"
                             disabled={loading}
-                            sx={{ mt: 3, py: 1.2 }}
+                            sx={{ mt: 2 }}
                         >
                             {loading ? "Updating..." : "Update Password"}
                         </Button>

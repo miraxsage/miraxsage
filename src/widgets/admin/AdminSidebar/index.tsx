@@ -1,19 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import Link from "next/link";
-import {
-    Box,
-    List,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Typography,
-    Button,
-    Divider,
-    useTheme,
-    alpha,
-} from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import HomeIcon from "@mui/icons-material/Home";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
@@ -21,18 +9,21 @@ import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import CallIcon from "@mui/icons-material/Call";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
-import MiraxsageIcon from "@/shared/icons/MiraxsageIcon";
+import LogoIcon from "@/shared/icons/Logo";
+import LanguageIcon from "@/shared/icons/LanguageIcon";
+import AccentedTabs from "@/shared/ui/AccentedTabs";
 import { useLanguage } from "@/shared/lib/store/appearanceSlice";
 import { getThemeColor } from "@/shared/lib/theme";
+import { motion } from "framer-motion";
 
 const NAV_ITEMS = [
-    { label: "Dashboard", icon: DashboardIcon, path: "/admin/dashboard" },
-    { label: "Landing", icon: HomeIcon, path: "/admin/landing" },
-    { label: "Resume", icon: AssignmentIndIcon, path: "/admin/resume" },
-    { label: "Projects", icon: RocketLaunchIcon, path: "/admin/projects" },
-    { label: "Contacts", icon: CallIcon, path: "/admin/contacts" },
-    { label: "Settings", icon: SettingsIcon, path: "/admin/settings" },
-] as const;
+    { label: "Dashboard", icon: <DashboardIcon />, path: "/admin/dashboard" },
+    { label: "Landing", icon: <HomeIcon />, path: "/admin/landing" },
+    { label: "Resume", icon: <AssignmentIndIcon />, path: "/admin/resume" },
+    { label: "Projects", icon: <RocketLaunchIcon />, path: "/admin/projects" },
+    { label: "Contacts", icon: <CallIcon />, path: "/admin/contacts" },
+    { label: "Settings", icon: <SettingsIcon />, path: "/admin/settings" },
+];
 
 interface AdminSidebarProps {
     onNavigate?: () => void;
@@ -43,10 +34,11 @@ export default function AdminSidebar({ onNavigate }: AdminSidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
     const { lang, update: updateLanguage } = useLanguage();
+    const isDarkMode = theme.palette.mode === "dark";
 
-    const regularText = getThemeColor("regularText", theme);
-    const activeText = getThemeColor("tabActiveText", theme);
-    const hoverBg = getThemeColor("tabHoverBg", theme);
+    const activeNavItem = NAV_ITEMS.find(
+        ({ path }) => pathname === path || pathname.startsWith(path + "/")
+    );
 
     const handleLogout = async () => {
         try {
@@ -56,18 +48,45 @@ export default function AdminSidebar({ onNavigate }: AdminSidebarProps) {
         }
     };
 
+    const tabColorsSx = {
+        "& .MuiTab-root": { color: getThemeColor("tabIcon", theme), gap: "8px", justifyContent: "flex-start", padding: "12px 38px 12px 18px" },
+        "& .MuiTab-root:hover": { color: getThemeColor("tabHoverIcon", theme) },
+        "& .MuiTab-root.Mui-selected": { color: getThemeColor("tabActiveText", theme) },
+        "& .MuiTab-root::before": { width: "100%", left: "0" },
+        "& .MuiTab-root:last-of-type::before": { display: "none" },
+    };
+
     return (
         <Box sx={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
             {/* Logo area */}
-            <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1.5 }}>
-                <Box sx={{ width: 36, height: 36, flexShrink: 0 }}>
-                    <MiraxsageIcon />
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1.5,
+                    pl: "18px",
+                    pr: "38px",
+                    minHeight: 55,
+                    borderBottom: `1px solid ${theme.palette.divider}`,
+                }}
+            >
+                <Box
+                    sx={{
+                        width: 30,
+                        height: 30,
+                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        "& svg": { width: 26, height: 26 },
+                    }}
+                >
+                    <LogoIcon />
                 </Box>
                 <Typography
-                    variant="h6"
                     sx={{
                         fontWeight: 600,
-                        fontSize: "1.1rem",
+                        fontSize: "1.05rem",
                         color: getThemeColor("menuText", theme),
                         whiteSpace: "nowrap",
                     }}
@@ -76,96 +95,69 @@ export default function AdminSidebar({ onNavigate }: AdminSidebarProps) {
                 </Typography>
             </Box>
 
-            <Divider />
-
-            {/* Locale selector */}
-            <Box sx={{ px: 2, py: 1, display: "flex", gap: 0.5 }}>
-                {(["ru", "en"] as const).map((locale) => (
-                    <Button
-                        key={locale}
-                        size="small"
-                        variant={lang === locale ? "contained" : "text"}
-                        onClick={() => updateLanguage(locale)}
-                        sx={{
-                            minWidth: 40,
-                            fontSize: "0.75rem",
-                            fontWeight: lang === locale ? 700 : 400,
-                            color: lang === locale ? undefined : regularText,
-                            textTransform: "uppercase",
-                        }}
-                    >
-                        {locale}
-                    </Button>
-                ))}
+            {/* Navigation */}
+            <Box sx={{ flex: 1, overflow: "auto" }}>
+                <AccentedTabs
+                    activeTab={activeNavItem?.path ?? null}
+                    orientation="vertical"
+                    mode="full"
+                    underline={false}
+                    onTabSelect={(tab) => {
+                        router.push(tab.id as string);
+                        onNavigate?.();
+                    }}
+                    sx={tabColorsSx}
+                >
+                    {[
+                        {
+                            id: "language",
+                            title: lang === "ru" ? "Русский" : "English",
+                            notTogglable: true,
+                            icon: (hovered: boolean) => (
+                                <motion.div
+                                    animate={{
+                                        filter: hovered ? "grayscale(0)" : "grayscale(1)",
+                                        opacity: hovered ? 1 : isDarkMode ? 0.5 : 0.4,
+                                    }}
+                                >
+                                    <LanguageIcon language={lang} />
+                                </motion.div>
+                            ),
+                            onClick() {
+                                updateLanguage(lang === "ru" ? "en" : "ru");
+                            },
+                        },
+                        ...NAV_ITEMS.map(({ label, icon, path }) => ({
+                            id: path,
+                            title: label,
+                            icon,
+                        })),
+                    ]}
+                </AccentedTabs>
             </Box>
 
-            <Divider />
-
-            {/* Navigation */}
-            <List sx={{ flex: 1, overflow: "auto", px: 1, py: 1 }}>
-                {NAV_ITEMS.map(({ label, icon: Icon, path }) => {
-                    const isActive = pathname === path || pathname.startsWith(path + "/");
-                    return (
-                        <ListItemButton
-                            key={path}
-                            component={Link}
-                            href={path}
-                            onClick={onNavigate}
-                            selected={isActive}
-                            sx={{
-                                borderRadius: 1,
-                                mb: 0.5,
-                                color: isActive ? activeText : regularText,
-                                bgcolor: isActive ? alpha(theme.palette.primary.main, 0.1) : "transparent",
-                                "&:hover": {
-                                    bgcolor: isActive ? alpha(theme.palette.primary.main, 0.15) : hoverBg,
-                                },
-                                "& .MuiListItemIcon-root": {
-                                    color: isActive ? activeText : getThemeColor("regularIcon", theme),
-                                    minWidth: 40,
-                                },
-                            }}
-                        >
-                            <ListItemIcon>
-                                <Icon fontSize="small" />
-                            </ListItemIcon>
-                            <ListItemText
-                                primary={label}
-                                primaryTypographyProps={{
-                                    fontSize: "0.9rem",
-                                    fontWeight: isActive ? 600 : 400,
-                                }}
-                            />
-                        </ListItemButton>
-                    );
-                })}
-            </List>
-
-            <Divider />
-
             {/* Logout */}
-            <Box sx={{ p: 1 }}>
-                <ListItemButton
-                    onClick={handleLogout}
-                    sx={{
-                        borderRadius: 1,
-                        color: regularText,
-                        "&:hover": {
-                            bgcolor: hoverBg,
-                            color: theme.palette.error.main,
-                            "& .MuiListItemIcon-root": { color: theme.palette.error.main },
-                        },
-                        "& .MuiListItemIcon-root": { color: getThemeColor("regularIcon", theme), minWidth: 40 },
-                    }}
-                >
-                    <ListItemIcon>
-                        <LogoutIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText
-                        primary="Logout"
-                        primaryTypographyProps={{ fontSize: "0.9rem" }}
-                    />
-                </ListItemButton>
+            <Box
+                onClick={handleLogout}
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    minHeight: 55,
+                    padding: "12px 38px 12px 18px",
+                    cursor: "pointer",
+                    color: getThemeColor("tabIcon", theme),
+                    borderTop: `1px solid ${theme.palette.divider}`,
+                    ...theme.typography.button,
+                    transition: "color 0.3s, background 0.2s ease-in-out 0.1s",
+                    "&:hover": {
+                        color: theme.palette.error.main,
+                        backgroundColor: getThemeColor("tabHoverBg", theme),
+                    },
+                }}
+            >
+                <LogoutIcon />
+                <span>Logout</span>
             </Box>
         </Box>
     );

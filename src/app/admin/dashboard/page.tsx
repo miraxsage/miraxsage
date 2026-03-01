@@ -75,14 +75,14 @@ export default function AdminDashboardPage() {
                             }}
                             elevation={0}
                         >
-                            <CardContent sx={{ p: 2.5 }}>
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}>
-                                    <Icon sx={{ color: theme.palette.primary.main, fontSize: 22 }} />
-                                    <Typography sx={{ fontWeight: 600, color: menuText, fontSize: "0.95rem" }}>
+                            <CardContent sx={{ padding: "18px 24px", "&:last-child": { pb: "18px" } }}>
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 0.5 }}>
+                                    <Icon sx={{ color: theme.palette.primary.main, fontSize: 24 }} />
+                                    <Typography sx={{ fontWeight: 600, color: menuText, fontSize: "1.1rem" }}>
                                         {label}
                                     </Typography>
                                 </Box>
-                                <Typography sx={{ color: regularText, fontSize: "0.85rem" }}>
+                                <Typography sx={{ color: regularText, fontSize: "0.95rem" }}>
                                     {description}
                                 </Typography>
                             </CardContent>

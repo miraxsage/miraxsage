@@ -1,47 +1,52 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Box, IconButton, useTheme, useMediaQuery } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { getThemeColor } from "@/shared/lib/theme";
 import AdminSidebar from "@/widgets/admin/AdminSidebar";
 
-const SIDEBAR_WIDTH = 280;
-
 export default function AdminLayoutClient({ children }: { children: React.ReactNode }) {
     const theme = useTheme();
+    const pathname = usePathname();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
+    const isLoginPage = pathname === "/admin/login";
+
     return (
-        <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-            {/* Sidebar */}
-            <Box
-                sx={{
-                    width: SIDEBAR_WIDTH,
-                    minWidth: SIDEBAR_WIDTH,
-                    height: "100vh",
-                    background: getThemeColor("barBackground", theme),
-                    borderRight: `1px solid ${theme.palette.divider}`,
-                    display: "flex",
-                    flexDirection: "column",
-                    overflow: "hidden",
-                    ...(isSmallScreen
-                        ? {
-                              position: "fixed",
-                              top: 0,
-                              left: sidebarOpen ? 0 : -SIDEBAR_WIDTH,
-                              zIndex: 1200,
-                              transition: "left 0.3s ease",
-                          }
-                        : {}),
-                }}
-            >
-                <AdminSidebar onNavigate={() => isSmallScreen && setSidebarOpen(false)} />
-            </Box>
+        <Box sx={{ display: "flex", height: "100vh", width: "100%", overflow: "hidden" }}>
+            {/* Sidebar — hidden on login page */}
+            {!isLoginPage && (
+                <Box
+                    sx={{
+                        flexShrink: 0,
+                        width: "fit-content",
+                        height: "100vh",
+                        background: getThemeColor("barBackground", theme),
+                        borderRight: `1px solid ${theme.palette.divider}`,
+                        display: "flex",
+                        flexDirection: "column",
+                        overflow: "hidden",
+                        ...(isSmallScreen
+                            ? {
+                                  position: "fixed",
+                                  top: 0,
+                                  left: 0,
+                                  zIndex: 1200,
+                                  transform: sidebarOpen ? "translateX(0)" : "translateX(-100%)",
+                                  transition: "transform 0.3s ease",
+                              }
+                            : {}),
+                    }}
+                >
+                    <AdminSidebar onNavigate={() => isSmallScreen && setSidebarOpen(false)} />
+                </Box>
+            )}
 
             {/* Overlay for small screens */}
-            {isSmallScreen && sidebarOpen && (
+            {!isLoginPage && isSmallScreen && sidebarOpen && (
                 <Box
                     onClick={() => setSidebarOpen(false)}
                     sx={{
@@ -63,7 +68,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
                 }}
             >
                 {/* Mobile header */}
-                {isSmallScreen && (
+                {!isLoginPage && isSmallScreen && (
                     <Box
                         sx={{
                             p: 1,
@@ -77,7 +82,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
                     </Box>
                 )}
 
-                <Box sx={{ p: 3 }}>{children}</Box>
+                <Box sx={{ p: isLoginPage ? 0 : 3 }}>{children}</Box>
             </Box>
         </Box>
     );

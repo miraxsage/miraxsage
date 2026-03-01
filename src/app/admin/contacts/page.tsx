@@ -10,13 +10,13 @@ import {
     Tab,
     Switch,
     FormControlLabel,
-    Alert,
     CircularProgress,
     useTheme,
 } from "@mui/material";
 import CallIcon from "@mui/icons-material/Call";
 import LinkIcon from "@mui/icons-material/Link";
 import ArticleIcon from "@mui/icons-material/Article";
+import AddIcon from "@mui/icons-material/Add";
 import { SortableList, AdminSection, useAdminData } from "@/features/admin-editor";
 import { getThemeColor } from "@/shared/lib/theme";
 
@@ -85,32 +85,46 @@ function ContactLinksTab({
     setItems,
     saving,
     onSave,
+    onSaveNow,
     error,
     success,
 }: {
     items: ContactInfo[];
     setItems: (items: ContactInfo[]) => void;
     saving: boolean;
-    onSave: () => void;
+    onSave: (items: ContactInfo[]) => void;
+    onSaveNow: (items: ContactInfo[]) => void;
     error: string;
     success: string;
 }) {
     const theme = useTheme();
 
     const handleReorder = (reordered: ContactInfo[]) => {
-        setItems(reordered.map((item, i) => ({ ...item, sort_order: i + 1 })));
+        const newItems = reordered.map((item, i) => ({ ...item, sort_order: i + 1 }));
+        setItems(newItems);
+        onSaveNow(newItems);
     };
 
     const handleDelete = (id: number | string) => {
-        setItems(items.filter((item) => item.id !== id));
+        const newItems = items.filter((item) => item.id !== id);
+        setItems(newItems);
+        onSaveNow(newItems);
     };
 
     const handleAdd = () => {
-        setItems([...items, blankContactInfo(items.length + 1)]);
+        const newItems = [...items, blankContactInfo(items.length + 1)];
+        setItems(newItems);
+        onSaveNow(newItems);
     };
 
     const updateItem = (id: number, field: keyof ContactInfo, value: unknown) => {
         setItems(items.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
+    };
+
+    const updateItemAndSave = (id: number, field: keyof ContactInfo, value: unknown) => {
+        const newItems = items.map((item) => (item.id === id ? { ...item, [field]: value } : item));
+        setItems(newItems);
+        onSaveNow(newItems);
     };
 
     return (
@@ -120,7 +134,6 @@ function ContactLinksTab({
             saving={saving}
             error={error}
             success={success}
-            onSave={onSave}
         >
             <SortableList<ContactInfo>
                 items={items}
@@ -144,6 +157,7 @@ function ContactLinksTab({
                             fullWidth
                             value={item.type}
                             onChange={(e) => updateItem(item.id, "type", e.target.value)}
+                            onBlur={() => onSave(items)}
                             placeholder="email, phone, telegram..."
                         />
                         <TextField
@@ -152,6 +166,7 @@ function ContactLinksTab({
                             fullWidth
                             value={item.title}
                             onChange={(e) => updateItem(item.id, "title", e.target.value)}
+                            onBlur={() => onSave(items)}
                         />
                         <TextField
                             label="Icon"
@@ -159,6 +174,7 @@ function ContactLinksTab({
                             fullWidth
                             value={item.icon}
                             onChange={(e) => updateItem(item.id, "icon", e.target.value)}
+                            onBlur={() => onSave(items)}
                             placeholder="MUI icon name or emoji"
                         />
                         <TextField
@@ -167,6 +183,7 @@ function ContactLinksTab({
                             fullWidth
                             value={item.url}
                             onChange={(e) => updateItem(item.id, "url", e.target.value)}
+                            onBlur={() => onSave(items)}
                             placeholder="https://..."
                         />
                         <FormControlLabel
@@ -174,7 +191,7 @@ function ContactLinksTab({
                                 <Switch
                                     checked={item.is_visible === 1}
                                     onChange={(e) =>
-                                        updateItem(item.id, "is_visible", e.target.checked ? 1 : 0)
+                                        updateItemAndSave(item.id, "is_visible", e.target.checked ? 1 : 0)
                                     }
                                     size="small"
                                 />
@@ -201,13 +218,15 @@ function PageContentTab({
     setItems,
     saving,
     onSave,
+    onSaveNow,
     error,
     success,
 }: {
     items: ContactPageContent[];
     setItems: (items: ContactPageContent[]) => void;
     saving: boolean;
-    onSave: () => void;
+    onSave: (items: ContactPageContent[]) => void;
+    onSaveNow: (items: ContactPageContent[]) => void;
     error: string;
     success: string;
 }) {
@@ -219,11 +238,15 @@ function PageContentTab({
     };
 
     const handleAdd = () => {
-        setItems([...items, blankPageContent()]);
+        const newItems = [...items, blankPageContent()];
+        setItems(newItems);
+        onSaveNow(newItems);
     };
 
     const handleDelete = (id: number) => {
-        setItems(items.filter((item) => item.id !== id));
+        const newItems = items.filter((item) => item.id !== id);
+        setItems(newItems);
+        onSaveNow(newItems);
     };
 
     return (
@@ -233,7 +256,6 @@ function PageContentTab({
             saving={saving}
             error={error}
             success={success}
-            onSave={onSave}
         >
             {items.map((item) => (
                 <Box
@@ -259,6 +281,7 @@ function PageContentTab({
                             size="small"
                             value={item.section}
                             onChange={(e) => updateItem(item.id, "section", e.target.value)}
+                            onBlur={() => onSave(items)}
                             sx={{ minWidth: 250 }}
                         />
                         <Button
@@ -284,6 +307,7 @@ function PageContentTab({
                             minRows={3}
                             value={item.content_en}
                             onChange={(e) => updateItem(item.id, "content_en", e.target.value)}
+                            onBlur={() => onSave(items)}
                         />
                         <TextField
                             label="Content (RU)"
@@ -293,6 +317,7 @@ function PageContentTab({
                             minRows={3}
                             value={item.content_ru}
                             onChange={(e) => updateItem(item.id, "content_ru", e.target.value)}
+                            onBlur={() => onSave(items)}
                         />
                     </Box>
                 </Box>
@@ -300,7 +325,8 @@ function PageContentTab({
 
             <Button
                 variant="outlined"
-                startIcon={<ArticleIcon />}
+                color="regular"
+                startIcon={<AddIcon />}
                 onClick={handleAdd}
                 sx={{ mt: 1 }}
             >
@@ -319,7 +345,7 @@ export default function AdminContactsPage() {
     const menuText = getThemeColor("menuText", theme);
     const [tab, setTab] = useState(0);
 
-    const { data, setData, loading, saving, error, success, save, clearMessages } =
+    const { data, setData, loading, saving, error, success, save } =
         useAdminData<ContactsData>({
             url: "/api/contacts",
         });
@@ -335,25 +361,18 @@ export default function AdminContactsPage() {
         setData((prev) => (prev ? { ...prev, contact_page_content: items } : prev));
     };
 
-    const handleSaveLinks = async () => {
-        clearMessages();
-        await save(
-            { section: "contact_info", data: contactLinks },
-            { method: "PUT", successMessage: "Contact links saved" },
-        );
+    // Save with current items from state (safe to call on blur — state is current between events)
+    const saveLinks = (items: ContactInfo[]) => {
+        save({ section: "contact_info", data: items }, { successMessage: "Saved" });
     };
 
-    const handleSaveContent = async () => {
-        clearMessages();
-        await save(
-            { section: "contact_page_content", data: pageContent },
-            { method: "PUT", successMessage: "Page content saved" },
-        );
+    const saveContent = (items: ContactPageContent[]) => {
+        save({ section: "contact_page_content", data: items }, { successMessage: "Saved" });
     };
 
     if (loading) {
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 48px)" }}>
                 <CircularProgress />
             </Box>
         );
@@ -386,7 +405,8 @@ export default function AdminContactsPage() {
                     items={contactLinks}
                     setItems={setContactLinks}
                     saving={saving}
-                    onSave={handleSaveLinks}
+                    onSave={saveLinks}
+                    onSaveNow={saveLinks}
                     error={error}
                     success={success}
                 />
@@ -397,7 +417,8 @@ export default function AdminContactsPage() {
                     items={pageContent}
                     setItems={setPageContent}
                     saving={saving}
-                    onSave={handleSaveContent}
+                    onSave={saveContent}
+                    onSaveNow={saveContent}
                     error={error}
                     success={success}
                 />

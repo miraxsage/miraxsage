@@ -19,6 +19,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import {
     Box,
+    Button,
     IconButton,
     Paper,
     useTheme,
@@ -105,7 +106,6 @@ export default function SortableList<T extends { id: number | string }>({
     addLabel = "Add Item",
     renderItem,
 }: SortableListProps<T>) {
-    const theme = useTheme();
     const sensors = useSensors(
         useSensor(PointerSensor),
         useSensor(KeyboardSensor, {
@@ -145,19 +145,15 @@ export default function SortableList<T extends { id: number | string }>({
                 </SortableContext>
             </DndContext>
             {onAdd && (
-                <IconButton
+                <Button
+                    variant="outlined"
+                    color="regular"
                     onClick={onAdd}
-                    sx={{
-                        mt: 1,
-                        border: `1px dashed ${theme.palette.divider}`,
-                        borderRadius: 1,
-                        width: "100%",
-                        py: 1,
-                        color: theme.palette.primary.main,
-                    }}
+                    startIcon={<AddIcon />}
+                    sx={{ mt: 1, alignSelf: "flex-start" }}
                 >
-                    <AddIcon sx={{ mr: 0.5 }} /> {addLabel}
-                </IconButton>
+                    {addLabel}
+                </Button>
             )}
         </Box>
     );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
     Box,
     Typography,
@@ -26,13 +26,13 @@ import {
     alpha,
 } from "@mui/material";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import DoneIcon from "@mui/icons-material/Done";
 import CodeIcon from "@mui/icons-material/Code";
-import { AdminSection, useAdminData } from "@/features/admin-editor";
+import { useAdminData } from "@/features/admin-editor";
 import { getThemeColor } from "@/shared/lib/theme";
 
 // ---------------------------------------------------------------------------
@@ -150,6 +150,9 @@ function ProjectsTab() {
         refetch,
     } = useAdminData<Project[]>({ url: "/api/projects" });
 
+    const projectsRef = useRef<Project[] | null>(null);
+    projectsRef.current = projects;
+
     const [techCategories, setTechCategories] = useState<TechnologyCategory[]>([]);
     const [expandedId, setExpandedId] = useState<number | null>(null);
     const [savingId, setSavingId] = useState<number | null>(null);
@@ -162,8 +165,6 @@ function ProjectsTab() {
             .then((cats: TechnologyCategory[]) => setTechCategories(cats))
             .catch(() => {});
     }, []);
-
-    const allTechnologies = techCategories.flatMap((c) => c.technologies);
 
     const toggleExpand = (id: number) => {
         setExpandedId((prev) => (prev === id ? null : id));
@@ -211,14 +212,30 @@ function ProjectsTab() {
                 const errBody = await res.json().catch(() => null);
                 throw new Error(errBody?.error || "Failed to save project");
             }
-            setLocalSuccess("Project saved");
-            setTimeout(() => setLocalSuccess(""), 3000);
-            refetch();
+            if (isNew) {
+                setLocalSuccess("Project created");
+                setTimeout(() => setLocalSuccess(""), 3000);
+                refetch();
+            }
         } catch (err) {
             setLocalError(err instanceof Error ? err.message : "Save failed");
         } finally {
             setSavingId(null);
         }
+    };
+
+    // Auto-save for existing projects: reads from projectsRef (current at blur time)
+    const autoSaveProject = (id: number) => {
+        if (!projectsRef.current) return;
+        const project = projectsRef.current.find((p) => p.id === id);
+        if (!project || project.id < 0) return;
+        handleSave(project);
+    };
+
+    // Auto-save with a computed project (for checkbox onChange before state updates)
+    const autoSaveProjectWith = (project: Project) => {
+        if (project.id < 0) return;
+        handleSave(project);
     };
 
     const handleDelete = async (id: number) => {
@@ -244,7 +261,7 @@ function ProjectsTab() {
 
     if (loading) {
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 48px)" }}>
                 <CircularProgress />
             </Box>
         );
@@ -264,7 +281,8 @@ function ProjectsTab() {
             )}
 
             <Button
-                variant="contained"
+                variant="outlined"
+                color="regular"
                 startIcon={<AddIcon />}
                 onClick={handleAdd}
                 sx={{ mb: 2 }}
@@ -275,6 +293,7 @@ function ProjectsTab() {
             {(projects ?? []).map((project) => {
                 const isExpanded = expandedId === project.id;
                 const isSaving = savingId === project.id;
+                const isNew = project.id < 0;
                 return (
                     <Card
                         key={project.id}
@@ -319,6 +338,7 @@ function ProjectsTab() {
                                             sx={{ fontSize: "0.7rem" }}
                                         />
                                     )}
+                                    {isSaving && <CircularProgress size={14} />}
                                 </Box>
                                 <Box sx={{ display: "flex", gap: 0.5 }}>
                                     <IconButton size="small" onClick={() => toggleExpand(project.id)}>
@@ -354,6 +374,7 @@ function ProjectsTab() {
                                         fullWidth
                                         value={project.slug ?? ""}
                                         onChange={(e) => updateField(project.id, "slug", e.target.value)}
+                                        onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
                                         label="Name (EN)"
@@ -361,6 +382,7 @@ function ProjectsTab() {
                                         fullWidth
                                         value={project.name_en ?? ""}
                                         onChange={(e) => updateField(project.id, "name_en", e.target.value)}
+                                        onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
                                         label="Name (RU)"
@@ -368,6 +390,7 @@ function ProjectsTab() {
                                         fullWidth
                                         value={project.name_ru ?? ""}
                                         onChange={(e) => updateField(project.id, "name_ru", e.target.value)}
+                                        onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
                                         label="Short Name (EN)"
@@ -377,6 +400,7 @@ function ProjectsTab() {
                                         onChange={(e) =>
                                             updateField(project.id, "short_name_en", e.target.value)
                                         }
+                                        onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
                                         label="Short Name (RU)"
@@ -386,6 +410,7 @@ function ProjectsTab() {
                                         onChange={(e) =>
                                             updateField(project.id, "short_name_ru", e.target.value)
                                         }
+                                        onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
                                         label="Domain"
@@ -393,6 +418,7 @@ function ProjectsTab() {
                                         fullWidth
                                         value={project.domain ?? ""}
                                         onChange={(e) => updateField(project.id, "domain", e.target.value)}
+                                        onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
                                         label="Description (EN)"
@@ -404,6 +430,7 @@ function ProjectsTab() {
                                         onChange={(e) =>
                                             updateField(project.id, "description_en", e.target.value)
                                         }
+                                        onBlur={() => autoSaveProject(project.id)}
                                         sx={{ gridColumn: { md: "1 / -1" } }}
                                     />
                                     <TextField
@@ -416,6 +443,7 @@ function ProjectsTab() {
                                         onChange={(e) =>
                                             updateField(project.id, "description_ru", e.target.value)
                                         }
+                                        onBlur={() => autoSaveProject(project.id)}
                                         sx={{ gridColumn: { md: "1 / -1" } }}
                                     />
                                     <TextField
@@ -426,6 +454,7 @@ function ProjectsTab() {
                                         onChange={(e) =>
                                             updateField(project.id, "year", Number(e.target.value))
                                         }
+                                        onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
                                         label="Rating"
@@ -435,6 +464,7 @@ function ProjectsTab() {
                                         onChange={(e) =>
                                             updateField(project.id, "rating", Number(e.target.value))
                                         }
+                                        onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
                                         label="Status"
@@ -444,6 +474,7 @@ function ProjectsTab() {
                                         onChange={(e) =>
                                             updateField(project.id, "status", e.target.value)
                                         }
+                                        onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
                                         label="Participating"
@@ -453,6 +484,7 @@ function ProjectsTab() {
                                         onChange={(e) =>
                                             updateField(project.id, "participating", e.target.value)
                                         }
+                                        onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
                                         label="Dev Time (months)"
@@ -466,6 +498,7 @@ function ProjectsTab() {
                                                 Number(e.target.value),
                                             )
                                         }
+                                        onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
                                         label="GitHub Link"
@@ -475,6 +508,7 @@ function ProjectsTab() {
                                         onChange={(e) =>
                                             updateField(project.id, "github_link", e.target.value)
                                         }
+                                        onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
                                         label="Images Count"
@@ -488,6 +522,7 @@ function ProjectsTab() {
                                                 Number(e.target.value),
                                             )
                                         }
+                                        onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
                                         label="Cover Brightness"
@@ -501,6 +536,7 @@ function ProjectsTab() {
                                                 Number(e.target.value),
                                             )
                                         }
+                                        onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
                                         label="Sort Order"
@@ -514,6 +550,7 @@ function ProjectsTab() {
                                                 Number(e.target.value),
                                             )
                                         }
+                                        onBlur={() => autoSaveProject(project.id)}
                                     />
 
                                     {/* Technologies checkboxes */}
@@ -545,50 +582,59 @@ function ProjectsTab() {
                                                         mt: 0.5,
                                                     }}
                                                 >
-                                                    {cat.technologies.map((tech) => (
-                                                        <FormControlLabel
-                                                            key={tech.id}
-                                                            control={
-                                                                <Checkbox
-                                                                    size="small"
-                                                                    checked={project.technologies.some(
-                                                                        (t) => t.id === tech.id,
-                                                                    )}
-                                                                    onChange={() =>
-                                                                        toggleTech(project.id, tech)
-                                                                    }
-                                                                />
-                                                            }
-                                                            label={tech.name}
-                                                            sx={{
-                                                                "& .MuiTypography-root": {
-                                                                    fontSize: "0.85rem",
-                                                                },
-                                                            }}
-                                                        />
-                                                    ))}
+                                                    {cat.technologies.map((tech) => {
+                                                        const checked = project.technologies.some(
+                                                            (t) => t.id === tech.id,
+                                                        );
+                                                        return (
+                                                            <FormControlLabel
+                                                                key={tech.id}
+                                                                control={
+                                                                    <Checkbox
+                                                                        size="small"
+                                                                        checked={checked}
+                                                                        onChange={() => {
+                                                                            if (isNew) {
+                                                                                toggleTech(project.id, tech);
+                                                                                return;
+                                                                            }
+                                                                            const newTechs = checked
+                                                                                ? project.technologies.filter((t) => t.id !== tech.id)
+                                                                                : [...project.technologies, tech];
+                                                                            const newProject = { ...project, technologies: newTechs };
+                                                                            toggleTech(project.id, tech);
+                                                                            autoSaveProjectWith(newProject);
+                                                                        }}
+                                                                    />
+                                                                }
+                                                                label={tech.name}
+                                                                sx={{
+                                                                    "& .MuiTypography-root": {
+                                                                        fontSize: "0.85rem",
+                                                                    },
+                                                                }}
+                                                            />
+                                                        );
+                                                    })}
                                                 </Box>
                                             </Box>
                                         ))}
                                     </Box>
 
-                                    {/* Save button */}
-                                    <Box sx={{ gridColumn: { md: "1 / -1" }, display: "flex", gap: 1 }}>
-                                        <Button
-                                            variant="contained"
-                                            onClick={() => handleSave(project)}
-                                            disabled={isSaving}
-                                            startIcon={
-                                                isSaving ? <CircularProgress size={16} /> : undefined
-                                            }
-                                        >
-                                            {isSaving
-                                                ? "Saving..."
-                                                : project.id < 0
-                                                  ? "Create Project"
-                                                  : "Save Project"}
-                                        </Button>
-                                    </Box>
+                                    {/* Create button only for new projects */}
+                                    {isNew && (
+                                        <Box sx={{ gridColumn: { md: "1 / -1" }, display: "flex", gap: 1 }}>
+                                            <Button
+                                                variant="outlined"
+                                                color="regular"
+                                                onClick={() => handleSave(project)}
+                                                disabled={isSaving}
+                                                startIcon={isSaving ? <CircularProgress size={16} /> : undefined}
+                                            >
+                                                {isSaving ? "Creating..." : "Create Project"}
+                                            </Button>
+                                        </Box>
+                                    )}
                                 </Box>
                             </Collapse>
                         </CardContent>
@@ -611,7 +657,6 @@ function TechnologiesTab() {
 
     const {
         data: categories,
-        setData: setCategories,
         loading,
         error,
         refetch,
@@ -636,26 +681,29 @@ function TechnologiesTab() {
         setEditingTech(null);
     };
 
-    const handleSaveTech = async () => {
-        if (!editingTech) return;
+    const handleSaveTech = async (techData?: Technology) => {
+        const t = techData ?? editingTech;
+        if (!t) return;
         setSaving(true);
         setLocalError("");
         setLocalSuccess("");
         try {
-            const isNew = editingTech.id < 0;
+            const isNew = t.id < 0;
             const res = await fetch("/api/technologies", {
                 method: isNew ? "POST" : "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(editingTech),
+                body: JSON.stringify(t),
             });
             if (!res.ok) {
                 const errBody = await res.json().catch(() => null);
                 throw new Error(errBody?.error || "Save failed");
             }
-            setLocalSuccess("Technology saved");
-            setTimeout(() => setLocalSuccess(""), 3000);
-            setEditingTech(null);
-            refetch();
+            if (isNew) {
+                setLocalSuccess("Technology created");
+                setTimeout(() => setLocalSuccess(""), 3000);
+                setEditingTech(null);
+                refetch();
+            }
         } catch (err) {
             setLocalError(err instanceof Error ? err.message : "Save failed");
         } finally {
@@ -680,7 +728,7 @@ function TechnologiesTab() {
 
     if (loading) {
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 48px)" }}>
                 <CircularProgress />
             </Box>
         );
@@ -717,6 +765,8 @@ function TechnologiesTab() {
                         </Typography>
                         <Button
                             size="small"
+                            variant="outlined"
+                            color="regular"
                             startIcon={<AddIcon />}
                             onClick={() => handleAddTech(cat.id)}
                         >
@@ -741,7 +791,7 @@ function TechnologiesTab() {
                                         setTech={setEditingTech}
                                         categories={allCategories}
                                         onSave={handleSaveTech}
-                                        onCancel={handleCancelEdit}
+                                        onClose={handleCancelEdit}
                                         saving={saving}
                                     />
                                 ) : (
@@ -832,7 +882,7 @@ function TechnologiesTab() {
                                     setTech={setEditingTech}
                                     categories={allCategories}
                                     onSave={handleSaveTech}
-                                    onCancel={handleCancelEdit}
+                                    onClose={handleCancelEdit}
                                     saving={saving}
                                 />
                             </CardContent>
@@ -853,18 +903,30 @@ function TechEditForm({
     setTech,
     categories,
     onSave,
-    onCancel,
+    onClose,
     saving,
 }: {
     tech: Technology;
     setTech: (t: Technology | null) => void;
     categories: TechnologyCategory[];
-    onSave: () => void;
-    onCancel: () => void;
+    onSave: (techData?: Technology) => void;
+    onClose: () => void;
     saving: boolean;
 }) {
+    const isNew = tech.id < 0;
+
     const update = (field: keyof Technology, value: unknown) => {
         setTech({ ...tech, [field]: value });
+    };
+
+    const updateAndSave = (field: keyof Technology, value: unknown) => {
+        if (isNew) {
+            update(field, value);
+            return;
+        }
+        const newTech = { ...tech, [field]: value };
+        setTech(newTech);
+        onSave(newTech);
     };
 
     return (
@@ -882,13 +944,14 @@ function TechEditForm({
                 fullWidth
                 value={tech.name ?? ""}
                 onChange={(e) => update("name", e.target.value)}
+                onBlur={() => !isNew && onSave()}
             />
             <FormControl size="small" fullWidth>
                 <InputLabel>Category</InputLabel>
                 <Select
                     value={tech.category_id}
                     label="Category"
-                    onChange={(e) => update("category_id", Number(e.target.value))}
+                    onChange={(e) => updateAndSave("category_id", Number(e.target.value))}
                 >
                     {categories.map((c) => (
                         <MenuItem key={c.id} value={c.id}>
@@ -903,6 +966,7 @@ function TechEditForm({
                 fullWidth
                 value={tech.docs_link ?? ""}
                 onChange={(e) => update("docs_link", e.target.value)}
+                onBlur={() => !isNew && onSave()}
             />
             <TextField
                 label="Icon"
@@ -910,6 +974,7 @@ function TechEditForm({
                 fullWidth
                 value={tech.icon ?? ""}
                 onChange={(e) => update("icon", e.target.value)}
+                onBlur={() => !isNew && onSave()}
             />
             <Box>
                 <Typography variant="caption" sx={{ mb: 0.5, display: "block" }}>
@@ -918,6 +983,7 @@ function TechEditForm({
                 <Slider
                     value={tech.skill_level}
                     onChange={(_, val) => update("skill_level", val as number)}
+                    onChangeCommitted={(_, val) => updateAndSave("skill_level", val as number)}
                     min={0}
                     max={100}
                     size="small"
@@ -930,6 +996,7 @@ function TechEditForm({
                 fullWidth
                 value={tech.experience_years ?? 0}
                 onChange={(e) => update("experience_years", Number(e.target.value))}
+                onBlur={() => !isNew && onSave()}
             />
             <TextField
                 label="Projects Count"
@@ -938,6 +1005,7 @@ function TechEditForm({
                 fullWidth
                 value={tech.projects_count ?? 0}
                 onChange={(e) => update("projects_count", Number(e.target.value))}
+                onBlur={() => !isNew && onSave()}
             />
             <TextField
                 label="Color"
@@ -945,6 +1013,7 @@ function TechEditForm({
                 fullWidth
                 value={tech.color ?? ""}
                 onChange={(e) => update("color", e.target.value)}
+                onBlur={() => !isNew && onSave()}
                 InputProps={{
                     startAdornment: (
                         <Box
@@ -967,6 +1036,7 @@ function TechEditForm({
                 fullWidth
                 value={tech.sort_order ?? 0}
                 onChange={(e) => update("sort_order", Number(e.target.value))}
+                onBlur={() => !isNew && onSave()}
             />
             <Box
                 sx={{
@@ -976,18 +1046,34 @@ function TechEditForm({
                     mt: 0.5,
                 }}
             >
-                <Button
-                    variant="contained"
-                    size="small"
-                    onClick={onSave}
-                    disabled={saving}
-                    startIcon={saving ? <CircularProgress size={14} /> : undefined}
-                >
-                    {saving ? "Saving..." : tech.id < 0 ? "Create" : "Save"}
-                </Button>
-                <Button variant="outlined" size="small" onClick={onCancel}>
-                    Cancel
-                </Button>
+                {isNew ? (
+                    <>
+                        <Button
+                            variant="outlined"
+                            color="regular"
+                            size="small"
+                            onClick={() => onSave()}
+                            disabled={saving}
+                            startIcon={saving ? <CircularProgress size={14} /> : undefined}
+                        >
+                            {saving ? "Creating..." : "Create"}
+                        </Button>
+                        <Button variant="outlined" color="regular" size="small" onClick={onClose}>
+                            Cancel
+                        </Button>
+                    </>
+                ) : (
+                    <Button
+                        variant="outlined"
+                        color="regular"
+                        size="small"
+                        startIcon={saving ? <CircularProgress size={14} /> : <DoneIcon />}
+                        onClick={onClose}
+                        disabled={saving}
+                    >
+                        {saving ? "Saving..." : "Done"}
+                    </Button>
+                )}
             </Box>
         </Box>
     );

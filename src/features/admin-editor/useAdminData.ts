@@ -14,6 +14,7 @@ export default function useAdminData<T>({ url, transform }: UseAdminDataOptions<
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+    const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
     const fetchData = useCallback(async () => {
         setLoading(true);
@@ -33,6 +34,13 @@ export default function useAdminData<T>({ url, transform }: UseAdminDataOptions<
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            if (debounceRef.current) clearTimeout(debounceRef.current);
+        };
+    }, []);
 
     const save = useCallback(
         async (body: unknown, options?: { method?: string; successMessage?: string }) => {
@@ -65,10 +73,20 @@ export default function useAdminData<T>({ url, transform }: UseAdminDataOptions<
         [url],
     );
 
+    const scheduleAutoSave = useCallback(
+        (body: unknown, delay = 800) => {
+            if (debounceRef.current) clearTimeout(debounceRef.current);
+            debounceRef.current = setTimeout(() => {
+                save(body).catch(() => {});
+            }, delay);
+        },
+        [save],
+    );
+
     const clearMessages = useCallback(() => {
         setError("");
         setSuccess("");
     }, []);
 
-    return { data, setData, loading, saving, error, success, save, refetch: fetchData, clearMessages };
+    return { data, setData, loading, saving, error, success, save, scheduleAutoSave, refetch: fetchData, clearMessages };
 }

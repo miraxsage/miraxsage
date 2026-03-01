@@ -3,7 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Card, CardContent, TextField, Button, Typography, Alert, useTheme } from "@mui/material";
-import MiraxsageIcon from "@/shared/icons/MiraxsageIcon";
+import LogoIcon from "@/shared/icons/Logo";
 import { getThemeColor } from "@/shared/lib/theme";
 
 export default function AdminLoginPage() {
@@ -56,6 +56,7 @@ export default function AdminLoginPage() {
                     maxWidth: 400,
                     background: getThemeColor("barBackground", theme),
                     border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: "6px",
                 }}
                 elevation={0}
             >
@@ -68,8 +69,8 @@ export default function AdminLoginPage() {
                             mb: 3,
                         }}
                     >
-                        <Box sx={{ width: 56, height: 56, mb: 2 }}>
-                            <MiraxsageIcon />
+                        <Box sx={{ width: 56, height: 56, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", "& svg": { width: 50, height: 50 } }}>
+                            <LogoIcon />
                         </Box>
                         <Typography
                             variant="h5"
@@ -94,7 +95,8 @@ export default function AdminLoginPage() {
                             label="Username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            margin="normal"
+                            margin="dense"
+                            size="small"
                             autoComplete="username"
                             autoFocus
                             required
@@ -105,16 +107,18 @@ export default function AdminLoginPage() {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            margin="normal"
+                            margin="dense"
+                            size="small"
                             autoComplete="current-password"
                             required
                         />
                         <Button
                             type="submit"
                             fullWidth
-                            variant="contained"
+                            variant="outlined"
+                            color="regular"
                             disabled={loading}
-                            sx={{ mt: 3, py: 1.2 }}
+                            sx={{ mt: 2 }}
                         >
                             {loading ? "Signing in..." : "Sign In"}
                         </Button>

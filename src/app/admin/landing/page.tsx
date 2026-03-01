@@ -147,9 +147,24 @@ export default function AdminLandingPage() {
         );
     };
 
-    const removeItem = <K extends SectionKey>(key: K, id: number | string) => {
-        const items = getSection(key) as unknown as Array<{ id: number | string }>;
-        updateSection(key, items.filter((item) => item.id !== id) as unknown as LandingData[K]);
+    // Save a section — reads current data state (safe to call on blur after onChange updates)
+    const saveSection = (key: SectionKey, items?: LandingData[SectionKey]) => {
+        const sectionItems = (items ?? getSection(key)) as unknown as Array<Record<string, unknown>>;
+        const ordered = sectionItems.map((it, i) => ({ ...it, sort_order: i }));
+        save({ section: key, data: ordered });
+    };
+
+    // Updater that also saves immediately — use for switches, reorder, delete, add
+    const updateItemAndSave = <K extends SectionKey>(
+        key: K,
+        id: number | string,
+        field: string,
+        value: unknown,
+    ) => {
+        const items = getSection(key) as unknown as Array<Record<string, unknown> & { id: number | string }>;
+        const newItems = items.map((item) => (item.id === id ? { ...item, [field]: value } : item)) as unknown as LandingData[K];
+        updateSection(key, newItems);
+        saveSection(key, newItems);
     };
 
     // ----- add helpers per section -----
@@ -166,7 +181,9 @@ export default function AdminLandingPage() {
             url: "",
             is_visible: 1,
         };
-        updateSection("header_items", [...items, newItem]);
+        const newItems = [...items, newItem];
+        updateSection("header_items", newItems);
+        saveSection("header_items", newItems);
     };
 
     const addTitleVariant = () => {
@@ -177,7 +194,9 @@ export default function AdminLandingPage() {
             text_en: "",
             text_ru: "",
         };
-        updateSection("title_variants", [...items, newItem]);
+        const newItems = [...items, newItem];
+        updateSection("title_variants", newItems);
+        saveSection("title_variants", newItems);
     };
 
     const addButton = () => {
@@ -190,7 +209,9 @@ export default function AdminLandingPage() {
             icon: "",
             url: "",
         };
-        updateSection("buttons", [...items, newItem]);
+        const newItems = [...items, newItem];
+        updateSection("buttons", newItems);
+        saveSection("buttons", newItems);
     };
 
     const addInfoBlock = () => {
@@ -209,7 +230,9 @@ export default function AdminLandingPage() {
             additional_content_data: "",
             is_visible: 1,
         };
-        updateSection("info_blocks", [...items, newItem]);
+        const newItems = [...items, newItem];
+        updateSection("info_blocks", newItems);
+        saveSection("info_blocks", newItems);
     };
 
     const addFooterItem = () => {
@@ -219,25 +242,16 @@ export default function AdminLandingPage() {
             content_en: "",
             content_ru: "",
         };
-        updateSection("footer", [...items, newItem]);
-    };
-
-    // ----- save handler -----
-
-    const activeSection = SECTION_TABS[tab].key;
-
-    const handleSave = async () => {
-        const items = getSection(activeSection) as unknown as Array<Record<string, unknown> & { id: number | string }>;
-        // Recalculate sort_order based on current position
-        const ordered = items.map((item, i) => ({ ...item, sort_order: i }));
-        await save({ section: activeSection, data: ordered });
+        const newItems = [...items, newItem];
+        updateSection("footer", newItems);
+        saveSection("footer", newItems);
     };
 
     // ----- render -----
 
     if (loading) {
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 48px)" }}>
                 <CircularProgress />
             </Box>
         );
@@ -250,7 +264,6 @@ export default function AdminLandingPage() {
             saving={saving}
             error={error}
             success={success}
-            onSave={handleSave}
         >
             <Tabs
                 value={tab}
@@ -268,8 +281,15 @@ export default function AdminLandingPage() {
             {tab === 0 && (
                 <SortableList
                     items={getSection("header_items")}
-                    onReorder={(items) => updateSection("header_items", items)}
-                    onDelete={(id) => removeItem("header_items", id)}
+                    onReorder={(items) => {
+                        updateSection("header_items", items);
+                        saveSection("header_items", items);
+                    }}
+                    onDelete={(id) => {
+                        const newItems = getSection("header_items").filter((it) => it.id !== id);
+                        updateSection("header_items", newItems);
+                        saveSection("header_items", newItems);
+                    }}
                     onAdd={addHeaderItem}
                     addLabel="Add Header Item"
                     renderItem={(item) => (
@@ -280,6 +300,7 @@ export default function AdminLandingPage() {
                                     size="small"
                                     value={item.label_en}
                                     onChange={(e) => updateItem("header_items", item.id, "label_en", e.target.value)}
+                                    onBlur={() => saveSection("header_items")}
                                     sx={{ flex: 1, minWidth: 140 }}
                                 />
                                 <TextField
@@ -287,6 +308,7 @@ export default function AdminLandingPage() {
                                     size="small"
                                     value={item.label_ru}
                                     onChange={(e) => updateItem("header_items", item.id, "label_ru", e.target.value)}
+                                    onBlur={() => saveSection("header_items")}
                                     sx={{ flex: 1, minWidth: 140 }}
                                 />
                             </FieldRow>
@@ -296,6 +318,7 @@ export default function AdminLandingPage() {
                                     size="small"
                                     value={item.url}
                                     onChange={(e) => updateItem("header_items", item.id, "url", e.target.value)}
+                                    onBlur={() => saveSection("header_items")}
                                     sx={{ flex: 2, minWidth: 200 }}
                                 />
                                 <TextField
@@ -303,6 +326,7 @@ export default function AdminLandingPage() {
                                     size="small"
                                     value={item.icon}
                                     onChange={(e) => updateItem("header_items", item.id, "icon", e.target.value)}
+                                    onBlur={() => saveSection("header_items")}
                                     sx={{ flex: 1, minWidth: 100 }}
                                 />
                                 <TextField
@@ -310,6 +334,7 @@ export default function AdminLandingPage() {
                                     size="small"
                                     value={item.type}
                                     onChange={(e) => updateItem("header_items", item.id, "type", e.target.value)}
+                                    onBlur={() => saveSection("header_items")}
                                     sx={{ flex: 1, minWidth: 80 }}
                                 />
                             </FieldRow>
@@ -318,7 +343,7 @@ export default function AdminLandingPage() {
                                     <Switch
                                         checked={item.is_visible === 1}
                                         onChange={(e) =>
-                                            updateItem("header_items", item.id, "is_visible", e.target.checked ? 1 : 0)
+                                            updateItemAndSave("header_items", item.id, "is_visible", e.target.checked ? 1 : 0)
                                         }
                                         size="small"
                                     />
@@ -338,8 +363,15 @@ export default function AdminLandingPage() {
             {tab === 1 && (
                 <SortableList
                     items={getSection("title_variants")}
-                    onReorder={(items) => updateSection("title_variants", items)}
-                    onDelete={(id) => removeItem("title_variants", id)}
+                    onReorder={(items) => {
+                        updateSection("title_variants", items);
+                        saveSection("title_variants", items);
+                    }}
+                    onDelete={(id) => {
+                        const newItems = getSection("title_variants").filter((it) => it.id !== id);
+                        updateSection("title_variants", newItems);
+                        saveSection("title_variants", newItems);
+                    }}
                     onAdd={addTitleVariant}
                     addLabel="Add Title Variant"
                     renderItem={(item) => (
@@ -349,6 +381,7 @@ export default function AdminLandingPage() {
                                 size="small"
                                 value={item.text_en}
                                 onChange={(e) => updateItem("title_variants", item.id, "text_en", e.target.value)}
+                                onBlur={() => saveSection("title_variants")}
                                 sx={{ flex: 1, minWidth: 200 }}
                             />
                             <TextField
@@ -356,6 +389,7 @@ export default function AdminLandingPage() {
                                 size="small"
                                 value={item.text_ru}
                                 onChange={(e) => updateItem("title_variants", item.id, "text_ru", e.target.value)}
+                                onBlur={() => saveSection("title_variants")}
                                 sx={{ flex: 1, minWidth: 200 }}
                             />
                         </FieldRow>
@@ -367,8 +401,15 @@ export default function AdminLandingPage() {
             {tab === 2 && (
                 <SortableList
                     items={getSection("buttons")}
-                    onReorder={(items) => updateSection("buttons", items)}
-                    onDelete={(id) => removeItem("buttons", id)}
+                    onReorder={(items) => {
+                        updateSection("buttons", items);
+                        saveSection("buttons", items);
+                    }}
+                    onDelete={(id) => {
+                        const newItems = getSection("buttons").filter((it) => it.id !== id);
+                        updateSection("buttons", newItems);
+                        saveSection("buttons", newItems);
+                    }}
                     onAdd={addButton}
                     addLabel="Add Button"
                     renderItem={(item) => (
@@ -379,6 +420,7 @@ export default function AdminLandingPage() {
                                     size="small"
                                     value={item.label_en}
                                     onChange={(e) => updateItem("buttons", item.id, "label_en", e.target.value)}
+                                    onBlur={() => saveSection("buttons")}
                                     sx={{ flex: 1, minWidth: 140 }}
                                 />
                                 <TextField
@@ -386,6 +428,7 @@ export default function AdminLandingPage() {
                                     size="small"
                                     value={item.label_ru}
                                     onChange={(e) => updateItem("buttons", item.id, "label_ru", e.target.value)}
+                                    onBlur={() => saveSection("buttons")}
                                     sx={{ flex: 1, minWidth: 140 }}
                                 />
                             </FieldRow>
@@ -395,6 +438,7 @@ export default function AdminLandingPage() {
                                     size="small"
                                     value={item.url}
                                     onChange={(e) => updateItem("buttons", item.id, "url", e.target.value)}
+                                    onBlur={() => saveSection("buttons")}
                                     sx={{ flex: 2, minWidth: 200 }}
                                 />
                                 <TextField
@@ -402,6 +446,7 @@ export default function AdminLandingPage() {
                                     size="small"
                                     value={item.icon}
                                     onChange={(e) => updateItem("buttons", item.id, "icon", e.target.value)}
+                                    onBlur={() => saveSection("buttons")}
                                     sx={{ flex: 1, minWidth: 100 }}
                                 />
                             </FieldRow>
@@ -414,8 +459,15 @@ export default function AdminLandingPage() {
             {tab === 3 && (
                 <SortableList
                     items={getSection("info_blocks")}
-                    onReorder={(items) => updateSection("info_blocks", items)}
-                    onDelete={(id) => removeItem("info_blocks", id)}
+                    onReorder={(items) => {
+                        updateSection("info_blocks", items);
+                        saveSection("info_blocks", items);
+                    }}
+                    onDelete={(id) => {
+                        const newItems = getSection("info_blocks").filter((it) => it.id !== id);
+                        updateSection("info_blocks", newItems);
+                        saveSection("info_blocks", newItems);
+                    }}
                     onAdd={addInfoBlock}
                     addLabel="Add Info Block"
                     renderItem={(item) => (
@@ -426,6 +478,7 @@ export default function AdminLandingPage() {
                                     size="small"
                                     value={item.slug}
                                     onChange={(e) => updateItem("info_blocks", item.id, "slug", e.target.value)}
+                                    onBlur={() => saveSection("info_blocks")}
                                     sx={{ flex: 1, minWidth: 140 }}
                                 />
                                 <TextField
@@ -433,6 +486,7 @@ export default function AdminLandingPage() {
                                     size="small"
                                     value={item.illustration}
                                     onChange={(e) => updateItem("info_blocks", item.id, "illustration", e.target.value)}
+                                    onBlur={() => saveSection("info_blocks")}
                                     sx={{ flex: 1, minWidth: 140 }}
                                 />
                                 <TextField
@@ -440,6 +494,7 @@ export default function AdminLandingPage() {
                                     size="small"
                                     value={item.image_url}
                                     onChange={(e) => updateItem("info_blocks", item.id, "image_url", e.target.value)}
+                                    onBlur={() => saveSection("info_blocks")}
                                     sx={{ flex: 1, minWidth: 140 }}
                                 />
                             </FieldRow>
@@ -449,6 +504,7 @@ export default function AdminLandingPage() {
                                     size="small"
                                     value={item.title_en}
                                     onChange={(e) => updateItem("info_blocks", item.id, "title_en", e.target.value)}
+                                    onBlur={() => saveSection("info_blocks")}
                                     sx={{ flex: 1, minWidth: 200 }}
                                 />
                                 <TextField
@@ -456,6 +512,7 @@ export default function AdminLandingPage() {
                                     size="small"
                                     value={item.title_ru}
                                     onChange={(e) => updateItem("info_blocks", item.id, "title_ru", e.target.value)}
+                                    onBlur={() => saveSection("info_blocks")}
                                     sx={{ flex: 1, minWidth: 200 }}
                                 />
                             </FieldRow>
@@ -467,6 +524,7 @@ export default function AdminLandingPage() {
                                     minRows={3}
                                     value={item.content_en}
                                     onChange={(e) => updateItem("info_blocks", item.id, "content_en", e.target.value)}
+                                    onBlur={() => saveSection("info_blocks")}
                                     sx={{ flex: 1, minWidth: 200 }}
                                 />
                                 <TextField
@@ -476,6 +534,7 @@ export default function AdminLandingPage() {
                                     minRows={3}
                                     value={item.content_ru}
                                     onChange={(e) => updateItem("info_blocks", item.id, "content_ru", e.target.value)}
+                                    onBlur={() => saveSection("info_blocks")}
                                     sx={{ flex: 1, minWidth: 200 }}
                                 />
                             </FieldRow>
@@ -487,6 +546,7 @@ export default function AdminLandingPage() {
                                     onChange={(e) =>
                                         updateItem("info_blocks", item.id, "additional_content_type", e.target.value)
                                     }
+                                    onBlur={() => saveSection("info_blocks")}
                                     sx={{ flex: 1, minWidth: 160 }}
                                 />
                                 <TextField
@@ -498,6 +558,7 @@ export default function AdminLandingPage() {
                                     onChange={(e) =>
                                         updateItem("info_blocks", item.id, "additional_content_data", e.target.value)
                                     }
+                                    onBlur={() => saveSection("info_blocks")}
                                     sx={{ flex: 2, minWidth: 200 }}
                                 />
                             </FieldRow>
@@ -506,7 +567,7 @@ export default function AdminLandingPage() {
                                     <Switch
                                         checked={item.is_visible === 1}
                                         onChange={(e) =>
-                                            updateItem("info_blocks", item.id, "is_visible", e.target.checked ? 1 : 0)
+                                            updateItemAndSave("info_blocks", item.id, "is_visible", e.target.checked ? 1 : 0)
                                         }
                                         size="small"
                                     />
@@ -526,8 +587,15 @@ export default function AdminLandingPage() {
             {tab === 4 && (
                 <SortableList
                     items={getSection("footer")}
-                    onReorder={(items) => updateSection("footer", items)}
-                    onDelete={(id) => removeItem("footer", id)}
+                    onReorder={(items) => {
+                        updateSection("footer", items);
+                        saveSection("footer", items);
+                    }}
+                    onDelete={(id) => {
+                        const newItems = getSection("footer").filter((it) => it.id !== id);
+                        updateSection("footer", newItems);
+                        saveSection("footer", newItems);
+                    }}
                     onAdd={addFooterItem}
                     addLabel="Add Footer Item"
                     renderItem={(item) => (
@@ -539,6 +607,7 @@ export default function AdminLandingPage() {
                                 minRows={2}
                                 value={item.content_en}
                                 onChange={(e) => updateItem("footer", item.id, "content_en", e.target.value)}
+                                onBlur={() => saveSection("footer")}
                                 sx={{ flex: 1, minWidth: 200 }}
                             />
                             <TextField
@@ -548,6 +617,7 @@ export default function AdminLandingPage() {
                                 minRows={2}
                                 value={item.content_ru}
                                 onChange={(e) => updateItem("footer", item.id, "content_ru", e.target.value)}
+                                onBlur={() => saveSection("footer")}
                                 sx={{ flex: 1, minWidth: 200 }}
                             />
                         </FieldRow>
