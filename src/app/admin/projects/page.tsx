@@ -32,7 +32,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import DoneIcon from "@mui/icons-material/Done";
 import CodeIcon from "@mui/icons-material/Code";
-import { useAdminData, useLocalizedField } from "@/features/admin-editor";
+import { useAdminData, useLocalizedField, AdminSection } from "@/features/admin-editor";
+import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
+import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
 
@@ -215,12 +217,12 @@ function ProjectsTab() {
                 throw new Error(errBody?.error || "Failed to save project");
             }
             if (isNew) {
-                setLocalSuccess("Project created");
+                setLocalSuccess(__("Project created", lang));
                 setTimeout(() => setLocalSuccess(""), 3000);
                 refetch();
             }
         } catch (err) {
-            setLocalError(err instanceof Error ? err.message : "Save failed");
+            setLocalError(err instanceof Error ? err.message : __("Save failed", lang));
         } finally {
             setSavingId(null);
         }
@@ -245,13 +247,13 @@ function ProjectsTab() {
             setProjects((prev) => (prev ? prev.filter((p) => p.id !== id) : prev));
             return;
         }
-        if (!confirm("Delete this project?")) return;
+        if (!confirm(__("Delete this project?", lang))) return;
         try {
             const res = await fetch(`/api/projects/${id}`, { method: "DELETE" });
-            if (!res.ok) throw new Error("Delete failed");
+            if (!res.ok) throw new Error(__("Delete failed", lang));
             refetch();
         } catch (err) {
-            setLocalError(err instanceof Error ? err.message : "Delete failed");
+            setLocalError(err instanceof Error ? err.message : __("Delete failed", lang));
         }
     };
 
@@ -418,7 +420,7 @@ function ProjectsTab() {
                                         sx={{ gridColumn: { md: "1 / -1" } }}
                                     />
                                     <TextField
-                                        label="Year"
+                                        label={__("Year", lang)}
                                         size="small"
                                         type="number"
                                         value={project.year ?? 0}
@@ -428,7 +430,7 @@ function ProjectsTab() {
                                         onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
-                                        label="Rating"
+                                        label={__("Rating", lang)}
                                         size="small"
                                         type="number"
                                         value={project.rating ?? 0}
@@ -448,7 +450,7 @@ function ProjectsTab() {
                                         onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
-                                        label="Participating"
+                                        label={__("Participating", lang)}
                                         size="small"
                                         fullWidth
                                         value={project.participating ?? ""}
@@ -472,7 +474,7 @@ function ProjectsTab() {
                                         onBlur={() => autoSaveProject(project.id)}
                                     />
                                     <TextField
-                                        label="GitHub Link"
+                                        label={__("GitHub Link", lang)}
                                         size="small"
                                         fullWidth
                                         value={project.github_link ?? ""}
@@ -668,33 +670,33 @@ function TechnologiesTab() {
             });
             if (!res.ok) {
                 const errBody = await res.json().catch(() => null);
-                throw new Error(errBody?.error || "Save failed");
+                throw new Error(errBody?.error || __("Save failed", lang));
             }
             if (isNew) {
-                setLocalSuccess("Technology created");
+                setLocalSuccess(__("Technology created", lang));
                 setTimeout(() => setLocalSuccess(""), 3000);
                 setEditingTech(null);
                 refetch();
             }
         } catch (err) {
-            setLocalError(err instanceof Error ? err.message : "Save failed");
+            setLocalError(err instanceof Error ? err.message : __("Save failed", lang));
         } finally {
             setSaving(false);
         }
     };
 
     const handleDeleteTech = async (id: number) => {
-        if (!confirm("Delete this technology?")) return;
+        if (!confirm(__("Delete this technology?", lang))) return;
         try {
             const res = await fetch("/api/technologies", {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id }),
             });
-            if (!res.ok) throw new Error("Delete failed");
+            if (!res.ok) throw new Error(__("Delete failed", lang));
             refetch();
         } catch (err) {
-            setLocalError(err instanceof Error ? err.message : "Delete failed");
+            setLocalError(err instanceof Error ? err.message : __("Delete failed", lang));
         }
     };
 
@@ -1053,6 +1055,51 @@ function TechEditForm({
 // Main Page
 // ---------------------------------------------------------------------------
 
+function GeneralLabelsTab() {
+    const { lang } = useLocalizedField();
+    const { data: labelsRaw, setData: setLabelsRaw, saving: labelsSaving, error: labelsError, success: labelsSuccess, save: labelsSave, loading } = useAdminData<UiLabelItem[]>({
+        url: "/api/ui-labels",
+    });
+
+    const labelsItems = labelsRaw ?? [];
+
+    const updateLabel = (id: number | string, field: string, value: string) => {
+        setLabelsRaw((prev) => {
+            if (!prev) return prev;
+            return prev.map((item) => (item.id === id ? { ...item, [field]: value } : item));
+        });
+    };
+
+    const saveLabels = (items: UiLabelItem[]) => {
+        const categoryItems = items.filter((it) => it.category === "projects_general");
+        labelsSave({ category: "projects_general", data: categoryItems });
+    };
+
+    if (loading) {
+        return (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    return (
+        <AdminSection
+            title={__("General Labels", lang)}
+            saving={labelsSaving}
+            error={labelsError}
+            success={labelsSuccess}
+        >
+            <UiLabelsEditor
+                category="projects_general"
+                items={labelsItems}
+                onUpdate={updateLabel}
+                onSave={saveLabels}
+            />
+        </AdminSection>
+    );
+}
+
 export default function AdminProjectsPage() {
     const theme = useTheme();
     const menuText = getThemeColor("menuText", theme);
@@ -1079,10 +1126,12 @@ export default function AdminProjectsPage() {
             >
                 <Tab label={__("Projects", lang)} icon={<RocketLaunchIcon />} iconPosition="start" />
                 <Tab label={__("Technologies", lang)} icon={<CodeIcon />} iconPosition="start" />
+                <Tab label={__("General Labels", lang)} />
             </Tabs>
 
             {tab === 0 && <ProjectsTab />}
             {tab === 1 && <TechnologiesTab />}
+            {tab === 2 && <GeneralLabelsTab />}
         </Box>
     );
 }

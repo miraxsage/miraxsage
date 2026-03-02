@@ -17,13 +17,15 @@ import CategoriesToolbar from "@/shared/ui/CategoriesToolbar";
 import { useEffect, useState } from "react";
 import { ToolbarButton } from "@/shared/ui/ToolbarButton";
 import __ from "@/shared/lib/i18n/translation";
+import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import { useRouter } from "next/navigation";
 
 export default function Projects() {
     const lang = useLanguage().lang;
+    const t = useUiLabels();
     useEffect(() => {
-        document.title = __("Projects") + " | Miraxsage";
-    }, [lang]);
+        document.title = t("Projects") + " | Miraxsage";
+    }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
     const theme = useTheme();
     const router = useRouter();
     const projectsLocation = useProjectsLocation()!;

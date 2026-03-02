@@ -6,42 +6,54 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { Box, alpha, useMediaQuery, useTheme } from "@mui/material";
 import { getThemeColor, useThemeColor } from "@/shared/lib/theme";
 import __ from "@/shared/lib/i18n/translation";
+import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import { usePathname, useRouter } from "next/navigation";
-import { useSiteMapVisibility } from "@/shared/lib/store/appearanceSlice";
+import { useAppearance, useSiteMapVisibility } from "@/shared/lib/store/appearanceSlice";
 import CustomBreadcrumbs from "@/shared/ui/Breadcrumbs";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import CallIcon from "@mui/icons-material/Call";
 import HomeIcon from "@mui/icons-material/Home";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
+import PersonIcon from "@mui/icons-material/Person";
+import type { SvgIconComponent } from "@mui/icons-material";
 
-const breadcrumbsItems = [
-    {
-        label: "Home",
-        icon: <HomeIcon />,
-        link: "/",
-    },
-    {
-        label: "About",
-        icon: <AssignmentIndIcon />,
-        link: "/about",
-    },
-    {
-        label: "Projects",
-        icon: <RocketLaunchIcon />,
-        link: "/projects",
-    },
-    {
-        label: "Interact",
-        icon: <CallIcon />,
-        link: "/interact",
-    },
-];
+export interface HeaderItem {
+    id: number;
+    label_en: string;
+    label_ru: string;
+    icon: string;
+    url: string;
+}
 
-function MobileRootBreadcrumb() {
+const ICON_MAP: Record<string, SvgIconComponent> = {
+    AssignmentIndIcon,
+    PersonIcon,
+    RocketLaunchIcon,
+    HomeIcon,
+    CallIcon,
+};
+
+function MobileRootBreadcrumb({ headerItems }: { headerItems: HeaderItem[] }) {
     const pathname = usePathname();
-    const currentItem = breadcrumbsItems.find((bc) => bc.link != "/" && pathname.startsWith(bc.link));
     const theme = useTheme();
     const router = useRouter();
+    const lang = useAppearance().language;
+    const locLabel = (item: HeaderItem) => (lang === "en" ? item.label_en : item.label_ru);
+
+    const t = useUiLabels();
+    const breadcrumbsItems = [
+        { label: t("Home"), icon: <HomeIcon />, link: "/" },
+        ...headerItems.map((item) => {
+            const IconComp = ICON_MAP[item.icon];
+            return {
+                label: locLabel(item),
+                icon: IconComp ? <IconComp /> : undefined,
+                link: item.url,
+            };
+        }),
+    ];
+
+    const currentItem = breadcrumbsItems.find((bc) => bc.link != "/" && pathname.startsWith(bc.link));
     if (!currentItem) return null;
     return (
         <CustomBreadcrumbs
@@ -62,7 +74,7 @@ function MobileRootBreadcrumb() {
         >
             {[
                 {
-                    label: __(currentItem.label),
+                    label: currentItem.label,
                     onClick: () => {
                         if (currentItem.link == "/projects" && pathname != currentItem.link) {
                             router.push(currentItem.link);
@@ -70,20 +82,21 @@ function MobileRootBreadcrumb() {
                         }
                     },
                     subitems: breadcrumbsItems
-                        .filter((bc) => bc != currentItem)
-                        .map((bc) => ({ ...bc, label: __(bc.label) })),
+                        .filter((bc) => bc != currentItem),
                 },
             ]}
         </CustomBreadcrumbs>
     );
 }
 
-export default function TopMenu() {
+export default function TopMenu({ headerItems }: { headerItems: HeaderItem[] }) {
     const router = useRouter();
     const pathname = usePathname();
     const theme = useTheme();
     const smScreen = useMediaQuery(theme.breakpoints.down("sm"));
     const siteMapVisibility = useSiteMapVisibility();
+    const lang = useAppearance().language;
+    const locLabel = (item: HeaderItem) => (lang === "en" ? item.label_en : item.label_ru);
 
     const onTabSelect = (tab: AccentedTabProps) => {
         if (siteMapVisibility.shown) {
@@ -91,6 +104,15 @@ export default function TopMenu() {
             setTimeout(() => router.push(`/${tab.id == "miraxsage" ? "" : tab.id}`), 300);
         } else router.push(`/${tab.id == "miraxsage" ? "" : tab.id}`);
     };
+
+    const tabs = [
+        { id: "miraxsage", title: "_Miraxsage", active: false },
+        ...headerItems.map((item) => ({
+            id: item.url.replace("/", ""),
+            title: `_${locLabel(item)}`,
+            active: pathname.startsWith(item.url),
+        })),
+    ];
 
     return (
         <Box
@@ -133,14 +155,10 @@ export default function TopMenu() {
                 <MenuIcon />
             </HorizontalPanelButton>
             {smScreen ? (
-                <MobileRootBreadcrumb />
+                <MobileRootBreadcrumb headerItems={headerItems} />
             ) : (
                 <AccentedTabs underline={false} mode="full" onTabSelect={onTabSelect}>
-                    {["miraxsage", "about", "projects", "interact"].map((id) => ({
-                        id,
-                        title: `_${__(id)}`,
-                        active: pathname.startsWith(`/${id}`),
-                    }))}
+                    {tabs}
                 </AccentedTabs>
             )}
         </Box>

@@ -1,7 +1,7 @@
 "use client";
 import { SimpleSpinner } from "@/shared/ui/Spinners";
 import { getThemeColor } from "@/shared/lib/theme";
-import __ from "@/shared/lib/i18n/translation";
+import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import { Alert, Box, Button, SxProps, alpha, useTheme } from "@mui/material";
 
 export type FeedbackSendingProps = {
@@ -12,6 +12,7 @@ export type FeedbackSendingProps = {
 };
 export function FeedbackSending({ status, message, onClick, sx }: FeedbackSendingProps) {
     const theme = useTheme();
+    const t = useUiLabels();
     return (
         <Box
             sx={{
@@ -47,7 +48,7 @@ export function FeedbackSending({ status, message, onClick, sx }: FeedbackSendin
                 </Alert>
             )}
             <Button color={status == "loading" ? "regular" : status} onClick={onClick} variant="outlined">
-                {__(status == "loading" ? "Cancel" : "Close")}
+                {t(status == "loading" ? "Cancel" : "Close")}
             </Button>
         </Box>
     );

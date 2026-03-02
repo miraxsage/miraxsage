@@ -4,7 +4,7 @@ import MusclesIcon from "@/shared/icons/MusclesIcon";
 import DescriptionPanel from "@/shared/ui/DescriptionPanel";
 import TechnologiesCrumbs from "@/shared/ui/TechnologiesCrumbs";
 import { useLanguage } from "@/shared/lib/store/appearanceSlice";
-import __ from "@/shared/lib/i18n/translation";
+import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 
 const data: { [k: string]: { description: { ru: string; en: string } } } = {
     frontend: {
@@ -61,6 +61,7 @@ export default function TechDescriptionBlock({
     withoutBorders,
 }: TechnologiesDescriptionBlock) {
     const lang = useLanguage();
+    const t = useUiLabels();
     return (
         <DescriptionPanel withoutBottomBorder={withoutBottomBorder} withoutBorders={withoutBorders}>
             {{
@@ -70,12 +71,12 @@ export default function TechDescriptionBlock({
                 ],
                 buttons: [
                     {
-                        label: __("Projects"),
+                        label: t("Projects"),
                         icon: <RocketLaunchIcon sx={{ fontSize: "20px", margin: "0px 5px 2px 0px" }} />,
                         link: `/projects?techs=${category}`,
                     },
                     {
-                        label: __("Skills"),
+                        label: t("Skills_tab"),
                         icon: <MusclesIcon sx={{ fontSize: "20px", margin: "0px 3px 2px 0px" }} />,
                         link: `/about/skills/hard`,
                     },

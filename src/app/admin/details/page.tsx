@@ -14,6 +14,8 @@ import {
 } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
 import { SortableList, AdminSection, useAdminData, useLocalizedField } from "@/features/admin-editor";
+import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
+import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
 
@@ -55,6 +57,9 @@ function FieldRow({ children }: { children: React.ReactNode }) {
 
 const TAB_KEYS = [
     { key: "header_items" as const, label: "Header Items" },
+    { key: "details_navigation" as const, label: "Navigation Labels" },
+    { key: "details_ui" as const, label: "UI Labels" },
+    { key: "landing" as const, label: "Landing Labels" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -71,6 +76,27 @@ export default function AdminDetailsPage() {
     const { data, setData, loading, saving, error, success, save } = useAdminData<DetailsData>({
         url: "/api/landing",
     });
+
+    const { data: labelsRaw, setData: setLabelsRaw, loading: labelsLoading, saving: labelsSaving, error: labelsError, success: labelsSuccess, save: labelsSave } = useAdminData<UiLabelItem[]>({
+        url: "/api/ui-labels",
+    });
+
+    const labelsItems = labelsRaw ?? [];
+
+    const updateLabel = (id: number | string, field: string, value: string) => {
+        setLabelsRaw((prev) => {
+            if (!prev) return prev;
+            return prev.map((item) => (item.id === id ? { ...item, [field]: value } : item));
+        });
+    };
+
+    const saveLabels = (items: UiLabelItem[]) => {
+        const currentTab = TAB_KEYS[tab];
+        if (!currentTab) return;
+        const category = currentTab.key;
+        const categoryItems = items.filter((it) => it.category === category);
+        labelsSave({ category, data: categoryItems });
+    };
 
     const items = data?.header_items ?? [];
 
@@ -112,7 +138,7 @@ export default function AdminDetailsPage() {
         saveItems(newItems);
     };
 
-    if (loading) {
+    if (loading || labelsLoading) {
         return (
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 48px)" }}>
                 <CircularProgress />
@@ -184,7 +210,7 @@ export default function AdminDetailsPage() {
                                     sx={{ flex: 1, minWidth: 140 }}
                                 />
                                 <TextField
-                                    label="URL"
+                                    label={__("URL", lang)}
                                     size="small"
                                     value={item.url}
                                     onChange={(e) => updateItem(item.id, "url", e.target.value)}
@@ -210,6 +236,16 @@ export default function AdminDetailsPage() {
                             </FieldRow>
                         </Box>
                     )}
+                />
+            )}
+
+            {/* ===== Navigation / UI / Landing Labels ===== */}
+            {tab >= 1 && tab <= 3 && (
+                <UiLabelsEditor
+                    category={TAB_KEYS[tab].key}
+                    items={labelsItems}
+                    onUpdate={updateLabel}
+                    onSave={saveLabels}
                 />
             )}
         </AdminSection>

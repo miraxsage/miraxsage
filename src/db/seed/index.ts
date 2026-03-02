@@ -8,6 +8,7 @@ import seedResume from "./resume";
 import seedTechnologies from "./technologies";
 import seedProjects from "./projects";
 import seedContacts from "./contacts";
+import seedUiLabels from "./ui-labels";
 
 const dbDir = path.resolve(process.cwd(), "data");
 if (!fs.existsSync(dbDir)) {
@@ -44,6 +45,7 @@ seedResume(db);
 seedTechnologies(db);
 seedProjects(db);
 seedContacts(db);
+seedUiLabels(db);
 
 // Summary
 const tables = db

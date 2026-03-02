@@ -217,6 +217,20 @@ export const darkTheme = createTheme(
                     },
                 },
             },
+            MuiOutlinedInput: {
+                styleOverrides: {
+                    notchedOutline: {
+                        borderColor: "#2f314a",
+                    },
+                },
+            },
+            MuiChip: {
+                styleOverrides: {
+                    outlined: {
+                        borderColor: "#2f314a",
+                    },
+                },
+            },
         },
     }) as ThemeOptions
 );

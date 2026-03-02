@@ -86,6 +86,7 @@ export async function PUT(request: NextRequest) {
         const db = getDb();
         const items = Array.isArray(data) ? data : [data];
 
+        db.pragma("defer_foreign_keys = ON");
         const transaction = db.transaction(() => {
             db.prepare(`DELETE FROM ${tableName}`).run();
 

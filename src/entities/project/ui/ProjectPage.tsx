@@ -23,6 +23,7 @@ import ProjectCarousel from "@/entities/project/ui/ProjectCarousel";
 import ProjectImageViewer from "@/entities/project/ui/ProjectImageViewer";
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 import __ from "@/shared/lib/i18n/translation";
+import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import { useRouter } from "next/navigation";
 
 function OptionalCustomScrollbar({
@@ -54,6 +55,7 @@ export default function ProjectPage() {
     const lang = useAppearance().language;
     const curProjectLocation = useProjectsLocation();
     const locatedProjects = getLocatedProjects(curProjectLocation!, lang);
+    const t = useUiLabels();
     const allProjectsLocation = curProjectLocation!.techs.length == 0 || locatedProjects.length == getProjectsArray().length;
     const content = useRef<{ ru: ReactNode; en: ReactNode; slug: string; swapDirection?: "left" | "right" }>({
         ru: null,
@@ -131,7 +133,7 @@ export default function ProjectPage() {
                 <div style={{ opacity: prevProjSlug ? 1 : 0.5 }}>
                     <ArrowBackIcon />
                     {lessLg && <br />}
-                    {__("Previous")}
+                    {t("Previous")}
                 </div>
             </LinkButton>
             <LinkButton
@@ -141,7 +143,7 @@ export default function ProjectPage() {
             >
                 <RocketLaunchIcon />
                 {lessLg && <br />}
-                {muchSmall ? __("Projects") : allProjectsLocation ? __("All projects") : __("All chosen projects")}
+                {muchSmall ? t("Projects") : allProjectsLocation ? t("All projects") : t("All chosen projects")}
             </LinkButton>
             <LinkButton
                 borders="bottom"
@@ -156,9 +158,9 @@ export default function ProjectPage() {
                 }}
             >
                 <div style={{ opacity: nextProjSlug ? 1 : 0.5 }}>
-                    {lessLg ? <ArrowForwardIcon /> : __("Next")}
+                    {lessLg ? <ArrowForwardIcon /> : t("Next")}
                     {lessLg && <br />}
-                    {lessLg ? __("Next") : <ArrowForwardIcon />}
+                    {lessLg ? t("Next") : <ArrowForwardIcon />}
                 </div>
             </LinkButton>
         </Box>

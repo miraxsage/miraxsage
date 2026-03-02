@@ -303,7 +303,7 @@ export default function AdminLandingPage() {
                                 sx={{ flex: 1, minWidth: 140 }}
                             />
                             <TextField
-                                label="URL"
+                                label={__("URL", lang)}
                                 size="small"
                                 value={item.url}
                                 onChange={(e) => updateItem("buttons", item.id, "url", e.target.value)}
@@ -359,7 +359,7 @@ export default function AdminLandingPage() {
                             />
                             <FieldRow>
                                 <TextField
-                                    label="Slug"
+                                    label={__("Slug", lang)}
                                     size="small"
                                     value={item.slug}
                                     onChange={(e) => updateItem("info_blocks", item.id, "slug", e.target.value)}

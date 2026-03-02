@@ -3,6 +3,7 @@ import DescriptionTable from "@/shared/ui/DescriptionTable";
 import { ProjectInterface, ProjectsList, getProjectsArray } from "@/entities/project/model/projects";
 import { useAppearance } from "@/shared/lib/store/appearanceSlice";
 import __ from "@/shared/lib/i18n/translation";
+import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import { capitalize } from "@/shared/lib/string";
 import TechnologiesCrumbs from "@/shared/ui/TechnologiesCrumbs";
 import Link from "@/shared/ui/Link";
@@ -11,21 +12,22 @@ import { Box } from "@mui/material";
 export default function ProjectInfoTable({ project: slug }: { project: ProjectsList }) {
     const project: ProjectInterface = getProjectsArray().find((p) => p.slug == slug)!;
     const lang = useAppearance().language;
+    const t = useUiLabels();
     return (
         <Box sx={{ marginLeft: "-1px" }}>
             <DescriptionTable withoutTopBorder={true} maxWidth="1 col">
                 {[
-                    [__("Full name"), project.name[lang], { fullLine: true }],
-                    [__("Description"), project.description[lang], { fullLine: true }],
-                    [__("Technologies"), <TechnologiesCrumbs techs={project.technologies} />, { fullLine: true }],
-                    [__("Domain area"), __(project.domain)],
-                    [__("Rating"), `[Score ${project.rating}/5]`],
-                    [__("Year"), project.year.toString()],
-                    [__("Status"), __(capitalize(project.status))],
-                    [__("Participating"), __(capitalize(project.participating))],
-                    [__("Develompent period"), project.devTimeMonths + " " + __("mon.")],
+                    [t("Full name"), project.name[lang], { fullLine: true }],
+                    [t("Description"), project.description[lang], { fullLine: true }],
+                    [t("Technologies"), <TechnologiesCrumbs techs={project.technologies} />, { fullLine: true }],
+                    [t("Domain area"), __(project.domain)],
+                    [t("Rating"), `[Score ${project.rating}/5]`],
+                    [t("Year"), project.year.toString()],
+                    [t("Status"), __(capitalize(project.status))],
+                    [t("Participating"), __(capitalize(project.participating))],
+                    [t("Development period"), project.devTimeMonths + " " + t("mon.")],
                     [
-                        __("Github link"),
+                        t("Github link"),
                         project.gitHubLink ? (
                             <Link href={project.gitHubLink} target="_blank">
                                 {project.gitHubLink}

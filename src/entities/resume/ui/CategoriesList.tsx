@@ -1,8 +1,11 @@
 "use client";
+import { useContext } from "react";
 import __ from "@/shared/lib/i18n/translation";
+import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 import { useLanguage } from "@/shared/lib/store/appearanceSlice";
+import { CategoryLabelsContext } from "@/entities/resume/model/categoryLabels";
 
 import categories, { AboutCategoriesInterface } from "@/entities/resume/model/categories";
 import { capitalize } from "@/shared/lib/string";
@@ -15,14 +18,15 @@ import AccentedTreeView, {
 
 function categoriesToTreeItems(
     categories: AboutCategoriesInterface,
-    activeItem?: string | null
+    activeItem?: string | null,
+    labelFn?: (slug: string) => string
 ): AccentedTreeItemProps[] {
     const res = Object.entries(categories).map(([id, details]) => ({
         id,
         isAccented: id == activeItem,
-        title: __(capitalize(id)),
+        title: labelFn ? labelFn(id) : __(capitalize(id)),
         icon: details.icon,
-        children: details.items ? categoriesToTreeItems(details.items, activeItem) : undefined,
+        children: details.items ? categoriesToTreeItems(details.items, activeItem, labelFn) : undefined,
     }));
     return res;
 }
@@ -35,14 +39,21 @@ type AboutCategoriesListProps = {
     | Omit<AccentedTreeViewUnselectableProps, "children">
 );
 
-export function abouteCategoriesTreeViewData() {
-    return categoriesToTreeItems(categories);
+export function abouteCategoriesTreeViewData(labelFn?: (slug: string) => string) {
+    return categoriesToTreeItems(categories, undefined, labelFn);
 }
 
 export default function AboutCategoriesList({ ...props }: AboutCategoriesListProps) {
-    useLanguage();
-    const data = categoriesToTreeItems(categories, props.activeItem);
-    data.unshift({ id: "download-pdf", title: __("Download PDF"), icon: <PictureAsPdfIcon /> });
+    const lang = useLanguage();
+    const labels = useContext(CategoryLabelsContext);
+    const t = useUiLabels();
+    const getCatLabel = (slug: string) => {
+        const entry = labels[slug];
+        if (!entry) return __(capitalize(slug));
+        return lang.lang === "en" ? entry.label_en : entry.label_ru;
+    };
+    const data = categoriesToTreeItems(categories, props.activeItem, getCatLabel);
+    data.unshift({ id: "download-pdf", title: t("Download PDF"), icon: <PictureAsPdfIcon /> });
     const onItemsSelectOuterHandler = props.onItemsSelect;
     const onItemsSelectHandler = !props.onItemsSelect
         ? undefined
@@ -59,7 +70,7 @@ export default function AboutCategoriesList({ ...props }: AboutCategoriesListPro
                   isPdfItemClick = true;
               }
               if (isPdfItemClick) {
-                  window.open(`/${__("Resume (Miraxsage)")}.pdf`, "_blank");
+                  window.open(`/${t("Resume (Miraxsage)")}.pdf`, "_blank");
                   return;
               }
               if (selectedItems)

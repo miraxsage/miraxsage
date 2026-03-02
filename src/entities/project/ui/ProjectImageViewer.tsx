@@ -14,7 +14,7 @@ import { SimpleSpinner } from "@/shared/ui/Spinners";
 import { useColorMode } from "@/shared/lib/store/appearanceSlice";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
-import __ from "@/shared/lib/i18n/translation";
+import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 
 type ProjectImageViewerProps = {
     project: ProjectInterface;
@@ -94,6 +94,7 @@ function ProjectImage({ source, scale, loading, appearSide }: ProjectImageProps)
 
 export default function ProjectImageViewer({ project, image, onClose }: ProjectImageViewerProps) {
     const theme = useTheme();
+    const t = useUiLabels();
     const isDarkMode = useColorMode().dark;
     const [loading, setLoading] = useState(true);
     const [scale, setScale] = useReducer((_old: number, action: number) => {
@@ -181,23 +182,23 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
                     >
                         <div style={{ opacity: !isFirstImage ? 1 : 0.5 }}>
                             <ArrowBackIcon />
-                            {!lessLg && __("Previous|1")}
+                            {!lessLg && t("Previous_alt")}
                         </div>
                     </LinkButton>
                     <LinkButton borders="bottom" onClick={scale > 0.5 ? () => setScale(scale - 0.1) : undefined}>
                         <div style={{ opacity: scale > 0.5 ? 1 : 0.5 }}>
                             <ZoomOutIcon />
-                            {lessLg ? "-" : __("Zoom_out")}
+                            {lessLg ? "-" : t("Zoom_out")}
                         </div>
                     </LinkButton>
                     <LinkButton borders="right-bottom-left" onClick={onClose}>
                         <RocketLaunchIcon />
-                        {muchSmall ? __("Back") : __("To description")}
+                        {muchSmall ? t("Back") : t("To description")}
                     </LinkButton>
                     <LinkButton borders="bottom" onClick={scale < 1.5 ? () => setScale(scale + 0.1) : undefined}>
                         <div style={{ opacity: scale < 1.5 ? 1 : 0.5 }}>
                             <ZoomInIcon />
-                            {lessLg ? "+" : __("Zoom_in")}
+                            {lessLg ? "+" : t("Zoom_in")}
                         </div>
                     </LinkButton>
 
@@ -212,7 +213,7 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
                         onClick={!isLastImage ? () => navigate("next") : undefined}
                     >
                         <div style={{ opacity: !isLastImage ? 1 : 0.5 }}>
-                            {!lessLg && __("Next|1")}
+                            {!lessLg && t("Next_alt")}
                             <ArrowForwardIcon />
                         </div>
                     </LinkButton>

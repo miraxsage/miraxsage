@@ -2,23 +2,34 @@
 
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import TopMenu from "@/widgets/layout/TopMenu";
+import type { HeaderItem } from "@/widgets/layout/TopMenu";
 import BottomBar from "@/widgets/layout/BottomBar";
 import AsideMenu from "@/widgets/layout/AsideMenu";
 import { getThemeColor } from "@/shared/lib/theme";
 import { useScreenMode } from "@/shared/lib/store/appearanceSlice";
 import SiteMap from "@/widgets/layout/SiteMap";
+import { CategoryLabelsContext, CategoryLabelsMap } from "@/entities/resume/model/categoryLabels";
+import { UiLabelsContext, UiLabelsMap } from "@/entities/ui-labels/model/uiLabelsContext";
+import { ResumeDataContext, ResumeData } from "@/entities/resume/model/resumeDataContext";
 
 interface LayoutProps {
     children: React.ReactNode;
+    headerItems: HeaderItem[];
+    categoryLabels: CategoryLabelsMap;
+    uiLabels: UiLabelsMap;
+    resumeData: ResumeData;
 }
 
-export default function MainLayout({ children }: LayoutProps) {
+export default function MainLayout({ children, headerItems, categoryLabels, uiLabels, resumeData }: LayoutProps) {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode == "dark";
     const smallHeight = useMediaQuery("@media (max-height:450px)");
     const glowColor = getThemeColor("layoutGlow", theme);
     const screenMode = useScreenMode();
     return (
+        <UiLabelsContext.Provider value={uiLabels}>
+        <CategoryLabelsContext.Provider value={categoryLabels}>
+        <ResumeDataContext.Provider value={resumeData}>
         <Box
             sx={{
                 ...(screenMode.full
@@ -66,7 +77,7 @@ export default function MainLayout({ children }: LayoutProps) {
                         : {}),
                 }}
             >
-                <TopMenu />
+                <TopMenu headerItems={headerItems} />
                 <Box
                     sx={{
                         display: "grid",
@@ -84,5 +95,8 @@ export default function MainLayout({ children }: LayoutProps) {
                 {!smallHeight && <BottomBar />}
             </Box>
         </Box>
+        </ResumeDataContext.Provider>
+        </CategoryLabelsContext.Provider>
+        </UiLabelsContext.Provider>
     );
 }

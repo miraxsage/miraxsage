@@ -6,6 +6,8 @@ import FloatingLine from "./FloatingLine";
 import { useColorMode, useLanguage } from "@/shared/lib/store/appearanceSlice";
 import LandingLink from "./LandingLink";
 import __ from "@/shared/lib/i18n/translation";
+import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
+import { CategoryLabelsContext } from "@/entities/resume/model/categoryLabels";
 import AccentedTreeView from "@/shared/ui/AccentedTreeView";
 import PersonIcon from "@mui/icons-material/Person";
 import SchoolIcon from "@mui/icons-material/School";
@@ -23,7 +25,7 @@ import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlin
 import MessageIcon from "@mui/icons-material/Message";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import { GitHub } from "@mui/icons-material";
-import { ReactNode, useState } from "react";
+import { ReactNode, useContext, useState } from "react";
 import Copyright from "./Copyright";
 import { useRouter } from "next/navigation";
 
@@ -80,6 +82,13 @@ export default function GetCloserSlide() {
     const isDarkMode = useColorMode().dark;
     const router = useRouter();
     const lang = useLanguage();
+    const t = useUiLabels();
+    const catLabels = useContext(CategoryLabelsContext);
+    const catLabel = (slug: string) => {
+        const entry = catLabels[slug];
+        if (!entry) return __(slug.charAt(0).toUpperCase() + slug.slice(1));
+        return lang.lang === "en" ? entry.label_en : entry.label_ru;
+    };
     const layoutBackgroundColor = getThemeColor("layoutBackground", theme);
     const textColor = useLandingColor("contrast");
     const accentColor = useLandingColor("accentA");
@@ -252,7 +261,7 @@ export default function GetCloserSlide() {
                                         📜
                                     </Box>{" "}
                                     Вы можете ознакомиться с моим подробным{" "}
-                                    <LandingLink href="/about">{__("resume")}</LandingLink>
+                                    <LandingLink href="/about">{t("resume")}</LandingLink>
                                 </Box>
                                 <Box sx={{ gridArea: "2/3/2/3", marginLeft: "20px" }}>
                                     <Box
@@ -261,7 +270,7 @@ export default function GetCloserSlide() {
                                     >
                                         💼
                                     </Box>{" "}
-                                    Посмотреть <LandingLink href="/projects">{__("portfolio")}</LandingLink> с самыми
+                                    Посмотреть <LandingLink href="/projects">{t("portfolio")}</LandingLink> с самыми
                                     интересными работами
                                 </Box>
                                 <Box sx={{ gridArea: "3/3/3/3", marginLeft: "20px" }}>
@@ -272,7 +281,7 @@ export default function GetCloserSlide() {
                                         🤝
                                     </Box>{" "}
                                     Cвязаться со мной в соцсетях или оставить{" "}
-                                    <LandingLink href="/interact">{__("message")}</LandingLink>
+                                    <LandingLink href="/interact">{t("message")}</LandingLink>
                                 </Box>
                             </>
                         ) : (
@@ -284,7 +293,7 @@ export default function GetCloserSlide() {
                                     >
                                         📜
                                     </Box>{" "}
-                                    You can review my detailed <LandingLink href="/about">{__("resume")}</LandingLink>
+                                    You can review my detailed <LandingLink href="/about">{t("resume")}</LandingLink>
                                 </Box>
                                 <Box sx={{ gridArea: "2/3/2/3", marginLeft: "20px" }}>
                                     <Box
@@ -293,7 +302,7 @@ export default function GetCloserSlide() {
                                     >
                                         💼
                                     </Box>{" "}
-                                    Check out the <LandingLink href="/projects">{__("portfolio")}</LandingLink> with my
+                                    Check out the <LandingLink href="/projects">{t("portfolio")}</LandingLink> with my
                                     most interesting works
                                 </Box>
                                 <Box sx={{ gridArea: "3/3/3/3", marginLeft: "20px" }}>
@@ -304,7 +313,7 @@ export default function GetCloserSlide() {
                                         🤝
                                     </Box>{" "}
                                     Connect with me on social media or leave a{" "}
-                                    <LandingLink href="/interact">{__("message")}</LandingLink>
+                                    <LandingLink href="/interact">{t("message")}</LandingLink>
                                 </Box>
                             </>
                         )}
@@ -417,58 +426,58 @@ export default function GetCloserSlide() {
                             {[
                                 {
                                     id: "/about/biography/general",
-                                    title: __("Biography"),
+                                    title: catLabel("biography"),
                                     icon: <PersonIcon />,
                                     children: [
                                         {
                                             id: "/about/biography/education",
-                                            title: __("Education"),
+                                            title: catLabel("education"),
                                             icon: <SchoolIcon />,
                                         },
                                         {
                                             id: "/about/biography/labor",
-                                            title: __("Labor"),
+                                            title: catLabel("labor"),
                                             icon: <BusinessCenterIcon />,
                                         },
                                     ],
                                 },
                                 {
                                     id: "/about/experience/technologies",
-                                    title: __("Experience"),
+                                    title: catLabel("experience"),
                                     icon: <MusclesIcon />,
                                     children: [
                                         {
                                             id: "/about/experience/achievements",
-                                            title: __("Achievements"),
+                                            title: catLabel("achievements"),
                                             icon: <EmojiEventsIcon />,
                                         },
                                         {
                                             id: "/projects",
-                                            title: __("Projects"),
+                                            title: t("Projects"),
                                             icon: <RocketLaunchIcon />,
                                         },
                                     ],
                                 },
                                 {
                                     id: "/about/specifications",
-                                    title: __("Specifications"),
+                                    title: catLabel("specifications"),
                                     icon: <AssessmentIcon />,
                                     children: [
                                         {
                                             id: "/about/specifications/soft-skills",
-                                            title: __("Soft-skills"),
+                                            title: catLabel("soft-skills"),
                                             icon: <PsychologyAltIcon />,
                                         },
                                         {
                                             id: "/about/specifications/hard-skills",
-                                            title: __("Hard-skills"),
+                                            title: catLabel("hard-skills"),
                                             icon: <PsychologyIcon />,
                                         },
                                     ],
                                 },
                                 {
                                     id: "/about/snippets",
-                                    title: __("Snippets|1"),
+                                    title: catLabel("snippets"),
                                     icon: <DataObjectIcon />,
                                 },
                             ]}
@@ -502,7 +511,7 @@ export default function GetCloserSlide() {
                             </SpecialButton>
                             <SpecialButton link="/interact">
                                 <MessageIcon />
-                                {!sm && __("Write")}
+                                {!sm && t("Write")}
                             </SpecialButton>
                         </Box>
                     </Box>

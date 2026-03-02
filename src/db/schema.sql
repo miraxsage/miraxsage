@@ -266,6 +266,15 @@ CREATE TABLE IF NOT EXISTS contact_page_content (
   content_ru TEXT NOT NULL DEFAULT ''
 );
 
+-- UI labels (admin-editable UI text)
+CREATE TABLE IF NOT EXISTS ui_labels (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  key TEXT NOT NULL UNIQUE,
+  value_en TEXT NOT NULL,
+  value_ru TEXT NOT NULL,
+  category TEXT NOT NULL DEFAULT 'general'
+);
+
 -- Code snippets
 CREATE TABLE IF NOT EXISTS code_snippets (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

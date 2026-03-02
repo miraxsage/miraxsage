@@ -6,8 +6,7 @@ import {
     findCategory,
 } from "@/entities/resume/model/categories";
 import { ReactNode } from "react";
-import __ from "@/shared/lib/i18n/translation";
-import { capitalize } from "@/shared/lib/string";
+import { useCatLabel } from "@/entities/resume/model/categoryLabels";
 import CustomAccordion from "@/shared/ui/Accordion";
 
 interface AboutBlockProps {
@@ -28,12 +27,13 @@ export default function AboutBlock({
     withoutTransition = false,
 }: AboutBlockProps) {
     const categoryObj: AboutCategory = findCategory(category);
+    const label = useCatLabel(category);
     return (
         <CustomAccordion
             withoutTransition={withoutTransition}
             className={className}
             icon={categoryObj.icon}
-            title={__(capitalize(category))}
+            title={label}
             onChange={onToggle}
             expanded={expanded}
         >

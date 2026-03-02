@@ -184,6 +184,9 @@
     "details": "детали",
 
     "header items": "пункты шапки",
+    "navigation labels": "навигационные метки",
+    "ui labels": "метки UI",
+    "landing labels": "метки лендинга",
     "title variants": "варианты заголовка",
     "buttons": "кнопки",
     "info blocks": "инфо-блоки",
@@ -272,5 +275,16 @@
     "dev time (months)": "время разработки (мес.)",
     "images count": "количество изображений",
     "cover brightness": "яркость обложки",
-    "general data": "общие данные"
+    "general data": "общие данные",
+    "general labels": "общие метки",
+    "slug": "слаг",
+    "url": "ссылка",
+    "delete this project?": "удалить этот проект?",
+    "delete this technology?": "удалить эту технологию?",
+    "save failed": "ошибка сохранения",
+    "delete failed": "ошибка удаления",
+    "project created": "проект создан",
+    "technology created": "технология создана",
+    "email, phone, telegram...": "email, телефон, telegram...",
+    "mui icon name or emoji": "имя MUI иконки или эмодзи"
 }

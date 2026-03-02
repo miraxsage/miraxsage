@@ -7,13 +7,18 @@ import MainSlide from "@/widgets/landing/MainSlide";
 import { AboutSlide } from "@/widgets/landing/AboutSlide";
 import GetCloserSlide from "@/widgets/landing/GetCloserSlide";
 import { ScrollObservable } from "@/widgets/landing/types";
-import type { LandingButton } from "@/widgets/landing/MainSlide";
+import type { LandingButton, TitleVariant } from "@/widgets/landing/MainSlide";
+import { UiLabelsContext, UiLabelsMap } from "@/entities/ui-labels/model/uiLabelsContext";
+import { CategoryLabelsContext, CategoryLabelsMap } from "@/entities/resume/model/categoryLabels";
 
 interface LandingClientProps {
     buttons: LandingButton[];
+    titleVariants: TitleVariant[];
+    uiLabels: UiLabelsMap;
+    categoryLabels: CategoryLabelsMap;
 }
 
-export default function LandingClient({ buttons }: LandingClientProps) {
+export default function LandingClient({ buttons, titleVariants, uiLabels, categoryLabels }: LandingClientProps) {
     const rootRef = useRef<HTMLDivElement>();
     const [scrollObservable, setScrollObservable] = useState<ScrollObservable | undefined>();
     useEffect(() => {
@@ -62,12 +67,16 @@ export default function LandingClient({ buttons }: LandingClientProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (
+        <UiLabelsContext.Provider value={uiLabels}>
+        <CategoryLabelsContext.Provider value={categoryLabels}>
         <CustomScrollbar ref={rootRef} className="landing-background-scroll-view" sx={{ width: "100%" }}>
             <Box sx={{ position: "absolute", width: "100%", top: 0, left: 0 }}>
-                <MainSlide scrollObservable={scrollObservable} buttons={buttons} />
+                <MainSlide scrollObservable={scrollObservable} buttons={buttons} titleVariants={titleVariants} />
                 <AboutSlide scrollObservable={scrollObservable} />
                 <GetCloserSlide />
             </Box>
         </CustomScrollbar>
+        </CategoryLabelsContext.Provider>
+        </UiLabelsContext.Provider>
     );
 }

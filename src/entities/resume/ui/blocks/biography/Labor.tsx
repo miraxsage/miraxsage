@@ -1,225 +1,107 @@
 "use client";
 import AccentedTreeView from "@/shared/ui/AccentedTreeView";
-import DescriptionTable, { DescriptionTableRowOptions } from "@/shared/ui/DescriptionTable";
+import type { AccentedTreeItemProps } from "@/shared/ui/AccentedTreeView";
+import DescriptionTable, { DescriptionTableData, DescriptionTableRowOptions } from "@/shared/ui/DescriptionTable";
 import { useLanguage } from "@/shared/lib/store/appearanceSlice";
-import __ from "@/shared/lib/i18n/translation";
-import ApartmentIcon from "@mui/icons-material/Apartment";
-import MemoryIcon from "@mui/icons-material/Memory";
 import { useMediaQuery, useTheme } from "@mui/material";
+import { useResumeData, LaborItem, LaborDataRow } from "@/entities/resume/model/resumeDataContext";
+import { ICON_MAP } from "@/entities/resume/model/iconMap";
 
-type Data = [string, string | { ru: string; en: string }, DescriptionTableRowOptions?][];
-const webarchitectData: Data = [
-    ["[Full name|1]", "Webarchitect.ru", { fullLine: true }],
-    ["[Region]", "[Krasnodar region]"],
-    ["[City]", "[Forbidden 7]"],
-    [
-        "[Responsibilities]",
-        {
-            ru: "Занимался ключевыми задачами проектирования архитектуры и командной реализацией больших проектов, разработкой backend-частей на PHP, Yii2, Laravel, MySQL, CMS Wordpress, реализацией сложной динамической frontend логики на React и Redux.",
-            en: "Handled key tasks in architecture design and team implementation of large projects, developed backend components using PHP, Yii2, Laravel, MySQL, CMS WordPress, and implemented complex dynamic frontend logic with React and Redux.",
-        },
-        { fullLine: true, showLastInCompactMode: true },
-    ],
-    [
-        "[Achievements]",
-        {
-            ru: "За длительный срок работы в команде с моим ведущим участием было разработано множество проектов. Одними из самых больших и интересных остаются краевой портал недвижимости Краснодара, ряд специализированных сервисов цифровых услуг, по настоящий день активно привлекающих пользователей и находящихся на поддержке.",
-            en: "Over a long period of working with the team, with my leading involvement, many projects have been developed. Among the largest and most interesting are the Krasnodar regional real estate portal, a number of specialized digital service platforms, which continue to actively attract users and are still maintained.",
-        },
-        { fullLine: true, showLastInCompactMode: true },
-    ],
-    ["[Position]", "[Fullstack developer]"],
-    ["[Years of experience]", "2 [years|2]"],
-];
-const kubanskieProduktyData: Data = [
-    [
-        "[Full name|1]",
-        {
-            en: "OOO Kuban products (Limited Liability Company)",
-            ru: "Общество с ограниченной ответственностью «Кубанские продукты»",
-        },
-        { fullLine: true },
-    ],
-    ["[Region]", "[Krasnodar region]"],
-    ["[City]", "[Forbidden 7]"],
-    [
-        "[Responsibilities]",
-        {
-            ru: "Кроме прочих обязанностей поддержки информационной инфраструктуры предприятия занимался разработкой отдельных программных модулей системы бухгалтерского учета, сайта, выполнял их интеграцию.",
-            en: "In addition to supporting the company's information infrastructure, I developed individual software modules for the accounting system and the website, and performed their integration.",
-        },
-        { fullLine: true, showLastInCompactMode: true },
-    ],
-    [
-        "[Achievements]",
-        {
-            ru: "Самостоятельно разработал сайт учета остатков автомобильных деталей на базе CMS Wordpress, React, Bootstrap, позволяющий интегрировать работу транспортного участка и бухгалтерии, синхронизируя данные на сайте, формируемые через мобильную версию сайта, с конфигурацией 1С Бухгалтерия, что существенно сократило объем двойной ручной работы, автоматизировало процесс документооборота и позволило существенно разгрузить штатную занятость.",
-            en: "I independently developed a website for tracking automotive parts inventory using CMS WordPress, React, and Bootstrap. This website integrates the operations of the transportation department and the accounting department by synchronizing data generated through the mobile version of the website with the 1C Accounting configuration. This significantly reduced the amount of duplicate manual work, automated the document workflow process, and substantially relieved staff workload.",
-        },
-        { fullLine: true, showLastInCompactMode: true },
-    ],
-    ["[Position]", "[Software engineer]"],
-    ["[Years of experience]", "2 [years|2]"],
-];
-const kubankabelData: Data = [
-    [
-        "[Full name|1]",
-        {
-            en: "ZAO Kuban cable factory (Сlosed Joint-Stock Company)",
-            ru: "Закрытое акционерное общество «Кабельный завод «Кубанькабель»",
-        },
-        { fullLine: true },
-    ],
-    ["[Region]", "[Krasnodar region]"],
-    ["[City]", "[Forbidden 7]"],
-    [
-        "[Responsibilities]",
-        {
-            ru: "Кроме прочих обязанностей поддержки информационной инфраструктуры предприятия занимался доработкой, редизайном и сопровождением официального сайта. Разработал ряд специализированных программ для автоматизированного учета производства, бухгалтерского учета, учета и оформления данных приборов промышленного электрооборудования и пр.",
-            en: "In addition to supporting the company's information infrastructure, I handled the improvement, redesign, and maintenance of the official website. I developed several specialized programs for automated production accounting, financial accounting, and the recording and management of data from industrial electrical equipment, among other tasks.",
-        },
-        { fullLine: true, showLastInCompactMode: true },
-    ],
-    [
-        "[Achievements]",
-        {
-            ru: "Внес весомый вклад в повышение производительности бухгалтерских и инженерно-технических расчетов благодаря разработке комплекса вспомогательных приложений и интеграционных программ с использованием технологий 1С:Предприятие, .NET Framework (C#), WEB, Excel VBA, за что неоднократно получал высокие оценки руководства. С нуля была разработана собственная конфигурация на платформе 1С:Предприятие для сдельного учета заработной платы работников кабельного производства с учетом индивидуальной специфики и особенностей предприятия, которая по настоящий момент является основным инструментом планово-экономического отдела.",
-            en: "I made a significant contribution to improving the efficiency of accounting and engineering calculations by developing a suite of auxiliary applications and integration programs using 1C, .NET Framework (C#), WEB, and Excel VBA technologies. For this work, I repeatedly received high praise from management. From scratch, I developed a custom configuration on the 1C platform for piece-rate payroll accounting for cable production workers, considering the unique specifics and features of the company. This configuration remains the primary tool for the planning and economic department to this day.",
-        },
-        { fullLine: true, showLastInCompactMode: true },
-    ],
-    ["[Position]", "[Software engineer]"],
-    ["[Type of employment]", "[Full]"],
-    ["[Years of experience]", "5 [years]"],
-];
-const administationData: Data = [
-    ["[Full name|1]", "[Municipal administration] г. [Forbidden 7]", { fullLine: true }],
-    ["[Region]", "[Krasnodar region]"],
-    ["[City]", "[Forbidden 7]"],
-    [
-        "[Responsibilities]",
-        {
-            ru: "Сопровождение официального информационного сайта администрации.",
-            en: "Maintenance of the official informational website of the administration.",
-        },
-        { fullLine: true, showLastInCompactMode: true },
-    ],
-    [
-        "[Achievements]",
-        {
-            ru: "Совместными усилиями разработал и внедрил собственную тему на Wordpress, реализующую специализированные инструменты администрирования и автоматизации, связанные с оформлением и публикацией материалов делопроизводства, новостных сводок и пр.",
-            en: "Collaboratively developed and implemented a custom WordPress theme that provides specialized tools for administration and automation related to the formatting and publication of documentation, news bulletins, and more.",
-        },
-        { fullLine: true, showLastInCompactMode: true },
-    ],
-    ["[Position]", "[Information technology sector specialist]"],
-    ["[Type of employment]", "[Full]"],
-    ["[Years of experience]", "1 [year]"],
-];
-const bedrosovaData: Data = [
-    ["[Full name|1]", "[Individual entrepreneur] [Bedrosova Y. V.]", { fullLine: true }],
-    ["[Region]", "[Krasnodar region]"],
-    ["[City]", "[Forbidden 7]"],
-    [
-        "[Responsibilities]",
-        {
-            ru: "Разработка интерактивного сайта по направлению учебной подготовки «Информатика и вычислительная техника».",
-            en: "Development of an interactive website for the educational program «Computer Science and Engineering».",
-        },
-        { fullLine: true, showLastInCompactMode: true },
-    ],
-    [
-        "[Achievements]",
-        { ru: "Приобретен опыт работы в команде.", en: "Gained experience working in a team." },
-        { fullLine: true, showLastInCompactMode: true },
-    ],
-    ["[Position]", "[Trainee]"],
-    ["[Type of employment]", "[Internship]"],
-];
+const FULL_LINE_FIELDS = new Set(["full_name", "responsibilities", "achievements"]);
+const SHOW_LAST_COMPACT_FIELDS = new Set(["responsibilities", "achievements"]);
 
-function DataTable({ data, withoutBottomBorder = false }: { data: Data; withoutBottomBorder?: boolean }) {
-    return <DescriptionTable withoutBottomBorder={withoutBottomBorder}>{data}</DescriptionTable>;
+function buildTree(
+    items: LaborItem[],
+    dataRows: LaborDataRow[],
+    lang: "en" | "ru",
+    lastLeafId: number | undefined
+): AccentedTreeItemProps[] {
+    const childrenMap = new Map<number | null, LaborItem[]>();
+    for (const item of items) {
+        if (!childrenMap.has(item.parent_id)) childrenMap.set(item.parent_id, []);
+        childrenMap.get(item.parent_id)!.push(item);
+    }
+
+    const dataByItem = new Map<number, LaborDataRow[]>();
+    for (const row of dataRows) {
+        if (!dataByItem.has(row.labor_item_id)) dataByItem.set(row.labor_item_id, []);
+        dataByItem.get(row.labor_item_id)!.push(row);
+    }
+
+    function buildNode(item: LaborItem): AccentedTreeItemProps {
+        const children = childrenMap.get(item.id) || [];
+        const data = dataByItem.get(item.id);
+        const Icon = item.icon ? ICON_MAP[item.icon] : undefined;
+        const label = lang === "en" ? item.label_en : item.label_ru;
+
+        if (data && data.length > 0) {
+            const tableData: DescriptionTableData = data.map((row) => {
+                const rowLabel = lang === "en" ? row.label_en : row.label_ru;
+                const value = { en: row.value_en, ru: row.value_ru };
+                const opts: DescriptionTableRowOptions = {};
+                if (FULL_LINE_FIELDS.has(row.field_key)) opts.fullLine = true;
+                if (SHOW_LAST_COMPACT_FIELDS.has(row.field_key)) opts.showLastInCompactMode = true;
+                return [rowLabel, value, opts];
+            });
+
+            return {
+                id: `labor_${item.id}`,
+                title: label,
+                icon: Icon ? <Icon /> : undefined,
+                children: [
+                    {
+                        id: `labor_${item.id}_details`,
+                        content: (
+                            <DescriptionTable withoutBottomBorder={item.id === lastLeafId}>
+                                {tableData}
+                            </DescriptionTable>
+                        ),
+                    },
+                ],
+            };
+        }
+
+        return {
+            id: `labor_${item.id}`,
+            title: label,
+            icon: Icon ? <Icon /> : undefined,
+            children: children.map((child) => buildNode(child)),
+        };
+    }
+
+    const roots = childrenMap.get(null) || [];
+    return roots.map((root) => buildNode(root));
 }
 
 export default function AboutBioLaborBlock() {
     const theme = useTheme();
     const lang = useLanguage();
     const lessSm = useMediaQuery(theme.breakpoints.down("sm"));
+    const { laborItems, laborData } = useResumeData();
+
+    const leafItems = laborItems.filter((item) => laborData.some((d) => d.labor_item_id === item.id));
+    const lastLeafId = leafItems[leafItems.length - 1]?.id;
+
+    const tree = buildTree(laborItems, laborData, lang.lang, lastLeafId);
+
+    // Expand root node and its first child (matching original behavior)
+    const expandedIds: string[] = [];
+    if (tree.length > 0 && "title" in tree[0] && tree[0].children) {
+        expandedIds.push(tree[0].id);
+        const firstChild = tree[0].children[0];
+        if (firstChild && "title" in firstChild) {
+            expandedIds.push(firstChild.id);
+        }
+    }
+
     return (
         <>
             <AccentedTreeView
                 intend={lessSm ? "small" : "regular"}
-                initiallyExpandedNodes={["it", "itWebarchitect"]}
+                initiallyExpandedNodes={expandedIds}
                 selectionMode="disable"
             >
-                {[
-                    {
-                        id: "it",
-                        title: __("Information technology"),
-                        icon: <MemoryIcon />,
-                        children: [
-                            {
-                                id: "itWebarchitect",
-                                title: `Webarchitect.ru (2015 - ${__("present time")})`,
-                                icon: <ApartmentIcon />,
-                                children: [
-                                    {
-                                        id: "itWebarchitect-datails",
-                                        content: <DataTable data={webarchitectData} />,
-                                    },
-                                ],
-                            },
-                            {
-                                id: "itKubanskieProdukty",
-                                title: `${
-                                    lang.en ? "OOO Kuban products (LLC)" : "ООО «Кубанские продукты»"
-                                } (09.2022 - ${__("present time")})`,
-                                icon: <ApartmentIcon />,
-                                children: [
-                                    {
-                                        id: "itKubanskieProdukty-datails",
-                                        content: <DataTable data={kubanskieProduktyData} />,
-                                    },
-                                ],
-                            },
-                            {
-                                id: "itKubankabel",
-                                title: `${
-                                    lang.en ? "ZAO Kuban cable (CJSC)" : "ЗАО «Кубанькабель»"
-                                } (04.2017 - 09.2022)`,
-                                icon: <ApartmentIcon />,
-                                children: [
-                                    {
-                                        id: "itKubanskieProdukty-datails",
-                                        content: <DataTable data={kubankabelData} />,
-                                    },
-                                ],
-                            },
-                            {
-                                id: "itAdministration",
-                                title: `${__("Municipal administration")} (06.2015 - 04.2017)`,
-                                icon: <ApartmentIcon />,
-                                children: [
-                                    {
-                                        id: "itAdministration-datails",
-                                        content: <DataTable data={administationData} />,
-                                    },
-                                ],
-                            },
-                            {
-                                id: "itBedrosova",
-                                title: __(["IE", " ", "Bedrosova Y. V.", " (06.2014 - 08.2014)"]),
-                                icon: <ApartmentIcon />,
-                                children: [
-                                    {
-                                        id: "itBedrosova-datails",
-                                        content: <DataTable withoutBottomBorder={true} data={bedrosovaData} />,
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                ]}
+                {tree}
             </AccentedTreeView>
         </>
     );

@@ -20,6 +20,8 @@ import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { SortableList, AdminSection, useAdminData, useLocalizedField } from "@/features/admin-editor";
+import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
+import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
 
@@ -157,6 +159,7 @@ const TAB_LABELS = [
     "Achievements",
     "Soft Skills",
     "Metrics",
+    "General Labels",
 ];
 
 function stampSortOrder<T extends { id: number | string }>(items: T[]): (T & { sort_order: number })[] {
@@ -316,6 +319,30 @@ export default function AdminResumePage() {
         url: "/api/resume",
     });
 
+    const { data: labelsRaw, setData: setLabelsRaw, loading: labelsLoading, saving: labelsSaving, error: labelsError, success: labelsSuccess, save: labelsSave } = useAdminData<UiLabelItem[]>({
+        url: "/api/ui-labels",
+    });
+
+    const labelsItems = labelsRaw ?? [];
+
+    const updateLabel = useCallback(
+        (id: number | string, field: string, value: string) => {
+            setLabelsRaw((prev) => {
+                if (!prev) return prev;
+                return prev.map((item) => (item.id === id ? { ...item, [field]: value } : item));
+            });
+        },
+        [setLabelsRaw],
+    );
+
+    const saveLabels = useCallback(
+        (items: UiLabelItem[]) => {
+            const categoryItems = items.filter((it) => it.category === "resume_general");
+            labelsSave({ category: "resume_general", data: categoryItems });
+        },
+        [labelsSave],
+    );
+
     // Keep a ref to always have the latest data for computing new state in handlers
     const dataRef = useRef<ResumeData | null>(null);
     dataRef.current = data;
@@ -439,7 +466,7 @@ export default function AdminResumePage() {
 
     // -- Loading state ------------------------------------------------------
 
-    if (loading || !data) {
+    if (loading || labelsLoading || !data) {
         return (
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 48px)" }}>
                 <CircularProgress />
@@ -814,6 +841,24 @@ export default function AdminResumePage() {
                                     <Field label={__("Chart Data (JSON)", lang)} value={item.chart_data} onChange={(v) => updateItem("metrics", item.id, "chart_data", v)} onBlur={() => saveSection("metrics")} multiline />
                                 </Box>
                             )}
+                        />
+                    </AdminSection>
+                );
+
+            // ----- GENERAL LABELS -----
+            case 8:
+                return (
+                    <AdminSection
+                        title={__("General Labels", lang)}
+                        saving={labelsSaving}
+                        error={labelsError}
+                        success={labelsSuccess}
+                    >
+                        <UiLabelsEditor
+                            category="resume_general"
+                            items={labelsItems}
+                            onUpdate={updateLabel}
+                            onSave={saveLabels}
                         />
                     </AdminSection>
                 );

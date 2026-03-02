@@ -6,7 +6,8 @@ import AccentedTabs from "@/shared/ui/AccentedTabs";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import CallIcon from "@mui/icons-material/Call";
 import __ from "@/shared/lib/i18n/translation";
-import React, { NamedExoticComponent, useEffect, useLayoutEffect, useReducer, useRef, useState } from "react";
+import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
+import React, { NamedExoticComponent, useContext, useEffect, useLayoutEffect, useReducer, useRef, useState } from "react";
 import { getThemeColor } from "@/shared/lib/theme";
 import categories, {
     AboutCategories,
@@ -26,12 +27,20 @@ import { RevealAsideMenuButton } from "@/widgets/layout/RevealAsideMenuButton";
 import CategoriesToolbar from "@/shared/ui/CategoriesToolbar";
 import PersonalDataIllustration from "./PersonalDataIllustration";
 import { alpha } from "@mui/material";
+import { CategoryLabelsContext } from "@/entities/resume/model/categoryLabels";
 
 export default function About() {
     const lang = useLanguage();
+    const labels = useContext(CategoryLabelsContext);
+    const t = useUiLabels();
+    const catLabel = (slug: string) => {
+        const entry = labels[slug];
+        if (!entry) return __(capitalize(slug));
+        return lang.lang === "en" ? entry.label_en : entry.label_ru;
+    };
     useEffect(() => {
-        document.title = __("About") + " | Miraxsage";
-    }, [lang.lang]);
+        document.title = t("About") + " | Miraxsage";
+    }, [lang.lang]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const theme = useTheme();
 
@@ -183,15 +192,15 @@ export default function About() {
                             : [
                                   { label: "Miraxsage", link: "/" },
                                   {
-                                      label: __("About"),
+                                      label: t("About"),
                                       subitems: [
                                           {
-                                              label: __("Projects"),
+                                              label: t("Projects"),
                                               icon: <RocketLaunchIcon />,
                                               link: "/projects",
                                           },
                                           {
-                                              label: __("Interact"),
+                                              label: t("Interact"),
                                               icon: <CallIcon />,
                                               link: "/interact",
                                           },
@@ -201,11 +210,11 @@ export default function About() {
                     ];
                     if (activeCat) {
                         items.push({
-                            label: __(capitalize(activeCat)),
+                            label: catLabel(activeCat),
                             subitems: Object.entries(categories)
                                 .filter(([key]) => key != activeCat)
                                 .map(([key, val]) => ({
-                                    label: __(capitalize(key)),
+                                    label: catLabel(key),
                                     icon: val.icon,
                                     link: "/about/" + key,
                                 })),
@@ -213,11 +222,11 @@ export default function About() {
                         const activeCategory = activeCat as AboutCategories;
                         if (selectedCat && hasSubcategories(activeCategory))
                             items.push({
-                                label: __(capitalize(selectedCat)),
+                                label: catLabel(selectedCat),
                                 subitems: Object.entries(categories[activeCategory]["items"])
                                     .filter(([key]) => key != selectedCat)
                                     .map(([key, val]) => ({
-                                        label: __(capitalize(key)),
+                                        label: catLabel(key),
                                         icon: val.icon,
                                         link: "/about/" + activeCategory + "/" + key,
                                     })),
@@ -383,7 +392,7 @@ export default function About() {
                         >
                             {openedCats.map((cat) => ({
                                 id: cat,
-                                title: `_${__(cat)}`,
+                                title: `_${catLabel(cat)}`,
                             }))}
                         </AccentedTabs>
                     )}{" "}

@@ -1,6 +1,6 @@
 "use client";
 import CustomBreadcrumbs, { CustomBreadcrumbsProps } from "@/shared/ui/Breadcrumbs";
-import __ from "@/shared/lib/i18n/translation";
+import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import CallIcon from "@mui/icons-material/Call";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -21,6 +21,7 @@ export default function ProjectsBreadcrumbs({ project, onBack }: ProjectsBreadcr
     const theme = useTheme();
     const lessSm = useMediaQuery(theme.breakpoints.down("sm"));
     const lang = useAppearance().language;
+    const t = useUiLabels();
     return (
         <Box sx={{ display: "flex", borderBottom: 1, borderColor: "divider" }}>
             <RevealAsideMenuButton />
@@ -40,16 +41,16 @@ export default function ProjectsBreadcrumbs({ project, onBack }: ProjectsBreadcr
                             ? []
                             : [
                                   {
-                                      label: __("Projects"),
+                                      label: t("Projects"),
                                       onClick: () => router.push("/projects"),
                                       subitems: [
                                           {
-                                              label: __("About"),
+                                              label: t("About"),
                                               icon: <AssignmentIndIcon />,
                                               link: "/about",
                                           },
                                           {
-                                              label: __("Interact"),
+                                              label: t("Interact"),
                                               icon: <CallIcon />,
                                               link: "/interact",
                                           },

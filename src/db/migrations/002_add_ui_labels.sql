@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS ui_labels (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  key TEXT NOT NULL UNIQUE,
+  value_en TEXT NOT NULL,
+  value_ru TEXT NOT NULL,
+  category TEXT NOT NULL DEFAULT 'general'
+);

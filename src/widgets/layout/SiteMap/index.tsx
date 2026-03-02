@@ -1,6 +1,7 @@
 "use client";
 
 import __ from "@/shared/lib/i18n/translation";
+import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import { Box, Button, IconButton, SxProps, alpha, styled, useMediaQuery, useTheme } from "@mui/material";
 import { ReactNode } from "react";
 import TelegramIcon from "@/shared/icons/TelegramIcon";
@@ -29,6 +30,9 @@ import { useColorMode, useLanguage, useScreenMode, useSiteMapVisibility, useView
 import { cubicBezier, motion } from "framer-motion";
 import AccentedTreeView, { AccentedTreeItemProps } from "@/shared/ui/AccentedTreeView";
 import { usePathname, useRouter } from "next/navigation";
+import { useContext } from "react";
+import { CategoryLabelsContext } from "@/entities/resume/model/categoryLabels";
+import { capitalize } from "@/shared/lib/string";
 
 const TransparentButton = styled(Button)(({ theme }) => ({
     color: getThemeColor("regularText", theme),
@@ -120,7 +124,8 @@ const links: Record<string, string> = {
 function navigateToSection(
     section: string,
     router: ReturnType<typeof useRouter>,
-    siteMapVisibility: ReturnType<typeof useSiteMapVisibility>
+    siteMapVisibility: ReturnType<typeof useSiteMapVisibility>,
+    t: (key: string) => string
 ) {
     siteMapVisibility.update("collapsed");
     if (section in links) {
@@ -129,7 +134,7 @@ function navigateToSection(
         else return router.push(links[section as keyof typeof links]);
     }
     if (section == "download-pdf") {
-        window.open(`/${__("Resume (Miraxsage)")}.pdf`, "_blank");
+        window.open(`/${t("Resume (Miraxsage)")}.pdf`, "_blank");
         return;
     }
     router.push(`/projects?techs=${section.toLowerCase()}`);
@@ -147,28 +152,29 @@ function findActiveCategoriesData(data: AccentedTreeItemProps[], matches: Accent
     return matches;
 }
 
-function allCategoriesTreeViewData(pathname: string, selectedItems?: string[], activePathData?: AccentedTreeItemProps[]) {
+function allCategoriesTreeViewData(pathname: string, selectedItems?: string[], activePathData?: AccentedTreeItemProps[], labelFn?: (slug: string) => string, t?: (key: string) => string) {
+    const _ = t ?? __;
     const data = [
         {
             id: "resume",
-            title: __("Resume"),
+            title: _("Resume"),
             icon: <AssignmentIndIcon />,
             children: [
-                { id: "download-pdf", title: __("Download PDF"), icon: <PictureAsPdfIcon /> },
-                ...abouteCategoriesTreeViewData(),
+                { id: "download-pdf", title: _("Download PDF"), icon: <PictureAsPdfIcon /> },
+                ...abouteCategoriesTreeViewData(labelFn),
             ],
         },
-        { id: "portfolio", title: __("Portfolio"), children: projectsCategoriesTreeViewData() },
+        { id: "portfolio", title: _("Portfolio"), children: projectsCategoriesTreeViewData() },
         {
             id: "contacts",
-            title: __("Interact"),
+            title: _("Interact"),
             icon: <PhoneIcon />,
             children: [
                 { id: "telegram", title: "Telegram", icon: <TelegramIcon /> },
                 { id: "email", title: "E-mail", icon: <AlternateEmailOutlinedIcon /> },
                 { id: "linkedin", title: "LinkedIn", icon: <LinkedInIcon /> },
                 { id: "github", title: "GitHub", icon: <GitHub /> },
-                { id: "write", title: __("Write"), icon: <MessageIcon /> },
+                { id: "write", title: _("Write"), icon: <MessageIcon /> },
             ],
         },
     ];
@@ -188,27 +194,39 @@ function allCategoriesTreeViewData(pathname: string, selectedItems?: string[], a
     return data;
 }
 
+function useCatLabelFn() {
+    const labels = useContext(CategoryLabelsContext);
+    const lang = useLanguage();
+    return (slug: string) => {
+        const entry = labels[slug];
+        if (!entry) return __(capitalize(slug));
+        return lang.lang === "en" ? entry.label_en : entry.label_ru;
+    };
+}
+
 function MobileSiteMapTreeView() {
     const router = useRouter();
     const pathname = usePathname();
     const theme = useTheme();
     const siteMapVisibility = useSiteMapVisibility();
+    const labelFn = useCatLabelFn();
+    const t = useUiLabels();
     const itemsToSelect: string[] = [];
-    const data = allCategoriesTreeViewData(pathname, itemsToSelect);
+    const data = allCategoriesTreeViewData(pathname, itemsToSelect, undefined, labelFn, t);
     return (
         <Box sx={{ display: "flex", flexDirection: "column" }}>
             <ColorModeButton sx={{ gridArea: "1/5/1/5" }} />
             <LanguageButton sx={{ gridArea: "2/5/2/5" }} />
             <SpecialButton action="/">
                 <HomeIcon />
-                {__("Home")}
+                {t("Home")}
             </SpecialButton>
             <AccentedTreeView
                 intend="double"
                 initiallyExpandedNodes={["resume", "portfolio", "contacts"]}
                 selectionMode="single"
                 selectedItems={itemsToSelect.length > 0 ? itemsToSelect[0] : undefined}
-                onItemsSelect={(e) => navigateToSection(e.id, router, siteMapVisibility)}
+                onItemsSelect={(e) => navigateToSection(e.id, router, siteMapVisibility, t)}
                 sx={{
                     "& .MuiTreeItem-root .MuiTreeItem-content": {
                         outline: `0px solid ${theme.palette.divider}`,
@@ -229,15 +247,17 @@ function MobileSiteMapTreeView() {
 function ColorModeButton({ sx }: { sx: SxProps }) {
     const colorMode = useColorMode();
     const isDarkMode = colorMode.dark;
+    const t = useUiLabels();
     return (
         <SpecialButton action={colorMode.toggle} sx={{ "& .MuiSvgIcon-root": { margin: "0px 7px 0 -2px" }, ...sx }}>
             {isDarkMode ? <LightModeIcon /> : <Brightness4Icon />}
-            {__(!isDarkMode ? "Dark mode" : "Light mode")}
+            {t(!isDarkMode ? "Dark mode" : "Light mode")}
         </SpecialButton>
     );
 }
 function LanguageButton({ sx }: { sx: SxProps }) {
     const lang = useLanguage();
+    const t = useUiLabels();
     return (
         <SpecialButton
             action={lang.toggle}
@@ -253,12 +273,13 @@ function LanguageButton({ sx }: { sx: SxProps }) {
             }}
         >
             <LanguageIcon language={lang.lang} />
-            {__(lang.ru ? "Русский язык" : "English")}
+            {t(lang.ru ? "Русский язык" : "English")}
         </SpecialButton>
     );
 }
 function ScreenModeButton({ sx }: { sx: SxProps }) {
     const screenMode = useScreenMode();
+    const t = useUiLabels();
     return (
         <SpecialButton
             action={screenMode.toggle}
@@ -268,12 +289,13 @@ function ScreenModeButton({ sx }: { sx: SxProps }) {
             }}
         >
             {screenMode.full ? <FullscreenExitIcon /> : <FullscreenIcon />}
-            {__(!screenMode.full ? "Full screen" : "In window")}
+            {t(!screenMode.full ? "Full screen" : "In window")}
         </SpecialButton>
     );
 }
 function ViewModeButton({ sx }: { sx: SxProps }) {
     const viewMode = useViewMode();
+    const t = useUiLabels();
     return (
         <SpecialButton
             action={viewMode.toggle}
@@ -283,7 +305,7 @@ function ViewModeButton({ sx }: { sx: SxProps }) {
             }}
         >
             {viewMode.desktop ? <TerminalIcon /> : <MonitorIcon />}
-            {__(viewMode.desktop ? "Console" : "User_interface")}
+            {t(viewMode.desktop ? "Console" : "User_interface")}
         </SpecialButton>
     );
 }
@@ -298,6 +320,7 @@ function ContactButton({
     borders?: string;
     hoverBorders?: string;
 }) {
+    const t = useUiLabels();
     const details: { action: string; content: ReactNode } = { action: "", content: "" };
     if (contact == "telegram") {
         details.action = "https://t.me/miraxsage";
@@ -340,7 +363,7 @@ function ContactButton({
         details.content = (
             <>
                 <MessageIcon />
-                {__("Write")}
+                {t("Write")}
             </>
         );
     }
@@ -379,6 +402,8 @@ export default function SiteMap() {
     const router = useRouter();
     const siteMapVisibility = useSiteMapVisibility();
     const screenMode = useScreenMode();
+    const labelFn = useCatLabelFn();
+    const t = useUiLabels();
 
     let activeChapter = "";
     let activeGroup = "";
@@ -387,7 +412,7 @@ export default function SiteMap() {
     if (!smScreen) {
         const itemsToSelect: string[] = [];
         const activePathData: AccentedTreeItemProps[] = [];
-        allCategoriesTreeViewData(pathname, itemsToSelect, activePathData);
+        allCategoriesTreeViewData(pathname, itemsToSelect, activePathData, labelFn, t);
         if (activePathData.length > 0) {
             activeChapter = activePathData.shift()!.id;
             if (activePathData.length > 1) activeGroup = activePathData.shift()!.id;
@@ -547,7 +572,7 @@ export default function SiteMap() {
 
                                     <SpecialButton action="/" sx={{ gridArea: "1/3/1/3" }}>
                                         <HomeIcon />
-                                        {__("Home")}
+                                        {t("Home")}
                                     </SpecialButton>
                                     <SpecialButton
                                         action="/about"
@@ -555,7 +580,7 @@ export default function SiteMap() {
                                         sx={{ gridArea: "2/3/2/3" }}
                                     >
                                         <AssignmentIndIcon />
-                                        {__("Resume")}
+                                        {t("Resume")}
                                     </SpecialButton>
                                     <SpecialButton
                                         action="/projects"
@@ -563,7 +588,7 @@ export default function SiteMap() {
                                         sx={{ gridArea: "3/3/3/3" }}
                                     >
                                         <RocketLaunchIcon />
-                                        {__("Portfolio")}
+                                        {t("Portfolio")}
                                     </SpecialButton>
                                     <SpecialButton
                                         action="/interact"
@@ -571,7 +596,7 @@ export default function SiteMap() {
                                         sx={{ gridArea: "4/3/4/3" }}
                                     >
                                         <PhoneIcon />
-                                        {__("Interact")}
+                                        {t("Interact")}
                                     </SpecialButton>
                                     <ColorModeButton sx={{ gridArea: "1/5/1/5" }} />
                                     <LanguageButton sx={{ gridArea: "2/5/2/5" }} />
@@ -664,7 +689,7 @@ export default function SiteMap() {
                                         selectedItems={activeItem}
                                         initiallyExpandedNodes={["biography", "experience", "specifications"]}
                                         intend="double"
-                                        onItemsSelect={(e: AccentedTreeItemProps) => navigateToSection(e.id, router, siteMapVisibility)}
+                                        onItemsSelect={(e: AccentedTreeItemProps) => navigateToSection(e.id, router, siteMapVisibility, t)}
                                         sx={{
                                             minWidth: "220px",
                                             "& .MuiTreeItem-content": {
@@ -690,7 +715,7 @@ export default function SiteMap() {
                                             e &&
                                             Array.isArray(e) &&
                                             e.length > 0 &&
-                                            navigateToSection(e[0].id, router, siteMapVisibility)
+                                            navigateToSection(e[0].id, router, siteMapVisibility, t)
                                         }
                                         sx={{
                                             minWidth: "230px",

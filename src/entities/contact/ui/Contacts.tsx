@@ -5,6 +5,7 @@ import { Box, Button, MenuItem, Theme, useMediaQuery, useTheme } from "@mui/mate
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import __ from "@/shared/lib/i18n/translation";
+import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import CustomAccordion from "@/shared/ui/Accordion";
 import DescriptionTable, { DescriptionTableData } from "@/shared/ui/DescriptionTable";
 import TelegramIcon from "@/shared/icons/TelegramIcon";
@@ -18,7 +19,6 @@ import CustomScrollbar from "@/shared/ui/Scrollbar";
 import { langs } from "@uiw/codemirror-extensions-langs";
 import { useEffect, useRef, useState } from "react";
 import { useAppearance, useScreenMode } from "@/shared/lib/store/appearanceSlice";
-import { capitalize } from "@/shared/lib/string";
 import { Base64 } from "@/shared/lib/base64";
 import { FeedbackSending } from "./FeedbackSending";
 import { AnimatePresence, motion } from "framer-motion";
@@ -101,6 +101,7 @@ async function sendForm(fields: { name: string; email: string; subject: string; 
 export default function Contacts() {
     const router = useRouter();
     const lang = useAppearance().language;
+    const t = useUiLabels();
     const screenMode = useScreenMode();
     const theme = useTheme();
     const md = useMediaQuery(theme.breakpoints.down("md"));
@@ -115,8 +116,8 @@ export default function Contacts() {
     const actualFeedback = useRef<{ status: "loading" | "success" | "error"; message: string } | undefined>();
     actualFeedback.current = feedback;
     useEffect(() => {
-        document.title = __("Interact") + " | Miraxsage";
-    }, [lang]);
+        document.title = t("Interact") + " | Miraxsage";
+    }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
     const [errors, setErrors] = useState<{ name?: string; email?: string; subject?: string; message?: string }>({});
     const validateField = (field: "name" | "email" | "subject" | "message", value?: string) => {
         if (!value) {
@@ -185,16 +186,16 @@ export default function Contacts() {
                             const items = [
                                 { label: "Miraxsage", link: "/" },
                                 {
-                                    label: __("Interact"),
+                                    label: t("Interact"),
                                     onClick: () => router.push("/interact"),
                                     subitems: [
                                         {
-                                            label: __("About"),
+                                            label: t("About"),
                                             icon: <AssignmentIndIcon />,
                                             link: "/about",
                                         },
                                         {
-                                            label: __("Projects"),
+                                            label: t("Projects"),
                                             icon: <RocketLaunchIcon />,
                                             link: "/projects",
                                         },
@@ -229,7 +230,7 @@ export default function Contacts() {
                         className={classes({ "container mx-auto": screenMode.full })}
                     >
                         <div>
-                            <CustomAccordion expandable={false} title={__("Social networks")}>
+                            <CustomAccordion expandable={false} title={t("Social networks")}>
                                 <Box sx={{ marginLeft: "-1px" }}>
                                     <DescriptionTable withoutBottomBorder={true} withoutTopBorder={true}>
                                         {[
@@ -251,7 +252,7 @@ export default function Contacts() {
                                     </DescriptionTable>
                                 </Box>
                             </CustomAccordion>
-                            <CustomAccordion expandable={false} title={__("Feedback")}>
+                            <CustomAccordion expandable={false} title={t("Feedback")}>
                                 <Box
                                     component="form"
                                     onSubmit={submit}
@@ -265,7 +266,7 @@ export default function Contacts() {
                                     <CustomTextField
                                         size="small"
                                         name="name"
-                                        label={__("Your name")}
+                                        label={t("Your name")}
                                         value={name}
                                         onChange={onFieldChange("name")}
                                         {...fieldValidationProps("name")}
@@ -273,7 +274,7 @@ export default function Contacts() {
                                     <CustomTextField
                                         size="small"
                                         name="email"
-                                        label={capitalize(__("email address"))}
+                                        label={t("Email address")}
                                         value={email}
                                         onChange={onFieldChange("email")}
                                         {...fieldValidationProps("email")}
@@ -282,25 +283,25 @@ export default function Contacts() {
                                         size="small"
                                         name="subject"
                                         select
-                                        label={__("Appeal's subject")}
+                                        label={t("Appeal's subject")}
                                         value={subject}
                                         onChange={onFieldChange("subject")}
                                         {...fieldValidationProps("subject")}
                                     >
-                                        <MenuItem value={__("Partnership proposition")}>
-                                            {__("Partnership proposition")}
+                                        <MenuItem value={t("Partnership proposition")}>
+                                            {t("Partnership proposition")}
                                         </MenuItem>
-                                        <MenuItem value={__("Job offer")}>{__("Job offer")}</MenuItem>
-                                        <MenuItem value={__("Thanks letter")}>{__("Thanks letter")}</MenuItem>
-                                        <MenuItem value={capitalize(__("resume / portfolio question"))}>
-                                            {capitalize(__("resume / portfolio question"))}
+                                        <MenuItem value={t("Job offer")}>{t("Job offer")}</MenuItem>
+                                        <MenuItem value={t("Thanks letter")}>{t("Thanks letter")}</MenuItem>
+                                        <MenuItem value={t("Resume / portfolio question")}>
+                                            {t("Resume / portfolio question")}
                                         </MenuItem>
-                                        <MenuItem value={__("Other")}>{__("Other")}</MenuItem>
+                                        <MenuItem value={t("Other")}>{t("Other")}</MenuItem>
                                     </CustomTextField>
                                     <CustomTextField
                                         size="small"
                                         name="message"
-                                        label={__("Message")}
+                                        label={t("Message")}
                                         value={message}
                                         onChange={onFieldChange("message")}
                                         {...fieldValidationProps("message")}
@@ -316,7 +317,7 @@ export default function Contacts() {
                                         variant="outlined"
                                         onClick={submit}
                                     >
-                                        {__("Submit")}
+                                        {t("Submit")}
                                     </Button>
                                 </Box>
                             </CustomAccordion>

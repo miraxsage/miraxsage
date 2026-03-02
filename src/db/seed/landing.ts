@@ -1,7 +1,7 @@
 import type Database from "better-sqlite3";
 
 const headerItems = [
-    { sort_order: 1, type: "link", label_en: "About", label_ru: "Резюме", icon: "PersonIcon", url: "/about", is_visible: 1 },
+    { sort_order: 1, type: "link", label_en: "About", label_ru: "Резюме", icon: "AssignmentIndIcon", url: "/about", is_visible: 1 },
     { sort_order: 2, type: "link", label_en: "Projects", label_ru: "Проекты", icon: "RocketLaunchIcon", url: "/projects", is_visible: 1 },
     { sort_order: 3, type: "link", label_en: "Interact", label_ru: "Контакты", icon: "CallIcon", url: "/interact", is_visible: 1 },
 ];

@@ -24,6 +24,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatedGeometricWaves } from "./AnimatedGeometricWaves";
 import { GlobalStyles } from "@mui/material";
 import __ from "@/shared/lib/i18n/translation";
+import { useUiLabel } from "@/entities/ui-labels/model/uiLabelsContext";
 import { ScrollObservable } from "@/widgets/landing/types";
 import TransparentButton from "./TransparentButton";
 import { rangeProgress } from "@/shared/lib/math";
@@ -39,6 +40,12 @@ export interface LandingButton {
     url: string;
 }
 
+export interface TitleVariant {
+    id: number;
+    text_en: string;
+    text_ru: string;
+}
+
 const ICON_MAP: Record<string, SvgIconComponent> = {
     AssignmentIndIcon,
     PersonIcon,
@@ -48,10 +55,55 @@ const ICON_MAP: Record<string, SvgIconComponent> = {
     CodeIcon,
 };
 
-function TypingShield({ titles }: { titles: string[] }) {
+function buildGradientMap(rawTitle: string): boolean[] {
+    const map: boolean[] = [];
+    let inBracket = false;
+    for (const ch of rawTitle) {
+        if (ch === "[") { inBracket = true; continue; }
+        if (ch === "]") { inBracket = false; continue; }
+        map.push(inBracket);
+    }
+    return map;
+}
+
+function stripBrackets(title: string): string {
+    return title.replace(/[[\]]/g, "");
+}
+
+function renderGradientText(
+    text: string,
+    gradientMap: boolean[],
+    start: number,
+    end: number,
+    gradientSx: Record<string, string>,
+): React.ReactNode[] {
+    if (start >= end) return [];
+    const nodes: React.ReactNode[] = [];
+    let runStart = start;
+    for (let i = start + 1; i <= end; i++) {
+        if (i === end || gradientMap[i] !== gradientMap[runStart]) {
+            const chunk = text.slice(runStart, i);
+            if (gradientMap[runStart]) {
+                nodes.push(
+                    <Box key={runStart} component="span" sx={{ display: "inline", ...gradientSx }}>
+                        {chunk}
+                    </Box>
+                );
+            } else {
+                nodes.push(<span key={runStart}>{chunk}</span>);
+            }
+            runStart = i;
+        }
+    }
+    return nodes;
+}
+
+function TypingShield({ titles, gradientSx }: { titles: string[]; gradientSx: Record<string, string> }) {
     const [currentTitle, setCurrentTitle] = useState(0);
-    const title = titles[Math.min(titles.length - 1, currentTitle)];
-    const [typedSymbolsWithDirection, setTypedSymbols] = useState(title.length);
+    const rawTitle = titles[Math.min(titles.length - 1, currentTitle)];
+    const plainTitle = stripBrackets(rawTitle);
+    const gradientMap = buildGradientMap(rawTitle);
+    const [typedSymbolsWithDirection, setTypedSymbols] = useState(plainTitle.length);
     const typedSymbols = Math.abs(typedSymbolsWithDirection);
     const [cursorShown, setCursorShown] = useState(false);
     const basicTypingDelay = 120;
@@ -60,7 +112,7 @@ function TypingShield({ titles }: { titles: string[] }) {
         let nextDelay = basicTypingDelay;
         const textTypingHandler = () => {
             setTypedSymbols((cur) => {
-                const changeDirection = cur == title.length || cur == -1;
+                const changeDirection = cur == plainTitle.length || cur == -1;
                 if (changeDirection) {
                     cur = -1 * cur;
                     if (cur == 1) {
@@ -69,7 +121,7 @@ function TypingShield({ titles }: { titles: string[] }) {
                         );
                     }
                 }
-                const advancedDelay = cur == title.length - 1 ? 1800 : 0;
+                const advancedDelay = cur == plainTitle.length - 1 ? 1800 : 0;
                 nextDelay = advancedDelay != 0 ? advancedDelay : (cur < 0 ? 0.5 : 1) * basicTypingDelay;
                 return changeDirection ? cur : cur + 1;
             });
@@ -80,7 +132,7 @@ function TypingShield({ titles }: { titles: string[] }) {
         return () => {
             clearTimeout(textTypingId);
         };
-    }, [title, titles.length]);
+    }, [plainTitle, titles.length]);
     useEffect(() => {
         const cursorBlinkHandler = () => setCursorShown((cursorShown) => !cursorShown);
         const cursorBlinkIntervalId = setInterval(cursorBlinkHandler, 500);
@@ -88,32 +140,37 @@ function TypingShield({ titles }: { titles: string[] }) {
             clearInterval(cursorBlinkIntervalId);
         };
     }, []);
-    const typedTitle = title.slice(0, Math.min(typedSymbols, title.length) - 1);
     const isDarkMode = useColorMode().dark;
     const paleColor = useLandingColor(isDarkMode ? "accentAPale" : "contrast");
+    const cursorCharIndex = typedSymbols - 1;
+    const cursorIsGradient = cursorCharIndex >= 0 && cursorCharIndex < gradientMap.length && gradientMap[cursorCharIndex];
+    const cursorHasBlock = cursorShown || (typedSymbols > 1 && plainTitle.length != typedSymbols);
     return (
         <>
-            {typedTitle}
+            {renderGradientText(plainTitle, gradientMap, 0, Math.min(typedSymbols, plainTitle.length) - 1, gradientSx)}
             <Box
                 sx={{
                     display: "inline",
                     borderRadius: "0 0 5px 5px",
-                    ...(cursorShown || (typedSymbols > 1 && title.length != typedSymbols)
+                    ...(cursorHasBlock
                         ? {
                               background: paleColor,
                               WebkitTextFillColor: getThemeColor("layoutBackground", theme),
                           }
-                        : {}),
+                        : cursorIsGradient
+                          ? gradientSx
+                          : {}),
                 }}
             >
-                {title.slice(typedSymbols - 1, typedSymbols)}
+                {plainTitle.slice(typedSymbols - 1, typedSymbols)}
             </Box>
         </>
     );
 }
 
-function WebDeveloperShield() {
+function WebDeveloperShield({ titles }: { titles: string[] }) {
     const theme = useTheme();
+    const developerLabel = useUiLabel("developer");
     const isDarkMode = useColorMode().dark;
     let paleColor = useLandingColor(isDarkMode ? "accentAPale" : "contrast");
     paleColor = isDarkMode ? paleColor : lighten(paleColor, 0.3);
@@ -121,15 +178,18 @@ function WebDeveloperShield() {
     const contrastColor = lighten(useLandingColor("contrast"), isDarkMode ? 0 : 0.2);
     const accentBLight = lighten(useLandingColor("accentB"), isDarkMode ? 0.2 : 0.5);
     const accentALight = lighten(useLandingColor("accentA"), isDarkMode ? 0.3 : 0.5);
+    const gradientSx: Record<string, string> = {
+        background: `linear-gradient(45deg, ${contrastColor} 10%, ${darkPaleColor})`,
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+    };
     return (
         <Box
             sx={{
                 fontSize: "57px",
                 userSelect: "none",
                 lineHeight: 1,
-                background: `linear-gradient(45deg, ${contrastColor} 10%, ${darkPaleColor})`,
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                color: contrastColor,
                 overflow: "hidden",
                 [theme.breakpoints.down("lg")]: {
                     fontSize: "42px",
@@ -182,7 +242,7 @@ function WebDeveloperShield() {
                     className="first-shield-title"
                     sx={{ gridArea: "2/2/span 2/span 1", padding: "0px 14px 0px 14px" }}
                 >
-                    <TypingShield titles={[__("Web"), "Frontend", "Fullstack"]} />
+                    <TypingShield titles={titles} gradientSx={gradientSx} />
                 </Box>
                 <Box
                     sx={{
@@ -213,7 +273,9 @@ function WebDeveloperShield() {
                     className="second-shield-title"
                     sx={{ gridArea: "3/2/span 2/span 3", padding: "5px 14px 8px 14px" }}
                 >
-                    {__("developer")}
+                    <Box component="span" sx={{ display: "inline", ...gradientSx }}>
+                        {developerLabel}
+                    </Box>
                 </Box>
                 <Box
                     sx={{ border: "1px solid " + paleColor, borderWidth: "0px 2px 0px 0px", gridArea: "4/5/4/5" }}
@@ -249,9 +311,10 @@ function WebDeveloperShield() {
     );
 }
 
-function SlideContent({ buttons }: { buttons: LandingButton[] }) {
+function SlideContent({ buttons, titleVariants }: { buttons: LandingButton[]; titleVariants: TitleVariant[] }) {
     const theme = useTheme();
     const lang = useAppearance().language;
+    const titles = titleVariants.map((v) => (lang === "en" ? v.text_en : v.text_ru));
     const isDarkMode = useColorMode().dark;
     const colorModeHook = useColorMode();
     const smallScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -459,7 +522,7 @@ function SlideContent({ buttons }: { buttons: LandingButton[] }) {
                             >
                                 {__("Maxim")}
                             </Box>
-                            <WebDeveloperShield />
+                            <WebDeveloperShield titles={titles} />
                         </Box>
                     </Box>
                 </Box>
@@ -471,9 +534,10 @@ function SlideContent({ buttons }: { buttons: LandingButton[] }) {
 type MainSlideProps = {
     scrollObservable?: ScrollObservable;
     buttons: LandingButton[];
+    titleVariants: TitleVariant[];
 };
 
-export default function MainSlide({ scrollObservable, buttons }: MainSlideProps) {
+export default function MainSlide({ scrollObservable, buttons, titleVariants }: MainSlideProps) {
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;
     const pageBgColor = getThemeColor("pageBgColor", theme);
@@ -577,7 +641,7 @@ export default function MainSlide({ scrollObservable, buttons }: MainSlideProps)
                     height: "100vh",
                 }}
             />
-            <SlideContent buttons={buttons} />
+            <SlideContent buttons={buttons} titleVariants={titleVariants} />
         </Box>
     );
 }

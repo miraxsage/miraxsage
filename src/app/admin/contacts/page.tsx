@@ -18,6 +18,8 @@ import LinkIcon from "@mui/icons-material/Link";
 import ArticleIcon from "@mui/icons-material/Article";
 import AddIcon from "@mui/icons-material/Add";
 import { SortableList, AdminSection, useAdminData, useLocalizedField } from "@/features/admin-editor";
+import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
+import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
 
@@ -178,7 +180,7 @@ function ContactLinksTab({
                                 value={item.type}
                                 onChange={(e) => updateItem(item.id, "type", e.target.value)}
                                 onBlur={() => onSave(items)}
-                                placeholder="email, phone, telegram..."
+                                placeholder={__("email, phone, telegram...", lang)}
                             />
                             <TextField
                                 label={__("Title", lang)}
@@ -195,10 +197,10 @@ function ContactLinksTab({
                                 value={item.icon}
                                 onChange={(e) => updateItem(item.id, "icon", e.target.value)}
                                 onBlur={() => onSave(items)}
-                                placeholder="MUI icon name or emoji"
+                                placeholder={__("MUI icon name or emoji", lang)}
                             />
                             <TextField
-                                label="URL"
+                                label={__("URL", lang)}
                                 size="small"
                                 fullWidth
                                 value={item.url}
@@ -339,6 +341,24 @@ export default function AdminContactsPage() {
             url: "/api/contacts",
         });
 
+    const { data: labelsRaw, setData: setLabelsRaw, loading: labelsLoading, saving: labelsSaving, error: labelsError, success: labelsSuccess, save: labelsSave } = useAdminData<UiLabelItem[]>({
+        url: "/api/ui-labels",
+    });
+
+    const labelsItems = labelsRaw ?? [];
+
+    const updateLabel = (id: number | string, field: string, value: string) => {
+        setLabelsRaw((prev) => {
+            if (!prev) return prev;
+            return prev.map((item) => (item.id === id ? { ...item, [field]: value } : item));
+        });
+    };
+
+    const saveLabels = (items: UiLabelItem[]) => {
+        const categoryItems = items.filter((it) => it.category === "contacts_general");
+        labelsSave({ category: "contacts_general", data: categoryItems });
+    };
+
     const contactLinks = data?.contact_info ?? [];
     const pageContent = data?.contact_page_content ?? [];
 
@@ -359,7 +379,7 @@ export default function AdminContactsPage() {
         save({ section: "contact_page_content", data: items }, { successMessage: "Saved" });
     };
 
-    if (loading) {
+    if (loading || labelsLoading) {
         return (
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 48px)" }}>
                 <CircularProgress />
@@ -387,6 +407,7 @@ export default function AdminContactsPage() {
             >
                 <Tab label={__("Contact Links", lang)} icon={<LinkIcon />} iconPosition="start" />
                 <Tab label={__("Page Content", lang)} icon={<ArticleIcon />} iconPosition="start" />
+                <Tab label={__("General Labels", lang)} />
             </Tabs>
 
             {tab === 0 && (
@@ -411,6 +432,22 @@ export default function AdminContactsPage() {
                     error={error}
                     success={success}
                 />
+            )}
+
+            {tab === 2 && (
+                <AdminSection
+                    title={__("General Labels", lang)}
+                    saving={labelsSaving}
+                    error={labelsError}
+                    success={labelsSuccess}
+                >
+                    <UiLabelsEditor
+                        category="contacts_general"
+                        items={labelsItems}
+                        onUpdate={updateLabel}
+                        onSave={saveLabels}
+                    />
+                </AdminSection>
             )}
         </Box>
     );

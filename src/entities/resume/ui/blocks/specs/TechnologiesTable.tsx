@@ -5,6 +5,7 @@ import { getThemeColor } from "@/shared/lib/theme";
 import { chartColors } from "@/shared/lib/colors";
 import { capitalize } from "@/shared/lib/string";
 import __ from "@/shared/lib/i18n/translation";
+import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import { Box, SxProps, alpha, useMediaQuery, useTheme } from "@mui/material";
 import { BarChart, PieChart } from "@mui/x-charts";
 import React, { useEffect, useState } from "react";
@@ -34,6 +35,7 @@ function levelKind(level: number) {
 }
 
 function TechnologiesChart({ data, currentChart, onCurrentChartChange, sx }: TechnologiesChartProps) {
+    const t = useUiLabels();
     const theme = useTheme();
     const is3xl = useMediaQuery(theme.breakpoints.only("3xl"));
     const isxl = useMediaQuery(theme.breakpoints.only("xl"));
@@ -48,9 +50,9 @@ function TechnologiesChart({ data, currentChart, onCurrentChartChange, sx }: Tec
     }));
     const statXAxises: string[] = [];
     const statChartData: { label: string; data: number[]; color: string }[] = [
-        { label: __("Level"), color: colors[0], data: [] },
-        { label: __("Experience"), color: colors[Math.floor(data.length / 4)], data: [] },
-        { label: __("Projects|2"), color: colors[Math.floor(data.length / 2)], data: [] },
+        { label: t("Level"), color: colors[0], data: [] },
+        { label: t("Experience"), color: colors[Math.floor(data.length / 4)], data: [] },
+        { label: t("Projects_tab"), color: colors[Math.floor(data.length / 2)], data: [] },
     ];
     data.forEach(([name, , , level, experience, projects]) => {
         statChartData[0].data.push(level / 10);
@@ -79,8 +81,8 @@ function TechnologiesChart({ data, currentChart, onCurrentChartChange, sx }: Tec
                 sx={{ width: "100%", "& .MuiTab-root": { paddingTop: "8px" } }}
             >
                 {[
-                    { id: "spread", title: __("Spread") },
-                    { id: "stat", title: __("Statistic") },
+                    { id: "spread", title: t("Spread") },
+                    { id: "stat", title: t("Statistic") },
                 ]}
             </AccentedTabs>
             <Box
@@ -133,6 +135,7 @@ function TechnologiesChart({ data, currentChart, onCurrentChartChange, sx }: Tec
 }
 
 export default function TechnologiesTable({ data, withoutBottomBorder }: TechnologiesTableProps) {
+    const t = useUiLabels();
     const theme = useTheme();
     const abovexl = useMediaQuery(theme.breakpoints.up("2xl"));
     const belowlg = useMediaQuery(theme.breakpoints.down("lg"));
@@ -176,14 +179,14 @@ export default function TechnologiesTable({ data, withoutBottomBorder }: Technol
             >
                 <Box className="grid-title">№</Box>
                 <Box className="grid-title" sx={{ gridColumn: "span " + (belowlg ? 2 : 1) }}>
-                    {__("Technology")}
+                    {t("Technology")}
                 </Box>
                 {!belowlg && (
                     <>
-                        <Box className="grid-title">{abovexl ? __("Proficiency level") : __("Level")}</Box>
-                        <Box className="grid-title">{__("Experience")}</Box>
-                        <Box className="grid-title">{__("Projects|2")}</Box>
-                        {abovexl && <Box className="grid-title">{__("Visualtization")}</Box>}
+                        <Box className="grid-title">{abovexl ? t("Proficiency level") : t("Level")}</Box>
+                        <Box className="grid-title">{t("Experience")}</Box>
+                        <Box className="grid-title">{t("Projects_tab")}</Box>
+                        {abovexl && <Box className="grid-title">{t("Visualization")}</Box>}
                     </>
                 )}
                 {data.map(([name, docsLink, Icon, level, experience, projects], i) => {
@@ -218,7 +221,7 @@ export default function TechnologiesTable({ data, withoutBottomBorder }: Technol
                             {belowlg && (
                                 <>
                                     <Box></Box>
-                                    <Box className="grid-title">{__("Level")}</Box>
+                                    <Box className="grid-title">{t("Level")}</Box>
                                 </>
                             )}
                             <Box>
@@ -228,7 +231,7 @@ export default function TechnologiesTable({ data, withoutBottomBorder }: Technol
                             {belowlg && (
                                 <>
                                     <Box style={{ borderTopWidth: 0 }}></Box>
-                                    <Box className="grid-title">{__("Experience")}</Box>
+                                    <Box className="grid-title">{t("Experience")}</Box>
                                 </>
                             )}
                             <Box>
@@ -237,7 +240,7 @@ export default function TechnologiesTable({ data, withoutBottomBorder }: Technol
                             {belowlg && (
                                 <>
                                     <Box style={{ borderTopWidth: 0 }}></Box>
-                                    <Box className="grid-title">{__("Projects|3")}</Box>
+                                    <Box className="grid-title">{t("Projects_tab_alt")}</Box>
                                 </>
                             )}
                             <Box
@@ -287,7 +290,7 @@ export default function TechnologiesTable({ data, withoutBottomBorder }: Technol
                 {!abovexl && (
                     <>
                         <Box className="grid-title" sx={{ gridColumn: "span " + (belowlg ? 3 : 5) }}>
-                            {__("Visualization")}
+                            {t("Visualization")}
                         </Box>
                         <TechnologiesChart
                             currentChart={currentChart}
