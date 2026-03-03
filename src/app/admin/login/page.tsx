@@ -82,7 +82,7 @@ export default function AdminLoginPage() {
                                 color: getThemeColor("menuText", theme),
                             }}
                         >
-                            {__("Administration", lang)}
+                            Miraxsage
                         </Typography>
                     </Box>
 

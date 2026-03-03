@@ -3,14 +3,13 @@ import { useColorMode, useLanguage } from "@/shared/lib/store/appearanceSlice";
 import { Box, alpha, useTheme } from "@mui/material";
 import { useLandingColor, useThemeColor } from "@/shared/lib/theme";
 import TransparentButton from "./TransparentButton";
-import TelegramIcon from "@/shared/icons/TelegramIcon";
-import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import { GitHub } from "@mui/icons-material";
 import { lighten } from "@mui/material";
 import { useRouter } from "next/navigation";
+import type { FooterItem, ContactItem } from "./MainSlide";
+import { CONTACT_ICON_MAP } from "./MainSlide";
+import renderContent from "./AboutSlide/renderContent";
 
-export default function Copyright() {
+export default function Copyright({ footer, contacts }: { footer: FooterItem[]; contacts: ContactItem[] }) {
     const lang = useLanguage();
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;
@@ -45,22 +44,8 @@ export default function Copyright() {
                     lineHeight: 1.25,
                 }}
             >
-                {lang.ru ? (
-                    <>
-                        © 2024 Miraxsage. Все права защищены.
-                        <br />
-                        Все материалы на сайте (товарные знаки, логотипы и изображения за исключением ряда <br />
-                        иллюстраций, заимствованных в свободном доступе) являются собственностью владельца <br />
-                        (Манина Максима Павловича) и могут быть использованы только с личного разрешения.
-                    </>
-                ) : (
-                    <>
-                        © 2024 Miraxsage. All rights reserved.
-                        <br />
-                        All materials on the website (trademarks, logos, and images excluding certain <br />
-                        illustrations sourced from public domain) are the property of the owner (Manin <br />
-                        Maxim) and may only be used with personal permission.
-                    </>
+                {footer.map((item) =>
+                    renderContent(lang.ru ? item.content_ru : item.content_en, color)
                 )}
                 <Box
                     sx={{
@@ -76,18 +61,15 @@ export default function Copyright() {
                     }}
                 >
                     <Box sx={{ display: "flex" }}>
-                        <TransparentButton onClick={linkClick("https://t.me/miraxsage")}>
-                            <TelegramIcon />
-                        </TransparentButton>
-                        <TransparentButton onClick={linkClick("mailto:manin.maxim@mail.ru")}>
-                            <AlternateEmailOutlinedIcon />
-                        </TransparentButton>
-                        <TransparentButton onClick={linkClick("https://www.linkedin.com/in/miraxsage")}>
-                            <LinkedInIcon />
-                        </TransparentButton>
-                        <TransparentButton onClick={linkClick("https://github.com/miraxsage/")} dividerSize="collapsed">
-                            <GitHub />
-                        </TransparentButton>
+                        {contacts.map((contact, i) => (
+                            <TransparentButton
+                                key={contact.id}
+                                onClick={linkClick(contact.url)}
+                                dividerSize={i === contacts.length - 1 ? "collapsed" : undefined}
+                            >
+                                {CONTACT_ICON_MAP[contact.icon]}
+                            </TransparentButton>
+                        ))}
                     </Box>
                 </Box>
             </Box>

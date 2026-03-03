@@ -200,7 +200,7 @@ function ContactLinksTab({
                                 placeholder={__("MUI icon name or emoji", lang)}
                             />
                             <TextField
-                                label={__("URL", lang)}
+                                label="URL"
                                 size="small"
                                 fullWidth
                                 value={item.url}

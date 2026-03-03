@@ -7,7 +7,7 @@ import MainSlide from "@/widgets/landing/MainSlide";
 import { AboutSlide } from "@/widgets/landing/AboutSlide";
 import GetCloserSlide from "@/widgets/landing/GetCloserSlide";
 import { ScrollObservable } from "@/widgets/landing/types";
-import type { LandingButton, TitleVariant } from "@/widgets/landing/MainSlide";
+import type { LandingButton, TitleVariant, InfoBlock, GetCloserItem, FooterItem, ContactItem } from "@/widgets/landing/MainSlide";
 import { UiLabelsContext, UiLabelsMap } from "@/entities/ui-labels/model/uiLabelsContext";
 import { CategoryLabelsContext, CategoryLabelsMap } from "@/entities/resume/model/categoryLabels";
 
@@ -16,9 +16,13 @@ interface LandingClientProps {
     titleVariants: TitleVariant[];
     uiLabels: UiLabelsMap;
     categoryLabels: CategoryLabelsMap;
+    infoBlocks: InfoBlock[];
+    getCloser: GetCloserItem | null;
+    footer: FooterItem[];
+    contacts: ContactItem[];
 }
 
-export default function LandingClient({ buttons, titleVariants, uiLabels, categoryLabels }: LandingClientProps) {
+export default function LandingClient({ buttons, titleVariants, uiLabels, categoryLabels, infoBlocks, getCloser, footer, contacts }: LandingClientProps) {
     const rootRef = useRef<HTMLDivElement>();
     const [scrollObservable, setScrollObservable] = useState<ScrollObservable | undefined>();
     useEffect(() => {
@@ -71,9 +75,9 @@ export default function LandingClient({ buttons, titleVariants, uiLabels, catego
         <CategoryLabelsContext.Provider value={categoryLabels}>
         <CustomScrollbar ref={rootRef} className="landing-background-scroll-view" sx={{ width: "100%" }}>
             <Box sx={{ position: "absolute", width: "100%", top: 0, left: 0 }}>
-                <MainSlide scrollObservable={scrollObservable} buttons={buttons} titleVariants={titleVariants} />
-                <AboutSlide scrollObservable={scrollObservable} />
-                <GetCloserSlide />
+                <MainSlide scrollObservable={scrollObservable} buttons={buttons} titleVariants={titleVariants} contacts={contacts} />
+                <AboutSlide scrollObservable={scrollObservable} infoBlocks={infoBlocks} />
+                <GetCloserSlide getCloser={getCloser} footer={footer} contacts={contacts} />
             </Box>
         </CustomScrollbar>
         </CategoryLabelsContext.Provider>

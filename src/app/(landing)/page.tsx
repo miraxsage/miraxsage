@@ -1,6 +1,6 @@
 import { getDb } from "@/db";
 import LandingClient from "./LandingClient";
-import type { LandingButton, TitleVariant } from "@/widgets/landing/MainSlide";
+import type { LandingButton, TitleVariant, InfoBlock, GetCloserItem, FooterItem, ContactItem } from "@/widgets/landing/MainSlide";
 import type { UiLabelsMap } from "@/entities/ui-labels/model/uiLabelsContext";
 import type { CategoryLabelEntry } from "@/entities/resume/model/categoryLabels";
 
@@ -28,6 +28,26 @@ function getUiLabels(): UiLabelsMap {
     return map;
 }
 
+function getInfoBlocks(): InfoBlock[] {
+    const db = getDb();
+    return db.prepare("SELECT * FROM landing_info_blocks WHERE is_visible = 1 ORDER BY sort_order").all() as InfoBlock[];
+}
+
+function getFooter(): FooterItem[] {
+    const db = getDb();
+    return db.prepare("SELECT * FROM landing_footer ORDER BY sort_order").all() as FooterItem[];
+}
+
+function getContacts(): ContactItem[] {
+    const db = getDb();
+    return db.prepare("SELECT * FROM contact_info WHERE is_visible = 1 ORDER BY sort_order").all() as ContactItem[];
+}
+
+function getGetCloser(): GetCloserItem | null {
+    const db = getDb();
+    return (db.prepare("SELECT * FROM landing_get_closer LIMIT 1").get() as GetCloserItem) ?? null;
+}
+
 function getCategoryLabels(): Record<string, CategoryLabelEntry> {
     const db = getDb();
     const rows = db.prepare("SELECT slug, label_en, label_ru FROM resume_categories").all() as Array<{
@@ -47,5 +67,9 @@ export default function Landing() {
     const titleVariants = getTitleVariants();
     const uiLabels = getUiLabels();
     const categoryLabels = getCategoryLabels();
-    return <LandingClient buttons={buttons} titleVariants={titleVariants} uiLabels={uiLabels} categoryLabels={categoryLabels} />;
+    const infoBlocks = getInfoBlocks();
+    const getCloser = getGetCloser();
+    const footer = getFooter();
+    const contacts = getContacts();
+    return <LandingClient buttons={buttons} titleVariants={titleVariants} uiLabels={uiLabels} categoryLabels={categoryLabels} infoBlocks={infoBlocks} getCloser={getCloser} footer={footer} contacts={contacts} />;
 }

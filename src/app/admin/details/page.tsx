@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import {
     Box,
     Tabs,
@@ -10,11 +10,12 @@ import {
     FormControlLabel,
     Typography,
     CircularProgress,
+    Chip,
     useTheme,
 } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
 import { SortableList, AdminSection, useAdminData, useLocalizedField } from "@/features/admin-editor";
-import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
+import type { ContactItem } from "@/widgets/landing/MainSlide";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
@@ -57,9 +58,8 @@ function FieldRow({ children }: { children: React.ReactNode }) {
 
 const TAB_KEYS = [
     { key: "header_items" as const, label: "Header Items" },
-    { key: "details_navigation" as const, label: "Navigation Labels" },
-    { key: "details_ui" as const, label: "UI Labels" },
-    { key: "landing" as const, label: "Landing Labels" },
+    { key: "contacts" as const, label: "Contacts" },
+    { key: "general_labels" as const, label: "General Labels" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -77,9 +77,51 @@ export default function AdminDetailsPage() {
         url: "/api/landing",
     });
 
-    const { data: labelsRaw, setData: setLabelsRaw, loading: labelsLoading, saving: labelsSaving, error: labelsError, success: labelsSuccess, save: labelsSave } = useAdminData<UiLabelItem[]>({
+    const { data: labelsRaw, setData: setLabelsRaw, loading: labelsLoading, save: labelsSave } = useAdminData<UiLabelItem[]>({
         url: "/api/ui-labels",
     });
+
+    const { data: contactsData, setData: setContactsData, loading: contactsLoading, saving: contactsSaving, error: contactsError, success: contactsSuccess, save: contactsSave } = useAdminData<{ contact_info: ContactItem[] }>({
+        url: "/api/contacts",
+    });
+
+    const contacts = contactsData?.contact_info ?? [];
+
+    const updateContacts = (newContacts: ContactItem[]) => {
+        if (!contactsData) return;
+        setContactsData({ ...contactsData, contact_info: newContacts });
+    };
+
+    const updateContact = (id: number | string, field: string, value: unknown) => {
+        updateContacts(contacts.map((c) => (c.id === id ? { ...c, [field]: value } : c)));
+    };
+
+    const saveContacts = (list?: ContactItem[]) => {
+        const ordered = (list ?? contacts).map((c, i) => ({ ...c, sort_order: i }));
+        contactsSave({ section: "contact_info", data: ordered });
+    };
+
+    const updateContactAndSave = (id: number | string, field: string, value: unknown) => {
+        const newContacts = contacts.map((c) => (c.id === id ? { ...c, [field]: value } : c));
+        updateContacts(newContacts);
+        saveContacts(newContacts);
+    };
+
+    const addContact = () => {
+        const newContact: ContactItem = {
+            id: nextTempId(),
+            sort_order: contacts.length,
+            type: "",
+            title_en: "",
+            title_ru: "",
+            icon: "",
+            url: "",
+            is_visible: 1,
+        };
+        const newContacts = [...contacts, newContact];
+        updateContacts(newContacts);
+        saveContacts(newContacts);
+    };
 
     const labelsItems = labelsRaw ?? [];
 
@@ -90,10 +132,7 @@ export default function AdminDetailsPage() {
         });
     };
 
-    const saveLabels = (items: UiLabelItem[]) => {
-        const currentTab = TAB_KEYS[tab];
-        if (!currentTab) return;
-        const category = currentTab.key;
+    const saveLabels = (category: string) => (items: UiLabelItem[]) => {
         const categoryItems = items.filter((it) => it.category === category);
         labelsSave({ category, data: categoryItems });
     };
@@ -138,7 +177,7 @@ export default function AdminDetailsPage() {
         saveItems(newItems);
     };
 
-    if (loading || labelsLoading) {
+    if (loading || labelsLoading || contactsLoading) {
         return (
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 48px)" }}>
                 <CircularProgress />
@@ -150,9 +189,9 @@ export default function AdminDetailsPage() {
         <AdminSection
             title={__("Details", lang)}
             icon={<TuneIcon sx={{ color: theme.palette.primary.main, fontSize: 28 }} />}
-            saving={saving}
-            error={error}
-            success={success}
+            saving={tab === 1 ? contactsSaving : saving}
+            error={tab === 1 ? contactsError : error}
+            success={tab === 1 ? contactsSuccess : success}
         >
             <Tabs
                 value={tab}
@@ -210,7 +249,7 @@ export default function AdminDetailsPage() {
                                     sx={{ flex: 1, minWidth: 140 }}
                                 />
                                 <TextField
-                                    label={__("URL", lang)}
+                                    label="URL"
                                     size="small"
                                     value={item.url}
                                     onChange={(e) => updateItem(item.id, "url", e.target.value)}
@@ -225,13 +264,70 @@ export default function AdminDetailsPage() {
                                     onBlur={() => saveItems()}
                                     sx={{ flex: 1, minWidth: 100 }}
                                 />
+                            </FieldRow>
+                        </Box>
+                    )}
+                />
+            )}
+
+            {/* ===== Contacts ===== */}
+            {tab === 1 && (
+                <SortableList
+                    items={contacts}
+                    onReorder={(reordered) => {
+                        updateContacts(reordered);
+                        saveContacts(reordered);
+                    }}
+                    onDelete={(id) => {
+                        const newContacts = contacts.filter((c) => c.id !== id);
+                        updateContacts(newContacts);
+                        saveContacts(newContacts);
+                    }}
+                    onAdd={addContact}
+                    addLabel={__("Add Contact", lang)}
+                    renderItem={(contact) => (
+                        <Box>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={contact.is_visible === 1}
+                                        onChange={(e) =>
+                                            updateContactAndSave(contact.id, "is_visible", e.target.checked ? 1 : 0)
+                                        }
+                                        size="small"
+                                    />
+                                }
+                                label={
+                                    <Typography variant="body2" sx={{ color: menuText }}>
+                                        {__("Visible", lang)}
+                                    </Typography>
+                                }
+                                sx={{ gap: 0.5, mb: "12px" }}
+                            />
+                            <FieldRow>
                                 <TextField
-                                    label={__("Type", lang)}
+                                    label={__("Title", lang)}
                                     size="small"
-                                    value={item.type}
-                                    onChange={(e) => updateItem(item.id, "type", e.target.value)}
-                                    onBlur={() => saveItems()}
-                                    sx={{ flex: 1, minWidth: 80 }}
+                                    value={lv(contact, "title")}
+                                    onChange={(e) => updateContact(contact.id, lk("title"), e.target.value)}
+                                    onBlur={() => saveContacts()}
+                                    sx={{ flex: 1, minWidth: 120 }}
+                                />
+                                <TextField
+                                    label="URL"
+                                    size="small"
+                                    value={contact.url}
+                                    onChange={(e) => updateContact(contact.id, "url", e.target.value)}
+                                    onBlur={() => saveContacts()}
+                                    sx={{ flex: 2, minWidth: 200 }}
+                                />
+                                <TextField
+                                    label={__("Icon", lang)}
+                                    size="small"
+                                    value={contact.icon}
+                                    onChange={(e) => updateContact(contact.id, "icon", e.target.value)}
+                                    onBlur={() => saveContacts()}
+                                    sx={{ flex: 1, minWidth: 100 }}
                                 />
                             </FieldRow>
                         </Box>
@@ -239,14 +335,44 @@ export default function AdminDetailsPage() {
                 />
             )}
 
-            {/* ===== Navigation / UI / Landing Labels ===== */}
-            {tab >= 1 && tab <= 3 && (
-                <UiLabelsEditor
-                    category={TAB_KEYS[tab].key}
-                    items={labelsItems}
-                    onUpdate={updateLabel}
-                    onSave={saveLabels}
-                />
+            {/* ===== General Labels ===== */}
+            {tab === 2 && (
+                <Box sx={{ display: "grid", gridTemplateColumns: "max-content 1fr", gap: 1.5, alignItems: "center" }}>
+                    {labelsItems.filter((it) => it.category === "details_ui").map((item) => (
+                        <Fragment key={item.id}>
+                            <Chip label={item.key} size="small" variant="outlined" sx={{ justifyContent: "flex-start", fontFamily: "monospace", fontSize: "0.8rem", color: "#E4E4E5", "& .MuiChip-label": { padding: "6px 12px" } }} />
+                            <TextField
+                                label={__("Value", lang)}
+                                size="small"
+                                value={item[lk("value") as keyof UiLabelItem] ?? ""}
+                                onChange={(e) => updateLabel(item.id, lk("value"), e.target.value)}
+                                onBlur={() => saveLabels("details_ui")(labelsItems)}
+                            />
+                        </Fragment>
+                    ))}
+
+                    {/* Divider with Navigation Labels heading */}
+                    <Box sx={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", gap: 2, my: 0.5 }}>
+                        <Box sx={{ flex: 1, height: "1px", background: theme.palette.divider }} />
+                        <Typography variant="subtitle2" sx={{ color: menuText, whiteSpace: "nowrap" }}>
+                            {__("Navigation Labels", lang)}
+                        </Typography>
+                        <Box sx={{ flex: 1, height: "1px", background: theme.palette.divider }} />
+                    </Box>
+
+                    {labelsItems.filter((it) => it.category === "details_navigation").map((item) => (
+                        <Fragment key={item.id}>
+                            <Chip label={item.key} size="small" variant="outlined" sx={{ justifyContent: "flex-start", fontFamily: "monospace", fontSize: "0.8rem", color: "#E4E4E5", "& .MuiChip-label": { padding: "6px 12px" } }} />
+                            <TextField
+                                label={__("Value", lang)}
+                                size="small"
+                                value={item[lk("value") as keyof UiLabelItem] ?? ""}
+                                onChange={(e) => updateLabel(item.id, lk("value"), e.target.value)}
+                                onBlur={() => saveLabels("details_navigation")(labelsItems)}
+                            />
+                        </Fragment>
+                    ))}
+                </Box>
             )}
         </AdminSection>
     );

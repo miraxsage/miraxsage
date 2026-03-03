@@ -8,11 +8,9 @@ import __ from "@/shared/lib/i18n/translation";
 import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import CustomAccordion from "@/shared/ui/Accordion";
 import DescriptionTable, { DescriptionTableData } from "@/shared/ui/DescriptionTable";
-import TelegramIcon from "@/shared/icons/TelegramIcon";
-import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import Link from "@/shared/ui/Link";
-import { GitHub } from "@mui/icons-material";
+import type { ContactItem } from "@/widgets/landing/MainSlide";
+import { CONTACT_ICON_MAP } from "@/widgets/landing/MainSlide";
 import CustomTextField from "@/shared/ui/TextInput";
 import CustomCodeEditor from "@/shared/ui/CodeEditor";
 import CustomScrollbar from "@/shared/ui/Scrollbar";
@@ -27,27 +25,28 @@ import { RevealAsideMenuButton } from "@/widgets/layout/RevealAsideMenuButton";
 import { getThemeColor } from "@/shared/lib/theme";
 import { useRouter } from "next/navigation";
 
-function contactData(title: string, Icon: React.FC, link: string, theme: Theme): DescriptionTableData[number] {
+function contactData(contact: ContactItem, theme: Theme, ru: boolean): DescriptionTableData[number] {
     return [
         {
-            title: title,
+            title: ru ? contact.title_ru : contact.title_en,
             icon: (
                 <Box
                     sx={{
+                        display: "flex",
+                        alignItems: "center",
                         "& .MuiSvgIcon-root": {
                             fontSize: "20px",
                             marginRight: "8px",
                             color: getThemeColor("regularHoverIcon", theme),
-                            marginTop: title == "GitHub" ? "-3px" : "0px",
                         },
                     }}
                 >
-                    {<Icon />}
+                    {CONTACT_ICON_MAP[contact.icon]}
                 </Box>
             ),
         },
-        <Link target="_blank" href={link}>
-            {link.replace(/^mailto:/, "")}
+        <Link target="_blank" href={contact.url}>
+            {contact.url.replace(/^mailto:/, "")}
         </Link>,
         { fullLine: true },
     ];
@@ -98,7 +97,7 @@ async function sendForm(fields: { name: string; email: string; subject: string; 
     }
 }
 
-export default function Contacts() {
+export default function Contacts({ contacts }: { contacts: ContactItem[] }) {
     const router = useRouter();
     const lang = useAppearance().language;
     const t = useUiLabels();
@@ -233,22 +232,7 @@ export default function Contacts() {
                             <CustomAccordion expandable={false} title={t("Social networks")}>
                                 <Box sx={{ marginLeft: "-1px" }}>
                                     <DescriptionTable withoutBottomBorder={true} withoutTopBorder={true}>
-                                        {[
-                                            contactData("Telegram", TelegramIcon, "https://t.me/miraxsage", theme),
-                                            contactData(
-                                                "Email",
-                                                AlternateEmailOutlinedIcon,
-                                                "mailto:manin.maxim@mail.ru",
-                                                theme
-                                            ),
-                                            contactData(
-                                                "LinkedIn",
-                                                LinkedInIcon,
-                                                "https://www.linkedin.com/in/miraxsage",
-                                                theme
-                                            ),
-                                            contactData("GitHub", GitHub, "https://github.com/miraxsage/", theme),
-                                        ]}
+                                        {contacts.map((c) => contactData(c, theme, lang === "ru"))}
                                     </DescriptionTable>
                                 </Box>
                             </CustomAccordion>

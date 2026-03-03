@@ -4,10 +4,12 @@ import { mix } from "@/shared/lib/colors";
 import { Box, SxProps, alpha, lighten, useMediaQuery, useTheme } from "@mui/material";
 import FloatingLine from "./FloatingLine";
 import { useColorMode, useLanguage } from "@/shared/lib/store/appearanceSlice";
-import LandingLink from "./LandingLink";
 import __ from "@/shared/lib/i18n/translation";
 import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import { CategoryLabelsContext } from "@/entities/resume/model/categoryLabels";
+import type { GetCloserItem, FooterItem, ContactItem } from "./MainSlide";
+import { CONTACT_ICON_MAP } from "./MainSlide";
+import renderContent from "./AboutSlide/renderContent";
 import AccentedTreeView from "@/shared/ui/AccentedTreeView";
 import PersonIcon from "@mui/icons-material/Person";
 import SchoolIcon from "@mui/icons-material/School";
@@ -20,11 +22,7 @@ import PsychologyIcon from "@mui/icons-material/Psychology";
 import DataObjectIcon from "@mui/icons-material/DataObject";
 import MusclesIcon from "@/shared/icons/MusclesIcon";
 import TransparentButton from "./TransparentButton";
-import TelegramIcon from "@/shared/icons/TelegramIcon";
-import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
 import MessageIcon from "@mui/icons-material/Message";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import { GitHub } from "@mui/icons-material";
 import { ReactNode, useContext, useState } from "react";
 import Copyright from "./Copyright";
 import { useRouter } from "next/navigation";
@@ -77,7 +75,13 @@ function arrayContainsSubstring(array: string[], substring: string) {
     return array.some((item) => item.includes(substring));
 }
 
-export default function GetCloserSlide() {
+function parseTitleParts(raw: string): [string, string, string, string?] {
+    const match = raw.match(/^(.*?)\[(.+?)\](.+?)(?:\s+(.+))?$/);
+    if (!match) return [raw, "", "", undefined];
+    return [match[1].trimEnd(), match[2], match[3], match[4]?.trim() || undefined];
+}
+
+export default function GetCloserSlide({ getCloser, footer, contacts }: { getCloser: GetCloserItem | null; footer: FooterItem[]; contacts: ContactItem[] }) {
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;
     const router = useRouter();
@@ -173,27 +177,39 @@ export default function GetCloserSlide() {
                             },
                         }}
                     >
-                        {lang.ru ? "Познакомимся " : "Let's get  "}
-                        <Box
-                            sx={{
-                                display: "inline-block",
-                                background: `linear-gradient(25deg, ${useLandingColor("accentA")}, ${useLandingColor(
-                                    "accentB"
-                                )})`,
-                                lineHeight: 1.25,
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
-                            }}
-                        >
-                            {lang.ru ? "ближе" : "closer"}
-                        </Box>
-                        ?{" "}
-                        <Box
-                            component="span"
-                            sx={{ fontSize: "45px", position: "relative", top: "-4px", whiteSpace: "nowrap" }}
-                        >
-                            🫱🫲
-                        </Box>
+                        {(() => {
+                            const titleRaw = getCloser
+                                ? (lang.ru ? getCloser.title_ru : getCloser.title_en)
+                                : (lang.ru ? "Познакомимся [ближе]? 🫱🫲" : "Let's get [closer]? 🫱🫲");
+                            const [prefix, accent, suffix, emoji] = parseTitleParts(titleRaw);
+                            return (
+                                <>
+                                    {prefix}
+                                    {" "}
+                                    <Box
+                                        sx={{
+                                            display: "inline-block",
+                                            background: `linear-gradient(25deg, ${useLandingColor("accentA")}, ${useLandingColor("accentB")})`,
+                                            lineHeight: 1.25,
+                                            WebkitBackgroundClip: "text",
+                                            WebkitTextFillColor: "transparent",
+                                        }}
+                                    >
+                                        {accent}
+                                    </Box>
+                                    {suffix}
+                                    {" "}
+                                    {emoji && (
+                                        <Box
+                                            component="span"
+                                            sx={{ fontSize: "45px", position: "relative", top: "-4px", whiteSpace: "nowrap" }}
+                                        >
+                                            {emoji}
+                                        </Box>
+                                    )}
+                                </>
+                            );
+                        })()}
                     </Box>
                     <Box sx={{ height: "25px" }}></Box>
                     <Box
@@ -251,72 +267,19 @@ export default function GetCloserSlide() {
                                 gridArea: "3/3/3/3",
                             }}
                         ></Box>
-                        {lang.ru ? (
-                            <>
-                                <Box sx={{ gridArea: "1/3/1/3", marginLeft: "20px" }}>
-                                    <Box
-                                        component="span"
-                                        sx={{ WebkitBackgroundClip: "unset", WebkitTextFillColor: "white" }}
-                                    >
-                                        📜
-                                    </Box>{" "}
-                                    Вы можете ознакомиться с моим подробным{" "}
-                                    <LandingLink href="/about">{t("resume")}</LandingLink>
+                        {(() => {
+                            const contentRaw = getCloser
+                                ? (lang.ru ? getCloser.content_ru : getCloser.content_en)
+                                : (lang.ru
+                                    ? "📜 Вы можете ознакомиться с моим подробным [резюме](/about)\n💼 Посмотреть [портфолио](/projects) с самыми интересными работами\n🤝 Связаться со мной в соцсетях или оставить [сообщение](/interact)"
+                                    : "📜 You can review my detailed [resume](/about)\n💼 Check out the [portfolio](/projects) with my most interesting works\n🤝 Connect with me on social media or leave a [message](/interact)");
+                            const lines = contentRaw.split("\n");
+                            return lines.map((line, i) => (
+                                <Box key={i} sx={{ gridArea: `${i + 1}/3/${i + 1}/3`, marginLeft: "20px" }}>
+                                    {renderContent(line, textColor)}
                                 </Box>
-                                <Box sx={{ gridArea: "2/3/2/3", marginLeft: "20px" }}>
-                                    <Box
-                                        component="span"
-                                        sx={{ WebkitBackgroundClip: "unset", WebkitTextFillColor: "white" }}
-                                    >
-                                        💼
-                                    </Box>{" "}
-                                    Посмотреть <LandingLink href="/projects">{t("portfolio")}</LandingLink> с самыми
-                                    интересными работами
-                                </Box>
-                                <Box sx={{ gridArea: "3/3/3/3", marginLeft: "20px" }}>
-                                    <Box
-                                        component="span"
-                                        sx={{ WebkitBackgroundClip: "unset", WebkitTextFillColor: "white" }}
-                                    >
-                                        🤝
-                                    </Box>{" "}
-                                    Cвязаться со мной в соцсетях или оставить{" "}
-                                    <LandingLink href="/interact">{t("message")}</LandingLink>
-                                </Box>
-                            </>
-                        ) : (
-                            <>
-                                <Box sx={{ gridArea: "1/3/1/3", marginLeft: "20px" }}>
-                                    <Box
-                                        component="span"
-                                        sx={{ WebkitBackgroundClip: "unset", WebkitTextFillColor: "white" }}
-                                    >
-                                        📜
-                                    </Box>{" "}
-                                    You can review my detailed <LandingLink href="/about">{t("resume")}</LandingLink>
-                                </Box>
-                                <Box sx={{ gridArea: "2/3/2/3", marginLeft: "20px" }}>
-                                    <Box
-                                        component="span"
-                                        sx={{ WebkitBackgroundClip: "unset", WebkitTextFillColor: "white" }}
-                                    >
-                                        💼
-                                    </Box>{" "}
-                                    Check out the <LandingLink href="/projects">{t("portfolio")}</LandingLink> with my
-                                    most interesting works
-                                </Box>
-                                <Box sx={{ gridArea: "3/3/3/3", marginLeft: "20px" }}>
-                                    <Box
-                                        component="span"
-                                        sx={{ WebkitBackgroundClip: "unset", WebkitTextFillColor: "white" }}
-                                    >
-                                        🤝
-                                    </Box>{" "}
-                                    Connect with me on social media or leave a{" "}
-                                    <LandingLink href="/interact">{t("message")}</LandingLink>
-                                </Box>
-                            </>
-                        )}
+                            ));
+                        })()}
                     </Box>
                     <Box
                         sx={{
@@ -490,25 +453,18 @@ export default function GetCloserSlide() {
                                 alignItems: "start",
                             }}
                         >
-                            <SpecialButton link="https://t.me/miraxsage" sx={{ borderWidth: "0px 0px 1px 1px" }}>
-                                <TelegramIcon />
-                                {!sm && "Telegram"}
-                            </SpecialButton>
-                            <SpecialButton link="mailto:manin.maxim@mail.ru" sx={{ borderWidth: "0px 1px 1px 0px" }}>
-                                <AlternateEmailOutlinedIcon />
-                                {!sm && "Email"}
-                            </SpecialButton>
-                            <SpecialButton
-                                link="https://www.linkedin.com/in/miraxsage"
-                                sx={{ borderWidth: "0px 0px 1px 1px" }}
-                            >
-                                <LinkedInIcon />
-                                {!sm && "LinkedIn"}
-                            </SpecialButton>
-                            <SpecialButton link="https://github.com/miraxsage/" sx={{ borderWidth: "0px 1px 0px 0px" }}>
-                                <GitHub />
-                                {!sm && "Github"}
-                            </SpecialButton>
+                            {contacts.map((contact, i) => {
+                                const isLast = i === contacts.length - 1;
+                                const bw = i % 2 === 0
+                                    ? `0px 0px ${isLast ? "0px" : "1px"} 1px`
+                                    : `0px 1px ${isLast ? "0px" : "1px"} 0px`;
+                                return (
+                                    <SpecialButton key={contact.id} link={contact.url} sx={{ borderWidth: bw }}>
+                                        {CONTACT_ICON_MAP[contact.icon]}
+                                        {!sm && (lang.ru ? contact.title_ru : contact.title_en)}
+                                    </SpecialButton>
+                                );
+                            })}
                             <SpecialButton link="/interact">
                                 <MessageIcon />
                                 {!sm && t("Write")}
@@ -517,7 +473,7 @@ export default function GetCloserSlide() {
                     </Box>
                 </Box>
             </Box>
-            <Copyright />
+            <Copyright footer={footer} contacts={contacts} />
         </Box>
     );
 }

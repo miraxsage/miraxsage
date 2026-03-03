@@ -4,6 +4,7 @@ import type { HeaderItem } from "@/widgets/layout/TopMenu";
 import type { CategoryLabelEntry } from "@/entities/resume/model/categoryLabels";
 import type { UiLabelsMap } from "@/entities/ui-labels/model/uiLabelsContext";
 import type { ResumeData } from "@/entities/resume/model/resumeDataContext";
+import type { ContactItem } from "@/widgets/landing/MainSlide";
 
 function getHeaderItems(): HeaderItem[] {
     const db = getDb();
@@ -48,10 +49,16 @@ function getResumeData(): ResumeData {
     return { educationItems, educationData, laborItems, laborData, softSkills };
 }
 
+function getContacts(): ContactItem[] {
+    const db = getDb();
+    return db.prepare("SELECT * FROM contact_info WHERE is_visible = 1 ORDER BY sort_order").all() as ContactItem[];
+}
+
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
     const headerItems = getHeaderItems();
     const categoryLabels = getCategoryLabels();
     const uiLabels = getUiLabels();
     const resumeData = getResumeData();
-    return <MainLayout headerItems={headerItems} categoryLabels={categoryLabels} uiLabels={uiLabels} resumeData={resumeData}>{children}</MainLayout>;
+    const contacts = getContacts();
+    return <MainLayout headerItems={headerItems} categoryLabels={categoryLabels} uiLabels={uiLabels} resumeData={resumeData} contacts={contacts}>{children}</MainLayout>;
 }

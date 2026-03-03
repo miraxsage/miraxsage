@@ -9,6 +9,7 @@ const SECTION_TABLES: Record<string, string> = {
     title_variants: "landing_title_variants",
     buttons: "landing_buttons",
     info_blocks: "landing_info_blocks",
+    get_closer: "landing_get_closer",
     footer: "landing_footer",
 };
 
@@ -28,6 +29,7 @@ export async function GET() {
         const info_blocks = db
             .prepare("SELECT * FROM landing_info_blocks ORDER BY sort_order")
             .all();
+        const get_closer = db.prepare("SELECT * FROM landing_get_closer").all();
         const footer = db.prepare("SELECT * FROM landing_footer").all();
 
         return jsonResponse({
@@ -35,6 +37,7 @@ export async function GET() {
             title_variants,
             buttons,
             info_blocks,
+            get_closer,
             footer,
         });
     } catch (error) {

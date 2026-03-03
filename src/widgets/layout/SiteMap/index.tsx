@@ -4,11 +4,9 @@ import __ from "@/shared/lib/i18n/translation";
 import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import { Box, Button, IconButton, SxProps, alpha, styled, useMediaQuery, useTheme } from "@mui/material";
 import { ReactNode } from "react";
-import TelegramIcon from "@/shared/icons/TelegramIcon";
-import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
 import MessageIcon from "@mui/icons-material/Message";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import { GitHub } from "@mui/icons-material";
+import type { ContactItem } from "@/widgets/landing/MainSlide";
+import { CONTACT_ICON_MAP } from "@/widgets/landing/MainSlide";
 import { getThemeColor } from "@/shared/lib/theme";
 import ProjectFiltersList, { projectsCategoriesTreeViewData } from "@/entities/project/ui/FiltersList";
 import CustomScrollbar from "@/shared/ui/Scrollbar";
@@ -93,7 +91,7 @@ function SpecialButton({
     );
 }
 
-const links: Record<string, string> = {
+const staticLinks: Record<string, string> = {
     resume: "/about",
     biography: "/about/biography",
     general: "/about/biography/general",
@@ -109,10 +107,6 @@ const links: Record<string, string> = {
     "hard-skills": "/about/specifications/hard-skills",
     metrics: "/about/specifications/metrics",
     snippets: "/about/snippets",
-    telegram: "https://t.me/miraxsage",
-    email: "mailto:manin.maxim@mail.ru",
-    linkedin: "https://www.linkedin.com/in/miraxsage",
-    github: "https://github.com/miraxsage/",
     frontend: "/projects?techs=frontend",
     backend: "/projects?techs=backend",
     desktop: "/projects?techs=desktop",
@@ -125,13 +119,15 @@ function navigateToSection(
     section: string,
     router: ReturnType<typeof useRouter>,
     siteMapVisibility: ReturnType<typeof useSiteMapVisibility>,
-    t: (key: string) => string
+    t: (key: string) => string,
+    extraLinks: Record<string, string> = {}
 ) {
     siteMapVisibility.update("collapsed");
+    const links = { ...staticLinks, ...extraLinks };
     if (section in links) {
-        const link = links[section as keyof typeof links];
+        const link = links[section];
         if (link.match("^(https?:|mailto:)")) window.open(link, "_blank");
-        else return router.push(links[section as keyof typeof links]);
+        else return router.push(link);
     }
     if (section == "download-pdf") {
         window.open(`/${t("Resume (Miraxsage)")}.pdf`, "_blank");
@@ -140,7 +136,7 @@ function navigateToSection(
     router.push(`/projects?techs=${section.toLowerCase()}`);
 }
 
-function findActiveCategoriesData(data: AccentedTreeItemProps[], matches: AccentedTreeItemProps[], pathname: string) {
+function findActiveCategoriesData(data: AccentedTreeItemProps[], matches: AccentedTreeItemProps[], pathname: string, links: Record<string, string>) {
     const stack = [...data];
     while (stack.length > 0) {
         const item = stack.shift()!;
@@ -152,8 +148,16 @@ function findActiveCategoriesData(data: AccentedTreeItemProps[], matches: Accent
     return matches;
 }
 
-function allCategoriesTreeViewData(pathname: string, selectedItems?: string[], activePathData?: AccentedTreeItemProps[], labelFn?: (slug: string) => string, t?: (key: string) => string) {
+function allCategoriesTreeViewData(pathname: string, contacts: ContactItem[], selectedItems?: string[], activePathData?: AccentedTreeItemProps[], labelFn?: (slug: string) => string, t?: (key: string) => string, ru?: boolean) {
     const _ = t ?? __;
+    const contactLinks = Object.fromEntries(contacts.map((c) => [c.type, c.url]));
+    const links = { ...staticLinks, ...contactLinks };
+    const contactChildren: AccentedTreeItemProps[] = contacts.map((c) => ({
+        id: c.type,
+        title: ru ? c.title_ru : c.title_en,
+        icon: CONTACT_ICON_MAP[c.icon] as React.ReactElement,
+    }));
+    contactChildren.push({ id: "write", title: _("Write"), icon: <MessageIcon /> });
     const data = [
         {
             id: "resume",
@@ -169,17 +173,11 @@ function allCategoriesTreeViewData(pathname: string, selectedItems?: string[], a
             id: "contacts",
             title: _("Interact"),
             icon: <PhoneIcon />,
-            children: [
-                { id: "telegram", title: "Telegram", icon: <TelegramIcon /> },
-                { id: "email", title: "E-mail", icon: <AlternateEmailOutlinedIcon /> },
-                { id: "linkedin", title: "LinkedIn", icon: <LinkedInIcon /> },
-                { id: "github", title: "GitHub", icon: <GitHub /> },
-                { id: "write", title: _("Write"), icon: <MessageIcon /> },
-            ],
+            children: contactChildren,
         },
     ];
     const matches: AccentedTreeItemProps[] = [];
-    findActiveCategoriesData(data, matches, pathname);
+    findActiveCategoriesData(data, matches, pathname, links);
     if (activePathData) activePathData.push(...matches);
     if (matches.length > 0) {
         if (matches.length == 1) {
@@ -191,7 +189,7 @@ function allCategoriesTreeViewData(pathname: string, selectedItems?: string[], a
             matches.at(-2)!.isAccented = true;
         }
     }
-    return data;
+    return { data, links };
 }
 
 function useCatLabelFn() {
@@ -204,15 +202,16 @@ function useCatLabelFn() {
     };
 }
 
-function MobileSiteMapTreeView() {
+function MobileSiteMapTreeView({ contacts }: { contacts: ContactItem[] }) {
     const router = useRouter();
     const pathname = usePathname();
     const theme = useTheme();
     const siteMapVisibility = useSiteMapVisibility();
     const labelFn = useCatLabelFn();
     const t = useUiLabels();
+    const lang = useLanguage();
     const itemsToSelect: string[] = [];
-    const data = allCategoriesTreeViewData(pathname, itemsToSelect, undefined, labelFn, t);
+    const { data, links } = allCategoriesTreeViewData(pathname, contacts, itemsToSelect, undefined, labelFn, t, lang.ru);
     return (
         <Box sx={{ display: "flex", flexDirection: "column" }}>
             <ColorModeButton sx={{ gridArea: "1/5/1/5" }} />
@@ -226,7 +225,7 @@ function MobileSiteMapTreeView() {
                 initiallyExpandedNodes={["resume", "portfolio", "contacts"]}
                 selectionMode="single"
                 selectedItems={itemsToSelect.length > 0 ? itemsToSelect[0] : undefined}
-                onItemsSelect={(e) => navigateToSection(e.id, router, siteMapVisibility, t)}
+                onItemsSelect={(e) => navigateToSection(e.id, router, siteMapVisibility, t, links)}
                 sx={{
                     "& .MuiTreeItem-root .MuiTreeItem-content": {
                         outline: `0px solid ${theme.palette.divider}`,
@@ -315,85 +314,41 @@ function ContactButton({
     borders = "1",
     hoverBorders = "1",
 }: {
-    contact: "telegram" | "email" | "linkedin" | "github" | "write";
+    contact: ContactItem | { type: "write"; url: string; title: string; icon: string };
     accented?: boolean;
     borders?: string;
     hoverBorders?: string;
 }) {
     const t = useUiLabels();
-    const details: { action: string; content: ReactNode } = { action: "", content: "" };
-    if (contact == "telegram") {
-        details.action = "https://t.me/miraxsage";
-        details.content = (
-            <>
-                <TelegramIcon />
-                {"Telegram"}
-            </>
-        );
-    }
-    if (contact == "email") {
-        details.action = "mailto:manin.maxim@mail.ru";
-        details.content = (
-            <>
-                <AlternateEmailOutlinedIcon />
-                {"E-mail"}
-            </>
-        );
-    }
-    if (contact == "linkedin") {
-        details.action = "https://www.linkedin.com/in/miraxsage";
-        details.content = (
-            <>
-                <LinkedInIcon />
-                {"LinkedIn"}
-            </>
-        );
-    }
-    if (contact == "github") {
-        details.action = "https://github.com/miraxsage/";
-        details.content = (
-            <>
-                <GitHub />
-                {"GitHub"}
-            </>
-        );
-    }
-    if (contact == "write") {
-        details.action = "/interact";
-        details.content = (
-            <>
-                <MessageIcon />
-                {t("Write")}
-            </>
-        );
-    }
+    const lang = useLanguage();
+    const action = contact.url;
+    const ci = contact as ContactItem;
+    const content: ReactNode = contact.type === "write"
+        ? <><MessageIcon />{t("Write")}</>
+        : <>{CONTACT_ICON_MAP[contact.icon]}{lang.ru ? ci.title_ru : ci.title_en}</>;
     const theme = useTheme();
     const contactBorderColor = accented ? getThemeColor("secondaryText", theme) : theme.palette.divider;
     const contactsColor = getThemeColor(accented ? "secondaryHoverText" : "regularText", theme);
     const contactsBackground = accented ? getThemeColor("secondaryHoverBg", theme) : alpha(theme.palette.divider, 0.3);
     return (
         <SpecialButton
-            action={details.action}
+            action={action}
             sx={{
                 borderColor: borders.replaceAll("0", "transparent").replaceAll("1", contactBorderColor),
                 "&:hover": {
                     borderColor: hoverBorders.replaceAll("0", "transparent").replaceAll("1", contactBorderColor),
                     color: contactsColor,
                     background: contactsBackground,
-                    "& .MuiSvgIcon-root": accented
-                        ? {
-                              color: contactsColor,
-                          }
-                        : {},
+                    "& .MuiSvgIcon-root": accented ? { color: contactsColor } : {},
                 },
             }}
         >
-            {details.content}
+            {content}
         </SpecialButton>
     );
 }
 
-export default function SiteMap() {
+export default function SiteMap({ contacts }: { contacts: ContactItem[] }) {
     const theme = useTheme();
     const pathname = usePathname();
     const lessMdScreen = useMediaQuery(theme.breakpoints.down("md"));
@@ -404,15 +359,18 @@ export default function SiteMap() {
     const screenMode = useScreenMode();
     const labelFn = useCatLabelFn();
     const t = useUiLabels();
+    const lang = useLanguage();
 
     let activeChapter = "";
     let activeGroup = "";
     let activeItem = "";
+    let resolvedLinks: Record<string, string> = staticLinks;
 
     if (!smScreen) {
         const itemsToSelect: string[] = [];
         const activePathData: AccentedTreeItemProps[] = [];
-        allCategoriesTreeViewData(pathname, itemsToSelect, activePathData, labelFn, t);
+        const result = allCategoriesTreeViewData(pathname, contacts, itemsToSelect, activePathData, labelFn, t, lang.ru);
+        resolvedLinks = result.links;
         if (activePathData.length > 0) {
             activeChapter = activePathData.shift()!.id;
             if (activePathData.length > 1) activeGroup = activePathData.shift()!.id;
@@ -421,6 +379,7 @@ export default function SiteMap() {
     }
 
     const isContactsPage = activeChapter == "contacts";
+    const writeContact = { type: "write" as const, url: "/interact", title: "Write", icon: "" };
 
     return (
         <>
@@ -495,7 +454,7 @@ export default function SiteMap() {
                             },
                         }}
                     >
-                        {smScreen && <MobileSiteMapTreeView />}
+                        {smScreen && <MobileSiteMapTreeView contacts={contacts} />}
                         {!smScreen && (
                             <>
                                 <Box
@@ -689,7 +648,7 @@ export default function SiteMap() {
                                         selectedItems={activeItem}
                                         initiallyExpandedNodes={["biography", "experience", "specifications"]}
                                         intend="double"
-                                        onItemsSelect={(e: AccentedTreeItemProps) => navigateToSection(e.id, router, siteMapVisibility, t)}
+                                        onItemsSelect={(e: AccentedTreeItemProps) => navigateToSection(e.id, router, siteMapVisibility, t, resolvedLinks)}
                                         sx={{
                                             minWidth: "220px",
                                             "& .MuiTreeItem-content": {
@@ -715,7 +674,7 @@ export default function SiteMap() {
                                             e &&
                                             Array.isArray(e) &&
                                             e.length > 0 &&
-                                            navigateToSection(e[0].id, router, siteMapVisibility, t)
+                                            navigateToSection(e[0].id, router, siteMapVisibility, t, resolvedLinks)
                                         }
                                         sx={{
                                             minWidth: "230px",
@@ -736,33 +695,25 @@ export default function SiteMap() {
                                             display: "flex",
                                             flexDirection: "column",
                                             alignItems: "start",
-                                            width: "150px",
+                                            width: "fit-content",
                                             "& button": {
                                                 width: "100%",
                                                 margin: 0,
+                                                maxWidth: "none",
+                                                whiteSpace: "nowrap",
                                             },
                                         }}
                                     >
-                                        <ContactButton contact="telegram" accented={isContactsPage} borders="0 0 1 1" />
-                                        <ContactButton
-                                            contact="email"
-                                            accented={isContactsPage}
-                                            borders="0 1 1 0"
-                                            hoverBorders="0 1 1 1"
-                                        />
-                                        <ContactButton
-                                            contact="linkedin"
-                                            accented={isContactsPage}
-                                            borders="0 0 1 1"
-                                            hoverBorders="0 1 1 1"
-                                        />
-                                        <ContactButton
-                                            contact="github"
-                                            accented={isContactsPage}
-                                            borders="0 1 0 0"
-                                            hoverBorders="0 1 0 1"
-                                        />
-                                        <ContactButton contact="write" accented={isContactsPage} />
+                                        {contacts.map((c, i) => (
+                                            <ContactButton
+                                                key={c.id}
+                                                contact={c}
+                                                accented={isContactsPage}
+                                                borders={i % 2 === 0 ? "0 0 1 1" : "0 1 1 0"}
+                                                hoverBorders={i === 0 ? "1 1 1 1" : "0 1 1 1"}
+                                            />
+                                        ))}
+                                        <ContactButton contact={writeContact} accented={isContactsPage} borders="0 1 1 1" hoverBorders="0 1 1 1" />
                                     </Box>
                                 </Box>
                             </>

@@ -80,7 +80,7 @@ function SortableItem({ id, children, onDelete }: SortableItemProps) {
                 <IconButton
                     size="small"
                     onClick={onDelete}
-                    sx={{ color: theme.palette.error.main, mt: 0.5 }}
+                    sx={{ color: getThemeColor("tabIcon", theme), mt: 0.5, "&:hover": { color: theme.palette.error.main } }}
                 >
                     <DeleteIcon fontSize="small" />
                 </IconButton>

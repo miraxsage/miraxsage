@@ -6,7 +6,8 @@ import CodeBackground from "../CodeBackground";
 import FloatingLine from "../FloatingLine";
 import HelloBlock from "./HelloBlock";
 import { ScrollObservable } from "@/widgets/landing/types";
-import { useColorMode } from "@/shared/lib/store/appearanceSlice";
+import type { InfoBlock } from "@/widgets/landing/MainSlide";
+import { useColorMode, useLanguage } from "@/shared/lib/store/appearanceSlice";
 import AboutMeBlock from "./AboutMeBlock";
 import SkillsBlock from "./SkillsBlock";
 import ExperienceBlock from "./ExperienceBlock";
@@ -18,9 +19,10 @@ import { debounce } from "@/shared/lib/common";
 
 type AboutSlideProps = {
     scrollObservable?: ScrollObservable;
+    infoBlocks: InfoBlock[];
 };
 
-const blocks = {
+const blockComponents: Record<string, React.ComponentType<{ id: string; sx?: import("@mui/material").SxProps; title?: [string, string, string, string?]; content?: string }>> = {
     hello: HelloBlock,
     "about-me": AboutMeBlock,
     skills: SkillsBlock,
@@ -29,8 +31,15 @@ const blocks = {
     team: TeamBlock,
 };
 
-export function AboutSlide({ scrollObservable }: AboutSlideProps) {
+function parseTitleParts(raw: string): [string, string, string, string?] {
+    const match = raw.match(/^(.*?)\[(.+?)\]\s*(.+?)(?:\s+(.+))?$/);
+    if (!match) return [raw, "", "", undefined];
+    return [match[1].trim(), match[2], match[3].trim(), match[4]?.trim() || undefined];
+}
+
+export function AboutSlide({ scrollObservable, infoBlocks }: AboutSlideProps) {
     const theme = useTheme();
+    const lang = useLanguage();
     const isDarkMode = useColorMode().dark;
     const layoutBackgroundColor = getThemeColor("layoutBackground", theme);
     const rootRef = useRef<HTMLDivElement | undefined>();
@@ -68,7 +77,7 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
                         vars.vw = vw;
                         vars.halfvh = vh / 2;
                         vars.pxToAboutSlide = vars.halfvh + 0.1763269807 * vw;
-                        vars.blocksKeys = Object.keys(blocks);
+                        vars.blocksKeys = infoBlocks.map((b) => b.slug);
                         vars.blocksElements = [];
                         vars.blocksInnerScrollHeights = vars.blocksKeys.map((id) => {
                             const block = rootRef.current?.querySelector(`#${id}-block`);
@@ -277,9 +286,13 @@ export function AboutSlide({ scrollObservable }: AboutSlideProps) {
                         margin: "0 auto",
                     }}
                 >
-                    {Object.entries(blocks).map(([id, Block]) => (
-                        <Block key={id} id={`${id}-block`} />
-                    ))}
+                    {infoBlocks.map((block) => {
+                        const Block = blockComponents[block.slug];
+                        if (!Block) return null;
+                        const title = parseTitleParts(lang.ru ? block.title_ru : block.title_en);
+                        const content = lang.ru ? block.content_ru : block.content_en;
+                        return <Block key={block.slug} id={`${block.slug}-block`} title={title} content={content} />;
+                    })}
                 </Box>
             </Box>
             <Box id="about-scrolling-placeholder" sx={{ width: "100%", background: "transparent" }}></Box>

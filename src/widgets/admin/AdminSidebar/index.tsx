@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Box, Typography, useTheme } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -74,6 +75,8 @@ export default function AdminSidebar({ onNavigate }: AdminSidebarProps) {
         <Box sx={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
             {/* Logo area */}
             <Box
+                component={Link}
+                href="/"
                 sx={{
                     display: "flex",
                     alignItems: "center",
@@ -82,6 +85,7 @@ export default function AdminSidebar({ onNavigate }: AdminSidebarProps) {
                     pr: "38px",
                     minHeight: 55,
                     borderBottom: `1px solid ${theme.palette.divider}`,
+                    textDecoration: "none",
                 }}
             >
                 <Box
@@ -93,19 +97,20 @@ export default function AdminSidebar({ onNavigate }: AdminSidebarProps) {
                         alignItems: "center",
                         justifyContent: "center",
                         "& svg": { width: 26, height: 26 },
+                        color: getThemeColor("tabIcon", theme),
                     }}
                 >
                     <LogoIcon />
                 </Box>
                 <Typography
                     sx={{
-                        fontWeight: 600,
+                        fontWeight: 400,
                         fontSize: "1.05rem",
-                        color: getThemeColor("menuText", theme),
+                        color: getThemeColor("tabIcon", theme),
                         whiteSpace: "nowrap",
                     }}
                 >
-                    {__("Administration", lang)}
+                    Miraxsage
                 </Typography>
             </Box>
 

@@ -64,15 +64,23 @@ CREATE TABLE IF NOT EXISTS landing_info_blocks (
   content_en TEXT NOT NULL DEFAULT '',
   content_ru TEXT NOT NULL DEFAULT '',
   illustration TEXT,
-  image_url TEXT,
-  additional_content_type TEXT,
-  additional_content_data TEXT,
   is_visible INTEGER NOT NULL DEFAULT 1
+);
+
+-- Landing: get closer slide
+CREATE TABLE IF NOT EXISTS landing_get_closer (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  title_en TEXT NOT NULL,
+  title_ru TEXT NOT NULL,
+  content_en TEXT NOT NULL DEFAULT '',
+  content_ru TEXT NOT NULL DEFAULT ''
 );
 
 -- Landing: footer
 CREATE TABLE IF NOT EXISTS landing_footer (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  sort_order INTEGER NOT NULL DEFAULT 0,
   content_en TEXT NOT NULL DEFAULT '',
   content_ru TEXT NOT NULL DEFAULT ''
 );
@@ -252,7 +260,8 @@ CREATE TABLE IF NOT EXISTS contact_info (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   sort_order INTEGER NOT NULL DEFAULT 0,
   type TEXT NOT NULL DEFAULT 'link',
-  title TEXT NOT NULL,
+  title_en TEXT NOT NULL DEFAULT '',
+  title_ru TEXT NOT NULL DEFAULT '',
   icon TEXT,
   url TEXT,
   is_visible INTEGER NOT NULL DEFAULT 1

@@ -46,6 +46,53 @@ export interface TitleVariant {
     text_ru: string;
 }
 
+export interface InfoBlock {
+    id: number;
+    slug: string;
+    sort_order: number;
+    title_en: string;
+    title_ru: string;
+    content_en: string;
+    content_ru: string;
+    illustration: string;
+    is_visible: number;
+}
+
+export interface GetCloserItem {
+    id: number;
+    title_en: string;
+    title_ru: string;
+    content_en: string;
+    content_ru: string;
+}
+
+export interface FooterItem {
+    id: number;
+    sort_order: number;
+    content_en: string;
+    content_ru: string;
+}
+
+export interface ContactItem {
+    id: number;
+    sort_order: number;
+    type: string;
+    title_en: string;
+    title_ru: string;
+    icon: string;
+    url: string;
+    is_visible: number;
+}
+
+export const CONTACT_ICON_MAP: Record<string, React.ReactNode> = {
+    TelegramIcon: <TelegramIcon />,
+    EmailIcon: <AlternateEmailOutlinedIcon />,
+    AlternateEmailOutlinedIcon: <AlternateEmailOutlinedIcon />,
+    LinkedInIcon: <LinkedInIcon />,
+    GitHubIcon: <GitHub />,
+    GitHub: <GitHub />,
+};
+
 const ICON_MAP: Record<string, SvgIconComponent> = {
     AssignmentIndIcon,
     PersonIcon,
@@ -311,7 +358,7 @@ function WebDeveloperShield({ titles }: { titles: string[] }) {
     );
 }
 
-function SlideContent({ buttons, titleVariants }: { buttons: LandingButton[]; titleVariants: TitleVariant[] }) {
+function SlideContent({ buttons, titleVariants, contacts }: { buttons: LandingButton[]; titleVariants: TitleVariant[]; contacts: ContactItem[] }) {
     const theme = useTheme();
     const lang = useAppearance().language;
     const titles = titleVariants.map((v) => (lang === "en" ? v.text_en : v.text_ru));
@@ -471,21 +518,15 @@ function SlideContent({ buttons, titleVariants }: { buttons: LandingButton[]; ti
                                 }}
                             >
                                 <Box className="flex">
-                                    <TransparentButton onClick={linkClick("https://t.me/miraxsage")}>
-                                        <TelegramIcon />
-                                    </TransparentButton>
-                                    <TransparentButton onClick={linkClick("mailto:manin.maxim@mail.ru")}>
-                                        <AlternateEmailOutlinedIcon />
-                                    </TransparentButton>
-                                    <TransparentButton onClick={linkClick("https://www.linkedin.com/in/miraxsage")}>
-                                        <LinkedInIcon />
-                                    </TransparentButton>
-                                    <TransparentButton
-                                        onClick={linkClick("https://github.com/miraxsage/")}
-                                        dividerSize="collapsed"
-                                    >
-                                        <GitHub />
-                                    </TransparentButton>
+                                    {contacts.map((contact, i) => (
+                                        <TransparentButton
+                                            key={contact.id}
+                                            onClick={linkClick(contact.url)}
+                                            dividerSize={i === contacts.length - 1 ? "collapsed" : undefined}
+                                        >
+                                            {CONTACT_ICON_MAP[contact.icon]}
+                                        </TransparentButton>
+                                    ))}
                                 </Box>
                             </Box>
                         </Box>
@@ -535,9 +576,10 @@ type MainSlideProps = {
     scrollObservable?: ScrollObservable;
     buttons: LandingButton[];
     titleVariants: TitleVariant[];
+    contacts: ContactItem[];
 };
 
-export default function MainSlide({ scrollObservable, buttons, titleVariants }: MainSlideProps) {
+export default function MainSlide({ scrollObservable, buttons, titleVariants, contacts }: MainSlideProps) {
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;
     const pageBgColor = getThemeColor("pageBgColor", theme);
@@ -641,7 +683,7 @@ export default function MainSlide({ scrollObservable, buttons, titleVariants }: 
                     height: "100vh",
                 }}
             />
-            <SlideContent buttons={buttons} titleVariants={titleVariants} />
+            <SlideContent buttons={buttons} titleVariants={titleVariants} contacts={contacts} />
         </Box>
     );
 }

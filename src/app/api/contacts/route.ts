@@ -61,6 +61,7 @@ export async function PUT(request: NextRequest) {
         transaction();
 
         revalidatePath("/interact");
+        revalidatePath("/");
 
         return successResponse(`Section "${section}" updated successfully`);
     } catch (error) {

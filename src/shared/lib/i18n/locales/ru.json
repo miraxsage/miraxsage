@@ -187,10 +187,12 @@
     "navigation labels": "навигационные метки",
     "ui labels": "метки UI",
     "landing labels": "метки лендинга",
-    "title variants": "варианты заголовка",
+    "qualifications": "квалификации",
     "buttons": "кнопки",
     "info blocks": "инфо-блоки",
+    "get closer": "познакомимся ближе",
     "footer": "подвал",
+
 
     "categories": "категории",
     "questionnaire": "анкета",
@@ -239,8 +241,6 @@
     "text": "текст",
     "illustration": "иллюстрация",
     "image url": "ссылка на изображение",
-    "additional content type": "тип дополнительного контента",
-    "additional content data": "данные дополнительного контента",
     "section name": "название раздела",
     "parent id": "родительский id",
     "chart type": "тип графика",

@@ -11,6 +11,7 @@ import SiteMap from "@/widgets/layout/SiteMap";
 import { CategoryLabelsContext, CategoryLabelsMap } from "@/entities/resume/model/categoryLabels";
 import { UiLabelsContext, UiLabelsMap } from "@/entities/ui-labels/model/uiLabelsContext";
 import { ResumeDataContext, ResumeData } from "@/entities/resume/model/resumeDataContext";
+import type { ContactItem } from "@/widgets/landing/MainSlide";
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -18,9 +19,10 @@ interface LayoutProps {
     categoryLabels: CategoryLabelsMap;
     uiLabels: UiLabelsMap;
     resumeData: ResumeData;
+    contacts: ContactItem[];
 }
 
-export default function MainLayout({ children, headerItems, categoryLabels, uiLabels, resumeData }: LayoutProps) {
+export default function MainLayout({ children, headerItems, categoryLabels, uiLabels, resumeData, contacts }: LayoutProps) {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode == "dark";
     const smallHeight = useMediaQuery("@media (max-height:450px)");
@@ -89,10 +91,10 @@ export default function MainLayout({ children, headerItems, categoryLabels, uiLa
                     <AsideMenu />
                     <Box sx={{ flexGrow: 1, maxWidth: "100dvw", position: "relative" }}>
                         {children}
-                        <SiteMap />
+                        <SiteMap contacts={contacts} />
                     </Box>
                 </Box>
-                {!smallHeight && <BottomBar />}
+                {!smallHeight && <BottomBar contacts={contacts} />}
             </Box>
         </Box>
         </ResumeDataContext.Provider>

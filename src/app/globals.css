@@ -60,7 +60,7 @@ a {
 @font-face {
   font-family: "Cascadia";
   src: url("/fonts/CascadiaCodePL-ExtraLight.woff2") format("woff2");
-  font-weight: 400;
+  font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
@@ -68,7 +68,7 @@ a {
 @font-face {
   font-family: "Cascadia";
   src: url("/fonts/CascadiaCodePL-Light.woff2") format("woff2");
-  font-weight: 500;
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }

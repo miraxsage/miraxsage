@@ -1,58 +1,24 @@
 "use client";
-import LandingLink from "../LandingLink";
 import { useLanguage } from "@/shared/lib/store/appearanceSlice";
+import { useLandingColor } from "@/shared/lib/theme";
 import WebDeveloperIllustration from "./WebDeveloperIllustration";
-import Emoji from "../Emoji";
 import AboutBlock from "./AboutBlock";
 import { SxProps } from "@mui/material";
+import renderContent from "./renderContent";
 
-export default function AboutMeBlock({ id, sx }: { id: string; sx?: SxProps }) {
+export default function AboutMeBlock({ id, sx, title, content }: { id: string; sx?: SxProps; title?: [string, string, string, string?]; content?: string }) {
     const lang = useLanguage();
+    const textColor = useLandingColor("contrast");
     return (
         <AboutBlock
             illustration={<WebDeveloperIllustration />}
             order="left"
-            title={lang.ru ? ["Обо", "мне", "👨‍💻"] : ["About", "me", "👨‍💻"]}
+            title={title ?? (lang.ru ? ["Обо", "мне", "👨‍💻"] : ["About", "me", "👨‍💻"])}
             id={id}
             sx={sx}
             squeezedImgHPos="-85% 0%"
         >
-            {lang.ru ? (
-                <>
-                    Программированием{"\u00A0"}
-                    <Emoji e="📟" /> и веб-разработкой я увлекся еще в 11 классе{"\u00A0"}
-                    <Emoji e="🌱" />, далеком 2010-м.
-                    <br />
-                    <br />
-                    Еще тогда мне нравилось собирать сложные, красивые и функциональные интерфейсы. <Emoji e="📱" />
-                    <br />
-                    <br />В 2015 с красным дипломом{"\u00A0"}
-                    <Emoji e="📕" /> окончил <LandingLink href="/about/biography/education">университет</LandingLink>{" "}
-                    <Emoji e="🏦" /> по профильному направлению информационных технологий.
-                    <br />
-                    <br />
-                    Прежде и до сих пор не теряю творческого интереса и вдохновения программировать, проектировать,
-                    порой часами исправлять единственный баг{"\u00A0"}
-                    <Emoji e="🐞" />, но в итоге все равно всегда находить творческое решение. <Emoji e="⛅️" />
-                </>
-            ) : (
-                <>
-                    I became passionate about programming{"\u00A0"}
-                    <Emoji e="📟" /> and web development back in 2010 when I was in the 11th grade{"\u00A0"}
-                    <Emoji e="🌱" />. Even then, I enjoyed creating complex, beautiful, and functional interfaces.{" "}
-                    <Emoji e="📱" />
-                    <br />
-                    <br />
-                    In 2015, I graduated with honors{"\u00A0"}
-                    <Emoji e="📕" /> from <LandingLink href="/about/biography/education">university</LandingLink>
-                    <Emoji e="🏦" /> with a degree in Information Technology.
-                    <br />
-                    <br />
-                    From then on and to this day, I have never lost my creative interest and inspiration for
-                    programming. I love designing, sometimes spending hours fixing a single bug{"\u00A0"}
-                    <Emoji e="🐞" />, but always finding a solution in the end. <Emoji e="⛅️" />
-                </>
-            )}
+            {content ? renderContent(content, textColor) : null}
         </AboutBlock>
     );
 }

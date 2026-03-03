@@ -14,6 +14,8 @@ import {
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import { SortableList, AdminSection, useAdminData, useLocalizedField } from "@/features/admin-editor";
+import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
+import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
 
@@ -46,10 +48,15 @@ interface InfoBlock {
     content_en: string;
     content_ru: string;
     illustration: string;
-    image_url: string;
-    additional_content_type: string;
-    additional_content_data: string;
     is_visible: number;
+}
+
+interface GetCloserItem {
+    id: number;
+    title_en: string;
+    title_ru: string;
+    content_en: string;
+    content_ru: string;
 }
 
 interface FooterItem {
@@ -62,6 +69,7 @@ interface LandingData {
     title_variants: TitleVariant[];
     buttons: LandingButton[];
     info_blocks: InfoBlock[];
+    get_closer: GetCloserItem[];
     footer: FooterItem[];
 }
 
@@ -71,9 +79,10 @@ type SectionKey = keyof LandingData;
 // Helpers
 // ---------------------------------------------------------------------------
 
-const SECTION_TAB_KEYS: { key: SectionKey; label: string }[] = [
-    { key: "title_variants", label: "Title Variants" },
+const SECTION_TAB_KEYS: { key: SectionKey | "landing"; label: string }[] = [
+    { key: "landing", label: "General Labels" },
     { key: "buttons", label: "Buttons" },
+    { key: "title_variants", label: "Qualifications" },
     { key: "info_blocks", label: "Info Blocks" },
     { key: "footer", label: "Footer" },
 ];
@@ -89,7 +98,7 @@ function nextTempId() {
 
 function FieldRow({ children }: { children: React.ReactNode }) {
     return (
-        <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap", mb: 1 }}>
+        <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap", "&:not(:last-child)": { mb: 1 } }}>
             {children}
         </Box>
     );
@@ -109,6 +118,24 @@ export default function AdminLandingPage() {
     const { data, setData, loading, saving, error, success, save } = useAdminData<LandingData>({
         url: "/api/landing",
     });
+
+    const { data: labelsRaw, setData: setLabelsRaw, loading: labelsLoading, save: labelsSave } = useAdminData<UiLabelItem[]>({
+        url: "/api/ui-labels",
+    });
+
+    const labelsItems = labelsRaw ?? [];
+
+    const updateLabel = (id: number | string, field: string, value: string) => {
+        setLabelsRaw((prev) => {
+            if (!prev) return prev;
+            return prev.map((item) => (item.id === id ? { ...item, [field]: value } : item));
+        });
+    };
+
+    const saveLabels = (items: UiLabelItem[]) => {
+        const categoryItems = items.filter((it) => it.category === "landing");
+        labelsSave({ category: "landing", data: categoryItems });
+    };
 
     // ----- section-level data helpers -----
 
@@ -197,9 +224,6 @@ export default function AdminLandingPage() {
             content_en: "",
             content_ru: "",
             illustration: "",
-            image_url: "",
-            additional_content_type: "",
-            additional_content_data: "",
             is_visible: 1,
         };
         const newItems = [...items, newItem];
@@ -207,21 +231,10 @@ export default function AdminLandingPage() {
         saveSection("info_blocks", newItems);
     };
 
-    const addFooterItem = () => {
-        const items = getSection("footer");
-        const newItem: FooterItem = {
-            id: nextTempId(),
-            content_en: "",
-            content_ru: "",
-        };
-        const newItems = [...items, newItem];
-        updateSection("footer", newItems);
-        saveSection("footer", newItems);
-    };
 
     // ----- render -----
 
-    if (loading) {
+    if (loading || labelsLoading) {
         return (
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 48px)" }}>
                 <CircularProgress />
@@ -249,31 +262,13 @@ export default function AdminLandingPage() {
                 ))}
             </Tabs>
 
-            {/* ===== Title Variants ===== */}
+            {/* ===== General Labels ===== */}
             {tab === 0 && (
-                <SortableList
-                    items={getSection("title_variants")}
-                    onReorder={(items) => {
-                        updateSection("title_variants", items);
-                        saveSection("title_variants", items);
-                    }}
-                    onDelete={(id) => {
-                        const newItems = getSection("title_variants").filter((it) => it.id !== id);
-                        updateSection("title_variants", newItems);
-                        saveSection("title_variants", newItems);
-                    }}
-                    onAdd={addTitleVariant}
-                    addLabel={__("Add Title Variant", lang)}
-                    renderItem={(item) => (
-                        <TextField
-                            label={__("Text", lang)}
-                            size="small"
-                            value={lv(item, "text")}
-                            onChange={(e) => updateItem("title_variants", item.id, lk("text"), e.target.value)}
-                            onBlur={() => saveSection("title_variants")}
-                            fullWidth
-                        />
-                    )}
+                <UiLabelsEditor
+                    category="landing"
+                    items={labelsItems}
+                    onUpdate={updateLabel}
+                    onSave={saveLabels}
                 />
             )}
 
@@ -303,7 +298,7 @@ export default function AdminLandingPage() {
                                 sx={{ flex: 1, minWidth: 140 }}
                             />
                             <TextField
-                                label={__("URL", lang)}
+                                label="URL"
                                 size="small"
                                 value={item.url}
                                 onChange={(e) => updateItem("buttons", item.id, "url", e.target.value)}
@@ -323,145 +318,165 @@ export default function AdminLandingPage() {
                 />
             )}
 
-            {/* ===== Info Blocks ===== */}
+            {/* ===== Qualifications ===== */}
             {tab === 2 && (
                 <SortableList
-                    items={getSection("info_blocks")}
+                    items={getSection("title_variants")}
                     onReorder={(items) => {
-                        updateSection("info_blocks", items);
-                        saveSection("info_blocks", items);
+                        updateSection("title_variants", items);
+                        saveSection("title_variants", items);
                     }}
                     onDelete={(id) => {
-                        const newItems = getSection("info_blocks").filter((it) => it.id !== id);
-                        updateSection("info_blocks", newItems);
-                        saveSection("info_blocks", newItems);
+                        const newItems = getSection("title_variants").filter((it) => it.id !== id);
+                        updateSection("title_variants", newItems);
+                        saveSection("title_variants", newItems);
                     }}
-                    onAdd={addInfoBlock}
-                    addLabel={__("Add Info Block", lang)}
-                    renderItem={(item) => (
-                        <Box>
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={item.is_visible === 1}
-                                        onChange={(e) =>
-                                            updateItemAndSave("info_blocks", item.id, "is_visible", e.target.checked ? 1 : 0)
-                                        }
-                                        size="small"
-                                    />
-                                }
-                                label={
-                                    <Typography variant="body2" sx={{ color: menuText }}>
-                                        {__("Visible", lang)}
-                                    </Typography>
-                                }
-                                sx={{ gap: 0.5, mb: "12px" }}
-                            />
-                            <FieldRow>
-                                <TextField
-                                    label={__("Slug", lang)}
-                                    size="small"
-                                    value={item.slug}
-                                    onChange={(e) => updateItem("info_blocks", item.id, "slug", e.target.value)}
-                                    onBlur={() => saveSection("info_blocks")}
-                                    sx={{ flex: 1, minWidth: 140 }}
-                                />
-                                <TextField
-                                    label={__("Title", lang)}
-                                    size="small"
-                                    value={lv(item, "title")}
-                                    onChange={(e) => updateItem("info_blocks", item.id, lk("title"), e.target.value)}
-                                    onBlur={() => saveSection("info_blocks")}
-                                    sx={{ flex: 2, minWidth: 200 }}
-                                />
-                            </FieldRow>
-                            <FieldRow>
-                                <TextField
-                                    label={__("Illustration", lang)}
-                                    size="small"
-                                    value={item.illustration}
-                                    onChange={(e) => updateItem("info_blocks", item.id, "illustration", e.target.value)}
-                                    onBlur={() => saveSection("info_blocks")}
-                                    sx={{ flex: 1, minWidth: 140 }}
-                                />
-                                <TextField
-                                    label={__("Image URL", lang)}
-                                    size="small"
-                                    value={item.image_url}
-                                    onChange={(e) => updateItem("info_blocks", item.id, "image_url", e.target.value)}
-                                    onBlur={() => saveSection("info_blocks")}
-                                    sx={{ flex: 1, minWidth: 140 }}
-                                />
-                            </FieldRow>
-                            <TextField
-                                label={__("Content", lang)}
-                                size="small"
-                                multiline
-                                minRows={3}
-                                fullWidth
-                                value={lv(item, "content")}
-                                onChange={(e) => updateItem("info_blocks", item.id, lk("content"), e.target.value)}
-                                onBlur={() => saveSection("info_blocks")}
-                                sx={{ mb: 1 }}
-                            />
-                            <FieldRow>
-                                <TextField
-                                    label={__("Additional Content Type", lang)}
-                                    size="small"
-                                    value={item.additional_content_type}
-                                    onChange={(e) =>
-                                        updateItem("info_blocks", item.id, "additional_content_type", e.target.value)
-                                    }
-                                    onBlur={() => saveSection("info_blocks")}
-                                    sx={{ flex: 1, minWidth: 160 }}
-                                />
-                                <TextField
-                                    label={__("Additional Content Data", lang)}
-                                    size="small"
-                                    multiline
-                                    minRows={2}
-                                    value={item.additional_content_data}
-                                    onChange={(e) =>
-                                        updateItem("info_blocks", item.id, "additional_content_data", e.target.value)
-                                    }
-                                    onBlur={() => saveSection("info_blocks")}
-                                    sx={{ flex: 2, minWidth: 200 }}
-                                />
-                            </FieldRow>
-                        </Box>
-                    )}
-                />
-            )}
-
-            {/* ===== Footer ===== */}
-            {tab === 3 && (
-                <SortableList
-                    items={getSection("footer")}
-                    onReorder={(items) => {
-                        updateSection("footer", items);
-                        saveSection("footer", items);
-                    }}
-                    onDelete={(id) => {
-                        const newItems = getSection("footer").filter((it) => it.id !== id);
-                        updateSection("footer", newItems);
-                        saveSection("footer", newItems);
-                    }}
-                    onAdd={addFooterItem}
-                    addLabel={__("Add Footer Item", lang)}
+                    onAdd={addTitleVariant}
+                    addLabel={__("Add Title Variant", lang)}
                     renderItem={(item) => (
                         <TextField
-                            label={__("Content", lang)}
+                            label={__("Text", lang)}
                             size="small"
-                            multiline
-                            minRows={2}
+                            value={lv(item, "text")}
+                            onChange={(e) => updateItem("title_variants", item.id, lk("text"), e.target.value)}
+                            onBlur={() => saveSection("title_variants")}
                             fullWidth
-                            value={lv(item, "content")}
-                            onChange={(e) => updateItem("footer", item.id, lk("content"), e.target.value)}
-                            onBlur={() => saveSection("footer")}
                         />
                     )}
                 />
             )}
+
+            {/* ===== Info Blocks ===== */}
+            {tab === 3 && (
+                <Box>
+                    <SortableList
+                        items={getSection("info_blocks")}
+                        onReorder={(items) => {
+                            updateSection("info_blocks", items);
+                            saveSection("info_blocks", items);
+                        }}
+                        onDelete={(id) => {
+                            const newItems = getSection("info_blocks").filter((it) => it.id !== id);
+                            updateSection("info_blocks", newItems);
+                            saveSection("info_blocks", newItems);
+                        }}
+                        onAdd={addInfoBlock}
+                        addLabel={__("Add Info Block", lang)}
+                        renderItem={(item) => (
+                            <Box>
+                                <FormControlLabel
+                                    control={
+                                        <Switch
+                                            checked={item.is_visible === 1}
+                                            onChange={(e) =>
+                                                updateItemAndSave("info_blocks", item.id, "is_visible", e.target.checked ? 1 : 0)
+                                            }
+                                            size="small"
+                                        />
+                                    }
+                                    label={
+                                        <Typography variant="body2" sx={{ color: menuText }}>
+                                            {__("Visible", lang)}
+                                        </Typography>
+                                    }
+                                    sx={{ gap: 0.5, mb: "12px" }}
+                                />
+                                <FieldRow>
+                                    <TextField
+                                        label={__("Slug", lang)}
+                                        size="small"
+                                        value={item.slug}
+                                        onChange={(e) => updateItem("info_blocks", item.id, "slug", e.target.value)}
+                                        onBlur={() => saveSection("info_blocks")}
+                                        sx={{ flex: 1, minWidth: 140 }}
+                                    />
+                                    <TextField
+                                        label={__("Title", lang)}
+                                        size="small"
+                                        value={lv(item, "title")}
+                                        onChange={(e) => updateItem("info_blocks", item.id, lk("title"), e.target.value)}
+                                        onBlur={() => saveSection("info_blocks")}
+                                        sx={{ flex: 2, minWidth: 200 }}
+                                    />
+                                </FieldRow>
+                                <FieldRow>
+                                    <TextField
+                                        label={__("Illustration", lang)}
+                                        size="small"
+                                        value={item.illustration}
+                                        onChange={(e) => updateItem("info_blocks", item.id, "illustration", e.target.value)}
+                                        onBlur={() => saveSection("info_blocks")}
+                                        sx={{ flex: 1, minWidth: 140 }}
+                                    />
+                                </FieldRow>
+                                <TextField
+                                    label={__("Content", lang)}
+                                    size="small"
+                                    multiline
+                                    minRows={3}
+                                    fullWidth
+                                    value={lv(item, "content")}
+                                    onChange={(e) => updateItem("info_blocks", item.id, lk("content"), e.target.value)}
+                                    onBlur={() => saveSection("info_blocks")}
+                                    sx={{ mb: 1 }}
+                                />
+                            </Box>
+                        )}
+                    />
+
+                    {/* --- Get Closer --- */}
+                    {(() => {
+                        const items = getSection("get_closer");
+                        const item = items[0];
+                        if (!item) return null;
+                        return (
+                            <Box sx={{ mt: 3, pt: 3, borderTop: `1px solid ${theme.palette.divider}` }}>
+                                <Typography variant="subtitle2" sx={{ color: menuText, mb: 1.5 }}>
+                                    {__("Get Closer", lang)}
+                                </Typography>
+                                <TextField
+                                    label={__("Title", lang)}
+                                    size="small"
+                                    value={lv(item, "title")}
+                                    onChange={(e) => updateItem("get_closer", item.id, lk("title"), e.target.value)}
+                                    onBlur={() => saveSection("get_closer")}
+                                    fullWidth
+                                    sx={{ mb: 1 }}
+                                />
+                                <TextField
+                                    label={__("Content", lang)}
+                                    size="small"
+                                    multiline
+                                    minRows={3}
+                                    fullWidth
+                                    value={lv(item, "content")}
+                                    onChange={(e) => updateItem("get_closer", item.id, lk("content"), e.target.value)}
+                                    onBlur={() => saveSection("get_closer")}
+                                />
+                            </Box>
+                        );
+                    })()}
+                </Box>
+            )}
+
+            {/* ===== Footer ===== */}
+            {tab === 4 && (() => {
+                const items = getSection("footer");
+                const item = items[0];
+                if (!item) return null;
+                return (
+                    <TextField
+                        label={__("Content", lang)}
+                        size="small"
+                        multiline
+                        minRows={2}
+                        fullWidth
+                        value={lv(item, "content")}
+                        onChange={(e) => updateItem("footer", item.id, lk("content"), e.target.value)}
+                        onBlur={() => saveSection("footer")}
+                    />
+                );
+            })()}
         </AdminSection>
     );
 }

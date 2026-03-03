@@ -3,14 +3,12 @@
 import { Box, alpha, useMediaQuery, useTheme } from "@mui/material";
 import { HorizontalPanelButton } from "@/shared/ui/PanelButtons";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import TelegramIcon from "@/shared/icons/TelegramIcon";
-import { GitHub as GithubIcon } from "@mui/icons-material";
 import { useThemeColor } from "@/shared/lib/theme";
 import { useColorMode } from "@/shared/lib/store/appearanceSlice";
+import type { ContactItem } from "@/widgets/landing/MainSlide";
+import { CONTACT_ICON_MAP } from "@/widgets/landing/MainSlide";
 
-export default function BottomBar() {
+export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
     const theme = useTheme();
     const goTo = (link: string) => () => {
         window.open(link, "_blank");
@@ -49,38 +47,17 @@ export default function BottomBar() {
                     </Box>
                 </>
             )}
-            <HorizontalPanelButton
-                onClick={goTo("https://t.me/miraxsage")}
-                dividerSide="left"
-                dividerSize={smScreen ? "removed" : "full"}
-                iconMode={true}
-            >
-                <TelegramIcon />
-            </HorizontalPanelButton>
-            <HorizontalPanelButton
-                onClick={goTo("mailto:manin.maxim@mail.ru")}
-                dividerSide="left"
-                dividerSize="squeezed"
-                iconMode={true}
-            >
-                <AlternateEmailOutlinedIcon />
-            </HorizontalPanelButton>
-            <HorizontalPanelButton
-                onClick={goTo("https://www.linkedin.com/in/miraxsage")}
-                dividerSide="left"
-                dividerSize="squeezed"
-                iconMode={true}
-            >
-                <LinkedInIcon />
-            </HorizontalPanelButton>
-            <HorizontalPanelButton
-                onClick={goTo("https://github.com/miraxsage/")}
-                dividerSide="left"
-                dividerSize="squeezed"
-                iconMode={true}
-            >
-                <GithubIcon />
-            </HorizontalPanelButton>
+            {contacts.map((contact, i) => (
+                <HorizontalPanelButton
+                    key={contact.id}
+                    onClick={goTo(contact.url)}
+                    dividerSide="left"
+                    dividerSize={i === 0 ? (smScreen ? "removed" : "full") : "squeezed"}
+                    iconMode={true}
+                >
+                    {CONTACT_ICON_MAP[contact.icon]}
+                </HorizontalPanelButton>
+            ))}
         </Box>
     );
 }
