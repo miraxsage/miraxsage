@@ -8,7 +8,7 @@ import { getThemeColor, useThemeColor } from "@/shared/lib/theme";
 import __ from "@/shared/lib/i18n/translation";
 import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import { usePathname, useRouter } from "next/navigation";
-import { useAppearance, useSiteMapVisibility } from "@/shared/lib/store/appearanceSlice";
+import { useSiteMapVisibility } from "@/shared/lib/store/appearanceSlice";
 import CustomBreadcrumbs from "@/shared/ui/Breadcrumbs";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import CallIcon from "@mui/icons-material/Call";
@@ -37,16 +37,13 @@ function MobileRootBreadcrumb({ headerItems }: { headerItems: HeaderItem[] }) {
     const pathname = usePathname();
     const theme = useTheme();
     const router = useRouter();
-    const lang = useAppearance().language;
-    const locLabel = (item: HeaderItem) => (lang === "en" ? item.label_en : item.label_ru);
-
     const t = useUiLabels();
     const breadcrumbsItems = [
         { label: t("Home"), icon: <HomeIcon />, link: "/" },
         ...headerItems.map((item) => {
             const IconComp = ICON_MAP[item.icon];
             return {
-                label: locLabel(item),
+                label: t(item.label_en),
                 icon: IconComp ? <IconComp /> : undefined,
                 link: item.url,
             };
@@ -95,8 +92,7 @@ export default function TopMenu({ headerItems }: { headerItems: HeaderItem[] }) 
     const theme = useTheme();
     const smScreen = useMediaQuery(theme.breakpoints.down("sm"));
     const siteMapVisibility = useSiteMapVisibility();
-    const lang = useAppearance().language;
-    const locLabel = (item: HeaderItem) => (lang === "en" ? item.label_en : item.label_ru);
+    const t = useUiLabels();
 
     const onTabSelect = (tab: AccentedTabProps) => {
         if (siteMapVisibility.shown) {
@@ -109,7 +105,7 @@ export default function TopMenu({ headerItems }: { headerItems: HeaderItem[] }) 
         { id: "miraxsage", title: "_Miraxsage", active: false },
         ...headerItems.map((item) => ({
             id: item.url.replace("/", ""),
-            title: `_${locLabel(item)}`,
+            title: `_${t(item.label_en)}`,
             active: pathname.startsWith(item.url),
         })),
     ];

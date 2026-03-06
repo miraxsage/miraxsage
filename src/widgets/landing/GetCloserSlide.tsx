@@ -416,7 +416,7 @@ export default function GetCloserSlide({ getCloser, footer, contacts }: { getClo
                                         },
                                         {
                                             id: "/projects",
-                                            title: t("Projects"),
+                                            title: t("Portfolio"),
                                             icon: <RocketLaunchIcon />,
                                         },
                                     ],

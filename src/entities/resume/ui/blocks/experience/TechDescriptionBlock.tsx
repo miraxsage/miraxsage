@@ -71,7 +71,7 @@ export default function TechDescriptionBlock({
                 ],
                 buttons: [
                     {
-                        label: t("Projects"),
+                        label: t("Portfolio"),
                         icon: <RocketLaunchIcon sx={{ fontSize: "20px", margin: "0px 5px 2px 0px" }} />,
                         link: `/projects?techs=${category}`,
                     },

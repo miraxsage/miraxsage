@@ -482,7 +482,6 @@ export default function AdminResumePage() {
             case 0:
                 return (
                     <AdminSection
-                        title={__("Categories", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -525,7 +524,6 @@ export default function AdminResumePage() {
             case 1:
                 return (
                     <AdminSection
-                        title={__("General Data", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -563,7 +561,6 @@ export default function AdminResumePage() {
             case 2:
                 return (
                     <AdminSection
-                        title={__("Education", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -620,7 +617,6 @@ export default function AdminResumePage() {
             case 3:
                 return (
                     <AdminSection
-                        title={__("Labor", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -677,7 +673,6 @@ export default function AdminResumePage() {
             case 4:
                 return (
                     <AdminSection
-                        title={__("Questionnaire", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -723,7 +718,6 @@ export default function AdminResumePage() {
             case 5:
                 return (
                     <AdminSection
-                        title={__("Achievements", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -754,7 +748,6 @@ export default function AdminResumePage() {
             case 6:
                 return (
                     <AdminSection
-                        title={__("Soft Skills", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -795,7 +788,6 @@ export default function AdminResumePage() {
             case 7:
                 return (
                     <AdminSection
-                        title={__("Metrics", lang)}
                         saving={saving}
                         error={error}
                         success={success}
@@ -849,7 +841,6 @@ export default function AdminResumePage() {
             case 8:
                 return (
                     <AdminSection
-                        title={__("General Labels", lang)}
                         saving={labelsSaving}
                         error={labelsError}
                         success={labelsSuccess}

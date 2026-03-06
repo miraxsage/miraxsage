@@ -1,0 +1,6 @@
+DELETE FROM contact_page_content WHERE section IN ('intro', 'headline_main', 'headline_sub', 'intro_p1', 'intro_p2');
+INSERT INTO contact_page_content (section, content_en, content_ru) VALUES
+  ('headline_main', 'Thank you!', 'Большое спасибо!'),
+  ('headline_sub', 'for Your attention', 'за Ваше внимание'),
+  ('intro_p1', 'I sincerely thank you for visiting my humble website and I truly hope it has managed to evoke positive visual, aesthetic, and functional emotions in you. Perhaps you might even feel inclined to write to me, ask a question, or make a suggestion. Honestly, I would be very happy to receive your feedback.', 'Я Вас сердечно благодарю за посещение моего скромного сайта и очень надеюсь, что у него получилось вызвать у Вас положительные эмоции визуального, эстетического, функционального плана и, возможно, Вам захотелось написать мне, задать вопрос или сделать предложение. Честно говоря, я буду очень рад получить от Вас обратную связь.'),
+  ('intro_p2', 'You can send me a message via one of the listed social networks (I use Telegram more often), by email, or directly on this page using the feedback form below.', 'Вы можете отправить мне сообщение в одной из указанных соцсетей (я чаще использую Telegram), по электронной почте или написать его прямо на этой странице через форму обратной связи ниже.');

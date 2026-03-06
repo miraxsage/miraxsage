@@ -6,6 +6,7 @@ import { Box, IconButton, useTheme, useMediaQuery } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { getThemeColor } from "@/shared/lib/theme";
 import AdminSidebar from "@/widgets/admin/AdminSidebar";
+import CustomScrollbar from "@/shared/ui/Scrollbar";
 
 export default function AdminLayoutClient({ children }: { children: React.ReactNode }) {
     const theme = useTheme();
@@ -63,26 +64,27 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
                 sx={{
                     flex: 1,
                     height: "100vh",
-                    overflow: "auto",
                     background: getThemeColor("layoutBackground", theme),
                 }}
             >
-                {/* Mobile header */}
-                {!isLoginPage && isSmallScreen && (
-                    <Box
-                        sx={{
-                            p: 1,
-                            borderBottom: `1px solid ${theme.palette.divider}`,
-                            background: getThemeColor("barBackground", theme),
-                        }}
-                    >
-                        <IconButton onClick={() => setSidebarOpen(true)} size="small">
-                            <MenuIcon />
-                        </IconButton>
-                    </Box>
-                )}
+                <CustomScrollbar>
+                    {/* Mobile header */}
+                    {!isLoginPage && isSmallScreen && (
+                        <Box
+                            sx={{
+                                p: 1,
+                                borderBottom: `1px solid ${theme.palette.divider}`,
+                                background: getThemeColor("barBackground", theme),
+                            }}
+                        >
+                            <IconButton onClick={() => setSidebarOpen(true)} size="small">
+                                <MenuIcon />
+                            </IconButton>
+                        </Box>
+                    )}
 
-                <Box sx={{ p: isLoginPage ? 0 : 3 }}>{children}</Box>
+                    <Box sx={{ p: isLoginPage ? 0 : 3 }}>{children}</Box>
+                </CustomScrollbar>
             </Box>
         </Box>
     );

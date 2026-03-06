@@ -9,9 +9,24 @@ const contactLinks = [
 
 const pageContent = [
     {
-        section: "intro",
-        content_en: "Feel free to reach out to me through any of the channels below. I'm always open to discussing new projects, creative ideas, or opportunities to be part of something great.",
-        content_ru: "Не стесняйтесь связаться со мной через любой из каналов ниже. Я всегда открыт для обсуждения новых проектов, креативных идей или возможностей стать частью чего-то великого.",
+        section: "headline_main",
+        content_en: "Thank you!",
+        content_ru: "Большое спасибо!",
+    },
+    {
+        section: "headline_sub",
+        content_en: "for Your attention",
+        content_ru: "за Ваше внимание",
+    },
+    {
+        section: "intro_p1",
+        content_en: "I sincerely thank you for visiting my humble website and I truly hope it has managed to evoke positive visual, aesthetic, and functional emotions in you. Perhaps you might even feel inclined to write to me, ask a question, or make a suggestion. Honestly, I would be very happy to receive your feedback.",
+        content_ru: "Я Вас сердечно благодарю за посещение моего скромного сайта и очень надеюсь, что у него получилось вызвать у Вас положительные эмоции визуального, эстетического, функционального плана и, возможно, Вам захотелось написать мне, задать вопрос или сделать предложение. Честно говоря, я буду очень рад получить от Вас обратную связь.",
+    },
+    {
+        section: "intro_p2",
+        content_en: "You can send me a message via one of the listed social networks (I use Telegram more often), by email, or directly on this page using the feedback form below.",
+        content_ru: "Вы можете отправить мне сообщение в одной из указанных соцсетей (я чаще использую Telegram), по электронной почте или написать его прямо на этой странице через форму обратной связи ниже.",
     },
 ];
 

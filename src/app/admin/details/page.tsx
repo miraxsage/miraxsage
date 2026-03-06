@@ -24,20 +24,29 @@ import { getThemeColor } from "@/shared/lib/theme";
 // Types
 // ---------------------------------------------------------------------------
 
-interface HeaderItem {
-    id: number;
-    sort_order: number;
-    type: string;
-    label_en: string;
-    label_ru: string;
-    icon: string;
-    url: string;
-    is_visible: number;
-}
+// ---------------------------------------------------------------------------
+// Label display names (localized chip labels for admin UI)
+// ---------------------------------------------------------------------------
 
-interface DetailsData {
-    header_items: HeaderItem[];
-}
+const KEY_LABELS: Record<string, { en: string; ru: string }> = {
+    // details_ui
+    "Dark mode": { en: "Dark mode", ru: "Тёмный режим" },
+    "Light mode": { en: "Light mode", ru: "Светлый режим" },
+    "English": { en: "English language", ru: "Английский язык" },
+    "Русский язык": { en: "Russian language", ru: "Русский язык" },
+    "Full screen": { en: "Fullscreen mode", ru: "Полный экран" },
+    "In window": { en: "Window mode", ru: "Оконный режим" },
+    "Console": { en: "Console", ru: "Консоль" },
+    "User interface": { en: "User interface", ru: "Интерфейс" },
+    // details_navigation
+    "Home": { en: "Home", ru: "Главная" },
+    "Resume": { en: "Resume", ru: "Резюме" },
+    "Portfolio": { en: "Portfolio", ru: "Портфолио" },
+    "Interact": { en: "Interact", ru: "Контакты" },
+"Download PDF": { en: "Download PDF", ru: "Скачать PDF" },
+    "Write": { en: "Write", ru: "Написать" },
+    "Resume filename": { en: "Resume filename", ru: "Имя файла резюме" },
+};
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -57,7 +66,6 @@ function FieldRow({ children }: { children: React.ReactNode }) {
 }
 
 const TAB_KEYS = [
-    { key: "header_items" as const, label: "Header Items" },
     { key: "contacts" as const, label: "Contacts" },
     { key: "general_labels" as const, label: "General Labels" },
 ];
@@ -73,11 +81,7 @@ export default function AdminDetailsPage() {
 
     const [tab, setTab] = useState(0);
 
-    const { data, setData, loading, saving, error, success, save } = useAdminData<DetailsData>({
-        url: "/api/landing",
-    });
-
-    const { data: labelsRaw, setData: setLabelsRaw, loading: labelsLoading, save: labelsSave } = useAdminData<UiLabelItem[]>({
+    const { data: labelsRaw, setData: setLabelsRaw, loading: labelsLoading, saving: labelsSaving, error: labelsError, success: labelsSuccess, save: labelsSave } = useAdminData<UiLabelItem[]>({
         url: "/api/ui-labels",
     });
 
@@ -137,47 +141,9 @@ export default function AdminDetailsPage() {
         labelsSave({ category, data: categoryItems });
     };
 
-    const items = data?.header_items ?? [];
+    const chipLabel = (key: string) => KEY_LABELS[key]?.[lang] ?? key;
 
-    const updateItems = (newItems: HeaderItem[]) => {
-        if (!data) return;
-        setData({ ...data, header_items: newItems });
-    };
-
-    const updateItem = (id: number | string, field: string, value: unknown) => {
-        updateItems(
-            items.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
-        );
-    };
-
-    const saveItems = (list?: HeaderItem[]) => {
-        const ordered = (list ?? items).map((it, i) => ({ ...it, sort_order: i }));
-        save({ section: "header_items", data: ordered });
-    };
-
-    const updateItemAndSave = (id: number | string, field: string, value: unknown) => {
-        const newItems = items.map((item) => (item.id === id ? { ...item, [field]: value } : item));
-        updateItems(newItems);
-        saveItems(newItems);
-    };
-
-    const addHeaderItem = () => {
-        const newItem: HeaderItem = {
-            id: nextTempId(),
-            sort_order: items.length,
-            type: "link",
-            label_en: "",
-            label_ru: "",
-            icon: "",
-            url: "",
-            is_visible: 1,
-        };
-        const newItems = [...items, newItem];
-        updateItems(newItems);
-        saveItems(newItems);
-    };
-
-    if (loading || labelsLoading || contactsLoading) {
+    if (labelsLoading || contactsLoading) {
         return (
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 48px)" }}>
                 <CircularProgress />
@@ -189,9 +155,9 @@ export default function AdminDetailsPage() {
         <AdminSection
             title={__("Details", lang)}
             icon={<TuneIcon sx={{ color: theme.palette.primary.main, fontSize: 28 }} />}
-            saving={tab === 1 ? contactsSaving : saving}
-            error={tab === 1 ? contactsError : error}
-            success={tab === 1 ? contactsSuccess : success}
+            saving={tab === 0 ? contactsSaving : labelsSaving}
+            error={tab === 0 ? contactsError : labelsError}
+            success={tab === 0 ? contactsSuccess : labelsSuccess}
         >
             <Tabs
                 value={tab}
@@ -205,73 +171,8 @@ export default function AdminDetailsPage() {
                 ))}
             </Tabs>
 
-            {/* ===== Header Items ===== */}
-            {tab === 0 && (
-                <SortableList
-                    items={items}
-                    onReorder={(reordered) => {
-                        updateItems(reordered);
-                        saveItems(reordered);
-                    }}
-                    onDelete={(id) => {
-                        const newItems = items.filter((it) => it.id !== id);
-                        updateItems(newItems);
-                        saveItems(newItems);
-                    }}
-                    onAdd={addHeaderItem}
-                    addLabel={__("Add Header Item", lang)}
-                    renderItem={(item) => (
-                        <Box>
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={item.is_visible === 1}
-                                        onChange={(e) =>
-                                            updateItemAndSave(item.id, "is_visible", e.target.checked ? 1 : 0)
-                                        }
-                                        size="small"
-                                    />
-                                }
-                                label={
-                                    <Typography variant="body2" sx={{ color: menuText }}>
-                                        {__("Visible", lang)}
-                                    </Typography>
-                                }
-                                sx={{ gap: 0.5, mb: "12px" }}
-                            />
-                            <FieldRow>
-                                <TextField
-                                    label={__("Label", lang)}
-                                    size="small"
-                                    value={lv(item, "label")}
-                                    onChange={(e) => updateItem(item.id, lk("label"), e.target.value)}
-                                    onBlur={() => saveItems()}
-                                    sx={{ flex: 1, minWidth: 140 }}
-                                />
-                                <TextField
-                                    label="URL"
-                                    size="small"
-                                    value={item.url}
-                                    onChange={(e) => updateItem(item.id, "url", e.target.value)}
-                                    onBlur={() => saveItems()}
-                                    sx={{ flex: 2, minWidth: 200 }}
-                                />
-                                <TextField
-                                    label={__("Icon", lang)}
-                                    size="small"
-                                    value={item.icon}
-                                    onChange={(e) => updateItem(item.id, "icon", e.target.value)}
-                                    onBlur={() => saveItems()}
-                                    sx={{ flex: 1, minWidth: 100 }}
-                                />
-                            </FieldRow>
-                        </Box>
-                    )}
-                />
-            )}
-
             {/* ===== Contacts ===== */}
-            {tab === 1 && (
+            {tab === 0 && (
                 <SortableList
                     items={contacts}
                     onReorder={(reordered) => {
@@ -336,11 +237,11 @@ export default function AdminDetailsPage() {
             )}
 
             {/* ===== General Labels ===== */}
-            {tab === 2 && (
+            {tab === 1 && (
                 <Box sx={{ display: "grid", gridTemplateColumns: "max-content 1fr", gap: 1.5, alignItems: "center" }}>
                     {labelsItems.filter((it) => it.category === "details_ui").map((item) => (
                         <Fragment key={item.id}>
-                            <Chip label={item.key} size="small" variant="outlined" sx={{ justifyContent: "flex-start", fontFamily: "monospace", fontSize: "0.8rem", color: "#E4E4E5", "& .MuiChip-label": { padding: "6px 12px" } }} />
+                            <Chip label={chipLabel(item.key)} size="small" variant="outlined" sx={{ justifyContent: "flex-start", fontFamily: "monospace", fontSize: "0.8rem", color: "#E4E4E5", "& .MuiChip-label": { padding: "6px 12px" } }} />
                             <TextField
                                 label={__("Value", lang)}
                                 size="small"
@@ -362,7 +263,7 @@ export default function AdminDetailsPage() {
 
                     {labelsItems.filter((it) => it.category === "details_navigation").map((item) => (
                         <Fragment key={item.id}>
-                            <Chip label={item.key} size="small" variant="outlined" sx={{ justifyContent: "flex-start", fontFamily: "monospace", fontSize: "0.8rem", color: "#E4E4E5", "& .MuiChip-label": { padding: "6px 12px" } }} />
+                            <Chip label={chipLabel(item.key)} size="small" variant="outlined" sx={{ justifyContent: "flex-start", fontFamily: "monospace", fontSize: "0.8rem", color: "#E4E4E5", "& .MuiChip-label": { padding: "6px 12px" } }} />
                             <TextField
                                 label={__("Value", lang)}
                                 size="small"

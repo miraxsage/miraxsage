@@ -24,7 +24,7 @@ export default function Projects() {
     const lang = useLanguage().lang;
     const t = useUiLabels();
     useEffect(() => {
-        document.title = t("Projects") + " | Miraxsage";
+        document.title = t("Portfolio") + " | Miraxsage";
     }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
     const theme = useTheme();
     const router = useRouter();

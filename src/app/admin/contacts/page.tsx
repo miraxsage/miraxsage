@@ -1,23 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Box,
     Typography,
-    Button,
     TextField,
     Tabs,
     Tab,
-    Switch,
-    FormControlLabel,
     CircularProgress,
     useTheme,
 } from "@mui/material";
 import CallIcon from "@mui/icons-material/Call";
-import LinkIcon from "@mui/icons-material/Link";
 import ArticleIcon from "@mui/icons-material/Article";
-import AddIcon from "@mui/icons-material/Add";
-import { SortableList, AdminSection, useAdminData, useLocalizedField } from "@/features/admin-editor";
+import { AdminSection, useAdminData, useLocalizedField } from "@/features/admin-editor";
 import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
@@ -27,16 +22,6 @@ import { getThemeColor } from "@/shared/lib/theme";
 // Types
 // ---------------------------------------------------------------------------
 
-interface ContactInfo {
-    id: number;
-    sort_order: number;
-    type: string;
-    title: string;
-    icon: string;
-    url: string;
-    is_visible: number;
-}
-
 interface ContactPageContent {
     id: number;
     section: string;
@@ -45,286 +30,14 @@ interface ContactPageContent {
 }
 
 interface ContactsData {
-    contact_info: ContactInfo[];
     contact_page_content: ContactPageContent[];
 }
+
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-let _nextTempId = -1;
-function nextTempId() {
-    return _nextTempId--;
-}
-
-function blankContactInfo(sortOrder: number): ContactInfo {
-    return {
-        id: nextTempId(),
-        sort_order: sortOrder,
-        type: "",
-        title: "",
-        icon: "",
-        url: "",
-        is_visible: 1,
-    };
-}
-
-function blankPageContent(): ContactPageContent {
-    return {
-        id: nextTempId(),
-        section: "",
-        content_en: "",
-        content_ru: "",
-    };
-}
-
-// ---------------------------------------------------------------------------
-// Contact Links Tab
-// ---------------------------------------------------------------------------
-
-function ContactLinksTab({
-    items,
-    setItems,
-    saving,
-    onSave,
-    onSaveNow,
-    error,
-    success,
-}: {
-    items: ContactInfo[];
-    setItems: (items: ContactInfo[]) => void;
-    saving: boolean;
-    onSave: (items: ContactInfo[]) => void;
-    onSaveNow: (items: ContactInfo[]) => void;
-    error: string;
-    success: string;
-}) {
-    const theme = useTheme();
-    const { lang } = useLocalizedField();
-
-    const handleReorder = (reordered: ContactInfo[]) => {
-        const newItems = reordered.map((item, i) => ({ ...item, sort_order: i + 1 }));
-        setItems(newItems);
-        onSaveNow(newItems);
-    };
-
-    const handleDelete = (id: number | string) => {
-        const newItems = items.filter((item) => item.id !== id);
-        setItems(newItems);
-        onSaveNow(newItems);
-    };
-
-    const handleAdd = () => {
-        const newItems = [...items, blankContactInfo(items.length + 1)];
-        setItems(newItems);
-        onSaveNow(newItems);
-    };
-
-    const updateItem = (id: number, field: keyof ContactInfo, value: unknown) => {
-        setItems(items.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
-    };
-
-    const updateItemAndSave = (id: number, field: keyof ContactInfo, value: unknown) => {
-        const newItems = items.map((item) => (item.id === id ? { ...item, [field]: value } : item));
-        setItems(newItems);
-        onSaveNow(newItems);
-    };
-
-    return (
-        <AdminSection
-            title={__("Contact Links", lang)}
-            icon={<LinkIcon sx={{ color: theme.palette.primary.main, fontSize: 22 }} />}
-            saving={saving}
-            error={error}
-            success={success}
-        >
-            <SortableList<ContactInfo>
-                items={items}
-                onReorder={handleReorder}
-                onDelete={handleDelete}
-                onAdd={handleAdd}
-                addLabel={__("Add Contact Link", lang)}
-                renderItem={(item) => (
-                    <Box sx={{ width: "100%" }}>
-                        <FormControlLabel
-                            control={
-                                <Switch
-                                    checked={item.is_visible === 1}
-                                    onChange={(e) =>
-                                        updateItemAndSave(item.id, "is_visible", e.target.checked ? 1 : 0)
-                                    }
-                                    size="small"
-                                />
-                            }
-                            label={__("Visible", lang)}
-                            sx={{
-                                gap: 0.5,
-                                mb: "12px",
-                                "& .MuiTypography-root": { fontSize: "0.8rem" },
-                                whiteSpace: "nowrap",
-                            }}
-                        />
-                        <Box
-                            sx={{
-                                display: "grid",
-                                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr 1fr" },
-                                gap: 1.5,
-                                alignItems: "center",
-                            }}
-                        >
-                            <TextField
-                                label={__("Type", lang)}
-                                size="small"
-                                fullWidth
-                                value={item.type}
-                                onChange={(e) => updateItem(item.id, "type", e.target.value)}
-                                onBlur={() => onSave(items)}
-                                placeholder={__("email, phone, telegram...", lang)}
-                            />
-                            <TextField
-                                label={__("Title", lang)}
-                                size="small"
-                                fullWidth
-                                value={item.title}
-                                onChange={(e) => updateItem(item.id, "title", e.target.value)}
-                                onBlur={() => onSave(items)}
-                            />
-                            <TextField
-                                label={__("Icon", lang)}
-                                size="small"
-                                fullWidth
-                                value={item.icon}
-                                onChange={(e) => updateItem(item.id, "icon", e.target.value)}
-                                onBlur={() => onSave(items)}
-                                placeholder={__("MUI icon name or emoji", lang)}
-                            />
-                            <TextField
-                                label="URL"
-                                size="small"
-                                fullWidth
-                                value={item.url}
-                                onChange={(e) => updateItem(item.id, "url", e.target.value)}
-                                onBlur={() => onSave(items)}
-                                placeholder="https://..."
-                            />
-                        </Box>
-                    </Box>
-                )}
-            />
-        </AdminSection>
-    );
-}
-
-// ---------------------------------------------------------------------------
-// Page Content Tab
-// ---------------------------------------------------------------------------
-
-function PageContentTab({
-    items,
-    setItems,
-    saving,
-    onSave,
-    onSaveNow,
-    error,
-    success,
-}: {
-    items: ContactPageContent[];
-    setItems: (items: ContactPageContent[]) => void;
-    saving: boolean;
-    onSave: (items: ContactPageContent[]) => void;
-    onSaveNow: (items: ContactPageContent[]) => void;
-    error: string;
-    success: string;
-}) {
-    const theme = useTheme();
-    const barBg = getThemeColor("barBackground", theme);
-    const { lang, lk, lv } = useLocalizedField();
-
-    const updateItem = (id: number, field: keyof ContactPageContent | string, value: string) => {
-        setItems(items.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
-    };
-
-    const handleAdd = () => {
-        const newItems = [...items, blankPageContent()];
-        setItems(newItems);
-        onSaveNow(newItems);
-    };
-
-    const handleDelete = (id: number) => {
-        const newItems = items.filter((item) => item.id !== id);
-        setItems(newItems);
-        onSaveNow(newItems);
-    };
-
-    return (
-        <AdminSection
-            title={__("Page Content", lang)}
-            icon={<ArticleIcon sx={{ color: theme.palette.primary.main, fontSize: 22 }} />}
-            saving={saving}
-            error={error}
-            success={success}
-        >
-            {items.map((item) => (
-                <Box
-                    key={item.id}
-                    sx={{
-                        mb: 2,
-                        p: 2,
-                        border: `1px solid ${theme.palette.divider}`,
-                        borderRadius: 1,
-                        background: barBg,
-                    }}
-                >
-                    <Box
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            mb: 1.5,
-                        }}
-                    >
-                        <TextField
-                            label={__("Section Name", lang)}
-                            size="small"
-                            value={item.section}
-                            onChange={(e) => updateItem(item.id, "section", e.target.value)}
-                            onBlur={() => onSave(items)}
-                            sx={{ minWidth: 250 }}
-                        />
-                        <Button
-                            size="small"
-                            color="error"
-                            onClick={() => handleDelete(item.id)}
-                        >
-                            {__("Remove", lang)}
-                        </Button>
-                    </Box>
-                    <TextField
-                        label={__("Content", lang)}
-                        size="small"
-                        fullWidth
-                        multiline
-                        minRows={3}
-                        value={lv(item, "content")}
-                        onChange={(e) => updateItem(item.id, lk("content"), e.target.value)}
-                        onBlur={() => onSave(items)}
-                    />
-                </Box>
-            ))}
-
-            <Button
-                variant="outlined"
-                color="regular"
-                startIcon={<AddIcon />}
-                onClick={handleAdd}
-                sx={{ mt: 1 }}
-            >
-                {__("Add Content Section", lang)}
-            </Button>
-        </AdminSection>
-    );
-}
 
 // ---------------------------------------------------------------------------
 // Main Page
@@ -333,7 +46,7 @@ function PageContentTab({
 export default function AdminContactsPage() {
     const theme = useTheme();
     const menuText = getThemeColor("menuText", theme);
-    const { lang } = useLocalizedField();
+    const { lang, lk, lv } = useLocalizedField();
     const [tab, setTab] = useState(0);
 
     const { data, setData, loading, saving, error, success, save } =
@@ -359,24 +72,50 @@ export default function AdminContactsPage() {
         labelsSave({ category: "contacts_general", data: categoryItems });
     };
 
-    const contactLinks = data?.contact_info ?? [];
     const pageContent = data?.contact_page_content ?? [];
-
-    const setContactLinks = (items: ContactInfo[]) => {
-        setData((prev) => (prev ? { ...prev, contact_info: items } : prev));
-    };
 
     const setPageContent = (items: ContactPageContent[]) => {
         setData((prev) => (prev ? { ...prev, contact_page_content: items } : prev));
     };
 
-    // Save with current items from state (safe to call on blur — state is current between events)
-    const saveLinks = (items: ContactInfo[]) => {
-        save({ section: "contact_info", data: items }, { successMessage: "Saved" });
-    };
-
     const saveContent = (items: ContactPageContent[]) => {
         save({ section: "contact_page_content", data: items }, { successMessage: "Saved" });
+    };
+
+    const updateItem = (id: number, field: keyof ContactPageContent | string, value: string) => {
+        setPageContent(pageContent.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
+    };
+
+    const getContent = (section: string) => {
+        const item = pageContent.find((c) => c.section === section);
+        return item ? lv(item, "content") : "";
+    };
+
+    const updateContent = (section: string, value: string) => {
+        const item = pageContent.find((c) => c.section === section);
+        if (item) updateItem(item.id, lk("content"), value);
+    };
+
+    // Local state prevents cursor jumping on every keystroke
+    const [introText, setIntroText] = useState<string | null>(null);
+
+    // Sync from DB when data loads or language switches
+    useEffect(() => { setIntroText(null); }, [data, lang]);
+
+    const introCombined = [getContent("intro_p1"), getContent("intro_p2")].filter(Boolean).join("\n\n");
+
+    const handleIntroBlur = () => {
+        const text = introText ?? introCombined;
+        const idx = text.indexOf("\n\n");
+        const p1 = idx === -1 ? text : text.slice(0, idx);
+        const p2 = idx === -1 ? "" : text.slice(idx + 2);
+        const newContent = pageContent.map((item) => {
+            if (item.section === "intro_p1") return { ...item, [lk("content")]: p1 };
+            if (item.section === "intro_p2") return { ...item, [lk("content")]: p2 };
+            return item;
+        });
+        setPageContent(newContent);
+        saveContent(newContent);
     };
 
     if (loading || labelsLoading) {
@@ -405,38 +144,50 @@ export default function AdminContactsPage() {
                     "& .MuiTab-root": { textTransform: "none", fontWeight: 500 },
                 }}
             >
-                <Tab label={__("Contact Links", lang)} icon={<LinkIcon />} iconPosition="start" />
                 <Tab label={__("Page Content", lang)} icon={<ArticleIcon />} iconPosition="start" />
                 <Tab label={__("General Labels", lang)} />
             </Tabs>
 
             {tab === 0 && (
-                <ContactLinksTab
-                    items={contactLinks}
-                    setItems={setContactLinks}
+                <AdminSection
                     saving={saving}
-                    onSave={saveLinks}
-                    onSaveNow={saveLinks}
                     error={error}
                     success={success}
-                />
+                >
+                    <TextField
+                        label={__("Contacts Headline (main)", lang)}
+                        size="small"
+                        fullWidth
+                        value={getContent("headline_main")}
+                        onChange={(e) => { updateContent("headline_main", e.target.value); }}
+                        onBlur={() => saveContent(pageContent)}
+                        sx={{ mb: 2 }}
+                    />
+                    <TextField
+                        label={__("Contacts Headline (sub)", lang)}
+                        size="small"
+                        fullWidth
+                        value={getContent("headline_sub")}
+                        onChange={(e) => { updateContent("headline_sub", e.target.value); }}
+                        onBlur={() => saveContent(pageContent)}
+                        sx={{ mb: 2 }}
+                    />
+                    <TextField
+                        label={__("Contacts Intro", lang)}
+                        size="small"
+                        fullWidth
+                        multiline
+                        minRows={5}
+                        value={introText ?? introCombined}
+                        onChange={(e) => setIntroText(e.target.value)}
+                        onBlur={handleIntroBlur}
+                        sx={{ mb: 2 }}
+                    />
+                </AdminSection>
             )}
 
             {tab === 1 && (
-                <PageContentTab
-                    items={pageContent}
-                    setItems={setPageContent}
-                    saving={saving}
-                    onSave={saveContent}
-                    onSaveNow={saveContent}
-                    error={error}
-                    success={success}
-                />
-            )}
-
-            {tab === 2 && (
                 <AdminSection
-                    title={__("General Labels", lang)}
                     saving={labelsSaving}
                     error={labelsError}
                     success={labelsSuccess}

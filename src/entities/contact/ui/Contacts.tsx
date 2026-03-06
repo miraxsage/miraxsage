@@ -1,6 +1,6 @@
 "use client";
 import CustomBreadcrumbs, { CustomBreadcrumbsProps } from "@/shared/ui/Breadcrumbs";
-import Thankfullness from "./Thankfullness";
+import Thankfullness, { PageContentItem } from "./Thankfullness";
 import { Box, Button, MenuItem, Theme, useMediaQuery, useTheme } from "@mui/material";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
@@ -97,7 +97,7 @@ async function sendForm(fields: { name: string; email: string; subject: string; 
     }
 }
 
-export default function Contacts({ contacts }: { contacts: ContactItem[] }) {
+export default function Contacts({ contacts, content }: { contacts: ContactItem[]; content: PageContentItem[] }) {
     const router = useRouter();
     const lang = useAppearance().language;
     const t = useUiLabels();
@@ -189,12 +189,12 @@ export default function Contacts({ contacts }: { contacts: ContactItem[] }) {
                                     onClick: () => router.push("/interact"),
                                     subitems: [
                                         {
-                                            label: t("About"),
+                                            label: t("Resume"),
                                             icon: <AssignmentIndIcon />,
                                             link: "/about",
                                         },
                                         {
-                                            label: t("Projects"),
+                                            label: t("Portfolio"),
                                             icon: <RocketLaunchIcon />,
                                             link: "/projects",
                                         },
@@ -208,7 +208,7 @@ export default function Contacts({ contacts }: { contacts: ContactItem[] }) {
             )}
             <CustomScrollbar sx={{ gridArea: "2/1/2/1" }}>
                 <Box sx={{ display: "grid", gridTemplate: "auto 1fr", minHeight: "100%" }}>
-                    <Thankfullness />
+                    <Thankfullness content={content} />
                     <Box
                         sx={{
                             padding: "15px",

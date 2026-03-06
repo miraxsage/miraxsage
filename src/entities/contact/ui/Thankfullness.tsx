@@ -7,6 +7,12 @@ import AgreementImage from "./AgreementImage";
 import GeometryWavesBackground from "./GeometryWavesBackground";
 import { useLanguage } from "@/shared/lib/store/appearanceSlice";
 
+export interface PageContentItem {
+    section: string;
+    content_en: string;
+    content_ru: string;
+}
+
 type HeadlineTitleBlockProps = {
     children: string;
     background: "light" | "dark" | "light-hatching" | "dark-hatching";
@@ -60,9 +66,8 @@ function HeadlineTitleBlock({ children, background, sx }: HeadlineTitleBlockProp
     );
 }
 
-function Headline({ sx }: { sx?: SxProps }) {
+function Headline({ main, sub, sx }: { main: string; sub: string; sx?: SxProps }) {
     const theme = useTheme();
-    const lang = useLanguage();
     return (
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "20px 0px", ...sx }}>
             <Box
@@ -89,7 +94,7 @@ function Headline({ sx }: { sx?: SxProps }) {
                         },
                     }}
                 >
-                    {lang.ru ? "Большое спасибо!" : "Thank you!"}
+                    {main}
                 </HeadlineTitleBlock>
                 <HeadlineTitleBlock
                     background="dark-hatching"
@@ -105,7 +110,7 @@ function Headline({ sx }: { sx?: SxProps }) {
                         },
                     }}
                 >
-                    {lang.ru ? " за Ваше внимание" : "for Your attention"}
+                    {sub}
                 </HeadlineTitleBlock>
                 <HeadlineTitleBlock
                     background="light"
@@ -115,7 +120,7 @@ function Headline({ sx }: { sx?: SxProps }) {
                         position: "relative",
                     }}
                 >
-                    {lang.ru ? "Большое спасибо!" : "Thank you!"}
+                    {main}
                 </HeadlineTitleBlock>
                 <HeadlineTitleBlock
                     background="dark"
@@ -127,16 +132,19 @@ function Headline({ sx }: { sx?: SxProps }) {
                         },
                     }}
                 >
-                    {lang.ru ? " за Ваше внимание" : "for Your attention"}
+                    {sub}
                 </HeadlineTitleBlock>
             </Box>
         </Box>
     );
 }
 
-export default function Thankfullness() {
+export default function Thankfullness({ content }: { content: PageContentItem[] }) {
     const theme = useTheme();
     const lang = useLanguage();
+    const lk = lang.ru ? "content_ru" : "content_en";
+    const get = (section: string) => content.find((c) => c.section === section)?.[lk] ?? "";
+
     return (
         <Box
             sx={{
@@ -208,7 +216,7 @@ export default function Thankfullness() {
                     <AgreementImage style={{ position: "absolute", height: "100%" }} />
                 </Box>
                 <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <Headline />
+                    <Headline main={get("headline_main")} sub={get("headline_sub")} />
                     <Box
                         sx={{
                             textIndent: "40px",
@@ -234,34 +242,8 @@ export default function Thankfullness() {
                             },
                         }}
                     >
-                        {lang.ru ? (
-                            <>
-                                <p>
-                                    Я Вас сердечно благодарю за посещение моего скромного сайта и очень надеюсь, что у
-                                    него получилось вызвать у Вас положительные эмоции визуального, эстетического,
-                                    функционального плана и, возможно, Вам захотелось написать мне, задать вопрос или
-                                    сделать предложение. Честно говоря, я буду очень рад получить от Вас обратную связь.
-                                </p>
-                                <p>
-                                    Вы можете отправить мне сообщение в одной из указанных соцсетей (я чаще использую
-                                    Telegram), по электронной почте или написать его прямо на этой станице через форму
-                                    обратной связи ниже.
-                                </p>
-                            </>
-                        ) : (
-                            <>
-                                <p>
-                                    I sincerely thank you for visiting my humble website and I truly hope it has managed
-                                    to evoke positive visual, aesthetic, and functional emotions in you. Perhaps you
-                                    might even feel inclined to write to me, ask a question, or make a suggestion.
-                                    Honestly, I would be very happy to receive your feedback.
-                                </p>
-                                <p>
-                                    You can send me a message via one of the listed social networks (I use Telegram more
-                                    often), by email, or directly on this page using the feedback form below.
-                                </p>
-                            </>
-                        )}
+                        <p>{get("intro_p1")}</p>
+                        <p>{get("intro_p2")}</p>
                     </Box>
                 </Box>
             </Box>

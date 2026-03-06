@@ -130,7 +130,7 @@ function navigateToSection(
         else return router.push(link);
     }
     if (section == "download-pdf") {
-        window.open(`/${t("Resume (Miraxsage)")}.pdf`, "_blank");
+        window.open(`/${t("Resume filename")}.pdf`, "_blank");
         return;
     }
     router.push(`/projects?techs=${section.toLowerCase()}`);
@@ -304,7 +304,7 @@ function ViewModeButton({ sx }: { sx: SxProps }) {
             }}
         >
             {viewMode.desktop ? <TerminalIcon /> : <MonitorIcon />}
-            {t(viewMode.desktop ? "Console" : "User_interface")}
+            {t(viewMode.desktop ? "Console" : "User interface")}
         </SpecialButton>
     );
 }

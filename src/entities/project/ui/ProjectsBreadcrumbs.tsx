@@ -41,11 +41,11 @@ export default function ProjectsBreadcrumbs({ project, onBack }: ProjectsBreadcr
                             ? []
                             : [
                                   {
-                                      label: t("Projects"),
+                                      label: t("Portfolio"),
                                       onClick: () => router.push("/projects"),
                                       subitems: [
                                           {
-                                              label: t("About"),
+                                              label: t("Resume"),
                                               icon: <AssignmentIndIcon />,
                                               link: "/about",
                                           },

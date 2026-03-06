@@ -6,11 +6,9 @@ const labels = [
     { key: "Resume", value_en: "Resume", value_ru: "Резюме", category: "details_navigation" },
     { key: "Portfolio", value_en: "Portfolio", value_ru: "Портфолио", category: "details_navigation" },
     { key: "Interact", value_en: "Interact", value_ru: "Контакты", category: "details_navigation" },
-    { key: "About", value_en: "About", value_ru: "Резюме", category: "details_navigation" },
-    { key: "Projects", value_en: "Projects", value_ru: "Проекты", category: "details_navigation" },
     { key: "Download PDF", value_en: "Download PDF", value_ru: "Скачать PDF", category: "details_navigation" },
     { key: "Write", value_en: "Write", value_ru: "Написать", category: "details_navigation" },
-    { key: "Resume (Miraxsage)", value_en: "Resume (Miraxsage)", value_ru: "Резюме (Miraxsage)", category: "details_navigation" },
+    { key: "Resume filename", value_en: "Resume (Miraxsage)", value_ru: "Резюме (Miraxsage)", category: "details_navigation" },
 
     // ── details_ui ──────────────────────────────────────────────────────
     { key: "Dark mode", value_en: "Dark mode", value_ru: "Темная тема", category: "details_ui" },
@@ -20,7 +18,7 @@ const labels = [
     { key: "Full screen", value_en: "Full screen", value_ru: "Во весь экран", category: "details_ui" },
     { key: "In window", value_en: "In window", value_ru: "В окне", category: "details_ui" },
     { key: "Console", value_en: "Console", value_ru: "Консоль", category: "details_ui" },
-    { key: "User_interface", value_en: "User interface", value_ru: "Интерфейс", category: "details_ui" },
+    { key: "User interface", value_en: "User interface", value_ru: "Интерфейс", category: "details_ui" },
 
     // ── landing ─────────────────────────────────────────────────────────
     { key: "developer", value_en: "developer", value_ru: "разработчик", category: "landing" },
@@ -77,8 +75,6 @@ const labels = [
     { key: "Resume / portfolio question", value_en: "Resume / portfolio question", value_ru: "Вопрос о резюме / портфолио", category: "contacts_general" },
     { key: "Other", value_en: "Other", value_ru: "Другое", category: "contacts_general" },
     { key: "Submit", value_en: "Submit", value_ru: "Отправить", category: "contacts_general" },
-    { key: "Cancel", value_en: "Cancel", value_ru: "Отмена", category: "contacts_general" },
-    { key: "Close", value_en: "Close", value_ru: "Закрыть", category: "contacts_general" },
 ];
 
 export default function seedUiLabels(db: Database.Database) {

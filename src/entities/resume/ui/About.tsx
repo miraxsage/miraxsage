@@ -39,7 +39,7 @@ export default function About() {
         return lang.lang === "en" ? entry.label_en : entry.label_ru;
     };
     useEffect(() => {
-        document.title = t("About") + " | Miraxsage";
+        document.title = t("Resume") + " | Miraxsage";
     }, [lang.lang]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const theme = useTheme();
@@ -192,10 +192,10 @@ export default function About() {
                             : [
                                   { label: "Miraxsage", link: "/" },
                                   {
-                                      label: t("About"),
+                                      label: t("Resume"),
                                       subitems: [
                                           {
-                                              label: t("Projects"),
+                                              label: t("Portfolio"),
                                               icon: <RocketLaunchIcon />,
                                               link: "/projects",
                                           },

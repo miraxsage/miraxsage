@@ -143,7 +143,7 @@ export default function ProjectPage() {
             >
                 <RocketLaunchIcon />
                 {lessLg && <br />}
-                {muchSmall ? t("Projects") : allProjectsLocation ? t("All projects") : t("All chosen projects")}
+                {muchSmall ? t("Portfolio") : allProjectsLocation ? t("All projects") : t("All chosen projects")}
             </LinkButton>
             <LinkButton
                 borders="bottom"

@@ -70,7 +70,7 @@ export default function AboutCategoriesList({ ...props }: AboutCategoriesListPro
                   isPdfItemClick = true;
               }
               if (isPdfItemClick) {
-                  window.open(`/${t("Resume (Miraxsage)")}.pdf`, "_blank");
+                  window.open(`/${t("Resume filename")}.pdf`, "_blank");
                   return;
               }
               if (selectedItems)

@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { getThemeColor } from "@/shared/lib/theme";
 
 interface AdminSectionProps {
-    title: string;
+    title?: string;
     icon?: React.ReactNode;
     saving?: boolean;
     error?: string;
@@ -55,19 +55,21 @@ export default function AdminSection({
 
     return (
         <Box>
-            <Box
-                sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    mb: 3,
-                    gap: 1.5,
-                }}
-            >
-                {icon}
-                <Typography variant="h5" sx={{ fontWeight: 600, color: menuText }}>
-                    {title}
-                </Typography>
-            </Box>
+            {title && (
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        mb: 3,
+                        gap: 1.5,
+                    }}
+                >
+                    {icon}
+                    <Typography variant="h5" sx={{ fontWeight: 600, color: menuText }}>
+                        {title}
+                    </Typography>
+                </Box>
+            )}
             {error && (
                 <Alert severity="error" sx={{ mb: 2 }}>
                     {error}
