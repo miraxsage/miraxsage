@@ -8,6 +8,8 @@ export interface CategoryLabelEntry {
     label_en: string;
     label_ru: string;
     sort_order: number;
+    icon?: string;
+    icon_svg?: string;
 }
 
 export type CategoryLabelsMap = Record<string, CategoryLabelEntry>;

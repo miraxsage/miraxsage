@@ -44,7 +44,7 @@ import {
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { SortableList, AdminSection, useAdminData, useLocalizedField, AdminKeyChip } from "@/features/admin-editor";
+import { SortableList, AdminSection, useAdminData, useLocalizedField, AdminKeyChip, IconPickerButton } from "@/features/admin-editor";
 import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
@@ -264,13 +264,9 @@ function CategoryAccordionRow({
                 />
             </Tooltip>
             <AdminKeyChip label={category.slug} sx={{ flexShrink: 0, width: "155px" }} />
-            <TextField
-                label={__("Icon", lang)}
-                size="small"
+            <IconPickerButton
                 value={category.icon}
-                onChange={(e) => onUpdateField("icon", e.target.value)}
-                onBlur={onSave}
-                sx={{ flex: "0 0 130px" }}
+                onChange={(v) => onUpdateAndSave("icon", v)}
             />
             <TextField
                 label={__("Label", lang)}
@@ -363,13 +359,9 @@ function ChildCategoryRow({ category, lang, lk, lv, onUpdateField, onUpdateAndSa
                 />
             </Tooltip>
             <AdminKeyChip label={category.slug} sx={{ flexShrink: 0, width: "155px" }} />
-            <TextField
-                label={__("Icon", lang)}
-                size="small"
+            <IconPickerButton
                 value={category.icon}
-                onChange={(e) => onUpdateField("icon", e.target.value)}
-                onBlur={onSave}
-                sx={{ flex: "0 0 130px" }}
+                onChange={(v) => onUpdateAndSave("icon", v)}
             />
             <TextField
                 label={__("Label", lang)}
@@ -385,14 +377,14 @@ function ChildCategoryRow({ category, lang, lk, lv, onUpdateField, onUpdateAndSa
 
 interface ChildrenDndListProps extends Omit<CategoryRowSharedProps, "category" | "onUpdateField" | "onUpdateAndSave" | "onSave"> {
     parentId: number;
-    children: Category[];
+    items: Category[];
     onReorder: (parentId: number, reordered: Category[]) => void;
     onUpdateField: (id: number, field: string, value: string) => void;
     onUpdateAndSave: (id: number, field: string, value: unknown) => void;
     onSave: () => void;
 }
 
-function ChildrenDndList({ parentId, children, onReorder, onUpdateField, onUpdateAndSave, onSave, lang, lk, lv }: ChildrenDndListProps) {
+function ChildrenDndList({ parentId, items, onReorder, onUpdateField, onUpdateAndSave, onSave, lang, lk, lv }: ChildrenDndListProps) {
     const sensors = useSensors(
         useSensor(PointerSensor),
         useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -401,16 +393,16 @@ function ChildrenDndList({ parentId, children, onReorder, onUpdateField, onUpdat
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
         if (over && active.id !== over.id) {
-            const oldIndex = children.findIndex((c) => c.id === active.id);
-            const newIndex = children.findIndex((c) => c.id === over.id);
-            onReorder(parentId, arrayMove(children, oldIndex, newIndex));
+            const oldIndex = items.findIndex((c) => c.id === active.id);
+            const newIndex = items.findIndex((c) => c.id === over.id);
+            onReorder(parentId, arrayMove(items, oldIndex, newIndex));
         }
     };
 
     return (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={children.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-                {children.map((child) => (
+            <SortableContext items={items.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+                {items.map((child) => (
                     <ChildCategoryRow
                         key={child.id}
                         category={child}
@@ -478,7 +470,7 @@ function CategoriesTab({ categories, onReorderTopLevel, onReorderChildren, onUpd
                             {kids.length > 0 && (
                                 <ChildrenDndList
                                     parentId={cat.id}
-                                    children={kids}
+                                    items={kids}
                                     onReorder={onReorderChildren}
                                     onUpdateField={onUpdateField}
                                     onUpdateAndSave={onUpdateAndSave}
@@ -932,7 +924,7 @@ export default function AdminResumePage() {
                                 <Box>
                                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1 }}>
                                         <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("education_items", item.id, lk("label"), v)} onBlur={() => saveSection("education_items")} sx={{ flex: "1 1 220px" }} />
-                                        <Field label={__("Icon", lang)} value={item.icon} onChange={(v) => updateItem("education_items", item.id, "icon", v)} onBlur={() => saveSection("education_items")} sx={{ flex: "0 0 140px" }} />
+                                        <IconPickerButton value={item.icon} onChange={(v) => { updateItem("education_items", item.id, "icon", v); saveSection("education_items"); }} />
                                         <Field
                                             label={__("Parent ID", lang)}
                                             value={item.parent_id != null ? String(item.parent_id) : ""}
@@ -988,7 +980,7 @@ export default function AdminResumePage() {
                                 <Box>
                                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1 }}>
                                         <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("labor_items", item.id, lk("label"), v)} onBlur={() => saveSection("labor_items")} sx={{ flex: "1 1 220px" }} />
-                                        <Field label={__("Icon", lang)} value={item.icon} onChange={(v) => updateItem("labor_items", item.id, "icon", v)} onBlur={() => saveSection("labor_items")} sx={{ flex: "0 0 140px" }} />
+                                        <IconPickerButton value={item.icon} onChange={(v) => { updateItem("labor_items", item.id, "icon", v); saveSection("labor_items"); }} />
                                         <Field
                                             label={__("Parent ID", lang)}
                                             value={item.parent_id != null ? String(item.parent_id) : ""}
@@ -1042,7 +1034,7 @@ export default function AdminResumePage() {
                             renderItem={(item) => (
                                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                        <Field label={__("Icon", lang)} value={item.icon} onChange={(v) => updateItem("questionnaire_items", item.id, "icon", v)} onBlur={() => saveSection("questionnaire_items")} sx={{ flex: "0 0 140px" }} />
+                                        <IconPickerButton value={item.icon} onChange={(v) => { updateItem("questionnaire_items", item.id, "icon", v); saveSection("questionnaire_items"); }} />
                                         <Field
                                             label={__("Parent ID", lang)}
                                             value={item.parent_id != null ? String(item.parent_id) : ""}
@@ -1118,7 +1110,7 @@ export default function AdminResumePage() {
                                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                                         <Field label={__("Slug", lang)} value={item.slug} onChange={(v) => updateItem("soft_skills", item.id, "slug", v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 120px" }} />
-                                        <Field label={__("Icon", lang)} value={item.icon} onChange={(v) => updateItem("soft_skills", item.id, "icon", v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "0 0 140px" }} />
+                                        <IconPickerButton value={item.icon} onChange={(v) => { updateItem("soft_skills", item.id, "icon", v); saveSection("soft_skills"); }} />
                                         <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("soft_skills", item.id, lk("label"), v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 200px" }} />
                                     </Box>
                                     <Field label={__("Description", lang)} value={lv(item, "description")} onChange={(v) => updateItem("soft_skills", item.id, lk("description"), v)} onBlur={() => saveSection("soft_skills")} multiline sx={{ flex: "1 1 100%" }} />

@@ -291,5 +291,10 @@
     "email, phone, telegram...": "email, телефон, telegram...",
     "mui icon name or emoji": "имя MUI иконки или эмодзи",
     "general visibility": "Общая видимость",
-    "landing visibility": "Видимость в лендинге"
+    "landing visibility": "Видимость в лендинге",
+    "select icon": "Выбрать иконку",
+    "search icons...": "Поиск иконок...",
+    "custom icons": "Кастомные иконки",
+    "mui icons": "MUI иконки",
+    "no icons found for": "Иконки не найдены для"
 }

@@ -3,6 +3,7 @@ import LandingClient from "./LandingClient";
 import type { LandingButton, TitleVariant, InfoBlock, GetCloserItem, FooterItem, ContactItem } from "@/widgets/landing/MainSlide";
 import type { UiLabelsMap } from "@/entities/ui-labels/model/uiLabelsContext";
 import type { CategoryLabelEntry } from "@/entities/resume/model/categoryLabels";
+import { resolveIconSvg } from "@/shared/lib/resolveIconSvg";
 
 function getLandingButtons(): LandingButton[] {
     const db = getDb();
@@ -50,15 +51,17 @@ function getGetCloser(): GetCloserItem | null {
 
 function getCategoryLabels(): Record<string, CategoryLabelEntry> {
     const db = getDb();
-    const rows = db.prepare("SELECT slug, label_en, label_ru, sort_order FROM resume_categories WHERE is_landing_visible = 1").all() as Array<{
+    const rows = db.prepare("SELECT slug, label_en, label_ru, sort_order, icon FROM resume_categories WHERE is_landing_visible = 1").all() as Array<{
         slug: string;
         label_en: string;
         label_ru: string;
         sort_order: number;
+        icon: string | null;
     }>;
     const map: Record<string, CategoryLabelEntry> = {};
     for (const row of rows) {
-        map[row.slug] = { label_en: row.label_en, label_ru: row.label_ru, sort_order: row.sort_order };
+        const icon = row.icon ?? undefined;
+        map[row.slug] = { label_en: row.label_en, label_ru: row.label_ru, sort_order: row.sort_order, icon, icon_svg: resolveIconSvg(icon) };
     }
     return map;
 }
