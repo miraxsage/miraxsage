@@ -27,12 +27,13 @@ import { RevealAsideMenuButton } from "@/widgets/layout/RevealAsideMenuButton";
 import CategoriesToolbar from "@/shared/ui/CategoriesToolbar";
 import PersonalDataIllustration from "./PersonalDataIllustration";
 import { alpha } from "@mui/material";
-import { CategoryLabelsContext } from "@/entities/resume/model/categoryLabels";
+import { CategoryLabelsContext, useVisibleCategories } from "@/entities/resume/model/categoryLabels";
 
 export default function About() {
     const lang = useLanguage();
     const labels = useContext(CategoryLabelsContext);
     const t = useUiLabels();
+    const visibleCategories = useVisibleCategories();
     const catLabel = (slug: string) => {
         const entry = labels[slug];
         if (!entry) return __(capitalize(slug));
@@ -128,7 +129,8 @@ export default function About() {
         if (changeExpandedNodes) setChangeExpandedNodes(undefined);
         let newActiveCat = params.category ? params.category : activeCat;
         let newActiveBlock = !newActiveCat ? null : params.block ? params.block : selectedCat;
-        if (newActiveCat && !Object.keys(categories).includes(newActiveCat)) newActiveCat = "biography";
+        const visibleCatKeys = Object.keys(visibleCategories);
+        if (newActiveCat && !visibleCatKeys.includes(newActiveCat)) newActiveCat = visibleCatKeys[0] ?? null;
         if (
             newActiveCat &&
             hasSubcategories(newActiveCat as AboutCategories) &&
@@ -211,23 +213,24 @@ export default function About() {
                     if (activeCat) {
                         items.push({
                             label: catLabel(activeCat),
-                            subitems: Object.entries(categories)
+                            subitems: Object.entries(visibleCategories)
                                 .filter(([key]) => key != activeCat)
                                 .map(([key, val]) => ({
                                     label: catLabel(key),
-                                    icon: val.icon,
+                                    icon: val.icon as React.JSX.Element,
                                     link: "/about/" + key,
                                 })),
                         });
                         const activeCategory = activeCat as AboutCategories;
-                        if (selectedCat && hasSubcategories(activeCategory))
+                        const visibleSubItems = visibleCategories[activeCategory]?.items ?? {};
+                        if (selectedCat && Object.keys(visibleSubItems).length > 0)
                             items.push({
                                 label: catLabel(selectedCat),
-                                subitems: Object.entries(categories[activeCategory]["items"])
+                                subitems: Object.entries(visibleSubItems)
                                     .filter(([key]) => key != selectedCat)
                                     .map(([key, val]) => ({
                                         label: catLabel(key),
-                                        icon: val.icon,
+                                        icon: val.icon as React.JSX.Element,
                                         link: "/about/" + activeCategory + "/" + key,
                                     })),
                             });
@@ -331,7 +334,7 @@ export default function About() {
                                 selectedItems={selectedCat ?? undefined}
                                 onItemsSelect={(item) => {
                                     if (lessLg) setCatsCollapsed(true);
-                                    const rootCats = Object.keys(categories);
+                                    const rootCats = Object.keys(visibleCategories);
                                     if (rootCats.includes(item.id)) {
                                         if (!openedCats.includes(item.id)) setOpenedCats([...openedCats, item.id]);
                                         setActiveCatAndBlock(

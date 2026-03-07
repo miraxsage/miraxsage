@@ -29,8 +29,9 @@ import { cubicBezier, motion } from "framer-motion";
 import AccentedTreeView, { AccentedTreeItemProps } from "@/shared/ui/AccentedTreeView";
 import { usePathname, useRouter } from "next/navigation";
 import { useContext } from "react";
-import { CategoryLabelsContext } from "@/entities/resume/model/categoryLabels";
+import { CategoryLabelsContext, useVisibleCategories } from "@/entities/resume/model/categoryLabels";
 import { capitalize } from "@/shared/lib/string";
+import type { AboutCategoriesInterface } from "@/entities/resume/model/categories";
 
 const TransparentButton = styled(Button)(({ theme }) => ({
     color: getThemeColor("regularText", theme),
@@ -148,7 +149,7 @@ function findActiveCategoriesData(data: AccentedTreeItemProps[], matches: Accent
     return matches;
 }
 
-function allCategoriesTreeViewData(pathname: string, contacts: ContactItem[], selectedItems?: string[], activePathData?: AccentedTreeItemProps[], labelFn?: (slug: string) => string, t?: (key: string) => string, ru?: boolean) {
+function allCategoriesTreeViewData(pathname: string, contacts: ContactItem[], selectedItems?: string[], activePathData?: AccentedTreeItemProps[], labelFn?: (slug: string) => string, t?: (key: string) => string, ru?: boolean, cats?: AboutCategoriesInterface) {
     const _ = t ?? __;
     const contactLinks = Object.fromEntries(contacts.map((c) => [c.type, c.url]));
     const links = { ...staticLinks, ...contactLinks };
@@ -165,7 +166,7 @@ function allCategoriesTreeViewData(pathname: string, contacts: ContactItem[], se
             icon: <AssignmentIndIcon />,
             children: [
                 { id: "download-pdf", title: _("Download PDF"), icon: <PictureAsPdfIcon /> },
-                ...abouteCategoriesTreeViewData(labelFn),
+                ...abouteCategoriesTreeViewData(labelFn, cats),
             ],
         },
         { id: "portfolio", title: _("Portfolio"), children: projectsCategoriesTreeViewData() },
@@ -210,8 +211,9 @@ function MobileSiteMapTreeView({ contacts }: { contacts: ContactItem[] }) {
     const labelFn = useCatLabelFn();
     const t = useUiLabels();
     const lang = useLanguage();
+    const visibleCats = useVisibleCategories();
     const itemsToSelect: string[] = [];
-    const { data, links } = allCategoriesTreeViewData(pathname, contacts, itemsToSelect, undefined, labelFn, t, lang.ru);
+    const { data, links } = allCategoriesTreeViewData(pathname, contacts, itemsToSelect, undefined, labelFn, t, lang.ru, visibleCats);
     return (
         <Box sx={{ display: "flex", flexDirection: "column" }}>
             <ColorModeButton sx={{ gridArea: "1/5/1/5" }} />
@@ -360,6 +362,7 @@ export default function SiteMap({ contacts }: { contacts: ContactItem[] }) {
     const labelFn = useCatLabelFn();
     const t = useUiLabels();
     const lang = useLanguage();
+    const visibleCats = useVisibleCategories();
 
     let activeChapter = "";
     let activeGroup = "";
@@ -369,7 +372,7 @@ export default function SiteMap({ contacts }: { contacts: ContactItem[] }) {
     if (!smScreen) {
         const itemsToSelect: string[] = [];
         const activePathData: AccentedTreeItemProps[] = [];
-        const result = allCategoriesTreeViewData(pathname, contacts, itemsToSelect, activePathData, labelFn, t, lang.ru);
+        const result = allCategoriesTreeViewData(pathname, contacts, itemsToSelect, activePathData, labelFn, t, lang.ru, visibleCats);
         resolvedLinks = result.links;
         if (activePathData.length > 0) {
             activeChapter = activePathData.shift()!.id;

@@ -1,0 +1,1 @@
+ALTER TABLE resume_categories ADD COLUMN is_visible INTEGER NOT NULL DEFAULT 1;

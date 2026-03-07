@@ -106,6 +106,7 @@ export async function PUT(request: NextRequest) {
         transaction();
 
         revalidatePath("/about", "layout");
+        revalidatePath("/", "layout");
 
         return successResponse(`Section "${section}" updated successfully`);
     } catch (error) {

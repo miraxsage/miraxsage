@@ -20,10 +20,14 @@ import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import PsychologyAltIcon from "@mui/icons-material/PsychologyAlt";
 import PsychologyIcon from "@mui/icons-material/Psychology";
 import DataObjectIcon from "@mui/icons-material/DataObject";
+import WebhookIcon from "@mui/icons-material/Webhook";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import BadgeIcon from "@mui/icons-material/Badge";
+import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import MusclesIcon from "@/shared/icons/MusclesIcon";
 import TransparentButton from "./TransparentButton";
 import MessageIcon from "@mui/icons-material/Message";
-import { ReactNode, useContext, useState } from "react";
+import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 import Copyright from "./Copyright";
 import { useRouter } from "next/navigation";
 
@@ -49,13 +53,15 @@ export function SpecialButton({ children, link, sx }: SpecialButtonProps) {
             sx={{
                 width: "225px",
                 fontSize: "22px",
+                lineHeight: 1.1,
+                textAlign: "left",
                 justifyContent: "start",
                 "& .MuiSvgIcon-root": {
                     fontSize: "25px",
                     marginRight: "10px",
                 },
                 border: "1px solid white",
-                padding: "5px 20px",
+                padding: "12px 20px",
                 color: paleTextColor,
                 borderColor: theme.palette.divider,
                 [theme.breakpoints.down("sm")]: {
@@ -69,6 +75,14 @@ export function SpecialButton({ children, link, sx }: SpecialButtonProps) {
             {children}
         </TransparentButton>
     );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function sortBySortOrder(items: any[]): any[] {
+    return items
+        .filter(Boolean)
+        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+        .map(({ sort_order: _so, ...rest }) => rest);
 }
 
 function arrayContainsSubstring(array: string[], substring: string) {
@@ -103,11 +117,203 @@ export default function GetCloserSlide({ getCloser, footer, contacts }: { getClo
         1
     )}, ${layoutBackgroundColor} 40%)`;
     const sm = useMediaQuery(theme.breakpoints.down("sm"));
-    const [openedNodes, setOpenedNodes] = useState([
-        "/about/biography/general",
-        "/about/experience/technologies",
-        "/about/specifications",
-    ]);
+    const [openedNodes, setOpenedNodes] = useState(() =>
+        [
+            catLabels["biography"] ? "/about/biography" : null,
+            catLabels["experience"] ? "/about/experience" : null,
+            catLabels["specifications"] ? "/about/specifications" : null,
+        ].filter(Boolean) as string[]
+    );
+
+    const hasTreeItems = !!(
+        catLabels["biography"] ||
+        catLabels["experience"] ||
+        catLabels["specifications"] ||
+        catLabels["snippets"]
+    );
+    const bioOpen = !!catLabels["biography"] && arrayContainsSubstring(openedNodes, "biography");
+    const expOpen = !!catLabels["experience"] && arrayContainsSubstring(openedNodes, "experience");
+
+    const treeRef = useRef<HTMLDivElement>(null);
+    const catLabelsRef = useRef(catLabels);
+    useEffect(() => { catLabelsRef.current = catLabels; }, [catLabels]);
+    const [treeHeight, setTreeHeight] = useState(0);
+    useEffect(() => {
+        const el = treeRef.current;
+        if (!el) return;
+        const getContentHeight = () => {
+            const treeEl = el.querySelector('[role="tree"]') as HTMLElement | null;
+            if (!treeEl) return (el.firstElementChild as HTMLElement)?.scrollHeight ?? 0;
+            const topItems = Array.from(treeEl.querySelectorAll(':scope > li[role="treeitem"]')) as HTMLElement[];
+            const treeRefTop = el.getBoundingClientRect().top;
+            // If projects is visible, stop at its center (id ends with "-/projects")
+            if (catLabelsRef.current["projects"]) {
+                const projectsEl = treeEl.querySelector('[id$="-/projects"]') as HTMLElement | null;
+                if (projectsEl) {
+                    const pRect = projectsEl.getBoundingClientRect();
+                    return pRect.top + 20 - treeRefTop;
+                }
+            }
+            // Fallback: if snippets is last, stop before it
+            if (catLabelsRef.current["snippets"] && topItems.length > 1) {
+                const snippetsEl = topItems[topItems.length - 1];
+                return snippetsEl.getBoundingClientRect().top - treeRefTop;
+            }
+            return treeEl.scrollHeight;
+        };
+        const observer = new ResizeObserver(() => setTreeHeight(getContentHeight()));
+        const treeEl = el.querySelector('[role="tree"]');
+        observer.observe(treeEl ?? el);
+        setTreeHeight(getContentHeight());
+        return () => observer.disconnect();
+    }, []);
+
+    const contentRaw = getCloser
+        ? (lang.ru ? getCloser.content_ru : getCloser.content_en)
+        : (lang.ru
+            ? "📜 Вы можете ознакомиться с моим подробным [резюме](/about)\n💼 Посмотреть [портфолио](/projects) с самыми интересными работами\n🤝 Связаться со мной в соцсетях или оставить [сообщение](/interact)"
+            : "📜 You can review my detailed [resume](/about)\n💼 Check out the [portfolio](/projects) with my most interesting works\n🤝 Connect with me on social media or leave a [message](/interact)");
+    const visibleLines = contentRaw.split("\n").filter((line) => {
+        if (line.includes("/about")) return hasTreeItems;
+        if (line.includes("/projects")) return !!catLabels["experience"] && !!catLabels["projects"];
+        return true;
+    });
+    const n = visibleLines.length;
+    const portfolioLineIdx = visibleLines.findIndex(l => l.includes("/projects"));
+    const portfolioRow = portfolioLineIdx + 1; // 1-indexed for CSS grid
+
+    const contactsOnlyBtnSx = !hasTreeItems ? {
+        width: "225px",
+        [theme.breakpoints.down("sm")]: {
+            fontSize: "20px",
+            width: "225px",
+            padding: "12px 20px",
+        },
+    } : {};
+    const contactsButtons = contacts.length > 0 ? (
+        <>
+            {contacts.map((contact, i) => {
+                const isLast = i === contacts.length - 1;
+                const bw = i % 2 === 0
+                    ? `0px 0px ${isLast ? "0px" : "1px"} 1px`
+                    : `0px 1px ${isLast ? "0px" : "1px"} 0px`;
+                return (
+                    <SpecialButton key={contact.id} link={contact.url} sx={{ borderWidth: bw, ...contactsOnlyBtnSx }}>
+                        {CONTACT_ICON_MAP[contact.icon]}
+                        {(!sm || !hasTreeItems) && (lang.ru ? contact.title_ru : contact.title_en)}
+                    </SpecialButton>
+                );
+            })}
+            <SpecialButton link="/interact" sx={contactsOnlyBtnSx}>
+                <MessageIcon />
+                {(!sm || !hasTreeItems) && t("Write")}
+            </SpecialButton>
+        </>
+    ) : (
+        <SpecialButton link="/interact" sx={contactsOnlyBtnSx}>
+            <MessageIcon />
+            {(!sm || !hasTreeItems) && t("Write")}
+        </SpecialButton>
+    );
+
+    const treeSection = hasTreeItems ? (
+        <Box ref={treeRef} sx={{ gridArea: "3/3/3/4", minWidth: "248px" }}>
+        <AccentedTreeView
+            intend="double"
+            selectionMode="single"
+            onToggle={(_e, toggled) => setOpenedNodes(toggled)}
+            onItemsSelect={(item) => {
+                router.push(item.id);
+            }}
+            initiallyExpandedNodes={[
+                catLabels["biography"] ? "/about/biography" : null,
+                catLabels["experience"] ? "/about/experience" : null,
+                catLabels["specifications"] ? "/about/specifications" : null,
+            ].filter(Boolean) as string[]}
+            sx={{
+                "& .MuiTreeItem-root": {
+                    "&:before": {
+                        top: "20px",
+                    },
+                    "&:last-child:before": {
+                        top: "20px",
+                        height: "calc(100% - 20px)",
+                    },
+                    "& .MuiTreeItem-content": {
+                        background: "transparent !important",
+                        "&:hover .MuiTreeItem-label, &:hover .MuiTreeItem-iconContainer svg": {
+                            color: (isDarkMode ? textColor : accentColor) + " !important",
+                        },
+                        "& .MuiTreeItem-label": {
+                            transition: "color 0.2s",
+                            fontSize: "22px",
+                            marginLeft: "5px",
+                            color: paleTextColor + " !important",
+                        },
+                    },
+                },
+                "& .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-iconContainer svg": {
+                    fontSize: "25px",
+                    transition: "color 0.2s",
+                    color: paleTextColor + " !important",
+                },
+                "& .MuiTreeItem-root .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-iconContainer svg":
+                    {
+                        marginLeft: "5px",
+                    },
+                [theme.breakpoints.down("sm")]: {
+                    [`& .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-iconContainer svg,
+                        & .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-label`]: {
+                        fontSize: "20px",
+                    },
+                },
+            }}
+        >
+            {sortBySortOrder([
+                catLabels["biography"] && {
+                    id: "/about/biography",
+                    title: catLabel("biography"),
+                    icon: <PersonIcon />,
+                    sort_order: catLabels["biography"]?.sort_order ?? 0,
+                    children: sortBySortOrder([
+                        catLabels["general"] && { id: "/about/biography/general", title: catLabel("general"), icon: <BadgeIcon />, sort_order: catLabels["general"]?.sort_order ?? 0 },
+                        catLabels["education"] && { id: "/about/biography/education", title: catLabel("education"), icon: <SchoolIcon />, sort_order: catLabels["education"]?.sort_order ?? 0 },
+                        catLabels["labor"] && { id: "/about/biography/labor", title: catLabel("labor"), icon: <BusinessCenterIcon />, sort_order: catLabels["labor"]?.sort_order ?? 0 },
+                        catLabels["questionaire"] && { id: "/about/biography/questionaire", title: catLabel("questionaire"), icon: <ReceiptLongIcon />, sort_order: catLabels["questionaire"]?.sort_order ?? 0 },
+                    ]),
+                },
+                catLabels["experience"] && {
+                    id: "/about/experience",
+                    title: catLabel("experience"),
+                    icon: <MusclesIcon />,
+                    sort_order: catLabels["experience"]?.sort_order ?? 0,
+                    children: sortBySortOrder([
+                        catLabels["technologies"] && { id: "/about/experience/technologies", title: catLabel("technologies"), icon: <WebhookIcon />, sort_order: catLabels["technologies"]?.sort_order ?? 0 },
+                        catLabels["achievements"] && { id: "/about/experience/achievements", title: catLabel("achievements"), icon: <EmojiEventsIcon />, sort_order: catLabels["achievements"]?.sort_order ?? 0 },
+                        catLabels["projects"] && { id: "/projects", title: catLabel("projects"), icon: <RocketLaunchIcon />, sort_order: catLabels["projects"]?.sort_order ?? 0 },
+                    ]),
+                },
+                catLabels["specifications"] && {
+                    id: "/about/specifications",
+                    title: catLabel("specifications"),
+                    icon: <AssessmentIcon />,
+                    sort_order: catLabels["specifications"]?.sort_order ?? 0,
+                    children: sortBySortOrder([
+                        catLabels["soft-skills"] && { id: "/about/specifications/soft-skills", title: catLabel("soft-skills"), icon: <PsychologyAltIcon />, sort_order: catLabels["soft-skills"]?.sort_order ?? 0 },
+                        catLabels["hard-skills"] && { id: "/about/specifications/hard-skills", title: catLabel("hard-skills"), icon: <PsychologyIcon />, sort_order: catLabels["hard-skills"]?.sort_order ?? 0 },
+                        catLabels["metrics"] && { id: "/about/specifications/metrics", title: catLabel("metrics"), icon: <LeaderboardIcon />, sort_order: catLabels["metrics"]?.sort_order ?? 0 },
+                    ]),
+                },
+                catLabels["snippets"] && {
+                    id: "/about/snippets",
+                    title: catLabel("snippets"),
+                    icon: <DataObjectIcon />,
+                    sort_order: catLabels["snippets"]?.sort_order ?? 0,
+                },
+            ])}
+        </AccentedTreeView>
+        </Box>
+    ) : null;
 
     return (
         <Box
@@ -212,6 +418,7 @@ export default function GetCloserSlide({ getCloser, footer, contacts }: { getClo
                         })()}
                     </Box>
                     <Box sx={{ height: "25px" }}></Box>
+                    {n > 0 && (
                     <Box
                         sx={{
                             background: `linear-gradient(90deg, ${textColor} 30%, ${darkPaleAccent})`,
@@ -222,7 +429,7 @@ export default function GetCloserSlide({ getCloser, footer, contacts }: { getClo
                             WebkitBackgroundClip: "text",
                             WebkitTextFillColor: "transparent",
                             display: "grid",
-                            gridTemplate: "auto auto auto / 25px 25px 1fr",
+                            gridTemplate: `${visibleLines.map(() => "auto").join(" ")} / 25px 25px 1fr`,
                             marginTop: "25px",
                             "& .connective-line": {
                                 borderColor: theme.palette.divider,
@@ -245,42 +452,43 @@ export default function GetCloserSlide({ getCloser, footer, contacts }: { getClo
                             },
                         }}
                     >
+                        {n > 1 && (
                         <Box
                             className="connective-line"
+                            sx={{ borderWidth: "1px 0px 0px 1px", gridArea: `1/2/${n + 1}/2` }}
+                        ></Box>
+                        )}
+                        {n > 1 && (
+                            <Box
+                                className="connective-line"
+                                sx={{
+                                    borderWidth: "0px",
+                                    gridArea: `2/2/3/3`,
+                                }}
+                            ></Box>
+                        )}
+                        {portfolioRow > 0 && (bioOpen || expOpen) && (
+                        <Box
                             sx={{
+                                borderColor: theme.palette.divider,
                                 borderWidth: "1px 0px 0px 1px",
-                                gridArea: "1/2/4/2",
+                                marginTop: "20px",
+                                gridArea: `${portfolioRow}/1/${n + 1}/3`,
                             }}
                         ></Box>
+                        )}
                         <Box
                             className="connective-line"
-                            sx={{
-                                borderWidth: "1px 0px 0px 1px",
-                                gridArea: "2/1/4/3",
-                            }}
+                            sx={{ background: theme.palette.divider, width: "1px", gridArea: `${n}/3/${n}/3` }}
                         ></Box>
-                        <Box
-                            className="connective-line"
-                            sx={{
-                                background: theme.palette.divider,
-                                width: "1px",
-                                gridArea: "3/3/3/3",
-                            }}
-                        ></Box>
-                        {(() => {
-                            const contentRaw = getCloser
-                                ? (lang.ru ? getCloser.content_ru : getCloser.content_en)
-                                : (lang.ru
-                                    ? "📜 Вы можете ознакомиться с моим подробным [резюме](/about)\n💼 Посмотреть [портфолио](/projects) с самыми интересными работами\n🤝 Связаться со мной в соцсетях или оставить [сообщение](/interact)"
-                                    : "📜 You can review my detailed [resume](/about)\n💼 Check out the [portfolio](/projects) with my most interesting works\n🤝 Connect with me on social media or leave a [message](/interact)");
-                            const lines = contentRaw.split("\n");
-                            return lines.map((line, i) => (
-                                <Box key={i} sx={{ gridArea: `${i + 1}/3/${i + 1}/3`, marginLeft: "20px" }}>
-                                    {renderContent(line, textColor)}
-                                </Box>
-                            ));
-                        })()}
+                        {visibleLines.map((line, i) => (
+                            <Box key={i} sx={{ gridArea: `${i + 1}/3/${i + 1}/3`, marginLeft: "20px" }}>
+                                {renderContent(line, textColor)}
+                            </Box>
+                        ))}
                     </Box>
+                    )}
+                    {hasTreeItems ? (
                     <Box
                         sx={{
                             display: "grid",
@@ -296,35 +504,21 @@ export default function GetCloserSlide({ getCloser, footer, contacts }: { getClo
                             },
                         }}
                     >
+                        {portfolioRow > 0 && (bioOpen || expOpen) && (
                         <Box
                             sx={{
-                                ...(arrayContainsSubstring(openedNodes, "biography")
-                                    ? arrayContainsSubstring(openedNodes, "experience")
-                                        ? {
-                                              height: sm ? "258.5px" : "274.5px",
-                                              width: "95px",
-                                          }
-                                        : {
-                                              height: sm ? "176.5px" : "187.5px",
-                                              width: "53px",
-                                          }
-                                    : arrayContainsSubstring(openedNodes, "experience")
-                                    ? { height: sm ? "187px" : "196px", width: "95px" }
-                                    : {
-                                          height: sm ? "104px" : "109px",
-                                          width: "53px",
-                                      }),
-                                transition: "all 0.3s",
-                                transitionProperty: "height, width",
+                                width: "95px",
+                                height: `${50 + treeHeight}px`,
+                                transition: "height 0.3s",
                                 borderColor: theme.palette.divider,
                                 borderWidth: "0px 0px 1px 1px",
                                 gridArea: "1/1/4/4",
                             }}
                         ></Box>
+                        )}
                         <Box
                             sx={{
                                 height: sm ? "70px" : "73px",
-                                transition: "height 0.3s",
                                 borderColor: theme.palette.divider,
                                 borderWidth: "0px 0px 1px 1px",
                                 gridArea: "1/2/4/2",
@@ -333,118 +527,7 @@ export default function GetCloserSlide({ getCloser, footer, contacts }: { getClo
                         <Box sx={{ background: theme.palette.divider, width: "1px", gridArea: "1/3/1/3" }}></Box>
                         <Box sx={{ background: theme.palette.divider, height: "1px", gridArea: "2/3/2/5" }}></Box>
                         <Box sx={{ background: theme.palette.divider, width: "1px", gridArea: "2/5/2/5" }}></Box>
-                        <AccentedTreeView
-                            intend="double"
-                            selectionMode="single"
-                            onToggle={(_e, toggled) => setOpenedNodes(toggled)}
-                            onItemsSelect={(item) => {
-                                router.push(item.id);
-                            }}
-                            initiallyExpandedNodes={[
-                                "/about/biography/general",
-                                "/about/experience/technologies",
-                                "/about/specifications",
-                            ]}
-                            sx={{
-                                gridArea: "3/3/3/4",
-                                minWidth: "248px",
-                                "& .MuiTreeItem-root": {
-                                    "&:before": {
-                                        top: "28px",
-                                    },
-                                    "&:last-child:before": {
-                                        top: "28px",
-                                        height: "calc(100% - 28px)",
-                                    },
-                                    "& .MuiTreeItem-content": {
-                                        background: "transparent !important",
-                                        "&:hover .MuiTreeItem-label, &:hover .MuiTreeItem-iconContainer svg": {
-                                            color: (isDarkMode ? textColor : accentColor) + " !important",
-                                        },
-                                        "& .MuiTreeItem-label": {
-                                            transition: "color 0.2s",
-                                            fontSize: "22px",
-                                            marginLeft: "5px",
-                                            color: paleTextColor + " !important",
-                                        },
-                                    },
-                                },
-                                "& .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-iconContainer svg": {
-                                    fontSize: "25px",
-                                    transition: "color 0.2s",
-                                    color: paleTextColor + " !important",
-                                },
-                                "& .MuiTreeItem-root .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-iconContainer svg":
-                                    {
-                                        marginLeft: "5px",
-                                    },
-                                [theme.breakpoints.down("sm")]: {
-                                    [`& .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-iconContainer svg,
-                                        & .MuiTreeItem-root .MuiTreeItem-content .MuiTreeItem-label`]: {
-                                        fontSize: "20px",
-                                    },
-                                },
-                            }}
-                        >
-                            {[
-                                {
-                                    id: "/about/biography/general",
-                                    title: catLabel("biography"),
-                                    icon: <PersonIcon />,
-                                    children: [
-                                        {
-                                            id: "/about/biography/education",
-                                            title: catLabel("education"),
-                                            icon: <SchoolIcon />,
-                                        },
-                                        {
-                                            id: "/about/biography/labor",
-                                            title: catLabel("labor"),
-                                            icon: <BusinessCenterIcon />,
-                                        },
-                                    ],
-                                },
-                                {
-                                    id: "/about/experience/technologies",
-                                    title: catLabel("experience"),
-                                    icon: <MusclesIcon />,
-                                    children: [
-                                        {
-                                            id: "/about/experience/achievements",
-                                            title: catLabel("achievements"),
-                                            icon: <EmojiEventsIcon />,
-                                        },
-                                        {
-                                            id: "/projects",
-                                            title: t("Portfolio"),
-                                            icon: <RocketLaunchIcon />,
-                                        },
-                                    ],
-                                },
-                                {
-                                    id: "/about/specifications",
-                                    title: catLabel("specifications"),
-                                    icon: <AssessmentIcon />,
-                                    children: [
-                                        {
-                                            id: "/about/specifications/soft-skills",
-                                            title: catLabel("soft-skills"),
-                                            icon: <PsychologyAltIcon />,
-                                        },
-                                        {
-                                            id: "/about/specifications/hard-skills",
-                                            title: catLabel("hard-skills"),
-                                            icon: <PsychologyIcon />,
-                                        },
-                                    ],
-                                },
-                                {
-                                    id: "/about/snippets",
-                                    title: catLabel("snippets"),
-                                    icon: <DataObjectIcon />,
-                                },
-                            ]}
-                        </AccentedTreeView>
+                        {treeSection}
                         <Box
                             sx={{
                                 gridArea: "3/5/3/6",
@@ -453,24 +536,32 @@ export default function GetCloserSlide({ getCloser, footer, contacts }: { getClo
                                 alignItems: "start",
                             }}
                         >
-                            {contacts.map((contact, i) => {
-                                const isLast = i === contacts.length - 1;
-                                const bw = i % 2 === 0
-                                    ? `0px 0px ${isLast ? "0px" : "1px"} 1px`
-                                    : `0px 1px ${isLast ? "0px" : "1px"} 0px`;
-                                return (
-                                    <SpecialButton key={contact.id} link={contact.url} sx={{ borderWidth: bw }}>
-                                        {CONTACT_ICON_MAP[contact.icon]}
-                                        {!sm && (lang.ru ? contact.title_ru : contact.title_en)}
-                                    </SpecialButton>
-                                );
-                            })}
-                            <SpecialButton link="/interact">
-                                <MessageIcon />
-                                {!sm && t("Write")}
-                            </SpecialButton>
+                            {contactsButtons}
                         </Box>
                     </Box>
+                    ) : contacts.length > 0 ? (
+                    <Box
+                        sx={{
+                            display: "grid",
+                            width: "100%",
+                            gridTemplate: "25px 25px auto / 25px 25px calc(50% - 162px) auto",
+                        }}
+                    >
+                        <Box sx={{ background: theme.palette.divider, width: "1px", gridArea: "1/3/1/3" }}></Box>
+                        <Box sx={{ background: theme.palette.divider, height: "1px", gridArea: "2/3/2/4" }}></Box>
+                        <Box sx={{ background: theme.palette.divider, width: "1px", gridArea: "2/4/2/4" }}></Box>
+                        <Box
+                            sx={{
+                                gridArea: "3/4/3/4",
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "start",
+                            }}
+                        >
+                            {contactsButtons}
+                        </Box>
+                    </Box>
+                    ) : null}
                 </Box>
             </Box>
             <Copyright footer={footer} contacts={contacts} />

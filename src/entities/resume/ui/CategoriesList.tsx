@@ -5,9 +5,9 @@ import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 import { useLanguage } from "@/shared/lib/store/appearanceSlice";
-import { CategoryLabelsContext } from "@/entities/resume/model/categoryLabels";
+import { CategoryLabelsContext, useVisibleCategories } from "@/entities/resume/model/categoryLabels";
 
-import categories, { AboutCategoriesInterface } from "@/entities/resume/model/categories";
+import { AboutCategoriesInterface } from "@/entities/resume/model/categories";
 import { capitalize } from "@/shared/lib/string";
 import AccentedTreeView, {
     AccentedTreeItemProps,
@@ -39,20 +39,21 @@ type AboutCategoriesListProps = {
     | Omit<AccentedTreeViewUnselectableProps, "children">
 );
 
-export function abouteCategoriesTreeViewData(labelFn?: (slug: string) => string) {
-    return categoriesToTreeItems(categories, undefined, labelFn);
+export function abouteCategoriesTreeViewData(labelFn?: (slug: string) => string, cats?: AboutCategoriesInterface) {
+    return categoriesToTreeItems(cats ?? {}, undefined, labelFn);
 }
 
 export default function AboutCategoriesList({ ...props }: AboutCategoriesListProps) {
     const lang = useLanguage();
     const labels = useContext(CategoryLabelsContext);
     const t = useUiLabels();
+    const visibleCategories = useVisibleCategories();
     const getCatLabel = (slug: string) => {
         const entry = labels[slug];
         if (!entry) return __(capitalize(slug));
         return lang.lang === "en" ? entry.label_en : entry.label_ru;
     };
-    const data = categoriesToTreeItems(categories, props.activeItem, getCatLabel);
+    const data = categoriesToTreeItems(visibleCategories, props.activeItem, getCatLabel);
     data.unshift({ id: "download-pdf", title: t("Download PDF"), icon: <PictureAsPdfIcon /> });
     const onItemsSelectOuterHandler = props.onItemsSelect;
     const onItemsSelectHandler = !props.onItemsSelect

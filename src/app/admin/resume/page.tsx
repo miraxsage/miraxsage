@@ -15,11 +15,35 @@ import {
     IconButton,
     Collapse,
     useTheme,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
+    Switch,
+    Paper,
 } from "@mui/material";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import { SortableList, AdminSection, useAdminData, useLocalizedField } from "@/features/admin-editor";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    useSortable,
+    verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { SortableList, AdminSection, useAdminData, useLocalizedField, AdminKeyChip } from "@/features/admin-editor";
 import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
@@ -37,6 +61,7 @@ interface Category {
     label_en: string;
     label_ru: string;
     parent_id: number | null;
+    is_visible: number;
 }
 
 interface GeneralDataItem {
@@ -164,6 +189,275 @@ const TAB_LABELS = [
 
 function stampSortOrder<T extends { id: number | string }>(items: T[]): (T & { sort_order: number })[] {
     return items.map((item, i) => ({ ...item, sort_order: i + 1 }));
+}
+
+// ---------------------------------------------------------------------------
+// Categories Tab components
+// ---------------------------------------------------------------------------
+
+interface CategoryRowSharedProps {
+    category: Category;
+    lang: "en" | "ru";
+    lk: (base: string) => string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    lv: (item: any, base: string) => string;
+    onUpdateField: (field: string, value: string) => void;
+    onUpdateAndSave: (field: string, value: unknown) => void;
+    onSave: () => void;
+}
+
+function CategoryAccordionRow({
+    category,
+    lang,
+    lk,
+    lv,
+    onUpdateField,
+    onUpdateAndSave,
+    onSave,
+    children,
+    hasChildren,
+}: CategoryRowSharedProps & { children?: React.ReactNode; hasChildren: boolean }) {
+    const theme = useTheme();
+    const [expanded, setExpanded] = useState(false);
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: category.id });
+
+    const style = { transform: CSS.Transform.toString(transform), transition };
+
+    const summaryRow = (
+        <Box
+            sx={{ display: "flex", alignItems: "center", width: "100%", gap: 1 }}
+            onClick={(e) => e.stopPropagation()}
+        >
+            <IconButton size="small" {...attributes} {...listeners} sx={{ cursor: "grab", flexShrink: 0 }}>
+                <DragIndicatorIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+                size="small"
+                onClick={() => hasChildren && setExpanded((v) => !v)}
+                sx={{ flexShrink: 0, opacity: hasChildren ? 1 : 0, pointerEvents: hasChildren ? "auto" : "none", color: getThemeColor("regularIcon", theme) }}
+            >
+                {expanded ? <ExpandMoreIcon fontSize="small" /> : <ChevronRightIcon fontSize="small" />}
+            </IconButton>
+            <Switch
+                checked={category.is_visible === 1}
+                onChange={(e) => onUpdateAndSave("is_visible", e.target.checked ? 1 : 0)}
+                size="small"
+                sx={{ flexShrink: 0 }}
+            />
+            <AdminKeyChip label={category.slug} sx={{ flexShrink: 0, width: "155px" }} />
+            <TextField
+                label={__("Icon", lang)}
+                size="small"
+                value={category.icon}
+                onChange={(e) => onUpdateField("icon", e.target.value)}
+                onBlur={onSave}
+                sx={{ flex: "0 0 130px" }}
+            />
+            <TextField
+                label={__("Label", lang)}
+                size="small"
+                value={lv(category, "label")}
+                onChange={(e) => onUpdateField(lk("label"), e.target.value)}
+                onBlur={onSave}
+                sx={{ flex: 1, minWidth: 120 }}
+            />
+        </Box>
+    );
+
+    return (
+        <Box ref={setNodeRef} style={style} sx={{ opacity: isDragging ? 0.5 : 1, mb: 1 }}>
+            <Accordion
+                expanded={hasChildren && expanded}
+                onChange={() => {}}
+                disableGutters
+                sx={{
+                    background: getThemeColor("titleBg", theme),
+                    boxShadow: "none",
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: "6px !important",
+                    "&:before": { display: "none" },
+                    "& .MuiAccordionSummary-root": { minHeight: "42px", padding: "0 14px", cursor: "default" },
+                    "& .MuiAccordionSummary-content": { margin: "8px 0", width: "100%" },
+                    "& .MuiAccordionDetails-root": {
+                        padding: "12px",
+                        background: getThemeColor("layoutBackground", theme),
+                        borderTop: `1px solid ${theme.palette.divider}`,
+                    },
+                }}
+            >
+                <AccordionSummary>
+                    {summaryRow}
+                </AccordionSummary>
+                {hasChildren && <AccordionDetails>{children}</AccordionDetails>}
+            </Accordion>
+        </Box>
+    );
+}
+
+function ChildCategoryRow({ category, lang, lk, lv, onUpdateField, onUpdateAndSave, onSave }: CategoryRowSharedProps) {
+    const theme = useTheme();
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: category.id });
+
+    const style = { transform: CSS.Transform.toString(transform), transition };
+
+    return (
+        <Paper
+            ref={setNodeRef}
+            style={style}
+            elevation={isDragging ? 4 : 0}
+            sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                px: 1.5,
+                py: 1,
+                mb: 1,
+                border: `1px solid ${theme.palette.divider}`,
+                background: getThemeColor("barBackground", theme),
+                opacity: isDragging ? 0.5 : 1,
+            }}
+        >
+            <IconButton size="small" {...attributes} {...listeners} sx={{ cursor: "grab", flexShrink: 0 }}>
+                <DragIndicatorIcon fontSize="small" />
+            </IconButton>
+            <Switch
+                checked={category.is_visible === 1}
+                onChange={(e) => onUpdateAndSave("is_visible", e.target.checked ? 1 : 0)}
+                size="small"
+                sx={{ flexShrink: 0 }}
+            />
+            <AdminKeyChip label={category.slug} sx={{ flexShrink: 0, width: "155px" }} />
+            <TextField
+                label={__("Icon", lang)}
+                size="small"
+                value={category.icon}
+                onChange={(e) => onUpdateField("icon", e.target.value)}
+                onBlur={onSave}
+                sx={{ flex: "0 0 130px" }}
+            />
+            <TextField
+                label={__("Label", lang)}
+                size="small"
+                value={lv(category, "label")}
+                onChange={(e) => onUpdateField(lk("label"), e.target.value)}
+                onBlur={onSave}
+                sx={{ flex: 1, minWidth: 120 }}
+            />
+        </Paper>
+    );
+}
+
+interface ChildrenDndListProps extends Omit<CategoryRowSharedProps, "category" | "onUpdateField" | "onUpdateAndSave" | "onSave"> {
+    parentId: number;
+    children: Category[];
+    onReorder: (parentId: number, reordered: Category[]) => void;
+    onUpdateField: (id: number, field: string, value: string) => void;
+    onUpdateAndSave: (id: number, field: string, value: unknown) => void;
+    onSave: () => void;
+}
+
+function ChildrenDndList({ parentId, children, onReorder, onUpdateField, onUpdateAndSave, onSave, lang, lk, lv }: ChildrenDndListProps) {
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    );
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (over && active.id !== over.id) {
+            const oldIndex = children.findIndex((c) => c.id === active.id);
+            const newIndex = children.findIndex((c) => c.id === over.id);
+            onReorder(parentId, arrayMove(children, oldIndex, newIndex));
+        }
+    };
+
+    return (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={children.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+                {children.map((child) => (
+                    <ChildCategoryRow
+                        key={child.id}
+                        category={child}
+                        lang={lang}
+                        lk={lk}
+                        lv={lv}
+                        onUpdateField={(field, value) => onUpdateField(child.id, field, value)}
+                        onUpdateAndSave={(field, value) => onUpdateAndSave(child.id, field, value)}
+                        onSave={onSave}
+                    />
+                ))}
+            </SortableContext>
+        </DndContext>
+    );
+}
+
+interface CategoriesTabProps extends Omit<CategoryRowSharedProps, "category" | "onUpdateField" | "onUpdateAndSave" | "onSave"> {
+    categories: Category[];
+    onReorderTopLevel: (reordered: Category[]) => void;
+    onReorderChildren: (parentId: number, reordered: Category[]) => void;
+    onUpdateField: (id: number, field: string, value: string) => void;
+    onUpdateAndSave: (id: number, field: string, value: unknown) => void;
+    onSave: () => void;
+}
+
+function CategoriesTab({ categories, onReorderTopLevel, onReorderChildren, onUpdateField, onUpdateAndSave, onSave, lang, lk, lv }: CategoriesTabProps) {
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    );
+
+    const topLevel = useMemo(
+        () => categories.filter((c) => c.parent_id === null).sort((a, b) => a.sort_order - b.sort_order),
+        [categories],
+    );
+
+    const handleTopLevelDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (over && active.id !== over.id) {
+            const oldIndex = topLevel.findIndex((c) => c.id === active.id);
+            const newIndex = topLevel.findIndex((c) => c.id === over.id);
+            onReorderTopLevel(arrayMove(topLevel, oldIndex, newIndex));
+        }
+    };
+
+    return (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleTopLevelDragEnd}>
+            <SortableContext items={topLevel.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+                {topLevel.map((cat) => {
+                    const kids = categories
+                        .filter((c) => c.parent_id === cat.id)
+                        .sort((a, b) => a.sort_order - b.sort_order);
+                    return (
+                        <CategoryAccordionRow
+                            key={cat.id}
+                            category={cat}
+                            hasChildren={kids.length > 0}
+                            lang={lang}
+                            lk={lk}
+                            lv={lv}
+                            onUpdateField={(field, value) => onUpdateField(cat.id, field, value)}
+                            onUpdateAndSave={(field, value) => onUpdateAndSave(cat.id, field, value)}
+                            onSave={onSave}
+                        >
+                            {kids.length > 0 && (
+                                <ChildrenDndList
+                                    parentId={cat.id}
+                                    children={kids}
+                                    onReorder={onReorderChildren}
+                                    onUpdateField={onUpdateField}
+                                    onUpdateAndSave={onUpdateAndSave}
+                                    onSave={onSave}
+                                    lang={lang}
+                                    lk={lk}
+                                    lv={lv}
+                                />
+                            )}
+                        </CategoryAccordionRow>
+                    );
+                })}
+            </SortableContext>
+        </DndContext>
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -464,6 +758,43 @@ export default function AdminResumePage() {
         save({ section: "labor_data", data: dataRef.current.labor_data });
     }, [save]);
 
+    // -- Category-specific handlers (preserve top-level/children on reorder) -
+
+    const updateCategoryAndSave = useCallback(
+        (id: number, field: string, value: unknown) => {
+            if (!dataRef.current) return;
+            const newCats = dataRef.current.categories.map((c) => (c.id === id ? { ...c, [field]: value } : c));
+            setData((prev) => (prev ? { ...prev, categories: newCats } : prev));
+            save({ section: "categories", data: newCats });
+        },
+        [setData, save],
+    );
+
+    const reorderTopLevelCats = useCallback(
+        (reordered: Category[]) => {
+            if (!dataRef.current) return;
+            const newTop = stampSortOrder(reordered);
+            const kids = dataRef.current.categories.filter((c) => c.parent_id !== null);
+            const all = [...newTop, ...kids];
+            setData((prev) => (prev ? { ...prev, categories: all } : prev));
+            save({ section: "categories", data: all });
+        },
+        [setData, save],
+    );
+
+    const reorderChildCats = useCallback(
+        (parentId: number, reordered: Category[]) => {
+            if (!dataRef.current) return;
+            const newKids = stampSortOrder(reordered);
+            const top = dataRef.current.categories.filter((c) => c.parent_id === null);
+            const otherKids = dataRef.current.categories.filter((c) => c.parent_id !== null && c.parent_id !== parentId);
+            const all = [...top, ...otherKids, ...newKids];
+            setData((prev) => (prev ? { ...prev, categories: all } : prev));
+            save({ section: "categories", data: all });
+        },
+        [setData, save],
+    );
+
     // -- Loading state ------------------------------------------------------
 
     if (loading || labelsLoading || !data) {
@@ -481,41 +812,17 @@ export default function AdminResumePage() {
             // ----- CATEGORIES -----
             case 0:
                 return (
-                    <AdminSection
-                        saving={saving}
-                        error={error}
-                        success={success}
-                    >
-                        <SortableList
-                            items={data.categories}
-                            onReorder={(items) => reorderItems("categories", items)}
-                            onDelete={(id) => deleteItem("categories", id)}
-                            onAdd={() =>
-                                addItem("categories", {
-                                    id: 0,
-                                    slug: "",
-                                    sort_order: 0,
-                                    icon: "",
-                                    label_en: "",
-                                    label_ru: "",
-                                    parent_id: null,
-                                } as Category)
-                            }
-                            addLabel={__("Add Category", lang)}
-                            renderItem={(item) => (
-                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                    <Field label={__("Slug", lang)} value={item.slug} onChange={(v) => updateItem("categories", item.id, "slug", v)} onBlur={() => saveSection("categories")} sx={{ flex: "1 1 120px" }} />
-                                    <Field label={__("Icon", lang)} value={item.icon} onChange={(v) => updateItem("categories", item.id, "icon", v)} onBlur={() => saveSection("categories")} sx={{ flex: "1 1 100px" }} />
-                                    <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("categories", item.id, lk("label"), v)} onBlur={() => saveSection("categories")} sx={{ flex: "1 1 200px" }} />
-                                    <Field
-                                        label={__("Parent ID", lang)}
-                                        value={item.parent_id != null ? String(item.parent_id) : ""}
-                                        onChange={(v) => updateItem("categories", item.id, "parent_id", v)}
-                                        onBlur={() => saveSection("categories")}
-                                        sx={{ flex: "0 0 100px" }}
-                                    />
-                                </Box>
-                            )}
+                    <AdminSection saving={saving} error={error} success={success}>
+                        <CategoriesTab
+                            categories={data.categories}
+                            onReorderTopLevel={reorderTopLevelCats}
+                            onReorderChildren={reorderChildCats}
+                            onUpdateField={(id, field, value) => updateItem("categories", id, field, value)}
+                            onUpdateAndSave={updateCategoryAndSave}
+                            onSave={() => saveSection("categories")}
+                            lang={lang}
+                            lk={lk}
+                            lv={lv}
                         />
                     </AdminSection>
                 );

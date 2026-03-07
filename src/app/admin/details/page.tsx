@@ -7,14 +7,12 @@ import {
     Tab,
     TextField,
     Switch,
-    FormControlLabel,
     Typography,
     CircularProgress,
-    Chip,
     useTheme,
 } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
-import { SortableList, AdminSection, useAdminData, useLocalizedField } from "@/features/admin-editor";
+import { SortableList, AdminSection, useAdminData, useLocalizedField, AdminKeyChip } from "@/features/admin-editor";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
@@ -57,13 +55,6 @@ function nextTempId() {
     return tempIdCounter--;
 }
 
-function FieldRow({ children }: { children: React.ReactNode }) {
-    return (
-        <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap", mb: 1 }}>
-            {children}
-        </Box>
-    );
-}
 
 const TAB_KEYS = [
     { key: "contacts" as const, label: "Contacts" },
@@ -187,50 +178,39 @@ export default function AdminDetailsPage() {
                     onAdd={addContact}
                     addLabel={__("Add Contact", lang)}
                     renderItem={(contact) => (
-                        <Box>
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={contact.is_visible === 1}
-                                        onChange={(e) =>
-                                            updateContactAndSave(contact.id, "is_visible", e.target.checked ? 1 : 0)
-                                        }
-                                        size="small"
-                                    />
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <Switch
+                                checked={contact.is_visible === 1}
+                                onChange={(e) =>
+                                    updateContactAndSave(contact.id, "is_visible", e.target.checked ? 1 : 0)
                                 }
-                                label={
-                                    <Typography variant="body2" sx={{ color: menuText }}>
-                                        {__("Visible", lang)}
-                                    </Typography>
-                                }
-                                sx={{ gap: 0.5, mb: "12px" }}
+                                size="small"
+                                sx={{ flexShrink: 0 }}
                             />
-                            <FieldRow>
-                                <TextField
-                                    label={__("Title", lang)}
-                                    size="small"
-                                    value={lv(contact, "title")}
-                                    onChange={(e) => updateContact(contact.id, lk("title"), e.target.value)}
-                                    onBlur={() => saveContacts()}
-                                    sx={{ flex: 1, minWidth: 120 }}
-                                />
-                                <TextField
-                                    label="URL"
-                                    size="small"
-                                    value={contact.url}
-                                    onChange={(e) => updateContact(contact.id, "url", e.target.value)}
-                                    onBlur={() => saveContacts()}
-                                    sx={{ flex: 2, minWidth: 200 }}
-                                />
-                                <TextField
-                                    label={__("Icon", lang)}
-                                    size="small"
-                                    value={contact.icon}
-                                    onChange={(e) => updateContact(contact.id, "icon", e.target.value)}
-                                    onBlur={() => saveContacts()}
-                                    sx={{ flex: 1, minWidth: 100 }}
-                                />
-                            </FieldRow>
+                            <TextField
+                                label={__("Icon", lang)}
+                                size="small"
+                                value={contact.icon}
+                                onChange={(e) => updateContact(contact.id, "icon", e.target.value)}
+                                onBlur={() => saveContacts()}
+                                sx={{ flex: "0 0 130px" }}
+                            />
+                            <TextField
+                                label={__("Title", lang)}
+                                size="small"
+                                value={lv(contact, "title")}
+                                onChange={(e) => updateContact(contact.id, lk("title"), e.target.value)}
+                                onBlur={() => saveContacts()}
+                                sx={{ flex: 1, minWidth: 120 }}
+                            />
+                            <TextField
+                                label="URL"
+                                size="small"
+                                value={contact.url}
+                                onChange={(e) => updateContact(contact.id, "url", e.target.value)}
+                                onBlur={() => saveContacts()}
+                                sx={{ flex: 2, minWidth: 200 }}
+                            />
                         </Box>
                     )}
                 />
@@ -241,7 +221,7 @@ export default function AdminDetailsPage() {
                 <Box sx={{ display: "grid", gridTemplateColumns: "max-content 1fr", gap: 1.5, alignItems: "center" }}>
                     {labelsItems.filter((it) => it.category === "details_ui").map((item) => (
                         <Fragment key={item.id}>
-                            <Chip label={chipLabel(item.key)} size="small" variant="outlined" sx={{ justifyContent: "flex-start", fontFamily: "monospace", fontSize: "0.8rem", color: "#E4E4E5", "& .MuiChip-label": { padding: "6px 12px" } }} />
+                            <AdminKeyChip label={chipLabel(item.key)} />
                             <TextField
                                 label={__("Value", lang)}
                                 size="small"
@@ -263,7 +243,7 @@ export default function AdminDetailsPage() {
 
                     {labelsItems.filter((it) => it.category === "details_navigation").map((item) => (
                         <Fragment key={item.id}>
-                            <Chip label={chipLabel(item.key)} size="small" variant="outlined" sx={{ justifyContent: "flex-start", fontFamily: "monospace", fontSize: "0.8rem", color: "#E4E4E5", "& .MuiChip-label": { padding: "6px 12px" } }} />
+                            <AdminKeyChip label={chipLabel(item.key)} />
                             <TextField
                                 label={__("Value", lang)}
                                 size="small"
