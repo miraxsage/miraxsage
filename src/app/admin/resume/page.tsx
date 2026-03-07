@@ -20,6 +20,7 @@ import {
     AccordionDetails,
     Switch,
     Paper,
+    Tooltip,
 } from "@mui/material";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -62,6 +63,7 @@ interface Category {
     label_ru: string;
     parent_id: number | null;
     is_visible: number;
+    is_landing_visible: number;
 }
 
 interface GeneralDataItem {
@@ -218,6 +220,8 @@ function CategoryAccordionRow({
     hasChildren,
 }: CategoryRowSharedProps & { children?: React.ReactNode; hasChildren: boolean }) {
     const theme = useTheme();
+    const isDark = theme.palette.mode === "dark";
+    const landingVisibilityColor = isDark ? theme.palette.secondary.light : theme.palette.primary.light;
     const [expanded, setExpanded] = useState(false);
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: category.id });
 
@@ -238,12 +242,27 @@ function CategoryAccordionRow({
             >
                 {expanded ? <ExpandMoreIcon fontSize="small" /> : <ChevronRightIcon fontSize="small" />}
             </IconButton>
-            <Switch
-                checked={category.is_visible === 1}
-                onChange={(e) => onUpdateAndSave("is_visible", e.target.checked ? 1 : 0)}
-                size="small"
-                sx={{ flexShrink: 0 }}
-            />
+            <Tooltip title={__("General visibility", lang)} placement="top">
+                <Switch
+                    checked={category.is_visible === 1}
+                    onChange={(e) => onUpdateAndSave("is_visible", e.target.checked ? 1 : 0)}
+                    size="small"
+                    sx={{ flexShrink: 0 }}
+                />
+            </Tooltip>
+            <Tooltip title={__("Landing visibility", lang)} placement="top">
+                <Switch
+                    checked={category.is_landing_visible === 1}
+                    disabled={category.is_visible === 0}
+                    onChange={(e) => onUpdateAndSave("is_landing_visible", e.target.checked ? 1 : 0)}
+                    size="small"
+                    sx={{
+                        flexShrink: 0,
+                        "& .MuiSwitch-switchBase.Mui-checked": { color: landingVisibilityColor },
+                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { backgroundColor: landingVisibilityColor },
+                    }}
+                />
+            </Tooltip>
             <AdminKeyChip label={category.slug} sx={{ flexShrink: 0, width: "155px" }} />
             <TextField
                 label={__("Icon", lang)}
@@ -296,6 +315,8 @@ function CategoryAccordionRow({
 
 function ChildCategoryRow({ category, lang, lk, lv, onUpdateField, onUpdateAndSave, onSave }: CategoryRowSharedProps) {
     const theme = useTheme();
+    const isDark = theme.palette.mode === "dark";
+    const landingVisibilityColor = isDark ? theme.palette.secondary.light : theme.palette.primary.light;
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: category.id });
 
     const style = { transform: CSS.Transform.toString(transform), transition };
@@ -320,12 +341,27 @@ function ChildCategoryRow({ category, lang, lk, lv, onUpdateField, onUpdateAndSa
             <IconButton size="small" {...attributes} {...listeners} sx={{ cursor: "grab", flexShrink: 0 }}>
                 <DragIndicatorIcon fontSize="small" />
             </IconButton>
-            <Switch
-                checked={category.is_visible === 1}
-                onChange={(e) => onUpdateAndSave("is_visible", e.target.checked ? 1 : 0)}
-                size="small"
-                sx={{ flexShrink: 0 }}
-            />
+            <Tooltip title={__("General visibility", lang)} placement="top">
+                <Switch
+                    checked={category.is_visible === 1}
+                    onChange={(e) => onUpdateAndSave("is_visible", e.target.checked ? 1 : 0)}
+                    size="small"
+                    sx={{ flexShrink: 0 }}
+                />
+            </Tooltip>
+            <Tooltip title={__("Landing visibility", lang)} placement="top">
+                <Switch
+                    checked={category.is_landing_visible === 1}
+                    disabled={category.is_visible === 0}
+                    onChange={(e) => onUpdateAndSave("is_landing_visible", e.target.checked ? 1 : 0)}
+                    size="small"
+                    sx={{
+                        flexShrink: 0,
+                        "& .MuiSwitch-switchBase.Mui-checked": { color: landingVisibilityColor },
+                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { backgroundColor: landingVisibilityColor },
+                    }}
+                />
+            </Tooltip>
             <AdminKeyChip label={category.slug} sx={{ flexShrink: 0, width: "155px" }} />
             <TextField
                 label={__("Icon", lang)}
@@ -763,7 +799,9 @@ export default function AdminResumePage() {
     const updateCategoryAndSave = useCallback(
         (id: number, field: string, value: unknown) => {
             if (!dataRef.current) return;
-            const newCats = dataRef.current.categories.map((c) => (c.id === id ? { ...c, [field]: value } : c));
+            const updates: Record<string, unknown> = { [field]: value };
+            if (field === "is_visible") updates.is_landing_visible = value;
+            const newCats = dataRef.current.categories.map((c) => (c.id === id ? { ...c, ...updates } : c));
             setData((prev) => (prev ? { ...prev, categories: newCats } : prev));
             save({ section: "categories", data: newCats });
         },

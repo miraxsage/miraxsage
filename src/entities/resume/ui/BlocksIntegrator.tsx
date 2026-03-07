@@ -15,6 +15,8 @@ import AboutSpecsMetricsBlock from "./blocks/specs/Metrics";
 import AboutSpecsSnippetsBlock from "./blocks/snippets/Snippets";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import CustomScrollbar from "@/shared/ui/Scrollbar";
+import { useVisibleCategories } from "@/entities/resume/model/categoryLabels";
+import { AboutContentfulCategories } from "@/entities/resume/model/categories";
 
 export type AboutBlocksIntegratorProps<K extends keyof AboutCategoriesType> = {
     category: K;
@@ -51,15 +53,22 @@ export default function AboutBlocksIntegrator<K extends keyof AboutCategoriesTyp
 }: AboutBlocksIntegratorProps<K>) {
     const theme = useTheme();
     const lessSm = useMediaQuery(theme.breakpoints.down("sm"));
+    const visibleCategories = useVisibleCategories();
     const [activeCat] = useState(category);
     const [expandedBlocks, setExpandedBlocks] = useState<string[]>([]);
-    if (!selectedBlock || !hasSubcategories(activeCat) || blocks[activeCat].every(([b]) => b != selectedBlock))
+    const visibleSubSlugs = hasSubcategories(activeCat)
+        ? new Set(Object.keys(visibleCategories[activeCat as AboutContentfulCategories]?.items ?? {}))
+        : new Set<string>();
+    const visibleBlocks = hasSubcategories(activeCat)
+        ? (blocks[activeCat] as readonly (readonly [string, React.FC])[]).filter(([b]) => visibleSubSlugs.has(b))
+        : [];
+    if (!selectedBlock || !hasSubcategories(activeCat) || visibleBlocks.every(([b]) => b != selectedBlock))
         selectedBlock = undefined;
     const onBlockToggle = (block: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
         const newExpandedBlocks = isExpanded ? [...expandedBlocks, block] : expandedBlocks.filter((b) => b != block);
         setExpandedBlocks(newExpandedBlocks);
-        if (onSelectedBlockChanged && (newExpandedBlocks.length != 1 || newExpandedBlocks[0] != selectedBlock))
-            onSelectedBlockChanged(newExpandedBlocks.length != 1 ? null : newExpandedBlocks[0], [...newExpandedBlocks]);
+        if (onSelectedBlockChanged && newExpandedBlocks.length == 1 && newExpandedBlocks[0] != selectedBlock)
+            onSelectedBlockChanged(newExpandedBlocks[0], [...newExpandedBlocks]);
     };
     useEffect(() => {
         if (selectedBlock) setExpandedBlocks([selectedBlock]);
@@ -69,18 +78,17 @@ export default function AboutBlocksIntegrator<K extends keyof AboutCategoriesTyp
             {hasSubcategories(activeCat) && (
                 <CustomScrollbar right="4.5px" bottom="5px" top="5px">
                     <Box sx={{ padding: lessSm ? "8px 15px 8px 7px" : "17px 15px 17px 14px" }}>
-                        {blocks[activeCat].map(([block, Control], i) => {
-                            const subBlocks = blocks[activeCat];
-                            const prevExpanded = i > 0 && expandedBlocks.includes(subBlocks[i - 1][0]);
+                        {visibleBlocks.map(([block, Control], i) => {
+                            const prevExpanded = i > 0 && expandedBlocks.includes(visibleBlocks[i - 1][0]);
                             const nextExpanded =
-                                i < subBlocks.length - 1 && expandedBlocks.includes(subBlocks[i + 1][0]);
+                                i < visibleBlocks.length - 1 && expandedBlocks.includes(visibleBlocks[i + 1][0]);
                             return (
                                 <AboutBlock
                                     key={block}
                                     className={`${prevExpanded ? "prev-expanded" : ""} ${nextExpanded ? "next-expanded" : ""}`.trim()}
                                     expanded={expandedBlocks.includes(block)}
                                     onToggle={onBlockToggle(block)}
-                                    category={block}
+                                    category={block as AboutCategoriesKeysRecursive<AboutCategoriesType>}
                                     withoutTransition={isSwitchingRender}
                                 >
                                     {<Control />}

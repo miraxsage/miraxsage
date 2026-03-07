@@ -90,6 +90,8 @@ export default function About() {
     const [catsCollapsed, setCatsCollapsed] = useState(lessLg);
     const [changeExpandedNodes, setChangeExpandedNodes] = useState<string[] | undefined>();
 
+    const prevParamsRef = useRef(params);
+
     const setActiveCatAndBlock = (
         cat: string | null,
         block: string | null = "default",
@@ -127,8 +129,15 @@ export default function About() {
         }
 
         if (changeExpandedNodes) setChangeExpandedNodes(undefined);
+        const prevParams = prevParamsRef.current;
+        prevParamsRef.current = params;
+        const paramsBlockChanged = params.block !== prevParams.block;
         let newActiveCat = params.category ? params.category : activeCat;
-        let newActiveBlock = !newActiveCat ? null : params.block ? params.block : selectedCat;
+        let newActiveBlock = !newActiveCat
+            ? null
+            : paramsBlockChanged
+              ? (params.block ?? null)
+              : selectedCat;
         const visibleCatKeys = Object.keys(visibleCategories);
         if (newActiveCat && !visibleCatKeys.includes(newActiveCat)) newActiveCat = visibleCatKeys[0] ?? null;
         if (
@@ -420,30 +429,18 @@ export default function About() {
                                     data-id={`${cat}-integrator`}
                                     initial={
                                         Object.keys(catsBlocksIntegrators).length > 1
-                                            ? { opacity: 0, clipPath: "circle(75% at 50% -125%)" }
+                                            ? { opacity: 1, clipPath: "circle(0% at 50% 25%)" }
                                             : false
                                     }
                                     animate={{
                                         display: cat == activeCat ? "grid" : "none",
-                                        opacity: cat == activeCat ? 1 : 0,
-                                        clipPath:
-                                            cat == activeCat
-                                                ? [
-                                                      "circle(75% at 50% -305%)",
-                                                      "circle(75% at 50% 50%)",
-                                                      "circle(1000% at 50% 50%)",
-                                                  ]
-                                                : [
-                                                      "circle(1000% at 50% 50%)",
-                                                      "circle(1000% at 50% 50%)",
-                                                      "circle(1000% at 50% 50%)",
-                                                  ],
+                                        clipPath: cat == activeCat
+                                            ? "circle(150% at 50% 50%)"
+                                            : "circle(0% at 50% 25%)",
                                     }}
                                     transition={{
-                                        duration: 0.5,
-                                        clipPath: { duration: 0.5, times: [0, 0.99, 1] },
-                                        opacity: { duration: cat == activeCat ? 0 : 0.4, delay: 0.1 },
-                                        display: { delay: cat == activeCat ? 0 : 0.4 },
+                                        clipPath: { duration: 0.7, ease: "easeOut" },
+                                        display: { delay: cat == activeCat ? 0 : 0.7 },
                                     }}
                                 >
                                     <Integrator cat={activeCat as any} block={selectedCat as any} params={params} />

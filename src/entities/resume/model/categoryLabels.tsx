@@ -22,12 +22,17 @@ export function useCatLabel(slug: string): string {
     return lang === "en" ? entry.label_en : entry.label_ru;
 }
 
-function filterCategoriesByVisibility(cats: AboutCategoriesInterface, visibleSlugs: Set<string>): AboutCategoriesInterface {
+function filterCategoriesByVisibility(cats: AboutCategoriesInterface, visibleSlugs: Set<string>, labels: CategoryLabelsMap): AboutCategoriesInterface {
     const result: AboutCategoriesInterface = {};
-    for (const [slug, cat] of Object.entries(cats)) {
+    const sorted = Object.entries(cats).sort(([a], [b]) => {
+        const orderA = labels[a]?.sort_order ?? Infinity;
+        const orderB = labels[b]?.sort_order ?? Infinity;
+        return orderA - orderB;
+    });
+    for (const [slug, cat] of sorted) {
         if (!visibleSlugs.has(slug)) continue;
         result[slug] = cat.items
-            ? { ...cat, items: filterCategoriesByVisibility(cat.items, visibleSlugs) }
+            ? { ...cat, items: filterCategoriesByVisibility(cat.items, visibleSlugs, labels) }
             : cat;
     }
     return result;
@@ -36,5 +41,5 @@ function filterCategoriesByVisibility(cats: AboutCategoriesInterface, visibleSlu
 export function useVisibleCategories(): AboutCategoriesInterface {
     const labels = useContext(CategoryLabelsContext);
     const visibleSlugs = new Set(Object.keys(labels));
-    return filterCategoriesByVisibility(categories, visibleSlugs);
+    return filterCategoriesByVisibility(categories, visibleSlugs, labels);
 }

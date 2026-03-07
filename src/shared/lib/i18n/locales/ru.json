@@ -289,5 +289,7 @@
     "project created": "проект создан",
     "technology created": "технология создана",
     "email, phone, telegram...": "email, телефон, telegram...",
-    "mui icon name or emoji": "имя MUI иконки или эмодзи"
+    "mui icon name or emoji": "имя MUI иконки или эмодзи",
+    "general visibility": "Общая видимость",
+    "landing visibility": "Видимость в лендинге"
 }

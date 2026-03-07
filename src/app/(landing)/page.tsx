@@ -50,7 +50,7 @@ function getGetCloser(): GetCloserItem | null {
 
 function getCategoryLabels(): Record<string, CategoryLabelEntry> {
     const db = getDb();
-    const rows = db.prepare("SELECT slug, label_en, label_ru, sort_order FROM resume_categories WHERE is_visible = 1").all() as Array<{
+    const rows = db.prepare("SELECT slug, label_en, label_ru, sort_order FROM resume_categories WHERE is_landing_visible = 1").all() as Array<{
         slug: string;
         label_en: string;
         label_ru: string;
