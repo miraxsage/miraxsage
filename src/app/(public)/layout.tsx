@@ -7,23 +7,27 @@ import type { CategoryLabelEntry } from "@/entities/resume/model/categoryLabels"
 import type { UiLabelsMap } from "@/entities/ui-labels/model/uiLabelsContext";
 import type { ResumeData } from "@/entities/resume/model/resumeDataContext";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
+import { resolveIconSvg } from "@/shared/lib/resolveIconSvg";
 
 function getHeaderItems(): HeaderItem[] {
     const db = getDb();
-    return db.prepare("SELECT * FROM landing_header_items WHERE is_visible = 1 ORDER BY sort_order").all() as HeaderItem[];
+    const rows = db.prepare("SELECT * FROM landing_header_items WHERE is_visible = 1 ORDER BY sort_order").all() as HeaderItem[];
+    return rows.map((item) => ({ ...item, icon_svg: resolveIconSvg(item.icon) }));
 }
 
 function getCategoryLabels(): Record<string, CategoryLabelEntry> {
     const db = getDb();
-    const rows = db.prepare("SELECT slug, label_en, label_ru, sort_order FROM resume_categories WHERE is_visible = 1").all() as Array<{
+    const rows = db.prepare("SELECT slug, label_en, label_ru, sort_order, icon FROM resume_categories WHERE is_visible = 1").all() as Array<{
         slug: string;
         label_en: string;
         label_ru: string;
         sort_order: number;
+        icon: string | null;
     }>;
     const map: Record<string, CategoryLabelEntry> = {};
     for (const row of rows) {
-        map[row.slug] = { label_en: row.label_en, label_ru: row.label_ru, sort_order: row.sort_order };
+        const icon = row.icon ?? undefined;
+        map[row.slug] = { label_en: row.label_en, label_ru: row.label_ru, sort_order: row.sort_order, icon, icon_svg: resolveIconSvg(icon) };
     }
     return map;
 }

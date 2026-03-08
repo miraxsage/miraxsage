@@ -7,7 +7,8 @@ import { resolveIconSvg } from "@/shared/lib/resolveIconSvg";
 
 function getLandingButtons(): LandingButton[] {
     const db = getDb();
-    return db.prepare("SELECT * FROM landing_buttons ORDER BY sort_order").all() as LandingButton[];
+    const rows = db.prepare("SELECT * FROM landing_buttons ORDER BY sort_order").all() as LandingButton[];
+    return rows.map((btn) => ({ ...btn, icon_svg: resolveIconSvg(btn.icon) }));
 }
 
 function getTitleVariants(): TitleVariant[] {

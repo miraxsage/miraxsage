@@ -12,7 +12,7 @@ import {
     useTheme,
 } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
-import { SortableList, AdminSection, useAdminData, useLocalizedField, AdminKeyChip } from "@/features/admin-editor";
+import { SortableList, AdminSection, useAdminData, useLocalizedField, AdminKeyChip, IconPickerButton } from "@/features/admin-editor";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
@@ -187,13 +187,9 @@ export default function AdminDetailsPage() {
                                 size="small"
                                 sx={{ flexShrink: 0 }}
                             />
-                            <TextField
-                                label={__("Icon", lang)}
-                                size="small"
+                            <IconPickerButton
                                 value={contact.icon}
-                                onChange={(e) => updateContact(contact.id, "icon", e.target.value)}
-                                onBlur={() => saveContacts()}
-                                sx={{ flex: "0 0 130px" }}
+                                onChange={(v) => updateContactAndSave(contact.id, "icon", v)}
                             />
                             <TextField
                                 label={__("Title", lang)}

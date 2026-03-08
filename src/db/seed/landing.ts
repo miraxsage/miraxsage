@@ -13,8 +13,9 @@ const titleVariants = [
 ];
 
 const buttons = [
-    { sort_order: 1, label_en: "About me", label_ru: "Обо мне", icon: "PersonIcon", url: "/about" },
-    { sort_order: 2, label_en: "Projects", label_ru: "Проекты", icon: "RocketLaunchIcon", url: "/projects" },
+    { sort_order: 1, label_en: "About me", label_ru: "Обо мне", icon: "Person", url: "/about" },
+    { sort_order: 2, label_en: "Projects", label_ru: "Проекты", icon: "RocketLaunch", url: "/projects" },
+    { sort_order: 3, label_en: "", label_ru: "", icon: "RudderIcon", url: "https://cosmic-front.miraxsage.ru" },
 ];
 
 const infoBlocks = [

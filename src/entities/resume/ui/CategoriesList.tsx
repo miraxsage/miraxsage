@@ -5,7 +5,7 @@ import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 import { useLanguage } from "@/shared/lib/store/appearanceSlice";
-import { CategoryLabelsContext, useVisibleCategories } from "@/entities/resume/model/categoryLabels";
+import { CategoryLabelsContext, CategoryLabelsMap, useVisibleCategories } from "@/entities/resume/model/categoryLabels";
 
 import { AboutCategoriesInterface } from "@/entities/resume/model/categories";
 import { capitalize } from "@/shared/lib/string";
@@ -15,9 +15,11 @@ import AccentedTreeView, {
     AccentedTreeViewSingleProps,
     AccentedTreeViewUnselectableProps,
 } from "@/shared/ui/AccentedTreeView";
+import DynamicIcon from "@/shared/ui/DynamicIcon";
 
 function categoriesToTreeItems(
     categories: AboutCategoriesInterface,
+    labels: CategoryLabelsMap,
     activeItem?: string | null,
     labelFn?: (slug: string) => string
 ): AccentedTreeItemProps[] {
@@ -25,8 +27,8 @@ function categoriesToTreeItems(
         id,
         isAccented: id == activeItem,
         title: labelFn ? labelFn(id) : __(capitalize(id)),
-        icon: details.icon,
-        children: details.items ? categoriesToTreeItems(details.items, activeItem, labelFn) : undefined,
+        icon: labels[id]?.icon ? <DynamicIcon name={labels[id].icon} svg={labels[id].icon_svg} /> : details.icon,
+        children: details.items ? categoriesToTreeItems(details.items, labels, activeItem, labelFn) : undefined,
     }));
     return res;
 }
@@ -39,8 +41,8 @@ type AboutCategoriesListProps = {
     | Omit<AccentedTreeViewUnselectableProps, "children">
 );
 
-export function abouteCategoriesTreeViewData(labelFn?: (slug: string) => string, cats?: AboutCategoriesInterface) {
-    return categoriesToTreeItems(cats ?? {}, undefined, labelFn);
+export function abouteCategoriesTreeViewData(labels: CategoryLabelsMap, labelFn?: (slug: string) => string, cats?: AboutCategoriesInterface) {
+    return categoriesToTreeItems(cats ?? {}, labels, undefined, labelFn);
 }
 
 export default function AboutCategoriesList({ ...props }: AboutCategoriesListProps) {
@@ -53,7 +55,7 @@ export default function AboutCategoriesList({ ...props }: AboutCategoriesListPro
         if (!entry) return __(capitalize(slug));
         return lang.lang === "en" ? entry.label_en : entry.label_ru;
     };
-    const data = categoriesToTreeItems(visibleCategories, props.activeItem, getCatLabel);
+    const data = categoriesToTreeItems(visibleCategories, labels, props.activeItem, getCatLabel);
     data.unshift({ id: "download-pdf", title: t("Download PDF"), icon: <PictureAsPdfIcon /> });
     const onItemsSelectOuterHandler = props.onItemsSelect;
     const onItemsSelectHandler = !props.onItemsSelect

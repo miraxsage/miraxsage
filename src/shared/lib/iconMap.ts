@@ -21,6 +21,8 @@ import OneCIcon from "@/shared/icons/OneCIcon";
 import BootstrapIcon from "@/shared/icons/BootstrapIcon";
 import MSSQLServerIcon from "@/shared/icons/MSSQLServerIcon";
 import SQLiteIcon from "@/shared/icons/SQLiteIcon";
+import MusclesIcon from "@/shared/icons/MusclesIcon";
+import RudderIcon from "@/shared/icons/RudderIcon";
 
 const iconMap: Record<string, React.FC> = {
     HTMLIcon,
@@ -46,6 +48,8 @@ const iconMap: Record<string, React.FC> = {
     BootstrapIcon,
     MSSQLServerIcon,
     SQLiteIcon,
+    MusclesIcon,
+    RudderIcon,
 };
 
 export function getIconComponent(iconName: string): React.FC {

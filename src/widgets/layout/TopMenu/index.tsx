@@ -10,28 +10,17 @@ import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import { usePathname, useRouter } from "next/navigation";
 import { useSiteMapVisibility } from "@/shared/lib/store/appearanceSlice";
 import CustomBreadcrumbs from "@/shared/ui/Breadcrumbs";
-import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
-import CallIcon from "@mui/icons-material/Call";
 import HomeIcon from "@mui/icons-material/Home";
-import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
-import PersonIcon from "@mui/icons-material/Person";
-import type { SvgIconComponent } from "@mui/icons-material";
+import DynamicIcon from "@/shared/ui/DynamicIcon";
 
 export interface HeaderItem {
     id: number;
     label_en: string;
     label_ru: string;
     icon: string;
+    icon_svg?: string;
     url: string;
 }
-
-const ICON_MAP: Record<string, SvgIconComponent> = {
-    AssignmentIndIcon,
-    PersonIcon,
-    RocketLaunchIcon,
-    HomeIcon,
-    CallIcon,
-};
 
 function MobileRootBreadcrumb({ headerItems }: { headerItems: HeaderItem[] }) {
     const pathname = usePathname();
@@ -40,14 +29,11 @@ function MobileRootBreadcrumb({ headerItems }: { headerItems: HeaderItem[] }) {
     const t = useUiLabels();
     const breadcrumbsItems = [
         { label: t("Home"), icon: <HomeIcon />, link: "/" },
-        ...headerItems.map((item) => {
-            const IconComp = ICON_MAP[item.icon];
-            return {
-                label: t(item.label_en),
-                icon: IconComp ? <IconComp /> : undefined,
-                link: item.url,
-            };
-        }),
+        ...headerItems.map((item) => ({
+            label: t(item.label_en),
+            icon: (item.icon || item.icon_svg) ? <DynamicIcon name={item.icon} svg={item.icon_svg} /> : undefined,
+            link: item.url,
+        })),
     ];
 
     const currentItem = breadcrumbsItems.find((bc) => bc.link != "/" && pathname.startsWith(bc.link));

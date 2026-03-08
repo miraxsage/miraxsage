@@ -296,5 +296,7 @@
     "search icons...": "Поиск иконок...",
     "custom icons": "Кастомные иконки",
     "mui icons": "MUI иконки",
-    "no icons found for": "Иконки не найдены для"
+    "no icons found for": "Иконки не найдены для",
+    "upload svg icon": "Загрузить SVG иконку",
+    "my icons": "Мои иконки"
 }

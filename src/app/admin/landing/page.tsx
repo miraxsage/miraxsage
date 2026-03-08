@@ -13,7 +13,7 @@ import {
     useTheme,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
-import { SortableList, AdminSection, useAdminData, useLocalizedField } from "@/features/admin-editor";
+import { SortableList, AdminSection, useAdminData, useLocalizedField, IconPickerButton } from "@/features/admin-editor";
 import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
@@ -305,13 +305,9 @@ export default function AdminLandingPage() {
                                 onBlur={() => saveSection("buttons")}
                                 sx={{ flex: 2, minWidth: 200 }}
                             />
-                            <TextField
-                                label={__("Icon", lang)}
-                                size="small"
+                            <IconPickerButton
                                 value={item.icon}
-                                onChange={(e) => updateItem("buttons", item.id, "icon", e.target.value)}
-                                onBlur={() => saveSection("buttons")}
-                                sx={{ flex: 1, minWidth: 100 }}
+                                onChange={(v) => updateItemAndSave("buttons", item.id, "icon", v)}
                             />
                         </FieldRow>
                     )}

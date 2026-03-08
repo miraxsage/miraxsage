@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { requireAuth } from "@/shared/api/auth";
 import { jsonResponse, errorResponse, successResponse } from "@/shared/api/response";
+import { invalidateIconCache } from "@/shared/lib/resolveIconSvg";
 
 const SECTION_TABLES: Record<string, string> = {
     categories: "resume_categories",
@@ -104,6 +105,13 @@ export async function PUT(request: NextRequest) {
         });
 
         transaction();
+
+        // Invalidate icon cache for any icons referenced in categories
+        if (section === "categories") {
+            for (const item of items) {
+                if (item.icon) invalidateIconCache(item.icon);
+            }
+        }
 
         revalidatePath("/about", "layout");
         revalidatePath("/", "layout");

@@ -4,13 +4,8 @@ import FloatingLine from "./FloatingLine";
 import FloatingBlock from "./FloatingBlock";
 import { getThemeColor, getLandingColor, useLandingColor } from "@/shared/lib/theme";
 import { mix } from "@/shared/lib/colors";
-import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
-import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
-import PersonIcon from "@mui/icons-material/Person";
-import HomeIcon from "@mui/icons-material/Home";
-import WorkIcon from "@mui/icons-material/Work";
-import CodeIcon from "@mui/icons-material/Code";
-import type { SvgIconComponent } from "@mui/icons-material";
+import DynamicIcon from "@/shared/ui/DynamicIcon";
+import ImageSearchIcon from "@mui/icons-material/ImageSearch";
 import LanguageIcon from "@/shared/icons/LanguageIcon";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import LightModeIcon from "@mui/icons-material/LightMode";
@@ -29,7 +24,6 @@ import { ScrollObservable } from "@/widgets/landing/types";
 import TransparentButton from "./TransparentButton";
 import { rangeProgress } from "@/shared/lib/math";
 import { useRouter } from "next/navigation";
-import RudderIcon from "@/shared/icons/RudderIcon";
 
 export interface LandingButton {
     id: number;
@@ -37,6 +31,7 @@ export interface LandingButton {
     label_en: string;
     label_ru: string;
     icon: string;
+    icon_svg?: string;
     url: string;
 }
 
@@ -91,15 +86,6 @@ export const CONTACT_ICON_MAP: Record<string, React.ReactNode> = {
     LinkedInIcon: <LinkedInIcon />,
     GitHubIcon: <GitHub />,
     GitHub: <GitHub />,
-};
-
-const ICON_MAP: Record<string, SvgIconComponent> = {
-    AssignmentIndIcon,
-    PersonIcon,
-    RocketLaunchIcon,
-    HomeIcon,
-    WorkIcon,
-    CodeIcon,
 };
 
 function buildGradientMap(rawTitle: string): boolean[] {
@@ -368,29 +354,33 @@ function SlideContent({ buttons, titleVariants, contacts }: { buttons: LandingBu
     const showAvatarDividers = useMediaQuery("(max-height: 850px)");
     const langHook = useLanguage();
     const router = useRouter();
-    const linkClick = (link: string) => {
-        return () => {
-            if (link.startsWith("/")) router.push(link);
-            else window.open(link, "_blank");
-        };
-    };
 
     const firstButtons = buttons.slice(0, 1);
     const restButtons = buttons.slice(1);
 
     const renderButton = (btn: LandingButton, isLast: boolean) => {
-        const IconComp = ICON_MAP[btn.icon];
         const label = lang === "en" ? btn.label_en : btn.label_ru;
-        return (
+        const isExternal = /^https?:\/\//.test(btn.url) || btn.url.startsWith("//");
+        const content = (
             <TransparentButton
                 key={btn.id}
-                onClick={linkClick(btn.url)}
+                onClick={isExternal ? undefined : () => router.push(btn.url)}
                 dividerSize={isLast ? "collapsed" : undefined}
             >
-                {IconComp && <IconComp />}
-                {!smallScreen && "\u00A0_" + label}
+                {btn.icon_svg || btn.icon
+                    ? <DynamicIcon svg={btn.icon_svg} name={btn.icon} />
+                    : <ImageSearchIcon />}
+                {!smallScreen && label && "\u00A0_" + label}
             </TransparentButton>
         );
+        if (isExternal) {
+            return (
+                <a key={btn.id} href={btn.url} target="_blank" rel="noopener noreferrer" style={{ display: "contents" }}>
+                    {content}
+                </a>
+            );
+        }
+        return content;
     };
 
     return (
@@ -456,12 +446,7 @@ function SlideContent({ buttons, titleVariants, contacts }: { buttons: LandingBu
                             <TransparentButton onClick={colorModeHook.toggle}>
                                 {!isDarkMode ? <Brightness4Icon /> : <LightModeIcon />}
                             </TransparentButton>
-                            {restButtons.map((btn) => renderButton(btn, false))}
-                            <a href="https://cosmic-front.miraxsage.ru" target="_blank">
-                                <TransparentButton dividerSize="collapsed" sx={{ height: "100%" }}>
-                                    <RudderIcon />
-                                </TransparentButton>
-                            </a>
+                            {restButtons.map((btn, i) => renderButton(btn, i === restButtons.length - 1))}
                         </Box>
                     </Box>
                     <Box
@@ -521,7 +506,7 @@ function SlideContent({ buttons, titleVariants, contacts }: { buttons: LandingBu
                                     {contacts.map((contact, i) => (
                                         <TransparentButton
                                             key={contact.id}
-                                            onClick={linkClick(contact.url)}
+                                            onClick={() => contact.url.startsWith("/") ? router.push(contact.url) : window.open(contact.url, "_blank")}
                                             dividerSize={i === contacts.length - 1 ? "collapsed" : undefined}
                                         >
                                             {CONTACT_ICON_MAP[contact.icon]}

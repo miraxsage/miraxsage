@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { requireAuth } from "@/shared/api/auth";
 import { jsonResponse, errorResponse, successResponse } from "@/shared/api/response";
+import { invalidateIconCache } from "@/shared/lib/resolveIconSvg";
 
 const SECTION_TABLES: Record<string, string> = {
     header_items: "landing_header_items",
@@ -84,7 +85,13 @@ export async function PUT(request: NextRequest) {
 
         transaction();
 
-        revalidatePath("/");
+        if (section === "buttons" || section === "header_items") {
+            for (const item of items) {
+                if (item.icon) invalidateIconCache(item.icon);
+            }
+        }
+
+        revalidatePath("/", "layout");
 
         return successResponse(`Section "${section}" updated successfully`);
     } catch (error) {

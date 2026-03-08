@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS user_icons (
+  name TEXT PRIMARY KEY,
+  svg  TEXT NOT NULL
+);

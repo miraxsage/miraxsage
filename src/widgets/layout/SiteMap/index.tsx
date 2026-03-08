@@ -149,7 +149,7 @@ function findActiveCategoriesData(data: AccentedTreeItemProps[], matches: Accent
     return matches;
 }
 
-function allCategoriesTreeViewData(pathname: string, contacts: ContactItem[], selectedItems?: string[], activePathData?: AccentedTreeItemProps[], labelFn?: (slug: string) => string, t?: (key: string) => string, ru?: boolean, cats?: AboutCategoriesInterface) {
+function allCategoriesTreeViewData(pathname: string, contacts: ContactItem[], selectedItems?: string[], activePathData?: AccentedTreeItemProps[], labelFn?: (slug: string) => string, t?: (key: string) => string, ru?: boolean, cats?: AboutCategoriesInterface, labels?: import("@/entities/resume/model/categoryLabels").CategoryLabelsMap) {
     const _ = t ?? __;
     const contactLinks = Object.fromEntries(contacts.map((c) => [c.type, c.url]));
     const links = { ...staticLinks, ...contactLinks };
@@ -166,7 +166,7 @@ function allCategoriesTreeViewData(pathname: string, contacts: ContactItem[], se
             icon: <AssignmentIndIcon />,
             children: [
                 { id: "download-pdf", title: _("Download PDF"), icon: <PictureAsPdfIcon /> },
-                ...abouteCategoriesTreeViewData(labelFn, cats),
+                ...abouteCategoriesTreeViewData(labels ?? {}, labelFn, cats),
             ],
         },
         { id: "portfolio", title: _("Portfolio"), children: projectsCategoriesTreeViewData() },
@@ -212,8 +212,9 @@ function MobileSiteMapTreeView({ contacts }: { contacts: ContactItem[] }) {
     const t = useUiLabels();
     const lang = useLanguage();
     const visibleCats = useVisibleCategories();
+    const labels = useContext(CategoryLabelsContext);
     const itemsToSelect: string[] = [];
-    const { data, links } = allCategoriesTreeViewData(pathname, contacts, itemsToSelect, undefined, labelFn, t, lang.ru, visibleCats);
+    const { data, links } = allCategoriesTreeViewData(pathname, contacts, itemsToSelect, undefined, labelFn, t, lang.ru, visibleCats, labels);
     return (
         <Box sx={{ display: "flex", flexDirection: "column" }}>
             <ColorModeButton sx={{ gridArea: "1/5/1/5" }} />
@@ -363,6 +364,7 @@ export default function SiteMap({ contacts }: { contacts: ContactItem[] }) {
     const t = useUiLabels();
     const lang = useLanguage();
     const visibleCats = useVisibleCategories();
+    const labels = useContext(CategoryLabelsContext);
 
     let activeChapter = "";
     let activeGroup = "";
@@ -372,7 +374,7 @@ export default function SiteMap({ contacts }: { contacts: ContactItem[] }) {
     if (!smScreen) {
         const itemsToSelect: string[] = [];
         const activePathData: AccentedTreeItemProps[] = [];
-        const result = allCategoriesTreeViewData(pathname, contacts, itemsToSelect, activePathData, labelFn, t, lang.ru, visibleCats);
+        const result = allCategoriesTreeViewData(pathname, contacts, itemsToSelect, activePathData, labelFn, t, lang.ru, visibleCats, labels);
         resolvedLinks = result.links;
         if (activePathData.length > 0) {
             activeChapter = activePathData.shift()!.id;

@@ -4,7 +4,7 @@ import { useColorMode } from "@/shared/lib/store/appearanceSlice";
 import { useLandingColor } from "@/shared/lib/theme";
 import { lighten } from "@mui/material";
 
-export default function TransparentButton({ sx, ...props }: HorizontalPanelButtonProps) {
+export default function TransparentButton({ sx, dividerSize, ...props }: HorizontalPanelButtonProps) {
     const isDarkMode = useColorMode().dark;
     const accentColor = useLandingColor("accentA");
     const contrastColor = useLandingColor("contrast");
@@ -12,7 +12,7 @@ export default function TransparentButton({ sx, ...props }: HorizontalPanelButto
     return (
         <HorizontalPanelButton
             dividerSide="right"
-            dividerSize="squeezed"
+            dividerSize={dividerSize ?? "squeezed"}
             iconMode={true}
             sx={{
                 ...(isDarkMode ? {} : { color: textColor }),

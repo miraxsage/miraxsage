@@ -11,20 +11,7 @@ import type { GetCloserItem, FooterItem, ContactItem } from "./MainSlide";
 import { CONTACT_ICON_MAP } from "./MainSlide";
 import renderContent from "./AboutSlide/renderContent";
 import AccentedTreeView from "@/shared/ui/AccentedTreeView";
-import PersonIcon from "@mui/icons-material/Person";
-import SchoolIcon from "@mui/icons-material/School";
-import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import AssessmentIcon from "@mui/icons-material/Assessment";
-import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
-import PsychologyAltIcon from "@mui/icons-material/PsychologyAlt";
-import PsychologyIcon from "@mui/icons-material/Psychology";
-import DataObjectIcon from "@mui/icons-material/DataObject";
-import WebhookIcon from "@mui/icons-material/Webhook";
-import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
-import BadgeIcon from "@mui/icons-material/Badge";
-import LeaderboardIcon from "@mui/icons-material/Leaderboard";
-import MusclesIcon from "@/shared/icons/MusclesIcon";
+import DynamicIcon from "@/shared/ui/DynamicIcon";
 import TransparentButton from "./TransparentButton";
 import MessageIcon from "@mui/icons-material/Message";
 import { ReactNode, useContext, useEffect, useRef, useState } from "react";
@@ -110,10 +97,11 @@ export default function GetCloserSlide({ getCloser, footer, contacts }: { getClo
     const layoutBackgroundColor = getThemeColor("layoutBackground", theme);
     const textColor = useLandingColor("contrast");
     const accentColor = useLandingColor("accentA");
+    const accentBColor = useLandingColor("accentB");
     const darkPaleAccent = mix(accentColor, "#777777", 0.6);
     const paleTextColor = isDarkMode ? lighten(theme.palette.divider, 0.35) : lighten(textColor, 0.2);
     const textGradiend = `linear-gradient(200deg, ${alpha(
-        mix(layoutBackgroundColor, useLandingColor("accentB"), 0.08),
+        mix(layoutBackgroundColor, accentBColor, 0.08),
         1
     )}, ${layoutBackgroundColor} 40%)`;
     const sm = useMediaQuery(theme.breakpoints.down("sm"));
@@ -273,41 +261,41 @@ export default function GetCloserSlide({ getCloser, footer, contacts }: { getClo
                 catLabels["biography"] && {
                     id: "/about/biography",
                     title: catLabel("biography"),
-                    icon: <PersonIcon />,
+                    icon: <DynamicIcon name={catLabels["biography"].icon} svg={catLabels["biography"].icon_svg} />,
                     sort_order: catLabels["biography"]?.sort_order ?? 0,
                     children: sortBySortOrder([
-                        catLabels["general"] && { id: "/about/biography/general", title: catLabel("general"), icon: <BadgeIcon />, sort_order: catLabels["general"]?.sort_order ?? 0 },
-                        catLabels["education"] && { id: "/about/biography/education", title: catLabel("education"), icon: <SchoolIcon />, sort_order: catLabels["education"]?.sort_order ?? 0 },
-                        catLabels["labor"] && { id: "/about/biography/labor", title: catLabel("labor"), icon: <BusinessCenterIcon />, sort_order: catLabels["labor"]?.sort_order ?? 0 },
-                        catLabels["questionaire"] && { id: "/about/biography/questionaire", title: catLabel("questionaire"), icon: <ReceiptLongIcon />, sort_order: catLabels["questionaire"]?.sort_order ?? 0 },
+                        catLabels["general"] && { id: "/about/biography/general", title: catLabel("general"), icon: <DynamicIcon name={catLabels["general"].icon} svg={catLabels["general"].icon_svg} />, sort_order: catLabels["general"]?.sort_order ?? 0 },
+                        catLabels["education"] && { id: "/about/biography/education", title: catLabel("education"), icon: <DynamicIcon name={catLabels["education"].icon} svg={catLabels["education"].icon_svg} />, sort_order: catLabels["education"]?.sort_order ?? 0 },
+                        catLabels["labor"] && { id: "/about/biography/labor", title: catLabel("labor"), icon: <DynamicIcon name={catLabels["labor"].icon} svg={catLabels["labor"].icon_svg} />, sort_order: catLabels["labor"]?.sort_order ?? 0 },
+                        catLabels["questionaire"] && { id: "/about/biography/questionaire", title: catLabel("questionaire"), icon: <DynamicIcon name={catLabels["questionaire"].icon} svg={catLabels["questionaire"].icon_svg} />, sort_order: catLabels["questionaire"]?.sort_order ?? 0 },
                     ]),
                 },
                 catLabels["experience"] && {
                     id: "/about/experience",
                     title: catLabel("experience"),
-                    icon: <MusclesIcon />,
+                    icon: <DynamicIcon name={catLabels["experience"].icon} svg={catLabels["experience"].icon_svg} />,
                     sort_order: catLabels["experience"]?.sort_order ?? 0,
                     children: sortBySortOrder([
-                        catLabels["technologies"] && { id: "/about/experience/technologies", title: catLabel("technologies"), icon: <WebhookIcon />, sort_order: catLabels["technologies"]?.sort_order ?? 0 },
-                        catLabels["achievements"] && { id: "/about/experience/achievements", title: catLabel("achievements"), icon: <EmojiEventsIcon />, sort_order: catLabels["achievements"]?.sort_order ?? 0 },
-                        catLabels["projects"] && { id: "/projects", title: catLabel("projects"), icon: <RocketLaunchIcon />, sort_order: catLabels["projects"]?.sort_order ?? 0 },
+                        catLabels["technologies"] && { id: "/about/experience/technologies", title: catLabel("technologies"), icon: <DynamicIcon name={catLabels["technologies"].icon} svg={catLabels["technologies"].icon_svg} />, sort_order: catLabels["technologies"]?.sort_order ?? 0 },
+                        catLabels["achievements"] && { id: "/about/experience/achievements", title: catLabel("achievements"), icon: <DynamicIcon name={catLabels["achievements"].icon} svg={catLabels["achievements"].icon_svg} />, sort_order: catLabels["achievements"]?.sort_order ?? 0 },
+                        catLabels["projects"] && { id: "/projects", title: catLabel("projects"), icon: <DynamicIcon name={catLabels["projects"].icon} svg={catLabels["projects"].icon_svg} />, sort_order: catLabels["projects"]?.sort_order ?? 0 },
                     ]),
                 },
                 catLabels["specifications"] && {
                     id: "/about/specifications",
                     title: catLabel("specifications"),
-                    icon: <AssessmentIcon />,
+                    icon: <DynamicIcon name={catLabels["specifications"].icon} svg={catLabels["specifications"].icon_svg} />,
                     sort_order: catLabels["specifications"]?.sort_order ?? 0,
                     children: sortBySortOrder([
-                        catLabels["soft-skills"] && { id: "/about/specifications/soft-skills", title: catLabel("soft-skills"), icon: <PsychologyAltIcon />, sort_order: catLabels["soft-skills"]?.sort_order ?? 0 },
-                        catLabels["hard-skills"] && { id: "/about/specifications/hard-skills", title: catLabel("hard-skills"), icon: <PsychologyIcon />, sort_order: catLabels["hard-skills"]?.sort_order ?? 0 },
-                        catLabels["metrics"] && { id: "/about/specifications/metrics", title: catLabel("metrics"), icon: <LeaderboardIcon />, sort_order: catLabels["metrics"]?.sort_order ?? 0 },
+                        catLabels["soft-skills"] && { id: "/about/specifications/soft-skills", title: catLabel("soft-skills"), icon: <DynamicIcon name={catLabels["soft-skills"].icon} svg={catLabels["soft-skills"].icon_svg} />, sort_order: catLabels["soft-skills"]?.sort_order ?? 0 },
+                        catLabels["hard-skills"] && { id: "/about/specifications/hard-skills", title: catLabel("hard-skills"), icon: <DynamicIcon name={catLabels["hard-skills"].icon} svg={catLabels["hard-skills"].icon_svg} />, sort_order: catLabels["hard-skills"]?.sort_order ?? 0 },
+                        catLabels["metrics"] && { id: "/about/specifications/metrics", title: catLabel("metrics"), icon: <DynamicIcon name={catLabels["metrics"].icon} svg={catLabels["metrics"].icon_svg} />, sort_order: catLabels["metrics"]?.sort_order ?? 0 },
                     ]),
                 },
                 catLabels["snippets"] && {
                     id: "/about/snippets",
                     title: catLabel("snippets"),
-                    icon: <DataObjectIcon />,
+                    icon: <DynamicIcon name={catLabels["snippets"].icon} svg={catLabels["snippets"].icon_svg} />,
                     sort_order: catLabels["snippets"]?.sort_order ?? 0,
                 },
             ])}
@@ -395,7 +383,7 @@ export default function GetCloserSlide({ getCloser, footer, contacts }: { getClo
                                     <Box
                                         sx={{
                                             display: "inline-block",
-                                            background: `linear-gradient(25deg, ${useLandingColor("accentA")}, ${useLandingColor("accentB")})`,
+                                            background: `linear-gradient(25deg, ${accentColor}, ${accentBColor})`,
                                             lineHeight: 1.25,
                                             WebkitBackgroundClip: "text",
                                             WebkitTextFillColor: "transparent",
