@@ -48,17 +48,19 @@ function getUiLabels(): UiLabelsMap {
 
 function getResumeData(): ResumeData {
     const db = getDb();
+    const generalData = db.prepare("SELECT * FROM resume_general_data ORDER BY sort_order").all() as ResumeData["generalData"];
     const educationItems = db.prepare("SELECT * FROM resume_education_items ORDER BY sort_order").all() as ResumeData["educationItems"];
     const educationData = db.prepare("SELECT * FROM resume_education_data ORDER BY sort_order").all() as ResumeData["educationData"];
     const laborItems = db.prepare("SELECT * FROM resume_labor_items ORDER BY sort_order").all() as ResumeData["laborItems"];
     const laborData = db.prepare("SELECT * FROM resume_labor_data ORDER BY sort_order").all() as ResumeData["laborData"];
     const softSkills = db.prepare("SELECT * FROM resume_soft_skills").all() as ResumeData["softSkills"];
-    return { educationItems, educationData, laborItems, laborData, softSkills };
+    return { generalData, educationItems, educationData, laborItems, laborData, softSkills };
 }
 
 function getContacts(): ContactItem[] {
     const db = getDb();
-    return db.prepare("SELECT * FROM contact_info WHERE is_visible = 1 ORDER BY sort_order").all() as ContactItem[];
+    const rows = db.prepare("SELECT * FROM contact_info WHERE is_visible = 1 ORDER BY sort_order").all() as ContactItem[];
+    return rows.map((c) => ({ ...c, icon_svg: resolveIconSvg(c.icon) }));
 }
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {

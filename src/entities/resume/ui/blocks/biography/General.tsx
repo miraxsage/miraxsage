@@ -4,27 +4,17 @@ import Avatar from "@/shared/ui/Avatar";
 import { getThemeColor } from "@/shared/lib/theme";
 import React from "react";
 import { DescriptionTableValue } from "@/shared/ui/DescriptionTable";
-
-const data = [
-    ["[Full name]", "[Manin Maxim] [Forbidden 8]"],
-    ["[Date of birth]", "[Forbidden 2].[Forbidden 2].199[Forbidden 1]"],
-    ["[Specialization]", "Web-[developer] [Tag full stack]"],
-    ["[Core technologies]", "HTML, CSS, JavaScript, TypeScript, React, Redux, ReactRouter, MUI"],
-    ["[Telegram]", "[Link https://t.me/miraxsage] [Priority Connection]"],
-    ["[Email]", "[Link mailto:manin.maxim@mail.ru manin.maxim@mail.ru]"],
-    ["[Education]", "[General] [secondary] [Score (4.3/5)] [Higher][Nbsp][specialized] [Score (5.0/5)]"],
-    ["[Foreign languages]", "[Language EN (~B2)]"],
-    ["[Citizenship]", "[Language RU - onlyIcon] [Russian Federation]"],
-    ["[Region]", "[Krasnodar region]"],
-    ["[City]", "[Forbidden 7]"],
-    ["[Years of experience]", "8 [years]"],
-    ["[Type of employment]", "[Full]"],
-    ["[Employment mode]", "[Full day], [distant work]"],
-    ["[Relocation]", "[Under review]"],
-];
+import { useLanguage } from "@/shared/lib/store/appearanceSlice";
+import { useResumeData } from "@/entities/resume/model/resumeDataContext";
 
 export default function AboutBioGeneralBlock() {
     const theme = useTheme();
+    const { lang } = useLanguage();
+    const { generalData } = useResumeData();
+    const data: [string, string][] = generalData.map((row) => [
+        lang === "ru" ? row.label_ru : row.label_en,
+        lang === "ru" ? row.value_ru : row.value_en,
+    ]);
     const borderWidth = { borderWidth: "0px 0px 1px 1px" };
     const is3xl = useMediaQuery(theme.breakpoints.only("3xl"));
     let itemsDisplace = 0;

@@ -263,7 +263,7 @@ function CategoryAccordionRow({
                     }}
                 />
             </Tooltip>
-            <AdminKeyChip label={category.slug} sx={{ flexShrink: 0, width: "155px" }} />
+            <AdminKeyChip label={__(category.slug.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase()), lang)} sx={{ flexShrink: 0, width: "155px" }} />
             <IconPickerButton
                 value={category.icon}
                 onChange={(v) => onUpdateAndSave("icon", v)}
@@ -358,7 +358,7 @@ function ChildCategoryRow({ category, lang, lk, lv, onUpdateField, onUpdateAndSa
                     }}
                 />
             </Tooltip>
-            <AdminKeyChip label={category.slug} sx={{ flexShrink: 0, width: "155px" }} />
+            <AdminKeyChip label={__(category.slug.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase()), lang)} sx={{ flexShrink: 0, width: "155px" }} />
             <IconPickerButton
                 value={category.icon}
                 onChange={(v) => onUpdateAndSave("icon", v)}
@@ -878,16 +878,15 @@ export default function AdminResumePage() {
                                     label_ru: "",
                                     value_en: "",
                                     value_ru: "",
-                                    value_format: "",
+                                    value_format: "rich",
                                 } as GeneralDataItem)
                             }
                             addLabel={__("Add Field", lang)}
                             renderItem={(item) => (
-                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                    <Field label={__("Key", lang)} value={item.field_key} onChange={(v) => updateItem("general_data", item.id, "field_key", v)} onBlur={() => saveSection("general_data")} sx={{ flex: "1 1 120px" }} />
-                                    <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("general_data", item.id, lk("label"), v)} onBlur={() => saveSection("general_data")} sx={{ flex: "1 1 180px" }} />
-                                    <Field label={__("Value", lang)} value={lv(item, "value")} onChange={(v) => updateItem("general_data", item.id, lk("value"), v)} onBlur={() => saveSection("general_data")} sx={{ flex: "1 1 220px" }} />
-                                    <Field label={__("Format", lang)} value={item.value_format} onChange={(v) => updateItem("general_data", item.id, "value_format", v)} onBlur={() => saveSection("general_data")} sx={{ flex: "0 0 120px" }} />
+                                <Box sx={{ display: "flex", gap: 1, alignItems: "center", width: "100%" }}>
+                                    <AdminKeyChip label={__(item.field_key.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase()), lang)} sx={{ flexShrink: 0, width: "180px" }} />
+                                    <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("general_data", item.id, lk("label"), v)} onBlur={() => saveSection("general_data")} sx={{ flex: "0 0 25%" }} />
+                                    <Field label={__("Value", lang)} value={lv(item, "value")} onChange={(v) => updateItem("general_data", item.id, lk("value"), v)} onBlur={() => saveSection("general_data")} sx={{ flex: "1 1 auto" }} />
                                 </Box>
                             )}
                         />

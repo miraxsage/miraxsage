@@ -18,6 +18,7 @@ export default function LanguageIcon({ language, sx, style, ...props }: Language
                 borderRadius: "4px",
                 objectFit: "cover",
                 display: "inline-block",
+                verticalAlign: "middle",
                 ...sx,
             }}
             src={`/img/icons/${language === "ru" ? "Russian" : "English"}.svg`}

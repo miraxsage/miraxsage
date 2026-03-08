@@ -41,6 +41,17 @@ export type LaborDataRow = {
     value_ru: string;
 };
 
+export type GeneralDataRow = {
+    id: number;
+    sort_order: number;
+    field_key: string;
+    label_en: string;
+    label_ru: string;
+    value_en: string;
+    value_ru: string;
+    value_format: string | null;
+};
+
 export type SoftSkillRow = {
     id: number;
     slug: string;
@@ -53,6 +64,7 @@ export type SoftSkillRow = {
 };
 
 export type ResumeData = {
+    generalData: GeneralDataRow[];
     educationItems: EducationItem[];
     educationData: EducationDataRow[];
     laborItems: LaborItem[];
@@ -61,6 +73,7 @@ export type ResumeData = {
 };
 
 export const ResumeDataContext = createContext<ResumeData>({
+    generalData: [],
     educationItems: [],
     educationData: [],
     laborItems: [],
