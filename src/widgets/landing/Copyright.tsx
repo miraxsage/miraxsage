@@ -6,7 +6,7 @@ import TransparentButton from "./TransparentButton";
 import { lighten } from "@mui/material";
 import { useRouter } from "next/navigation";
 import type { FooterItem, ContactItem } from "./MainSlide";
-import { CONTACT_ICON_MAP } from "./MainSlide";
+import DynamicIcon from "@/shared/ui/DynamicIcon";
 import renderContent from "./AboutSlide/renderContent";
 
 export default function Copyright({ footer, contacts }: { footer: FooterItem[]; contacts: ContactItem[] }) {
@@ -67,7 +67,7 @@ export default function Copyright({ footer, contacts }: { footer: FooterItem[]; 
                                 onClick={linkClick(contact.url)}
                                 dividerSize={i === contacts.length - 1 ? "collapsed" : undefined}
                             >
-                                {CONTACT_ICON_MAP[contact.icon]}
+                                <DynamicIcon svg={contact.icon_svg} name={contact.icon} />
                             </TransparentButton>
                         ))}
                     </Box>

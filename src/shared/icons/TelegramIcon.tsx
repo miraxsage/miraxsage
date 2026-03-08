@@ -8,12 +8,8 @@ const TelegramIcon: React.FC = (props) => (
             width={24}
             height={24}
             viewBox="0 0 27 27"
-            style={{
-                fillRule: "evenodd",
-                clipRule: "evenodd",
-                strokeLinejoin: "round",
-                strokeMiterlimit: 1.41421,
-            }}
+            fillRule="evenodd"
+            clipRule="evenodd"
             fill="currentColor"
             {...props}
         >

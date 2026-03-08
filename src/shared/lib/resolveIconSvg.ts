@@ -31,9 +31,12 @@ function resolveUserIconSvg(name: string): string | null {
 
 // JSX camelCase SVG attrs that need conversion to HTML kebab-case
 const CAMEL_TO_KEBAB: Record<string, string> = {
+    fillRule: "fill-rule",
+    clipRule: "clip-rule",
     strokeWidth: "stroke-width",
     strokeLinecap: "stroke-linecap",
     strokeLinejoin: "stroke-linejoin",
+    strokeMiterlimit: "stroke-miterlimit",
     strokeDasharray: "stroke-dasharray",
     fillOpacity: "fill-opacity",
     strokeOpacity: "stroke-opacity",
@@ -70,7 +73,28 @@ function resolveCustomIconSvg(name: string): string | null {
     // Build output attrs, always include xmlns
     const htmlAttrs: string[] = ['xmlns="http://www.w3.org/2000/svg"'];
 
-    for (const m of cleanAttrsStr.matchAll(/(\w+)=(?:"([^"]*)"|\{([^}]*)\})/g)) {
+    // Extract style={{ ... }} separately (nested braces break the simple attr regex)
+    const styleObjMatch = cleanAttrsStr.match(/\bstyle=\{\{([\s\S]*?)\}\}/);
+    if (styleObjMatch) {
+        const styleBody = styleObjMatch[1];
+        // Convert known camelCase style props to SVG attributes
+        const STYLE_TO_SVG_ATTR: Record<string, string> = {
+            fillRule: "fill-rule",
+            clipRule: "clip-rule",
+            strokeLinejoin: "stroke-linejoin",
+            strokeLinecap: "stroke-linecap",
+            strokeMiterlimit: "stroke-miterlimit",
+        };
+        for (const [camel, svgAttr] of Object.entries(STYLE_TO_SVG_ATTR)) {
+            const m = styleBody.match(new RegExp(`\\b${camel}:\\s*(?:"([^"]+)"|([\\d.]+))`));
+            if (m) htmlAttrs.push(`${svgAttr}="${m[1] ?? m[2]}"`);
+        }
+    }
+
+    // Strip style={{...}} before scanning simple attrs to avoid partial matches
+    const attrsWithoutStyle = cleanAttrsStr.replace(/\bstyle=\{\{[\s\S]*?\}\}/, "");
+
+    for (const m of attrsWithoutStyle.matchAll(/(\w+)=(?:"([^"]*)"|\{([^}]*)\})/g)) {
         const [, attrName, strVal, jsxVal] = m;
         if (SKIP_ATTRS.has(attrName)) continue;
         const val = strVal ?? jsxVal.trim();

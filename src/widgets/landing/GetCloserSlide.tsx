@@ -8,7 +8,6 @@ import __ from "@/shared/lib/i18n/translation";
 import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import { CategoryLabelsContext } from "@/entities/resume/model/categoryLabels";
 import type { GetCloserItem, FooterItem, ContactItem } from "./MainSlide";
-import { CONTACT_ICON_MAP } from "./MainSlide";
 import renderContent from "./AboutSlide/renderContent";
 import AccentedTreeView from "@/shared/ui/AccentedTreeView";
 import DynamicIcon from "@/shared/ui/DynamicIcon";
@@ -187,7 +186,7 @@ export default function GetCloserSlide({ getCloser, footer, contacts }: { getClo
                     : `0px 1px ${isLast ? "0px" : "1px"} 0px`;
                 return (
                     <SpecialButton key={contact.id} link={contact.url} sx={{ borderWidth: bw, ...contactsOnlyBtnSx }}>
-                        {CONTACT_ICON_MAP[contact.icon]}
+                        <DynamicIcon svg={contact.icon_svg} name={contact.icon} />
                         {(!sm || !hasTreeItems) && (lang.ru ? contact.title_ru : contact.title_en)}
                     </SpecialButton>
                 );

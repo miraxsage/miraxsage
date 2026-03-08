@@ -6,7 +6,7 @@ import { Box, Button, IconButton, SxProps, alpha, styled, useMediaQuery, useThem
 import { ReactNode } from "react";
 import MessageIcon from "@mui/icons-material/Message";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
-import { CONTACT_ICON_MAP } from "@/widgets/landing/MainSlide";
+import DynamicIcon from "@/shared/ui/DynamicIcon";
 import { getThemeColor } from "@/shared/lib/theme";
 import ProjectFiltersList, { projectsCategoriesTreeViewData } from "@/entities/project/ui/FiltersList";
 import CustomScrollbar from "@/shared/ui/Scrollbar";
@@ -156,7 +156,7 @@ function allCategoriesTreeViewData(pathname: string, contacts: ContactItem[], se
     const contactChildren: AccentedTreeItemProps[] = contacts.map((c) => ({
         id: c.type,
         title: ru ? c.title_ru : c.title_en,
-        icon: CONTACT_ICON_MAP[c.icon] as React.ReactElement,
+        icon: <DynamicIcon svg={c.icon_svg} name={c.icon} />,
     }));
     contactChildren.push({ id: "write", title: _("Write"), icon: <MessageIcon /> });
     const data = [
@@ -328,7 +328,7 @@ function ContactButton({
     const ci = contact as ContactItem;
     const content: ReactNode = contact.type === "write"
         ? <><MessageIcon />{t("Write")}</>
-        : <>{CONTACT_ICON_MAP[contact.icon]}{lang.ru ? ci.title_ru : ci.title_en}</>;
+        : <><DynamicIcon svg={ci.icon_svg} name={contact.icon} />{lang.ru ? ci.title_ru : ci.title_en}</>;
     const theme = useTheme();
     const contactBorderColor = accented ? getThemeColor("secondaryText", theme) : theme.palette.divider;
     const contactsColor = getThemeColor(accented ? "secondaryHoverText" : "regularText", theme);

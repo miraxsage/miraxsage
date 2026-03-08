@@ -19,10 +19,10 @@ function replaceColors(svg: string): string {
     return svg;
 }
 
-/** Remove width/height from root <svg> tag only */
+/** Remove width/height from root <svg> tag and set to 1em so parent font-size controls size */
 function stripRootDimensions(svg: string): string {
     return svg.replace(/^(<svg\b[^>]*)>/, (_, attrs) =>
-        attrs.replace(/\s+(?:width|height)="[^"]*"/g, '') + '>'
+        attrs.replace(/\s+(?:width|height)="[^"]*"/g, '') + ' width="1em" height="1em">'
     );
 }
 

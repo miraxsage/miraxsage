@@ -6,7 +6,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useThemeColor } from "@/shared/lib/theme";
 import { useColorMode } from "@/shared/lib/store/appearanceSlice";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
-import { CONTACT_ICON_MAP } from "@/widgets/landing/MainSlide";
+import DynamicIcon from "@/shared/ui/DynamicIcon";
 
 export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
     const theme = useTheme();
@@ -55,7 +55,7 @@ export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
                     dividerSize={i === 0 ? (smScreen ? "removed" : "full") : "squeezed"}
                     iconMode={true}
                 >
-                    {CONTACT_ICON_MAP[contact.icon]}
+                    <DynamicIcon svg={contact.icon_svg} name={contact.icon} />
                 </HorizontalPanelButton>
             ))}
         </Box>

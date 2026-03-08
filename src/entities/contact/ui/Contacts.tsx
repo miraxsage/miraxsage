@@ -10,7 +10,7 @@ import CustomAccordion from "@/shared/ui/Accordion";
 import DescriptionTable, { DescriptionTableData } from "@/shared/ui/DescriptionTable";
 import Link from "@/shared/ui/Link";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
-import { CONTACT_ICON_MAP } from "@/widgets/landing/MainSlide";
+import DynamicIcon from "@/shared/ui/DynamicIcon";
 import CustomTextField from "@/shared/ui/TextInput";
 import CustomCodeEditor from "@/shared/ui/CodeEditor";
 import CustomScrollbar from "@/shared/ui/Scrollbar";
@@ -41,7 +41,7 @@ function contactData(contact: ContactItem, theme: Theme, ru: boolean): Descripti
                         },
                     }}
                 >
-                    {CONTACT_ICON_MAP[contact.icon]}
+                    <DynamicIcon svg={contact.icon_svg} name={contact.icon} />
                 </Box>
             ),
         },

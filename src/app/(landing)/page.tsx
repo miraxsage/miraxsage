@@ -42,7 +42,8 @@ function getFooter(): FooterItem[] {
 
 function getContacts(): ContactItem[] {
     const db = getDb();
-    return db.prepare("SELECT * FROM contact_info WHERE is_visible = 1 ORDER BY sort_order").all() as ContactItem[];
+    const rows = db.prepare("SELECT * FROM contact_info WHERE is_visible = 1 ORDER BY sort_order").all() as ContactItem[];
+    return rows.map((c) => ({ ...c, icon_svg: resolveIconSvg(c.icon) }));
 }
 
 function getGetCloser(): GetCloserItem | null {

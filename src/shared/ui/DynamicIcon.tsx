@@ -45,11 +45,12 @@ interface DynamicIconProps {
 
 export default function DynamicIcon({ name, svg, fontSize }: DynamicIconProps) {
     if (svg) {
-        // display:contents removes the span box — SVG participates directly in parent layout
-        // so CSS rules like ".iconContainer svg { fontSize: 25px }" apply correctly
+        // display:contents removes the span box but CSS inheritance still works,
+        // so font-size here propagates to the SVG's "1em" width/height.
+        // Default 1.5rem matches MUI's SvgIcon default size.
         return (
             <span
-                style={{ display: "contents", fontSize: fontSize ?? undefined }}
+                style={{ display: "contents", fontSize: fontSize ?? "1.5rem" }}
                 dangerouslySetInnerHTML={{ __html: svg }}
             />
         );

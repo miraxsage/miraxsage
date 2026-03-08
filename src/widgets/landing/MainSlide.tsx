@@ -11,10 +11,6 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import { useAppearance, useColorMode, useLanguage } from "@/shared/lib/store/appearanceSlice";
 import MiraxsageIcon from "@/shared/icons/MiraxsageIcon";
-import TelegramIcon from "@/shared/icons/TelegramIcon";
-import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import { GitHub } from "@mui/icons-material";
 import { useEffect, useRef, useState } from "react";
 import { AnimatedGeometricWaves } from "./AnimatedGeometricWaves";
 import { GlobalStyles } from "@mui/material";
@@ -75,18 +71,10 @@ export interface ContactItem {
     title_en: string;
     title_ru: string;
     icon: string;
+    icon_svg?: string;
     url: string;
     is_visible: number;
 }
-
-export const CONTACT_ICON_MAP: Record<string, React.ReactNode> = {
-    TelegramIcon: <TelegramIcon />,
-    EmailIcon: <AlternateEmailOutlinedIcon />,
-    AlternateEmailOutlinedIcon: <AlternateEmailOutlinedIcon />,
-    LinkedInIcon: <LinkedInIcon />,
-    GitHubIcon: <GitHub />,
-    GitHub: <GitHub />,
-};
 
 function buildGradientMap(rawTitle: string): boolean[] {
     const map: boolean[] = [];
@@ -509,7 +497,7 @@ function SlideContent({ buttons, titleVariants, contacts }: { buttons: LandingBu
                                             onClick={() => contact.url.startsWith("/") ? router.push(contact.url) : window.open(contact.url, "_blank")}
                                             dividerSize={i === contacts.length - 1 ? "collapsed" : undefined}
                                         >
-                                            {CONTACT_ICON_MAP[contact.icon]}
+                                            <DynamicIcon svg={contact.icon_svg} name={contact.icon} />
                                         </TransparentButton>
                                     ))}
                                 </Box>

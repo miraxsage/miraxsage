@@ -40,7 +40,7 @@ export const HorizontalPanelButton: React.FC<HorizontalPanelButtonProps> = ({
                 ? { padding: "12px 18px" }
                 : {
                       padding: "8px 9.5px",
-                      "& .MuiSvgIcon-root": {
+                      "& .MuiSvgIcon-root, & svg": {
                           fontSize: iconSize == "small" ? "17px" : "21px",
                       },
                   }),
