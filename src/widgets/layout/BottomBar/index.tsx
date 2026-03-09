@@ -28,7 +28,7 @@ export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
         >
             {!smScreen && (
                 <>
-                    <HorizontalPanelButton iconMode={true}>
+                    <HorizontalPanelButton iconMode={true} sx={{ width: "64px" }}>
                         <InfoOutlinedIcon />
                     </HorizontalPanelButton>
                     <Box

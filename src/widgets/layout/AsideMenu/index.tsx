@@ -24,11 +24,15 @@ export default function AsideMenu() {
     const isDarkMode = colorMode.dark;
     const lang = useLanguage();
     return (
-        <motion.aside
-            style={{ borderColor: theme.palette.divider }}
-            animate={{
-                maxWidth: asideMenuVisibility.shown ? "65px" : "0px",
+        <aside
+            style={{
+                borderColor: theme.palette.divider,
+                borderRightStyle: "solid",
                 borderRightWidth: asideMenuVisibility.shown ? "1px" : "0px",
+                overflow: "hidden",
+                width: "65px",
+                maxWidth: asideMenuVisibility.shown ? "65px" : "0px",
+                transition: "max-width 0.3s ease, border-right-width 0.3s ease",
             }}
         >
             <AccentedTabs
@@ -63,6 +67,10 @@ export default function AsideMenu() {
                         notTogglable: true,
                         icon: (hovered: boolean) => (
                             <motion.div
+                                initial={{
+                                    filter: "grayscale(1)",
+                                    opacity: isDarkMode ? 0.5 : 0.4,
+                                }}
                                 animate={{
                                     filter: hovered ? "grayscale(0)" : "grayscale(1)",
                                     opacity: hovered ? 1 : isDarkMode ? 0.5 : 0.4,
@@ -93,6 +101,6 @@ export default function AsideMenu() {
                     },
                 ]}
             </AccentedTabs>
-        </motion.aside>
+        </aside>
     );
 }

@@ -276,7 +276,7 @@ export default function AccentedTabs({
                         <motion.div
                             className={classes({ active })}
                             style={{ overflow: "hidden" }}
-                            initial={{ maxWidth: "100%" }}
+                            initial={{ maxWidth: "100%", marginRight: iconMRight }}
                             animate={{
                                 maxWidth: iconMaxSize,
                                 marginRight: iconMRight,
