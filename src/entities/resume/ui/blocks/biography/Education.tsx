@@ -6,6 +6,7 @@ import { useLanguage } from "@/shared/lib/store/appearanceSlice";
 import { useMediaQuery, useTheme } from "@mui/material";
 import { useResumeData, EducationItem, EducationDataRow } from "@/entities/resume/model/resumeDataContext";
 import { ICON_MAP } from "@/entities/resume/model/iconMap";
+import DynamicIcon from "@/shared/ui/DynamicIcon";
 
 
 function buildTree(
@@ -29,7 +30,8 @@ function buildTree(
     function buildNode(item: EducationItem): AccentedTreeItemProps {
         const children = (childrenMap.get(item.id) || []).sort((a, b) => a.sort_order - b.sort_order);
         const data = (dataByItem.get(item.id) || []).sort((a, b) => a.sort_order - b.sort_order);
-        const Icon = item.icon ? ICON_MAP[item.icon] : undefined;
+        const StaticIcon = item.icon ? ICON_MAP[item.icon] : undefined;
+        const icon = StaticIcon ? <StaticIcon /> : (item.icon || item.icon_svg) ? <DynamicIcon name={item.icon} svg={item.icon_svg} /> : undefined;
         const label = lang === "en" ? item.label_en : item.label_ru;
 
         if (data.length > 0) {
@@ -44,7 +46,7 @@ function buildTree(
             return {
                 id: `edu_${item.id}`,
                 title: label,
-                icon: Icon ? <Icon /> : undefined,
+                icon,
                 children: [
                     {
                         id: `edu_${item.id}_details`,
@@ -61,7 +63,7 @@ function buildTree(
         return {
             id: `edu_${item.id}`,
             title: label,
-            icon: Icon ? <Icon /> : undefined,
+            icon,
             children: children.map((child) => buildNode(child)),
         };
     }

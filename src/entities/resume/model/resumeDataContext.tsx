@@ -7,6 +7,7 @@ export type EducationItem = {
     label_en: string;
     label_ru: string;
     icon: string | null;
+    icon_svg?: string;
     parent_id: number | null;
 };
 
@@ -28,6 +29,7 @@ export type LaborItem = {
     label_en: string;
     label_ru: string;
     icon: string | null;
+    icon_svg?: string;
     parent_id: number | null;
 };
 

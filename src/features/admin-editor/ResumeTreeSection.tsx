@@ -84,7 +84,7 @@ function stampSortOrder<T extends { id: number | string }>(arr: T[]): (T & { sor
 
 interface DataItemRowProps {
     item: TreeDataItem;
-    onChange: (field: string, value: unknown) => void;
+    onChange: (field: string, value: unknown, shouldSave?: boolean) => void;
     onDelete: () => void;
     onSave: () => void;
 }
@@ -140,7 +140,7 @@ function DataItemRow({ item, onChange, onDelete, onSave }: DataItemRowProps) {
                     <Checkbox
                         size="small"
                         checked={item.is_full_line === 1}
-                        onChange={(e) => { onChange("is_full_line", e.target.checked ? 1 : 0); onSave(); }}
+                        onChange={(e) => { onChange("is_full_line", e.target.checked ? 1 : 0, true); }}
                         sx={{ flexShrink: 0 }}
                     />
                 </Tooltip>
@@ -169,7 +169,7 @@ function DataItemRow({ item, onChange, onDelete, onSave }: DataItemRowProps) {
 interface DataListProps {
     items: TreeDataItem[];
     onReorder: (reordered: TreeDataItem[]) => void;
-    onChange: (id: number, field: string, value: unknown) => void;
+    onChange: (id: number, field: string, value: unknown, shouldSave?: boolean) => void;
     onDelete: (id: number) => void;
     onAdd: () => void;
     onSave: () => void;
@@ -200,7 +200,7 @@ function DataList({ items, onReorder, onChange, onDelete, onAdd, onSave }: DataL
                     <DataItemRow
                         key={item.id}
                         item={item}
-                        onChange={(field, value) => onChange(item.id, field, value)}
+                        onChange={(field, value, shouldSave) => onChange(item.id, field, value, shouldSave)}
                         onDelete={() => onDelete(item.id)}
                         onSave={onSave}
                     />
@@ -227,7 +227,7 @@ interface TreeItemRowProps {
     onChildAdd: (parentId: number) => void;
     onDataReorder: (parentId: number, reordered: TreeDataItem[]) => void;
     onDataAdd: (parentId: number) => void;
-    onDataChange: (id: number, field: string, value: unknown) => void;
+    onDataChange: (id: number, field: string, value: unknown, shouldSave?: boolean) => void;
     onDataDelete: (id: number) => void;
     onSave: (newItems?: TreeItem[], newData?: TreeDataItem[]) => void;
     nextTempId: () => number;
@@ -314,7 +314,7 @@ function TreeItemRow({
                         >
                             {expanded ? <ExpandMoreIcon fontSize="small" /> : <ChevronRightIcon fontSize="small" />}
                         </IconButton>
-                        <IconPickerButton value={item.icon} onChange={(v) => { onItemChange(item.id, "icon", v); onSave(); }} sx={{ width: 28, height: 28 }} />
+                        <IconPickerButton value={item.icon} onChange={(v) => { onItemChange(item.id, "icon", v); onSave(allItems.map(i => i.id === item.id ? { ...i, icon: v } : i)); }} sx={{ width: 28, height: 28 }} />
                         <TextField
                             label={__("Label", lang)}
                             size="small"
@@ -502,9 +502,11 @@ export default function ResumeTreeSection({
         onSave(undefined, newData);
     }, [data, foreignKey, nextTempId, onDataChange, onSave]);
 
-    const handleDataChange = useCallback((id: number, field: string, value: unknown) => {
-        onDataChange(data.map((d) => (d.id === id ? { ...d, [field]: value } : d)));
-    }, [data, onDataChange]);
+    const handleDataChange = useCallback((id: number, field: string, value: unknown, shouldSave = false) => {
+        const newData = data.map((d) => (d.id === id ? { ...d, [field]: value } : d));
+        onDataChange(newData);
+        if (shouldSave) onSave(undefined, newData);
+    }, [data, onDataChange, onSave]);
 
     const handleDataDelete = useCallback((id: number) => {
         const newData = data.filter((d) => d.id !== id);

@@ -49,9 +49,11 @@ function getUiLabels(): UiLabelsMap {
 function getResumeData(): ResumeData {
     const db = getDb();
     const generalData = db.prepare("SELECT * FROM resume_general_data ORDER BY sort_order").all() as ResumeData["generalData"];
-    const educationItems = db.prepare("SELECT * FROM resume_education_items ORDER BY sort_order").all() as ResumeData["educationItems"];
+    const educationItems = (db.prepare("SELECT * FROM resume_education_items ORDER BY sort_order").all() as ResumeData["educationItems"])
+        .map((item) => ({ ...item, icon_svg: resolveIconSvg(item.icon) }));
     const educationData = db.prepare("SELECT * FROM resume_education_data ORDER BY sort_order").all() as ResumeData["educationData"];
-    const laborItems = db.prepare("SELECT * FROM resume_labor_items ORDER BY sort_order").all() as ResumeData["laborItems"];
+    const laborItems = (db.prepare("SELECT * FROM resume_labor_items ORDER BY sort_order").all() as ResumeData["laborItems"])
+        .map((item) => ({ ...item, icon_svg: resolveIconSvg(item.icon) }));
     const laborData = db.prepare("SELECT * FROM resume_labor_data ORDER BY sort_order").all() as ResumeData["laborData"];
     const softSkills = db.prepare("SELECT * FROM resume_soft_skills").all() as ResumeData["softSkills"];
     return { generalData, educationItems, educationData, laborItems, laborData, softSkills };

@@ -7,7 +7,6 @@ import FirstPageIcon from "@mui/icons-material/FirstPage";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import CloseIcon from "@mui/icons-material/Close";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import { motion } from "framer-motion";
 import { Box, useTheme } from "@mui/material";
 import { getThemeColor } from "@/shared/lib/theme";
 import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
@@ -39,15 +38,15 @@ export default function CategoriesToolbar({
 }: CategoriesToolbarProps) {
     const theme = useTheme();
     return (
-        <motion.div
-            initial={false}
+        <div
             style={{
                 borderBottom: `1px solid ${theme.palette.divider}`,
                 background: getThemeColor("layoutBackground", theme),
                 display: "flex",
+                width: "100%",
+                minWidth: 0,
                 ...style,
             }}
-            animate={{ maxWidth: collapsed ? "39px" : "250px" }}
         >
             {onFilter && (
                 <ToolbarButton
@@ -108,6 +107,6 @@ export default function CategoriesToolbar({
                     </ToolbarButton>
                 )}
             </Box>
-        </motion.div>
+        </div>
     );
 }

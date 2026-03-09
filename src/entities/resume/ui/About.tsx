@@ -292,9 +292,12 @@ export default function About() {
                 <div
                     style={{
                         display: "grid",
-                        maxWidth: catsCollapsed ? "39px" : "230px",
+                        gridTemplateColumns: "minmax(0, 1fr)",
+                        gridTemplateRows: "auto minmax(0, 1fr)",
+                        width: catsCollapsed ? "39px" : "285px",
+                        minWidth: 0,
                         overflow: "hidden",
-                        transition: mounted ? "max-width 0.3s ease" : "none",
+                        transition: mounted ? "width 0.3s ease" : "none",
                         ...(lessLg
                             ? {
                                   position: "absolute",
@@ -302,7 +305,6 @@ export default function About() {
                                   height: "100%",
                               }
                             : {}),
-                        gridTemplateRows: "auto minmax(0, 1fr)",
                     }}
                 >
                     {lessLg && (
@@ -326,16 +328,12 @@ export default function About() {
                         onUnfold={() => {
                             setChangeExpandedNodes(["biography", "experience", "specifications"]);
                         }}
-                        onClose={
-                            lessSm
-                                ? undefined
-                                : () => {
-                                      setOpenedCats([]);
-                                      setActiveCatAndBlock(null);
-                                      if (lessLg) setCatsCollapsed(true);
-                                  }
-                        }
-                        style={{ overflow: "hidden" }}
+                        onClose={() => {
+                            setOpenedCats([]);
+                            setActiveCatAndBlock(null);
+                            if (lessLg) setCatsCollapsed(true);
+                        }}
+                        style={{ overflow: "visible" }}
                     />
 
                     <CustomScrollbar right="2px" top="2px" bottom="3px">
@@ -344,8 +342,8 @@ export default function About() {
                                 background: getThemeColor("layoutBackground", theme),
                                 overflow: "hidden",
                                 minHeight: "100%",
-                                maxWidth: catsCollapsed ? "39px" : "230px",
-                                transition: mounted ? "max-width 0.3s ease" : "none",
+                                width: catsCollapsed ? "39px" : "285px",
+                                transition: mounted ? "width 0.3s ease" : "none",
                             }}
                         >
                             <AboutCategoriesList
