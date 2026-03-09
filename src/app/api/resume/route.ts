@@ -113,7 +113,6 @@ export async function PUT(request: NextRequest) {
             }
         }
 
-        revalidatePath("/about", "layout");
         revalidatePath("/", "layout");
 
         return successResponse(`Section "${section}" updated successfully`);

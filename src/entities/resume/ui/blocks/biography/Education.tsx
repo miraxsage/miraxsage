@@ -7,8 +7,6 @@ import { useMediaQuery, useTheme } from "@mui/material";
 import { useResumeData, EducationItem, EducationDataRow } from "@/entities/resume/model/resumeDataContext";
 import { ICON_MAP } from "@/entities/resume/model/iconMap";
 
-const FULL_LINE_FIELDS = new Set(["full_name", "graduate_work", "certificates", "field_of_study"]);
-const SHOW_LAST_COMPACT_FIELDS = new Set(["graduate_work", "certificates"]);
 
 function buildTree(
     items: EducationItem[],
@@ -29,18 +27,17 @@ function buildTree(
     }
 
     function buildNode(item: EducationItem): AccentedTreeItemProps {
-        const children = childrenMap.get(item.id) || [];
-        const data = dataByItem.get(item.id);
+        const children = (childrenMap.get(item.id) || []).sort((a, b) => a.sort_order - b.sort_order);
+        const data = (dataByItem.get(item.id) || []).sort((a, b) => a.sort_order - b.sort_order);
         const Icon = item.icon ? ICON_MAP[item.icon] : undefined;
         const label = lang === "en" ? item.label_en : item.label_ru;
 
-        if (data && data.length > 0) {
+        if (data.length > 0) {
             const tableData: DescriptionTableData = data.map((row) => {
                 const rowLabel = lang === "en" ? row.label_en : row.label_ru;
                 const value = { en: row.value_en, ru: row.value_ru };
                 const opts: DescriptionTableRowOptions = {};
-                if (FULL_LINE_FIELDS.has(row.field_key)) opts.fullLine = true;
-                if (SHOW_LAST_COMPACT_FIELDS.has(row.field_key)) opts.showLastInCompactMode = true;
+                if (row.is_full_line) opts.fullLine = true;
                 return [rowLabel, value, opts];
             });
 
@@ -69,7 +66,7 @@ function buildTree(
         };
     }
 
-    const roots = childrenMap.get(null) || [];
+    const roots = (childrenMap.get(null) || []).sort((a, b) => a.sort_order - b.sort_order);
     return roots.map((root) => buildNode(root));
 }
 

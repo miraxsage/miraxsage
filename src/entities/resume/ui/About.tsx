@@ -1,7 +1,17 @@
 "use client";
 import { useLanguage } from "@/shared/lib/store/appearanceSlice";
 import AboutCategoriesList from "./CategoriesList";
-import { Alert, Box, useMediaQuery, useTheme } from "@mui/material";
+import { Alert, Box, keyframes, useMediaQuery, useTheme } from "@mui/material";
+import LogoIcon from "@/shared/icons/Logo";
+
+const loaderBars1 = keyframes({
+    "0%, 100%": { backgroundSize: "20% 100%" },
+    "33%, 66%": { backgroundSize: "20% 40%" },
+});
+const loaderBars2 = keyframes({
+    "0%, 33%": { backgroundPosition: "0 0, 50% 100%, 100% 0" },
+    "66%, 100%": { backgroundPosition: "0 100%, 50% 0, 100% 100%" },
+});
 import AccentedTabs from "@/shared/ui/AccentedTabs";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import CallIcon from "@mui/icons-material/Call";
@@ -30,6 +40,9 @@ import { alpha } from "@mui/material";
 import { CategoryLabelsContext, useVisibleCategories } from "@/entities/resume/model/categoryLabels";
 
 export default function About() {
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+
     const lang = useLanguage();
     const labels = useContext(CategoryLabelsContext);
     const t = useUiLabels();
@@ -255,10 +268,12 @@ export default function About() {
             ></Box>
             <Box sx={{ display: "flex", height: "100%", position: "relative", gridColumn: "span 2" }}>
                 <motion.div
+                    initial={false}
                     onClick={() => setCatsCollapsed(true)}
                     animate={{
-                        opacity: !catsCollapsed && lessLg ? 1 : 0,
-                        visibility: !catsCollapsed && lessLg ? "visible" : "collapse",
+                        opacity: mounted && !catsCollapsed && lessLg ? 1 : 0,
+                        backdropFilter: mounted && !catsCollapsed && lessLg ? "blur(3px)" : "blur(0px)",
+                        visibility: mounted && !catsCollapsed && lessLg ? "visible" : "collapse",
                         transition: {
                             duration: 0.3,
                             ease: "easeOut",
@@ -270,18 +285,19 @@ export default function About() {
                         width: "100%",
                         height: "100%",
                         zIndex: 3,
+                        opacity: 0,
                         background: alpha(getThemeColor("barBackground", theme), 0.8),
-                        backdropFilter: "blur(3px)",
                     }}
                 ></motion.div>
-                <motion.div
-                    initial={false}
-                    animate={{ maxWidth: catsCollapsed ? "39px" : "230px" }}
+                <div
                     style={{
                         display: "grid",
+                        maxWidth: catsCollapsed ? "39px" : "230px",
+                        overflow: "hidden",
+                        transition: mounted ? "max-width 0.3s ease" : "none",
                         ...(lessLg
                             ? {
-                                  position: lessLg ? "absolute" : "static",
+                                  position: "absolute",
                                   zIndex: 3,
                                   height: "100%",
                               }
@@ -323,15 +339,13 @@ export default function About() {
                     />
 
                     <CustomScrollbar right="2px" top="2px" bottom="3px">
-                        <motion.div
-                            initial={false}
+                        <div
                             style={{
                                 background: getThemeColor("layoutBackground", theme),
                                 overflow: "hidden",
                                 minHeight: "100%",
-                            }}
-                            animate={{
                                 maxWidth: catsCollapsed ? "39px" : "230px",
+                                transition: mounted ? "max-width 0.3s ease" : "none",
                             }}
                         >
                             <AboutCategoriesList
@@ -372,12 +386,50 @@ export default function About() {
                                     },
                                 }}
                             />
-                        </motion.div>
+                        </div>
                     </CustomScrollbar>
-                </motion.div>
+                </div>
                 {lessLg && <Box sx={{ minWidth: "39px", height: "100%" }}></Box>}
                 <Box sx={{ height: "100%", backgroundColor: "divider", minWidth: "1px" }} />
-                <Box sx={{ display: "grid", width: "100%", gridTemplateRows: "auto minmax(0, 1fr)" }}>
+                <Box sx={{ display: "grid", width: "100%", gridTemplateRows: "auto minmax(0, 1fr)", position: "relative" }}>
+                    <Box
+                        sx={{
+                            position: "absolute",
+                            inset: 0,
+                            zIndex: 10,
+                            background: getThemeColor("layoutBackground", theme),
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            opacity: mounted ? 0 : 1,
+                            visibility: mounted ? "hidden" : "visible",
+                            transition: "opacity 0.25s ease, visibility 0s linear 0.25s",
+                            pointerEvents: "none",
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "15px",
+                                alignItems: "center",
+                                color: theme.palette.mode === "dark" ? "#2c2f3e" : "#d1d1d1",
+                            }}
+                        >
+                            <Box sx={{ "& svg": { width: 45, height: 45 } }}>
+                                <LogoIcon />
+                            </Box>
+                            <Box
+                                sx={{
+                                    width: "25px",
+                                    aspectRatio: "5/4",
+                                    background:
+                                        "no-repeat linear-gradient(currentColor 0 0), no-repeat linear-gradient(currentColor 0 0), no-repeat linear-gradient(currentColor 0 0)",
+                                    animation: `${loaderBars1} 1s infinite, ${loaderBars2} 1s infinite`,
+                                }}
+                            />
+                        </Box>
+                    </Box>
                     {!!openedCats.length && (
                         <AccentedTabs
                             size="small"

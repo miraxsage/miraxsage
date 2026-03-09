@@ -19,6 +19,7 @@ export type EducationDataRow = {
     label_ru: string;
     value_en: string;
     value_ru: string;
+    is_full_line: number;
 };
 
 export type LaborItem = {
@@ -39,6 +40,7 @@ export type LaborDataRow = {
     label_ru: string;
     value_en: string;
     value_ru: string;
+    is_full_line: number;
 };
 
 export type GeneralDataRow = {

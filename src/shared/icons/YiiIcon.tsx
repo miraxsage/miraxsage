@@ -1,16 +1,14 @@
 import { SvgIcon } from "@mui/material";
 
 const YiiIcon: React.FC = (props) => (
-    <SvgIcon>
+    <SvgIcon {...props}>
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlSpace="preserve"
             width={24}
             height={24}
             viewBox="0 0 2713 3335"
-            fill="currentColor"
-            {...props}
-        >
+            fill="currentColor"        >
             <g transform="translate(0,3335) scale(0.1,-0.1)" stroke="none">
                 <path
                     d="M21574 33239 c-378 -256 -827 -617 -1244 -999 -198 -182 -705 -691

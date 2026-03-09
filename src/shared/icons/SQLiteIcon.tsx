@@ -1,16 +1,14 @@
 import { SvgIcon } from "@mui/material";
 
 const SQLiteIcon: React.FC = (props) => (
-    <SvgIcon>
+    <SvgIcon {...props}>
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlSpace="preserve"
             width={24}
             height={24}
             viewBox="0 0 512 512"
-            fill="currentColor"
-            {...props}
-        >
+            fill="currentColor"        >
             <path
                 d="M441.845,11.6c-21.957-19.583-48.547-11.717-74.787,11.573c-3.892,3.459-7.784,7.298-11.647,11.398
 		c-6.067,6.433-12.064,13.629-17.952,21.391c-6.109-2.524-12.788-3.93-19.786-3.93H100.063c-28.769,0-52.308,23.54-52.308,52.308

@@ -1,7 +1,7 @@
 import { SvgIcon } from "@mui/material";
 
 const LaravelIcon: React.FC = (props) => (
-    <SvgIcon>
+    <SvgIcon {...props}>
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlSpace="preserve"
@@ -12,9 +12,7 @@ const LaravelIcon: React.FC = (props) => (
             strokeLinejoin="round"
             strokeWidth="2"
             fill="none"
-            stroke="currentColor"
-            {...props}
-        >
+            stroke="currentColor"        >
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
             <path d="M3 17l8 5l7 -4v-8l-4 -2.5l4 -2.5l4 2.5v4l-11 6.5l-4 -2.5v-7.5l-4 -2.5z" />
             <path d="M11 18v4" />

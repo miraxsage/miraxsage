@@ -1,16 +1,14 @@
 import { SvgIcon } from "@mui/material";
 
 const PassionStrokeIcon: React.FC = (props) => (
-    <SvgIcon>
+    <SvgIcon {...props}>
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlSpace="preserve"
             width={24}
             height={24}
             viewBox="0 0 512 512"
-            fill="currentColor"
-            {...props}
-        >
+            fill="currentColor"        >
             <g transform="translate(0,512) scale(0.1,-0.1)">
                 <path
                     d="M2785 5039 c-356 -52 -680 -281 -839 -594 -71 -140 -106 -276 -106

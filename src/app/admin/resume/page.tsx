@@ -13,7 +13,6 @@ import {
     FormControl,
     InputLabel,
     IconButton,
-    Collapse,
     useTheme,
     Accordion,
     AccordionSummary,
@@ -24,7 +23,6 @@ import {
 } from "@mui/material";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import {
@@ -47,6 +45,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { SortableList, AdminSection, useAdminData, useLocalizedField, AdminKeyChip, IconPickerButton } from "@/features/admin-editor";
 import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
+import ResumeTreeSection from "@/features/admin-editor/ResumeTreeSection";
+import type { TreeItem, TreeDataItem } from "@/features/admin-editor/ResumeTreeSection";
 import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
 
@@ -95,6 +95,7 @@ interface EducationDataItem {
     label_ru: string;
     value_en: string;
     value_ru: string;
+    is_full_line: number;
 }
 
 interface LaborItem {
@@ -115,6 +116,7 @@ interface LaborDataItem {
     label_ru: string;
     value_en: string;
     value_ru: string;
+    is_full_line: number;
 }
 
 interface QuestionnaireItem {
@@ -524,111 +526,6 @@ function Field({ label, value, onChange, onBlur, multiline, size = "small", sx, 
 }
 
 // ---------------------------------------------------------------------------
-// Sub-data editor for Education / Labor items
-// ---------------------------------------------------------------------------
-
-interface SubDataEditorProps<D extends { id: number; sort_order: number; field_key: string; label_en: string; label_ru: string; value_en: string; value_ru: string }> {
-    parentId: number;
-    foreignKey: string;
-    allData: D[];
-    setAllData: (updater: (prev: D[]) => D[]) => void;
-    onAutoSave?: () => void;
-    lang: "en" | "ru";
-    lk: (base: string) => string;
-}
-
-function SubDataEditor<D extends { id: number; sort_order: number; field_key: string; label_en: string; label_ru: string; value_en: string; value_ru: string }>({
-    parentId,
-    foreignKey,
-    allData,
-    setAllData,
-    onAutoSave,
-    lang,
-    lk,
-}: SubDataEditorProps<D>) {
-    const items = useMemo(
-        () => allData.filter((d) => (d as Record<string, unknown>)[foreignKey] === parentId),
-        [allData, parentId, foreignKey],
-    );
-
-    const updateField = (id: number | string, key: keyof D, value: string) => {
-        setAllData((prev) => prev.map((d) => (d.id === id ? { ...d, [key]: value } : d)));
-    };
-
-    const handleReorder = (reordered: D[]) => {
-        const otherItems = allData.filter((d) => (d as Record<string, unknown>)[foreignKey] !== parentId);
-        setAllData(() => [...otherItems, ...stampSortOrder(reordered)]);
-        onAutoSave?.();
-    };
-
-    const handleDelete = (id: number | string) => {
-        setAllData((prev) => prev.filter((d) => d.id !== id));
-        onAutoSave?.();
-    };
-
-    const handleAdd = () => {
-        const newItem = {
-            id: nextTempId(),
-            [foreignKey]: parentId,
-            sort_order: items.length + 1,
-            field_key: "",
-            label_en: "",
-            label_ru: "",
-            value_en: "",
-            value_ru: "",
-        } as unknown as D;
-        setAllData((prev) => [...prev, newItem]);
-        onAutoSave?.();
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const lv = (item: any, base: string): string => (item[`${base}_${lang}`] as string) ?? "";
-
-    return (
-        <Box sx={{ mt: 1, pl: 2, borderLeft: "2px solid", borderColor: "divider" }}>
-            <Typography variant="caption" sx={{ mb: 1, display: "block", fontWeight: 600 }}>
-                {__("Data rows", lang)}
-            </Typography>
-            <SortableList
-                items={items}
-                onReorder={handleReorder}
-                onDelete={handleDelete}
-                onAdd={handleAdd}
-                addLabel={__("Add Data Row", lang)}
-                renderItem={(item) => (
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                        <Field label={__("Key", lang)} value={item.field_key} onChange={(v) => updateField(item.id, "field_key" as keyof D, v)} onBlur={onAutoSave} sx={{ flex: "1 1 120px" }} />
-                        <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateField(item.id, lk("label") as keyof D, v)} onBlur={onAutoSave} sx={{ flex: "1 1 180px" }} />
-                        <Field label={__("Value", lang)} value={lv(item, "value")} onChange={(v) => updateField(item.id, lk("value") as keyof D, v)} onBlur={onAutoSave} sx={{ flex: "1 1 220px" }} />
-                    </Box>
-                )}
-            />
-        </Box>
-    );
-}
-
-// ---------------------------------------------------------------------------
-// Expandable wrapper for education / labor items
-// ---------------------------------------------------------------------------
-
-function ExpandableItem({ label, children }: { label: string; children: React.ReactNode }) {
-    const [open, setOpen] = useState(false);
-    return (
-        <Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: open ? 1 : 0 }}>
-                <IconButton size="small" onClick={() => setOpen((o) => !o)}>
-                    {open ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
-                </IconButton>
-                <Typography variant="body2" sx={{ fontWeight: 500, cursor: "pointer" }} onClick={() => setOpen((o) => !o)}>
-                    {label || "Untitled"}
-                </Typography>
-            </Box>
-            <Collapse in={open}>{children}</Collapse>
-        </Box>
-    );
-}
-
-// ---------------------------------------------------------------------------
 // Page Component
 // ---------------------------------------------------------------------------
 
@@ -739,28 +636,6 @@ export default function AdminResumePage() {
         [setData, save],
     );
 
-    // -- Sub-data setters for education_data / labor_data -------------------
-
-    const setEducationData = useCallback(
-        (updater: (prev: EducationDataItem[]) => EducationDataItem[]) => {
-            setData((prev) => {
-                if (!prev) return prev;
-                return { ...prev, education_data: updater(prev.education_data) };
-            });
-        },
-        [setData],
-    );
-
-    const setLaborData = useCallback(
-        (updater: (prev: LaborDataItem[]) => LaborDataItem[]) => {
-            setData((prev) => {
-                if (!prev) return prev;
-                return { ...prev, labor_data: updater(prev.labor_data) };
-            });
-        },
-        [setData],
-    );
-
     const updateItemAndSave = useCallback(
         <K extends keyof ResumeData>(section: K, id: number | string, key: string, value: string) => {
             if (!dataRef.current) return;
@@ -775,16 +650,6 @@ export default function AdminResumePage() {
         },
         [setData, save],
     );
-
-    const saveEducationData = useCallback(() => {
-        if (!dataRef.current) return;
-        save({ section: "education_data", data: dataRef.current.education_data });
-    }, [save]);
-
-    const saveLaborData = useCallback(() => {
-        if (!dataRef.current) return;
-        save({ section: "labor_data", data: dataRef.current.labor_data });
-    }, [save]);
 
     // -- Category-specific handlers (preserve top-level/children on reorder) -
 
@@ -896,55 +761,24 @@ export default function AdminResumePage() {
             // ----- EDUCATION -----
             case 2:
                 return (
-                    <AdminSection
-                        saving={saving}
-                        error={error}
-                        success={success}
-                    >
-                        <SortableList
-                            items={data.education_items}
-                            onReorder={(items) => reorderItems("education_items", items)}
-                            onDelete={(id) => {
-                                deleteItem("education_items", id);
-                                setEducationData((prev) => prev.filter((d) => d.education_item_id !== id));
+                    <AdminSection saving={saving} error={error} success={success}>
+                        <ResumeTreeSection
+                            items={data.education_items as unknown as TreeItem[]}
+                            data={data.education_data as unknown as TreeDataItem[]}
+                            foreignKey="education_item_id"
+                            onItemsChange={(newItems) => {
+                                setData((prev) => prev ? { ...prev, education_items: newItems as unknown as EducationItem[] } : prev);
                             }}
-                            onAdd={() =>
-                                addItem("education_items", {
-                                    id: 0,
-                                    sort_order: 0,
-                                    label_en: "",
-                                    label_ru: "",
-                                    icon: "",
-                                    parent_id: null,
-                                } as EducationItem)
-                            }
-                            addLabel={__("Add Education Item", lang)}
-                            renderItem={(item) => (
-                                <Box>
-                                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1 }}>
-                                        <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("education_items", item.id, lk("label"), v)} onBlur={() => saveSection("education_items")} sx={{ flex: "1 1 220px" }} />
-                                        <IconPickerButton value={item.icon} onChange={(v) => { updateItem("education_items", item.id, "icon", v); saveSection("education_items"); }} />
-                                        <Field
-                                            label={__("Parent ID", lang)}
-                                            value={item.parent_id != null ? String(item.parent_id) : ""}
-                                            onChange={(v) => updateItem("education_items", item.id, "parent_id", v)}
-                                            onBlur={() => saveSection("education_items")}
-                                            sx={{ flex: "0 0 100px" }}
-                                        />
-                                    </Box>
-                                    <ExpandableItem label={`${__("Data rows", lang)}: ${lv(item, "label") || "Untitled"}`}>
-                                        <SubDataEditor
-                                            parentId={item.id as number}
-                                            foreignKey="education_item_id"
-                                            allData={data.education_data}
-                                            setAllData={setEducationData}
-                                            onAutoSave={saveEducationData}
-                                            lang={lang}
-                                            lk={lk}
-                                        />
-                                    </ExpandableItem>
-                                </Box>
-                            )}
+                            onDataChange={(newData) => {
+                                setData((prev) => prev ? { ...prev, education_data: newData as unknown as EducationDataItem[] } : prev);
+                            }}
+                            onSave={(newItems, newData) => {
+                                const itemsToSave = newItems ?? dataRef.current?.education_items;
+                                const dataToSave = newData ?? dataRef.current?.education_data;
+                                if (itemsToSave) save({ section: "education_items", data: itemsToSave });
+                                if (dataToSave) save({ section: "education_data", data: dataToSave });
+                            }}
+                            nextTempId={nextTempId}
                         />
                     </AdminSection>
                 );
@@ -952,55 +786,24 @@ export default function AdminResumePage() {
             // ----- LABOR -----
             case 3:
                 return (
-                    <AdminSection
-                        saving={saving}
-                        error={error}
-                        success={success}
-                    >
-                        <SortableList
-                            items={data.labor_items}
-                            onReorder={(items) => reorderItems("labor_items", items)}
-                            onDelete={(id) => {
-                                deleteItem("labor_items", id);
-                                setLaborData((prev) => prev.filter((d) => d.labor_item_id !== id));
+                    <AdminSection saving={saving} error={error} success={success}>
+                        <ResumeTreeSection
+                            items={data.labor_items as unknown as TreeItem[]}
+                            data={data.labor_data as unknown as TreeDataItem[]}
+                            foreignKey="labor_item_id"
+                            onItemsChange={(newItems) => {
+                                setData((prev) => prev ? { ...prev, labor_items: newItems as unknown as LaborItem[] } : prev);
                             }}
-                            onAdd={() =>
-                                addItem("labor_items", {
-                                    id: 0,
-                                    sort_order: 0,
-                                    label_en: "",
-                                    label_ru: "",
-                                    icon: "",
-                                    parent_id: null,
-                                } as LaborItem)
-                            }
-                            addLabel={__("Add Labor Item", lang)}
-                            renderItem={(item) => (
-                                <Box>
-                                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1 }}>
-                                        <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("labor_items", item.id, lk("label"), v)} onBlur={() => saveSection("labor_items")} sx={{ flex: "1 1 220px" }} />
-                                        <IconPickerButton value={item.icon} onChange={(v) => { updateItem("labor_items", item.id, "icon", v); saveSection("labor_items"); }} />
-                                        <Field
-                                            label={__("Parent ID", lang)}
-                                            value={item.parent_id != null ? String(item.parent_id) : ""}
-                                            onChange={(v) => updateItem("labor_items", item.id, "parent_id", v)}
-                                            onBlur={() => saveSection("labor_items")}
-                                            sx={{ flex: "0 0 100px" }}
-                                        />
-                                    </Box>
-                                    <ExpandableItem label={`${__("Data rows", lang)}: ${lv(item, "label") || "Untitled"}`}>
-                                        <SubDataEditor
-                                            parentId={item.id as number}
-                                            foreignKey="labor_item_id"
-                                            allData={data.labor_data}
-                                            setAllData={setLaborData}
-                                            onAutoSave={saveLaborData}
-                                            lang={lang}
-                                            lk={lk}
-                                        />
-                                    </ExpandableItem>
-                                </Box>
-                            )}
+                            onDataChange={(newData) => {
+                                setData((prev) => prev ? { ...prev, labor_data: newData as unknown as LaborDataItem[] } : prev);
+                            }}
+                            onSave={(newItems, newData) => {
+                                const itemsToSave = newItems ?? dataRef.current?.labor_items;
+                                const dataToSave = newData ?? dataRef.current?.labor_data;
+                                if (itemsToSave) save({ section: "labor_items", data: itemsToSave });
+                                if (dataToSave) save({ section: "labor_data", data: dataToSave });
+                            }}
+                            nextTempId={nextTempId}
                         />
                     </AdminSection>
                 );

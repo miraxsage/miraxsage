@@ -1,16 +1,14 @@
 import { SvgIcon } from "@mui/material";
 
 const AverageMetricIcon: React.FC = (props) => (
-    <SvgIcon>
+    <SvgIcon {...props}>
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlSpace="preserve"
             width={24}
             height={24}
             viewBox="0 0 512 512"
-            fill="currentColor"
-            {...props}
-        >
+            fill="currentColor"        >
             <g transform="translate(0,512) scale(0.1,-0.1)">
                 <path
                     d="M3455 4466 c-90 -39 -123 -165 -64 -240 11 -15 80 -70 152 -124 l131

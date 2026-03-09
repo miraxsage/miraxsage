@@ -5,3 +5,4 @@ export { default as AdminSection } from "./AdminSection";
 export { default as useAdminData } from "./useAdminData";
 export { default as useLocalizedField } from "./useLocalizedField";
 export { default as IconPickerButton } from "./IconPickerButton";
+export { default as ResumeTreeSection } from "./ResumeTreeSection";

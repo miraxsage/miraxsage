@@ -21,10 +21,7 @@ import {
     type EditorState,
     type LexicalEditor,
 } from "lexical";
-import {
-    FORMAT_TEXT_COMMAND,
-    FORMAT_ELEMENT_COMMAND,
-} from "lexical";
+import { FORMAT_TEXT_COMMAND } from "lexical";
 import {
     INSERT_ORDERED_LIST_COMMAND,
     INSERT_UNORDERED_LIST_COMMAND,
@@ -142,12 +139,14 @@ function HtmlInitPlugin({ html }: { html: string }) {
 interface RichTextEditorProps {
     value: string;
     onChange: (html: string) => void;
+    onBlur?: () => void;
     minHeight?: number;
 }
 
 export default function RichTextEditor({
     value,
     onChange,
+    onBlur,
     minHeight = 120,
 }: RichTextEditorProps) {
     const theme = useTheme();
@@ -207,6 +206,7 @@ export default function RichTextEditor({
                                     outline: "none",
                                     color: getThemeColor("regularText", theme),
                                 }}
+                                onBlur={onBlur}
                             />
                         }
                         placeholder={

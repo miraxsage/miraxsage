@@ -1,16 +1,14 @@
 import { SvgIcon } from "@mui/material";
 
 const IntegrityStrokeIcon: React.FC = (props) => (
-    <SvgIcon>
+    <SvgIcon {...props}>
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlSpace="preserve"
             width={24}
             height={24}
             viewBox="0 0 512 512"
-            fill="currentColor"
-            {...props}
-        >
+            fill="currentColor"        >
             <g transform="translate(0,512) scale(0.1,-0.1)">
                 <path
                     d="M3570 5035 c-90 -20 -232 -93 -312 -160 -38 -31 -68 -60 -68 -63 -1

@@ -1,16 +1,14 @@
 import { SvgIcon } from "@mui/material";
 
 const CreativeMindStrokeIcon: React.FC = (props) => (
-    <SvgIcon>
+    <SvgIcon {...props}>
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlSpace="preserve"
             width={24}
             height={24}
             viewBox="0 0 512 512"
-            fill="currentColor"
-            {...props}
-        >
+            fill="currentColor"        >
             <g transform="translate(0,512) scale(0.1,-0.1)">
                 <path
                     d="M2623 4964 c-29 -7 -63 -50 -63 -79 0 -12 9 -34 20 -48 20 -25 20

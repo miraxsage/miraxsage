@@ -1,16 +1,14 @@
 import { SvgIcon } from "@mui/material";
 
 const BootstrapIcon: React.FC = (props) => (
-    <SvgIcon>
+    <SvgIcon {...props}>
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlSpace="preserve"
             width={24}
             height={24}
             viewBox="0 0 512 512"
-            fill="currentColor"
-            {...props}
-        >
+            fill="currentColor"        >
             <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" stroke="none">
                 <path
                     d="M969 4585 c-165 -36 -307 -162 -371 -327 -18 -47 -21 -87 -28 -348
