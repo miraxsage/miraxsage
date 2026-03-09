@@ -835,17 +835,10 @@ export default function AdminResumePage() {
                             addLabel={__("Add Question", lang)}
                             renderItem={(item) => (
                                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                                         <IconPickerButton value={item.icon} onChange={(v) => { updateItem("questionnaire_items", item.id, "icon", v); saveSection("questionnaire_items"); }} />
-                                        <Field
-                                            label={__("Parent ID", lang)}
-                                            value={item.parent_id != null ? String(item.parent_id) : ""}
-                                            onChange={(v) => updateItem("questionnaire_items", item.id, "parent_id", v)}
-                                            onBlur={() => saveSection("questionnaire_items")}
-                                            sx={{ flex: "0 0 100px" }}
-                                        />
+                                        <Field label={__("Question", lang)} value={lv(item, "question")} onChange={(v) => updateItem("questionnaire_items", item.id, lk("question"), v)} onBlur={() => saveSection("questionnaire_items")} sx={{ flex: "1 1 auto" }} />
                                     </Box>
-                                    <Field label={__("Question", lang)} value={lv(item, "question")} onChange={(v) => updateItem("questionnaire_items", item.id, lk("question"), v)} onBlur={() => saveSection("questionnaire_items")} multiline sx={{ flex: "1 1 100%" }} />
                                     <Field label={__("Answer", lang)} value={lv(item, "answer")} onChange={(v) => updateItem("questionnaire_items", item.id, lk("answer"), v)} onBlur={() => saveSection("questionnaire_items")} multiline sx={{ flex: "1 1 100%" }} />
                                 </Box>
                             )}
