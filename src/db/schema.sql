@@ -200,6 +200,7 @@ CREATE TABLE IF NOT EXISTS technology_categories (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   slug TEXT NOT NULL UNIQUE,
   sort_order INTEGER NOT NULL DEFAULT 0,
+  icon TEXT,
   label_en TEXT NOT NULL,
   label_ru TEXT NOT NULL
 );
@@ -208,7 +209,8 @@ CREATE TABLE IF NOT EXISTS technology_categories (
 CREATE TABLE IF NOT EXISTS technologies (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   category_id INTEGER NOT NULL REFERENCES technology_categories(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
+  name_en TEXT NOT NULL,
+  name_ru TEXT NOT NULL DEFAULT '',
   docs_link TEXT,
   icon TEXT,
   skill_level INTEGER NOT NULL DEFAULT 0,

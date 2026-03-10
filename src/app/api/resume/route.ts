@@ -16,6 +16,8 @@ const SECTION_TABLES: Record<string, string> = {
     achievements: "resume_achievements",
     soft_skills: "resume_soft_skills",
     metrics: "resume_metrics",
+    technology_categories: "technology_categories",
+    technologies: "technologies",
 };
 
 export async function GET() {
@@ -48,6 +50,8 @@ export async function GET() {
             .all();
         const soft_skills = db.prepare("SELECT * FROM resume_soft_skills ORDER BY sort_order").all();
         const metrics = db.prepare("SELECT * FROM resume_metrics").all();
+        const technology_categories = db.prepare("SELECT * FROM technology_categories ORDER BY sort_order").all();
+        const technologies = db.prepare("SELECT * FROM technologies ORDER BY sort_order").all();
 
         return jsonResponse({
             categories,
@@ -60,6 +64,8 @@ export async function GET() {
             achievements,
             soft_skills,
             metrics,
+            technology_categories,
+            technologies,
         });
     } catch (error) {
         console.error("Resume GET error:", error);
@@ -107,7 +113,7 @@ export async function PUT(request: NextRequest) {
         transaction();
 
         // Invalidate icon cache for any sections that have icons
-        const ICON_SECTIONS = ["categories", "education_items", "labor_items", "questionnaire_items"];
+        const ICON_SECTIONS = ["categories", "education_items", "labor_items", "questionnaire_items", "technology_categories", "technologies"];
         if (ICON_SECTIONS.includes(section)) {
             for (const item of items) {
                 if (item.icon) invalidateIconCache(item.icon);

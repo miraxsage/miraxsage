@@ -21,6 +21,8 @@ import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
     DndContext,
     closestCenter,
@@ -149,6 +151,29 @@ interface MetricItem {
     text: string;
 }
 
+interface TechnologyCategoryItem {
+    id: number;
+    slug: string;
+    sort_order: number;
+    icon: string;
+    label_en: string;
+    label_ru: string;
+}
+
+interface TechnologyItem {
+    id: number;
+    category_id: number;
+    sort_order: number;
+    name_en: string;
+    name_ru: string;
+    docs_link: string;
+    icon: string;
+    skill_level: number;
+    experience_years: number;
+    projects_count: number;
+    color: string;
+}
+
 interface ResumeData {
     categories: Category[];
     general_data: GeneralDataItem[];
@@ -160,6 +185,8 @@ interface ResumeData {
     achievements: AchievementItem[];
     soft_skills: SoftSkillItem[];
     metrics: MetricItem[];
+    technology_categories: TechnologyCategoryItem[];
+    technologies: TechnologyItem[];
 }
 
 // ---------------------------------------------------------------------------
@@ -179,6 +206,7 @@ const TAB_LABELS = [
     "Questionnaire",
     "Achievements",
     "Soft Skills",
+    "Hard Skills",
     "Metrics",
     "General Labels",
 ];
@@ -566,6 +594,388 @@ function LevelValuesEditor({ item, updateItem, saveSection, lang }: {
             <Field label={(lang === "ru" ? "Показатель Б" : "Indicator B") + " %"} value={v2} onChange={setV2} onBlur={handleBlur} error={!v2Valid} sx={{ flex: "1 1 0" }} />
             <Field label={(lang === "ru" ? "Показатель В" : "Indicator C") + " %"} value={v3} onChange={setV3} onBlur={handleBlur} error={!v3Valid} sx={{ flex: "1 1 0" }} />
         </Box>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Hard Skills Tab
+// ---------------------------------------------------------------------------
+
+interface HardSkillsTabProps {
+    categories: TechnologyCategoryItem[];
+    technologies: TechnologyItem[];
+    lang: "en" | "ru";
+    lk: (base: string) => string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    lv: (item: any, base: string) => string;
+    updateItem: <K extends keyof ResumeData>(section: K, id: number | string, key: string, value: string) => void;
+    updateItemAndSave: <K extends keyof ResumeData>(section: K, id: number | string, key: string, value: string) => void;
+    saveSection: (section: keyof ResumeData) => void;
+    setData: React.Dispatch<React.SetStateAction<ResumeData | null>>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    save: (payload: any) => void;
+}
+
+function TechIndicatorField({ label, value, onChange, onBlur, validate, sx }: {
+    label: string;
+    value: string;
+    onChange: (v: string) => void;
+    onBlur: () => void;
+    validate: (v: string) => boolean;
+    sx?: object;
+}) {
+    return (
+        <Field
+            label={label}
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+            error={!validate(value)}
+            sx={sx}
+        />
+    );
+}
+
+function TechItemEditor({ item, lang, lk, lv, updateItem, saveSection, updateItemAndSave }: {
+    item: TechnologyItem;
+    lang: "en" | "ru";
+    lk: (base: string) => string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    lv: (item: any, base: string) => string;
+    updateItem: HardSkillsTabProps["updateItem"];
+    saveSection: HardSkillsTabProps["saveSection"];
+    updateItemAndSave: HardSkillsTabProps["updateItemAndSave"];
+}) {
+    const [level, setLevel] = useState(String(item.skill_level));
+    const [exp, setExp] = useState(String(item.experience_years));
+    const [projects, setProjects] = useState(String(item.projects_count));
+
+    const prevItem = useRef({ skill_level: item.skill_level, experience_years: item.experience_years, projects_count: item.projects_count });
+    if (item.skill_level !== prevItem.current.skill_level || item.experience_years !== prevItem.current.experience_years || item.projects_count !== prevItem.current.projects_count) {
+        prevItem.current = { skill_level: item.skill_level, experience_years: item.experience_years, projects_count: item.projects_count };
+        setLevel(String(item.skill_level));
+        setExp(String(item.experience_years));
+        setProjects(String(item.projects_count));
+    }
+
+    const levelValid = (v: string) => /^\d+$/.test(v) && Number(v) >= 0 && Number(v) <= 100;
+    const expValid = (v: string) => /^\d{1,2}([.,]\d)?$/.test(v);
+    const projectsValid = (v: string) => /^\d+$/.test(v) && Number(v) >= 0;
+
+    const handleBlur = () => {
+        if (!levelValid(level) || !expValid(exp) || !projectsValid(projects)) return;
+        const normExp = exp.replace(",", ".");
+        updateItem("technologies", item.id, "skill_level", level);
+        updateItem("technologies", item.id, "experience_years", normExp);
+        updateItem("technologies", item.id, "projects_count", projects);
+        saveSection("technologies");
+    };
+
+    return (
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                <IconPickerButton value={item.icon} onChange={(v) => updateItemAndSave("technologies", item.id, "icon", v)} />
+                <Field label={__("Name", lang)} value={lv(item, "name")} onChange={(v) => updateItem("technologies", item.id, lk("name"), v)} onBlur={() => saveSection("technologies")} sx={{ flex: "1 1 auto" }} />
+                <Field label={__("Docs link", lang)} value={item.docs_link} onChange={(v) => updateItem("technologies", item.id, "docs_link", v)} onBlur={() => saveSection("technologies")} sx={{ flex: "1 1 auto" }} />
+                <Field label={__("Color", lang)} value={item.color ?? ""} onChange={(v) => updateItem("technologies", item.id, "color", v)} onBlur={() => saveSection("technologies")} sx={{ flex: "0 0 100px" }} />
+            </Box>
+            <Box sx={{ display: "flex", gap: 1 }}>
+                <TechIndicatorField
+                    label={__("Level", lang) + " (0-100)"}
+                    value={level}
+                    onChange={setLevel}
+                    onBlur={handleBlur}
+                    validate={levelValid}
+                    sx={{ flex: "1 1 0" }}
+                />
+                <TechIndicatorField
+                    label={__("Experience", lang) + " (" + __("years", lang) + ")"}
+                    value={exp}
+                    onChange={(v) => setExp(v.replace(",", "."))}
+                    onBlur={handleBlur}
+                    validate={expValid}
+                    sx={{ flex: "1 1 0" }}
+                />
+                <TechIndicatorField
+                    label={__("Projects", lang)}
+                    value={projects}
+                    onChange={setProjects}
+                    onBlur={handleBlur}
+                    validate={projectsValid}
+                    sx={{ flex: "1 1 0" }}
+                />
+            </Box>
+        </Box>
+    );
+}
+
+function HardSkillsTab({ categories, technologies, lang, lk, lv, updateItem, updateItemAndSave, saveSection, setData, save }: HardSkillsTabProps) {
+    const theme = useTheme();
+    const [expandedCats, setExpandedCats] = useState<Set<number>>(new Set());
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    );
+
+    const sortedCats = useMemo(
+        () => [...categories].sort((a, b) => a.sort_order - b.sort_order),
+        [categories],
+    );
+
+    const toggleCat = (id: number) => {
+        setExpandedCats((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id); else next.add(id);
+            return next;
+        });
+    };
+
+    const handleCatDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
+        const oldIndex = sortedCats.findIndex((c) => c.id === active.id);
+        const newIndex = sortedCats.findIndex((c) => c.id === over.id);
+        const reordered = stampSortOrder(arrayMove(sortedCats, oldIndex, newIndex));
+        setData((prev) => prev ? { ...prev, technology_categories: reordered } : prev);
+        save({ section: "technology_categories", data: reordered });
+    };
+
+    const handleTechDragEnd = (catId: number) => (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
+        const catTechs = technologies.filter((t) => t.category_id === catId).sort((a, b) => a.sort_order - b.sort_order);
+        const oldIndex = catTechs.findIndex((t) => t.id === active.id);
+        const newIndex = catTechs.findIndex((t) => t.id === over.id);
+        const reordered = stampSortOrder(arrayMove(catTechs, oldIndex, newIndex));
+        const otherTechs = technologies.filter((t) => t.category_id !== catId);
+        const all = [...otherTechs, ...reordered];
+        setData((prev) => prev ? { ...prev, technologies: all } : prev);
+        save({ section: "technologies", data: all });
+    };
+
+    const addCategory = () => {
+        const newCat: TechnologyCategoryItem = {
+            id: nextTempId(),
+            slug: "",
+            sort_order: categories.length + 1,
+            icon: "",
+            label_en: "",
+            label_ru: "",
+        };
+        const newCats = [...categories, newCat];
+        setData((prev) => prev ? { ...prev, technology_categories: newCats } : prev);
+        save({ section: "technology_categories", data: newCats });
+        setExpandedCats((prev) => new Set(prev).add(newCat.id));
+    };
+
+    const deleteCategory = (id: number) => {
+        const newCats = categories.filter((c) => c.id !== id);
+        const newTechs = technologies.filter((t) => t.category_id !== id);
+        setData((prev) => prev ? { ...prev, technology_categories: newCats, technologies: newTechs } : prev);
+        save({ section: "technology_categories", data: newCats });
+        save({ section: "technologies", data: newTechs });
+    };
+
+    const addTech = (catId: number) => {
+        const catTechs = technologies.filter((t) => t.category_id === catId);
+        const newTech: TechnologyItem = {
+            id: nextTempId(),
+            category_id: catId,
+            sort_order: catTechs.length + 1,
+            name_en: "",
+            name_ru: "",
+            docs_link: "",
+            icon: "",
+            skill_level: 0,
+            experience_years: 0,
+            projects_count: 0,
+            color: "",
+        };
+        const all = [...technologies, newTech];
+        setData((prev) => prev ? { ...prev, technologies: all } : prev);
+        save({ section: "technologies", data: all });
+    };
+
+    const deleteTech = (id: number) => {
+        const newTechs = technologies.filter((t) => t.id !== id);
+        setData((prev) => prev ? { ...prev, technologies: newTechs } : prev);
+        save({ section: "technologies", data: newTechs });
+    };
+
+    return (
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCatDragEnd}>
+                <SortableContext items={sortedCats.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+                    {sortedCats.map((cat) => {
+                        const catTechs = technologies
+                            .filter((t) => t.category_id === cat.id)
+                            .sort((a, b) => a.sort_order - b.sort_order);
+                        const expanded = expandedCats.has(cat.id);
+                        return (
+                            <HardSkillCategoryRow
+                                key={cat.id}
+                                cat={cat}
+                                expanded={expanded}
+                                onToggle={() => toggleCat(cat.id)}
+                                lang={lang}
+                                lk={lk}
+                                lv={lv}
+                                updateItem={updateItem}
+                                updateItemAndSave={updateItemAndSave}
+                                saveSection={saveSection}
+                                onDelete={() => deleteCategory(cat.id)}
+                                onAddTech={() => addTech(cat.id)}
+                                onDeleteTech={deleteTech}
+                                catTechs={catTechs}
+                                handleTechDragEnd={handleTechDragEnd(cat.id)}
+                            />
+                        );
+                    })}
+                </SortableContext>
+            </DndContext>
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
+                <IconButton onClick={addCategory} color="primary" sx={{ border: `1px dashed ${theme.palette.divider}`, borderRadius: "8px", px: 3 }}>
+                    <AddIcon fontSize="small" />
+                    <Typography variant="body2" sx={{ ml: 0.5 }}>{__("Add Category", lang)}</Typography>
+                </IconButton>
+            </Box>
+        </Box>
+    );
+}
+
+function HardSkillCategoryRow({ cat, expanded, onToggle, lang, lk, lv, updateItem, updateItemAndSave, saveSection, onDelete, onAddTech, onDeleteTech, catTechs, handleTechDragEnd }: {
+    cat: TechnologyCategoryItem;
+    expanded: boolean;
+    onToggle: () => void;
+    lang: "en" | "ru";
+    lk: (base: string) => string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    lv: (item: any, base: string) => string;
+    updateItem: HardSkillsTabProps["updateItem"];
+    updateItemAndSave: HardSkillsTabProps["updateItemAndSave"];
+    saveSection: HardSkillsTabProps["saveSection"];
+    onDelete: () => void;
+    onAddTech: () => void;
+    onDeleteTech: (id: number) => void;
+    catTechs: TechnologyItem[];
+    handleTechDragEnd: (event: DragEndEvent) => void;
+}) {
+    const theme = useTheme();
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: cat.id });
+    const style = { transform: CSS.Transform.toString(transform), transition };
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    );
+
+    return (
+        <Box ref={setNodeRef} style={style} sx={{ opacity: isDragging ? 0.5 : 1 }}>
+            <Accordion
+                expanded={expanded}
+                onChange={() => {}}
+                disableGutters
+                sx={{
+                    background: getThemeColor("titleBg", theme),
+                    boxShadow: "none",
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: "6px !important",
+                    "&:before": { display: "none" },
+                    "& .MuiAccordionSummary-root": { minHeight: "42px", padding: "0 14px", cursor: "default" },
+                    "& .MuiAccordionSummary-content": { margin: "8px 0", width: "100%" },
+                    "& .MuiAccordionDetails-root": {
+                        padding: "12px",
+                        background: getThemeColor("layoutBackground", theme),
+                        borderTop: `1px solid ${theme.palette.divider}`,
+                    },
+                }}
+            >
+                <AccordionSummary>
+                    <Box sx={{ display: "flex", alignItems: "center", width: "100%", gap: 1 }} onClick={(e) => e.stopPropagation()}>
+                        <IconButton size="small" {...attributes} {...listeners} sx={{ cursor: "grab", flexShrink: 0 }}>
+                            <DragIndicatorIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton size="small" onClick={onToggle} sx={{ flexShrink: 0, color: getThemeColor("regularIcon", theme) }}>
+                            {expanded ? <ExpandMoreIcon fontSize="small" /> : <ChevronRightIcon fontSize="small" />}
+                        </IconButton>
+                        <IconPickerButton value={cat.icon} onChange={(v) => updateItemAndSave("technology_categories", cat.id, "icon", v)} />
+                        <Field label={__("Label", lang)} value={lv(cat, "label")} onChange={(v) => updateItem("technology_categories", cat.id, lk("label"), v)} onBlur={() => saveSection("technology_categories")} sx={{ flex: "1 1 auto" }} />
+                        <IconButton size="small" onClick={onDelete} color="error" sx={{ flexShrink: 0 }}>
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Box>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleTechDragEnd}>
+                        <SortableContext items={catTechs.map((t) => t.id)} strategy={verticalListSortingStrategy}>
+                            {catTechs.map((tech) => (
+                                <SortableTechRow key={tech.id} tech={tech} lang={lang} lk={lk} lv={lv} updateItem={updateItem} updateItemAndSave={updateItemAndSave} saveSection={saveSection} onDelete={() => onDeleteTech(tech.id)} />
+                            ))}
+                        </SortableContext>
+                    </DndContext>
+                    <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
+                        <IconButton onClick={onAddTech} size="small" sx={{ border: `1px dashed ${theme.palette.divider}`, borderRadius: "8px", px: 2 }}>
+                            <AddIcon fontSize="small" />
+                            <Typography variant="caption" sx={{ ml: 0.5 }}>{__("Add Technology", lang)}</Typography>
+                        </IconButton>
+                    </Box>
+                </AccordionDetails>
+            </Accordion>
+        </Box>
+    );
+}
+
+function SortableTechRow({ tech, lang, lk, lv, updateItem, updateItemAndSave, saveSection, onDelete }: {
+    tech: TechnologyItem;
+    lang: "en" | "ru";
+    lk: (base: string) => string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    lv: (item: any, base: string) => string;
+    updateItem: HardSkillsTabProps["updateItem"];
+    updateItemAndSave: HardSkillsTabProps["updateItemAndSave"];
+    saveSection: HardSkillsTabProps["saveSection"];
+    onDelete: () => void;
+}) {
+    const theme = useTheme();
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: tech.id });
+    const style = { transform: CSS.Transform.toString(transform), transition };
+
+    return (
+        <Paper
+            ref={setNodeRef}
+            style={style}
+            elevation={isDragging ? 4 : 0}
+            sx={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 1,
+                px: 1.5,
+                py: 1,
+                mb: 1,
+                border: `1px solid ${theme.palette.divider}`,
+                background: getThemeColor("barBackground", theme),
+                opacity: isDragging ? 0.5 : 1,
+            }}
+        >
+            <IconButton size="small" {...attributes} {...listeners} sx={{ cursor: "grab", flexShrink: 0, mt: "4px" }}>
+                <DragIndicatorIcon fontSize="small" />
+            </IconButton>
+            <Box sx={{ flex: 1 }}>
+                <TechItemEditor
+                    item={tech}
+                    lang={lang}
+                    lk={lk}
+                    lv={lv}
+                    updateItem={updateItem}
+                    saveSection={saveSection}
+                    updateItemAndSave={updateItemAndSave}
+                />
+            </Box>
+            <IconButton size="small" onClick={onDelete} color="error" sx={{ flexShrink: 0, mt: "4px" }}>
+                <DeleteIcon fontSize="small" />
+            </IconButton>
+        </Paper>
     );
 }
 
@@ -959,8 +1369,27 @@ export default function AdminResumePage() {
                     </AdminSection>
                 );
 
+            // ----- HARD SKILLS -----
+            case 7:
+                return (
+                    <AdminSection saving={saving} error={error} success={success}>
+                        <HardSkillsTab
+                            categories={data.technology_categories}
+                            technologies={data.technologies}
+                            lang={lang}
+                            lk={lk}
+                            lv={lv}
+                            updateItem={updateItem}
+                            updateItemAndSave={updateItemAndSave}
+                            saveSection={saveSection}
+                            setData={setData}
+                            save={save}
+                        />
+                    </AdminSection>
+                );
+
             // ----- METRICS -----
-            case 7: {
+            case 8: {
                 const metric = data.metrics[0];
                 return (
                     <AdminSection saving={saving} error={error} success={success}>
@@ -977,7 +1406,7 @@ export default function AdminResumePage() {
             }
 
             // ----- GENERAL LABELS -----
-            case 8:
+            case 9:
                 return (
                     <AdminSection
                         saving={labelsSaving}

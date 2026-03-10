@@ -60,7 +60,11 @@ function getResumeData(): ResumeData {
         .map((item) => ({ ...item, icon_svg: resolveIconSvg(item.icon) }));
     const achievements = db.prepare("SELECT * FROM resume_achievements ORDER BY sort_order").all() as ResumeData["achievements"];
     const metrics = db.prepare("SELECT id, text FROM resume_metrics LIMIT 1").all() as ResumeData["metrics"];
-    return { generalData, educationItems, educationData, laborItems, laborData, softSkills, questionnaireItems, achievements, metrics };
+    const technologyCategories = (db.prepare("SELECT * FROM technology_categories ORDER BY sort_order").all() as ResumeData["technologyCategories"])
+        .map((cat) => ({ ...cat, icon_svg: resolveIconSvg(cat.icon) }));
+    const technologies = (db.prepare("SELECT * FROM technologies ORDER BY sort_order").all() as ResumeData["technologies"])
+        .map((tech) => ({ ...tech, icon_svg: resolveIconSvg(tech.icon) }));
+    return { generalData, educationItems, educationData, laborItems, laborData, softSkills, questionnaireItems, achievements, metrics, technologyCategories, technologies };
 }
 
 function getContacts(): ContactItem[] {
