@@ -58,7 +58,9 @@ function getResumeData(): ResumeData {
     const softSkills = db.prepare("SELECT * FROM resume_soft_skills").all() as ResumeData["softSkills"];
     const questionnaireItems = (db.prepare("SELECT * FROM resume_questionnaire_items ORDER BY sort_order").all() as ResumeData["questionnaireItems"])
         .map((item) => ({ ...item, icon_svg: resolveIconSvg(item.icon) }));
-    return { generalData, educationItems, educationData, laborItems, laborData, softSkills, questionnaireItems };
+    const achievements = db.prepare("SELECT * FROM resume_achievements ORDER BY sort_order").all() as ResumeData["achievements"];
+    const metrics = db.prepare("SELECT id, text FROM resume_metrics LIMIT 1").all() as ResumeData["metrics"];
+    return { generalData, educationItems, educationData, laborItems, laborData, softSkills, questionnaireItems, achievements, metrics };
 }
 
 function getContacts(): ContactItem[] {

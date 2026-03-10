@@ -67,6 +67,18 @@ export type QuestionnaireItem = {
     icon_svg?: string;
 };
 
+export type MetricRow = {
+    id: number;
+    text: string;
+};
+
+export type AchievementRow = {
+    id: number;
+    sort_order: number;
+    content_en: string;
+    content_ru: string;
+};
+
 export type SoftSkillRow = {
     id: number;
     slug: string;
@@ -86,6 +98,8 @@ export type ResumeData = {
     laborData: LaborDataRow[];
     softSkills: SoftSkillRow[];
     questionnaireItems: QuestionnaireItem[];
+    achievements: AchievementRow[];
+    metrics: MetricRow[];
 };
 
 export const ResumeDataContext = createContext<ResumeData>({
@@ -96,6 +110,8 @@ export const ResumeDataContext = createContext<ResumeData>({
     laborData: [],
     softSkills: [],
     questionnaireItems: [],
+    achievements: [],
+    metrics: [],
 });
 
 export function useResumeData(): ResumeData {

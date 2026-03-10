@@ -1,13 +1,12 @@
 "use client";
-import { useLanguage } from "@/shared/lib/store/appearanceSlice";
+import { useResumeData } from "@/entities/resume/model/resumeDataContext";
 
 export default function AboutSpecsMetricsBlock() {
-    const lang = useLanguage();
+    const { metrics } = useResumeData();
+    const text = metrics[0]?.text ?? "";
     return (
-        <div className="px-4 py-3">
-            {lang.ru
-                ? `Метрики производительности временно в состоянии предварительной актуализации.`
-                : `The performance metrics are currently undergoing preliminary updating.`}
+        <div className="px-4 py-3" style={{ whiteSpace: "pre-wrap" }}>
+            {text}
         </div>
     );
 }

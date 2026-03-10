@@ -8,10 +8,6 @@ import {
     TextField,
     Typography,
     CircularProgress,
-    MenuItem,
-    Select,
-    FormControl,
-    InputLabel,
     IconButton,
     useTheme,
     Accordion,
@@ -150,11 +146,7 @@ interface SoftSkillItem {
 
 interface MetricItem {
     id: number;
-    slug: string;
-    label_en: string;
-    label_ru: string;
-    chart_type: string;
-    chart_data: string;
+    text: string;
 }
 
 interface ResumeData {
@@ -917,57 +909,21 @@ export default function AdminResumePage() {
                 );
 
             // ----- METRICS -----
-            case 7:
+            case 7: {
+                const metric = data.metrics[0];
                 return (
-                    <AdminSection
-                        saving={saving}
-                        error={error}
-                        success={success}
-                    >
-                        <SortableList
-                            items={data.metrics}
-                            onReorder={(items) => reorderItems("metrics", items)}
-                            onDelete={(id) => deleteItem("metrics", id)}
-                            onAdd={() =>
-                                addItem("metrics", {
-                                    id: 0,
-                                    slug: "",
-                                    label_en: "",
-                                    label_ru: "",
-                                    chart_type: "bar",
-                                    chart_data: "{}",
-                                } as MetricItem)
-                            }
-                            addLabel={__("Add Metric", lang)}
-                            renderItem={(item) => (
-                                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                        <Field label={__("Slug", lang)} value={item.slug} onChange={(v) => updateItem("metrics", item.id, "slug", v)} onBlur={() => saveSection("metrics")} sx={{ flex: "1 1 120px" }} />
-                                        <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("metrics", item.id, lk("label"), v)} onBlur={() => saveSection("metrics")} sx={{ flex: "1 1 220px" }} />
-                                        <FormControl size="small" sx={{ flex: "0 0 140px" }}>
-                                            <InputLabel>{__("Chart Type", lang)}</InputLabel>
-                                            <Select
-                                                label={__("Chart Type", lang)}
-                                                value={item.chart_type ?? "bar"}
-                                                onChange={(e) =>
-                                                    updateItemAndSave("metrics", item.id, "chart_type", e.target.value)
-                                                }
-                                            >
-                                                <MenuItem value="bar">Bar</MenuItem>
-                                                <MenuItem value="pie">Pie</MenuItem>
-                                                <MenuItem value="line">Line</MenuItem>
-                                                <MenuItem value="doughnut">Doughnut</MenuItem>
-                                                <MenuItem value="radar">Radar</MenuItem>
-                                                <MenuItem value="polar">Polar</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </Box>
-                                    <Field label={__("Chart Data (JSON)", lang)} value={item.chart_data} onChange={(v) => updateItem("metrics", item.id, "chart_data", v)} onBlur={() => saveSection("metrics")} multiline />
-                                </Box>
-                            )}
+                    <AdminSection saving={saving} error={error} success={success}>
+                        <Field
+                            label={__("Text", lang)}
+                            value={metric?.text ?? ""}
+                            onChange={(v) => metric && updateItem("metrics", metric.id, "text", v)}
+                            onBlur={() => saveSection("metrics")}
+                            multiline
+                            sx={{ width: "100%" }}
                         />
                     </AdminSection>
                 );
+            }
 
             // ----- GENERAL LABELS -----
             case 8:

@@ -144,11 +144,13 @@ export default function About() {
         if (changeExpandedNodes) setChangeExpandedNodes(undefined);
         const prevParams = prevParamsRef.current;
         prevParamsRef.current = params;
+        const paramsCatChanged = params.category !== prevParams.category;
         const paramsBlockChanged = params.block !== prevParams.block;
-        let newActiveCat = params.category ? params.category : activeCat;
+        // When params haven't changed yet (pending navigation), trust activeCat over the stale URL
+        let newActiveCat = paramsCatChanged ? (params.category ?? activeCat) : activeCat;
         let newActiveBlock = !newActiveCat
             ? null
-            : paramsBlockChanged
+            : paramsBlockChanged || paramsCatChanged
               ? (params.block ?? null)
               : selectedCat;
         const visibleCatKeys = Object.keys(visibleCategories);
