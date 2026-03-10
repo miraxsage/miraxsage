@@ -55,7 +55,7 @@ function getResumeData(): ResumeData {
     const laborItems = (db.prepare("SELECT * FROM resume_labor_items ORDER BY sort_order").all() as ResumeData["laborItems"])
         .map((item) => ({ ...item, icon_svg: resolveIconSvg(item.icon) }));
     const laborData = db.prepare("SELECT * FROM resume_labor_data ORDER BY sort_order").all() as ResumeData["laborData"];
-    const softSkills = db.prepare("SELECT * FROM resume_soft_skills").all() as ResumeData["softSkills"];
+    const softSkills = db.prepare("SELECT * FROM resume_soft_skills ORDER BY sort_order").all() as ResumeData["softSkills"];
     const questionnaireItems = (db.prepare("SELECT * FROM resume_questionnaire_items ORDER BY sort_order").all() as ResumeData["questionnaireItems"])
         .map((item) => ({ ...item, icon_svg: resolveIconSvg(item.icon) }));
     const achievements = db.prepare("SELECT * FROM resume_achievements ORDER BY sort_order").all() as ResumeData["achievements"];

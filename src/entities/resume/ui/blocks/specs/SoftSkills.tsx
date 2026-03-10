@@ -106,7 +106,11 @@ export default function AboutSpecsSoftSkillsBlock() {
         >
             {softSkills.map((skill, i) => {
                 const Icon = ICON_MAP[skill.icon];
-                const levelValues: [number, number, number] = JSON.parse(skill.level_values);
+                const raw: number[] = JSON.parse(skill.level_values);
+                const level = raw[0] ?? 0;
+                const totalLevel = raw[1] ?? 100;
+                const averagePercent = raw.length >= 4 ? raw[2] : (totalLevel > 0 ? Math.round(100 * (raw[2] ?? 0) / totalLevel) : 0);
+                const levelPercent = raw.length >= 4 ? raw[3] : (totalLevel > 0 ? Math.round(100 * level / totalLevel) : 0);
                 const label = lang.lang === "en" ? skill.label_en : skill.label_ru;
                 const description = { en: skill.description_en, ru: skill.description_ru };
 
@@ -117,9 +121,10 @@ export default function AboutSpecsSoftSkillsBlock() {
                             label={label}
                             description={description}
                             icon={Icon ? <Icon /> : <></>}
-                            level={levelValues[0]}
-                            totalLevel={levelValues[1]}
-                            averageLevel={levelValues[2]}
+                            level={level}
+                            totalLevel={totalLevel}
+                            averagePercent={averagePercent}
+                            levelPercent={levelPercent}
                         />
                         <div className="connector">
                             <div></div>

@@ -19,11 +19,12 @@ type DiagrammProps = {
     icon: ReactNode;
     level: number;
     totalLevel: number;
-    averageLevel: number;
+    averagePercent: number;
+    levelPercent: number;
     accentedElement?: "total" | "average" | "level";
 };
 
-function Diagramm({ icon, level, averageLevel, totalLevel, accentedElement }: DiagrammProps) {
+function Diagramm({ icon, level, totalLevel, averagePercent, levelPercent, accentedElement }: DiagrammProps) {
     const theme = useTheme();
     const isDark = useColorMode().dark;
     const primaryColor = isDark ? theme.palette.primary.main : theme.palette.primary.dark;
@@ -34,12 +35,12 @@ function Diagramm({ icon, level, averageLevel, totalLevel, accentedElement }: Di
         : theme.palette.secondary.main;
     const dividerColor = theme.palette.divider;
     const totalToColor = getThemeColor("regularText", theme);
+    const totalFromColor = accentedElement == "total" ? totalToColor : dividerColor;
     const averageFromColor = accentedElement == "average" ? secondaryColor : dividerColor;
     const averageToColor = secondaryColor;
     const levelFromColor = accentedElement == "level" ? primaryColor : dividerColor;
     const levelToColor = primaryColor;
-    const levelPercent = Math.round((100 * level) / totalLevel);
-    const averagePercent = Math.round((100 * averageLevel) / totalLevel);
+    const totalPercent = totalLevel > 0 ? Math.round((100 * level) / totalLevel) : 0;
     return (
         <div className="pt-3 pr-3 pb-3 flex flex-wrap">
             <div className="flex self-center h-full max-h-24">
@@ -47,8 +48,10 @@ function Diagramm({ icon, level, averageLevel, totalLevel, accentedElement }: Di
                     sx={{
                         width: "2px",
                         marginRight: "5px",
-                        background: accentedElement == "total" ? totalToColor : dividerColor,
                         transition: "all 0.2s",
+                        backgroundImage: `linear-gradient(transparent 0%, transparent ${
+                            100 - totalPercent
+                        }%, ${totalToColor} ${100 - totalPercent}%, ${totalFromColor} 100%)`,
                     }}
                 ></Box>
                 <Box
@@ -151,14 +154,13 @@ export default function SoftSkillDescriptionBlock({
     icon,
     level,
     totalLevel,
-    averageLevel,
+    averagePercent,
+    levelPercent,
 }: SoftSkillDescriptionBlockProps) {
     const theme = useTheme();
     const lang = useLanguage();
     const belowlg = useMediaQuery(theme.breakpoints.down("lg"));
     const [accentedElement, setAccentedElement] = useState<DiagrammProps["accentedElement"]>();
-    const levelPercent = Math.round((100 * level) / totalLevel);
-    const averagePercent = Math.round((100 * averageLevel) / totalLevel);
     return (
         <Box
             sx={{
@@ -189,7 +191,7 @@ export default function SoftSkillDescriptionBlock({
             >
                 {number}
             </Box>
-            <div className={"flex flex-col " + (belowlg ? "px-3 py-2" : "px-4 py-3")}>
+            <div className={"flex flex-col gap-2 px-4 py-3"}>
                 <div
                     className="flex gap-2 flex-wrap"
                     onPointerOver={(e: React.PointerEvent) => {
@@ -220,8 +222,9 @@ export default function SoftSkillDescriptionBlock({
                 <Diagramm
                     icon={icon}
                     level={level}
-                    averageLevel={averageLevel}
                     totalLevel={totalLevel}
+                    averagePercent={averagePercent}
+                    levelPercent={levelPercent}
                     accentedElement={accentedElement}
                 />
             </Box>
@@ -230,7 +233,7 @@ export default function SoftSkillDescriptionBlock({
                 <Box
                     sx={{
                         gridColumn: "span 2",
-                        padding: "5px 8px 8px 8px",
+                        padding: "0px 16px 12px 16px",
                         ["@media (max-width: 450px)"]: {
                             gridColumn: "span 1",
                         },

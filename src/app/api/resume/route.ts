@@ -46,7 +46,7 @@ export async function GET() {
         const achievements = db
             .prepare("SELECT * FROM resume_achievements ORDER BY sort_order")
             .all();
-        const soft_skills = db.prepare("SELECT * FROM resume_soft_skills").all();
+        const soft_skills = db.prepare("SELECT * FROM resume_soft_skills ORDER BY sort_order").all();
         const metrics = db.prepare("SELECT * FROM resume_metrics").all();
 
         return jsonResponse({

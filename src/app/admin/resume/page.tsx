@@ -496,9 +496,10 @@ interface FieldProps {
     sx?: object;
     select?: boolean;
     children?: React.ReactNode;
+    error?: boolean;
 }
 
-function Field({ label, value, onChange, onBlur, multiline, size = "small", sx, select, children }: FieldProps) {
+function Field({ label, value, onChange, onBlur, multiline, size = "small", sx, select, children, error }: FieldProps) {
     return (
         <TextField
             label={label}
@@ -510,10 +511,61 @@ function Field({ label, value, onChange, onBlur, multiline, size = "small", sx, 
             multiline={multiline}
             minRows={multiline ? 2 : undefined}
             select={select}
+            error={error}
             sx={{ ...sx }}
         >
             {children}
         </TextField>
+    );
+}
+
+function parseLevelValues(json: string): [number, number, number, number] {
+    try {
+        const arr = JSON.parse(json);
+        if (arr.length >= 4) return [arr[0], arr[1], arr[2], arr[3]];
+        const [l, t, a] = arr as [number, number, number];
+        return [l, t, t > 0 ? Math.round(100 * a / t) : 0, t > 0 ? Math.round(100 * l / t) : 0];
+    } catch { return [0, 100, 0, 0]; }
+}
+
+function LevelValuesEditor({ item, updateItem, saveSection, lang }: {
+    item: { id: number; level_values: string };
+    updateItem: (section: "soft_skills", id: number, key: string, value: string) => void;
+    saveSection: (section: "soft_skills") => void;
+    lang: "en" | "ru";
+}) {
+    const [num, den, pct2, pct3] = parseLevelValues(item.level_values);
+    const [frac, setFrac] = useState(`${num}/${den}`);
+    const [v2, setV2] = useState(String(pct2));
+    const [v3, setV3] = useState(String(pct3));
+
+    const prevJson = useRef(item.level_values);
+    if (item.level_values !== prevJson.current) {
+        prevJson.current = item.level_values;
+        const [n, d, p2, p3] = parseLevelValues(item.level_values);
+        setFrac(`${n}/${d}`);
+        setV2(String(p2));
+        setV3(String(p3));
+    }
+
+    const fracValid = /^\d+\s*\/\s*[1-9]\d*$/.test(frac);
+    const v2Valid = /^\d+$/.test(v2);
+    const v3Valid = /^\d+$/.test(v3);
+
+    const handleBlur = () => {
+        if (!fracValid || !v2Valid || !v3Valid) return;
+        const [a, b] = frac.split("/").map((s) => parseInt(s.trim()));
+        const json = JSON.stringify([a, b, parseInt(v2), parseInt(v3)]);
+        updateItem("soft_skills", item.id, "level_values", json);
+        saveSection("soft_skills");
+    };
+
+    return (
+        <Box sx={{ display: "flex", gap: 1 }}>
+            <Field label={lang === "ru" ? "Показатель А" : "Indicator A"} value={frac} onChange={setFrac} onBlur={handleBlur} error={!fracValid} sx={{ flex: "1 1 0" }} />
+            <Field label={(lang === "ru" ? "Показатель Б" : "Indicator B") + " %"} value={v2} onChange={setV2} onBlur={handleBlur} error={!v2Valid} sx={{ flex: "1 1 0" }} />
+            <Field label={(lang === "ru" ? "Показатель В" : "Indicator C") + " %"} value={v3} onChange={setV3} onBlur={handleBlur} error={!v3Valid} sx={{ flex: "1 1 0" }} />
+        </Box>
     );
 }
 
@@ -895,13 +947,12 @@ export default function AdminResumePage() {
                             addLabel={__("Add Soft Skill", lang)}
                             renderItem={(item) => (
                                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                        <Field label={__("Slug", lang)} value={item.slug} onChange={(v) => updateItem("soft_skills", item.id, "slug", v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 120px" }} />
+                                    <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                                         <IconPickerButton value={item.icon} onChange={(v) => updateItemAndSave("soft_skills", item.id, "icon", v)} />
-                                        <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("soft_skills", item.id, lk("label"), v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 200px" }} />
+                                        <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("soft_skills", item.id, lk("label"), v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 auto" }} />
                                     </Box>
-                                    <Field label={__("Description", lang)} value={lv(item, "description")} onChange={(v) => updateItem("soft_skills", item.id, lk("description"), v)} onBlur={() => saveSection("soft_skills")} multiline sx={{ flex: "1 1 100%" }} />
-                                    <Field label={__("Level Values (JSON)", lang)} value={item.level_values} onChange={(v) => updateItem("soft_skills", item.id, "level_values", v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 100%" }} />
+                                    <Field label={__("Description", lang)} value={lv(item, "description")} onChange={(v) => updateItem("soft_skills", item.id, lk("description"), v)} onBlur={() => saveSection("soft_skills")} multiline />
+                                    <LevelValuesEditor item={item} updateItem={updateItem} saveSection={saveSection} lang={lang} />
                                 </Box>
                             )}
                         />

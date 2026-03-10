@@ -175,6 +175,7 @@ CREATE TABLE IF NOT EXISTS resume_achievements (
 -- Resume: soft skills
 CREATE TABLE IF NOT EXISTS resume_soft_skills (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  sort_order INTEGER NOT NULL DEFAULT 0,
   slug TEXT NOT NULL UNIQUE,
   label_en TEXT NOT NULL,
   label_ru TEXT NOT NULL,
