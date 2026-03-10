@@ -106,8 +106,9 @@ export async function PUT(request: NextRequest) {
 
         transaction();
 
-        // Invalidate icon cache for any icons referenced in categories
-        if (section === "categories") {
+        // Invalidate icon cache for any sections that have icons
+        const ICON_SECTIONS = ["categories", "education_items", "labor_items", "questionnaire_items"];
+        if (ICON_SECTIONS.includes(section)) {
             for (const item of items) {
                 if (item.icon) invalidateIconCache(item.icon);
             }

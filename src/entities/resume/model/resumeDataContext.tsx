@@ -56,6 +56,17 @@ export type GeneralDataRow = {
     value_format: string | null;
 };
 
+export type QuestionnaireItem = {
+    id: number;
+    sort_order: number;
+    question_en: string;
+    question_ru: string;
+    answer_en: string;
+    answer_ru: string;
+    icon: string | null;
+    icon_svg?: string;
+};
+
 export type SoftSkillRow = {
     id: number;
     slug: string;
@@ -74,6 +85,7 @@ export type ResumeData = {
     laborItems: LaborItem[];
     laborData: LaborDataRow[];
     softSkills: SoftSkillRow[];
+    questionnaireItems: QuestionnaireItem[];
 };
 
 export const ResumeDataContext = createContext<ResumeData>({
@@ -83,6 +95,7 @@ export const ResumeDataContext = createContext<ResumeData>({
     laborItems: [],
     laborData: [],
     softSkills: [],
+    questionnaireItems: [],
 });
 
 export function useResumeData(): ResumeData {

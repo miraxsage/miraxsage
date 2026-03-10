@@ -836,7 +836,7 @@ export default function AdminResumePage() {
                             renderItem={(item) => (
                                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                        <IconPickerButton value={item.icon} onChange={(v) => { updateItem("questionnaire_items", item.id, "icon", v); saveSection("questionnaire_items"); }} />
+                                        <IconPickerButton value={item.icon} onChange={(v) => updateItemAndSave("questionnaire_items", item.id, "icon", v)} />
                                         <Field label={__("Question", lang)} value={lv(item, "question")} onChange={(v) => updateItem("questionnaire_items", item.id, lk("question"), v)} onBlur={() => saveSection("questionnaire_items")} sx={{ flex: "1 1 auto" }} />
                                     </Box>
                                     <Field label={__("Answer", lang)} value={lv(item, "answer")} onChange={(v) => updateItem("questionnaire_items", item.id, lk("answer"), v)} onBlur={() => saveSection("questionnaire_items")} multiline sx={{ flex: "1 1 100%" }} />
@@ -905,7 +905,7 @@ export default function AdminResumePage() {
                                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                                         <Field label={__("Slug", lang)} value={item.slug} onChange={(v) => updateItem("soft_skills", item.id, "slug", v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 120px" }} />
-                                        <IconPickerButton value={item.icon} onChange={(v) => { updateItem("soft_skills", item.id, "icon", v); saveSection("soft_skills"); }} />
+                                        <IconPickerButton value={item.icon} onChange={(v) => updateItemAndSave("soft_skills", item.id, "icon", v)} />
                                         <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("soft_skills", item.id, lk("label"), v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 200px" }} />
                                     </Box>
                                     <Field label={__("Description", lang)} value={lv(item, "description")} onChange={(v) => updateItem("soft_skills", item.id, lk("description"), v)} onBlur={() => saveSection("soft_skills")} multiline sx={{ flex: "1 1 100%" }} />
