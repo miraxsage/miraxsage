@@ -3,6 +3,7 @@
 import { useState, useCallback, useMemo, useRef } from "react";
 import {
     Box,
+    Button,
     Tabs,
     Tab,
     TextField,
@@ -171,7 +172,6 @@ interface TechnologyItem {
     skill_level: number;
     experience_years: number;
     projects_count: number;
-    color: string;
 }
 
 interface ResumeData {
@@ -223,7 +223,7 @@ interface CategoryRowSharedProps {
     category: Category;
     lang: "en" | "ru";
     lk: (base: string) => string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     lv: (item: any, base: string) => string;
     onUpdateField: (field: string, value: string) => void;
     onUpdateAndSave: (field: string, value: unknown) => void;
@@ -606,13 +606,13 @@ interface HardSkillsTabProps {
     technologies: TechnologyItem[];
     lang: "en" | "ru";
     lk: (base: string) => string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     lv: (item: any, base: string) => string;
     updateItem: <K extends keyof ResumeData>(section: K, id: number | string, key: string, value: string) => void;
     updateItemAndSave: <K extends keyof ResumeData>(section: K, id: number | string, key: string, value: string) => void;
     saveSection: (section: keyof ResumeData) => void;
     setData: React.Dispatch<React.SetStateAction<ResumeData | null>>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     save: (payload: any) => void;
 }
 
@@ -640,7 +640,7 @@ function TechItemEditor({ item, lang, lk, lv, updateItem, saveSection, updateIte
     item: TechnologyItem;
     lang: "en" | "ru";
     lk: (base: string) => string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     lv: (item: any, base: string) => string;
     updateItem: HardSkillsTabProps["updateItem"];
     saveSection: HardSkillsTabProps["saveSection"];
@@ -672,45 +672,39 @@ function TechItemEditor({ item, lang, lk, lv, updateItem, saveSection, updateIte
     };
 
     return (
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                <IconPickerButton value={item.icon} onChange={(v) => updateItemAndSave("technologies", item.id, "icon", v)} />
-                <Field label={__("Name", lang)} value={lv(item, "name")} onChange={(v) => updateItem("technologies", item.id, lk("name"), v)} onBlur={() => saveSection("technologies")} sx={{ flex: "1 1 auto" }} />
-                <Field label={__("Docs link", lang)} value={item.docs_link} onChange={(v) => updateItem("technologies", item.id, "docs_link", v)} onBlur={() => saveSection("technologies")} sx={{ flex: "1 1 auto" }} />
-                <Field label={__("Color", lang)} value={item.color ?? ""} onChange={(v) => updateItem("technologies", item.id, "color", v)} onBlur={() => saveSection("technologies")} sx={{ flex: "0 0 100px" }} />
-            </Box>
-            <Box sx={{ display: "flex", gap: 1 }}>
-                <TechIndicatorField
-                    label={__("Level", lang) + " (0-100)"}
-                    value={level}
-                    onChange={setLevel}
-                    onBlur={handleBlur}
-                    validate={levelValid}
-                    sx={{ flex: "1 1 0" }}
-                />
-                <TechIndicatorField
-                    label={__("Experience", lang) + " (" + __("years", lang) + ")"}
-                    value={exp}
-                    onChange={(v) => setExp(v.replace(",", "."))}
-                    onBlur={handleBlur}
-                    validate={expValid}
-                    sx={{ flex: "1 1 0" }}
-                />
-                <TechIndicatorField
-                    label={__("Projects", lang)}
-                    value={projects}
-                    onChange={setProjects}
-                    onBlur={handleBlur}
-                    validate={projectsValid}
-                    sx={{ flex: "1 1 0" }}
-                />
-            </Box>
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            <IconPickerButton value={item.icon} onChange={(v) => updateItemAndSave("technologies", item.id, "icon", v)} />
+            <Field label={__("Name", lang)} value={lv(item, "name")} onChange={(v) => updateItem("technologies", item.id, lk("name"), v)} onBlur={() => saveSection("technologies")} sx={{ flex: "1 1 0", maxWidth: "180px" }} />
+            <Field label={__("Docs link", lang)} value={item.docs_link} onChange={(v) => updateItem("technologies", item.id, "docs_link", v)} onBlur={() => saveSection("technologies")} sx={{ flex: "2 1 0" }} />
+            <TechIndicatorField
+                label={__("Level", lang) + " (0-100)"}
+                value={level}
+                onChange={setLevel}
+                onBlur={handleBlur}
+                validate={levelValid}
+                sx={{ flex: "0 0 140px" }}
+            />
+            <TechIndicatorField
+                label={__("Experience", lang) + " (" + __("years", lang) + ")"}
+                value={exp}
+                onChange={(v) => setExp(v.replace(",", "."))}
+                onBlur={handleBlur}
+                validate={expValid}
+                sx={{ flex: "0 0 100px" }}
+            />
+            <TechIndicatorField
+                label={__("Projects", lang)}
+                value={projects}
+                onChange={setProjects}
+                onBlur={handleBlur}
+                validate={projectsValid}
+                sx={{ flex: "0 0 100px" }}
+            />
         </Box>
     );
 }
 
 function HardSkillsTab({ categories, technologies, lang, lk, lv, updateItem, updateItemAndSave, saveSection, setData, save }: HardSkillsTabProps) {
-    const theme = useTheme();
     const [expandedCats, setExpandedCats] = useState<Set<number>>(new Set());
 
     const sensors = useSensors(
@@ -790,7 +784,6 @@ function HardSkillsTab({ categories, technologies, lang, lk, lv, updateItem, upd
             skill_level: 0,
             experience_years: 0,
             projects_count: 0,
-            color: "",
         };
         const all = [...technologies, newTech];
         setData((prev) => prev ? { ...prev, technologies: all } : prev);
@@ -834,12 +827,9 @@ function HardSkillsTab({ categories, technologies, lang, lk, lv, updateItem, upd
                     })}
                 </SortableContext>
             </DndContext>
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
-                <IconButton onClick={addCategory} color="primary" sx={{ border: `1px dashed ${theme.palette.divider}`, borderRadius: "8px", px: 3 }}>
-                    <AddIcon fontSize="small" />
-                    <Typography variant="body2" sx={{ ml: 0.5 }}>{__("Add Category", lang)}</Typography>
-                </IconButton>
-            </Box>
+            <Button variant="outlined" color="regular" startIcon={<AddIcon />} onClick={addCategory} sx={{ alignSelf: "flex-start" }}>
+                {__("Category_acc", lang)}
+            </Button>
         </Box>
     );
 }
@@ -850,7 +840,7 @@ function HardSkillCategoryRow({ cat, expanded, onToggle, lang, lk, lv, updateIte
     onToggle: () => void;
     lang: "en" | "ru";
     lk: (base: string) => string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     lv: (item: any, base: string) => string;
     updateItem: HardSkillsTabProps["updateItem"];
     updateItemAndSave: HardSkillsTabProps["updateItemAndSave"];
@@ -901,7 +891,7 @@ function HardSkillCategoryRow({ cat, expanded, onToggle, lang, lk, lv, updateIte
                         </IconButton>
                         <IconPickerButton value={cat.icon} onChange={(v) => updateItemAndSave("technology_categories", cat.id, "icon", v)} />
                         <Field label={__("Label", lang)} value={lv(cat, "label")} onChange={(v) => updateItem("technology_categories", cat.id, lk("label"), v)} onBlur={() => saveSection("technology_categories")} sx={{ flex: "1 1 auto" }} />
-                        <IconButton size="small" onClick={onDelete} color="error" sx={{ flexShrink: 0 }}>
+                        <IconButton size="small" onClick={onDelete} sx={{ flexShrink: 0, color: getThemeColor("tabIcon", theme), "&:hover": { color: theme.palette.error.main } }}>
                             <DeleteIcon fontSize="small" />
                         </IconButton>
                     </Box>
@@ -914,12 +904,9 @@ function HardSkillCategoryRow({ cat, expanded, onToggle, lang, lk, lv, updateIte
                             ))}
                         </SortableContext>
                     </DndContext>
-                    <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
-                        <IconButton onClick={onAddTech} size="small" sx={{ border: `1px dashed ${theme.palette.divider}`, borderRadius: "8px", px: 2 }}>
-                            <AddIcon fontSize="small" />
-                            <Typography variant="caption" sx={{ ml: 0.5 }}>{__("Add Technology", lang)}</Typography>
-                        </IconButton>
-                    </Box>
+                    <Button variant="outlined" color="regular" startIcon={<AddIcon />} onClick={onAddTech} sx={{ alignSelf: "flex-start" }}>
+                        {__("Technology_acc", lang)}
+                    </Button>
                 </AccordionDetails>
             </Accordion>
         </Box>
@@ -930,7 +917,7 @@ function SortableTechRow({ tech, lang, lk, lv, updateItem, updateItemAndSave, sa
     tech: TechnologyItem;
     lang: "en" | "ru";
     lk: (base: string) => string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     lv: (item: any, base: string) => string;
     updateItem: HardSkillsTabProps["updateItem"];
     updateItemAndSave: HardSkillsTabProps["updateItemAndSave"];
@@ -972,7 +959,7 @@ function SortableTechRow({ tech, lang, lk, lv, updateItem, updateItemAndSave, sa
                     updateItemAndSave={updateItemAndSave}
                 />
             </Box>
-            <IconButton size="small" onClick={onDelete} color="error" sx={{ flexShrink: 0, mt: "4px" }}>
+            <IconButton size="small" onClick={onDelete} sx={{ flexShrink: 0, mt: "4px", color: getThemeColor("tabIcon", theme), "&:hover": { color: theme.palette.error.main } }}>
                 <DeleteIcon fontSize="small" />
             </IconButton>
         </Paper>

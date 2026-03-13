@@ -205,11 +205,11 @@ export default function TechnologiesTable({ data, withoutBottomBorder }: Technol
                                     "&:hover": {
                                         color: getThemeColor("regularHoverText", theme),
                                         background: getThemeColor("titleBg", theme),
-                                        "& .MuiSvgIcon-root": {
+                                        "& svg": {
                                             color: getThemeColor("regularHoverIcon", theme),
                                         },
                                     },
-                                    "& .MuiSvgIcon-root": {
+                                    "& svg": {
                                         fontSize: "20px",
                                         marginRight: "5px",
                                         color: getThemeColor("regularIcon", theme),

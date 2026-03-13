@@ -93,20 +93,54 @@ export async function PUT(request: NextRequest) {
         const db = getDb();
         const items = Array.isArray(data) ? data : [data];
 
-        db.pragma("defer_foreign_keys = ON");
+        // Sections that are FK parents: use UPSERT to avoid cascading child deletions
+        const FK_PARENT_SECTIONS = new Set(["technology_categories", "education_items", "labor_items"]);
+
         const transaction = db.transaction(() => {
-            db.prepare(`DELETE FROM ${tableName}`).run();
+            if (FK_PARENT_SECTIONS.has(section)) {
+                // UPSERT: update existing rows, insert new ones, delete removed ones
+                const existingIds = new Set(
+                    (db.prepare(`SELECT id FROM ${tableName}`).all() as { id: number }[]).map((r) => r.id)
+                );
+                const incomingIds = new Set(items.map((i) => Number(i.id)).filter(Boolean));
 
-            if (items.length === 0) return;
+                // Delete rows no longer in the list
+                for (const id of existingIds) {
+                    if (!incomingIds.has(id)) db.prepare(`DELETE FROM ${tableName} WHERE id = ?`).run(id);
+                }
 
-            const columns = Object.keys(items[0]);
-            const placeholders = columns.map(() => "?").join(", ");
-            const stmt = db.prepare(
-                `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${placeholders})`,
-            );
+                if (items.length === 0) return;
+                const columns = Object.keys(items[0]);
+                const nonIdCols = columns.filter((c) => c !== "id");
 
-            for (const item of items) {
-                stmt.run(...columns.map((col) => item[col] ?? null));
+                for (const item of items) {
+                    if (existingIds.has(Number(item.id))) {
+                        const setClauses = nonIdCols.map((c) => `${c} = ?`).join(", ");
+                        db.prepare(`UPDATE ${tableName} SET ${setClauses} WHERE id = ?`).run(
+                            ...nonIdCols.map((col) => item[col] ?? null),
+                            item.id
+                        );
+                    } else {
+                        const placeholders = columns.map(() => "?").join(", ");
+                        db.prepare(`INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${placeholders})`).run(
+                            ...columns.map((col) => item[col] ?? null)
+                        );
+                    }
+                }
+            } else {
+                // Standard DELETE+INSERT for sections without FK-dependent children
+                db.prepare(`DELETE FROM ${tableName}`).run();
+
+                if (items.length === 0) return;
+
+                const columns = Object.keys(items[0]);
+                const placeholders = columns.map(() => "?").join(", ");
+                const stmt = db.prepare(
+                    `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${placeholders})`,
+                );
+                for (const item of items) {
+                    stmt.run(...columns.map((col) => item[col] ?? null));
+                }
             }
         });
 

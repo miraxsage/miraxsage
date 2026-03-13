@@ -310,5 +310,7 @@
     "indicator 1": "Показатель 1",
     "indicator 2": "Показатель 2",
     "indicator 3": "Показатель 3",
-    "hard skills": "Технические навыки"
+    "hard skills": "Технические навыки",
+    "category_acc": "Категория",
+    "technology_acc": "Технология"
 }

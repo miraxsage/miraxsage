@@ -431,6 +431,49 @@ export default function seedResume(db: Database.Database) {
         message_ru: "Метрики производительности временно в состоянии предварительной актуализации.",
       })
     );
+
+    // ─── Technology Categories & Technologies ───────────────────────────
+    const insertTechCat = db.prepare(
+      `INSERT INTO technology_categories (slug, sort_order, icon, label_en, label_ru)
+       VALUES (?, ?, ?, ?, ?)`
+    );
+    const insertTech = db.prepare(
+      `INSERT INTO technologies (category_id, sort_order, name_en, name_ru, docs_link, icon, skill_level, experience_years, projects_count)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    );
+
+    const frontendId = Number(insertTechCat.run("frontend", 1, "Markup", "Frontend", "Frontend").lastInsertRowid);
+    const backendId = Number(insertTechCat.run("backend", 2, "Terminal", "Backend", "Backend").lastInsertRowid);
+    const desktopId = Number(insertTechCat.run("desktop", 3, "PersonalVideo", "Desktop", "Desktop").lastInsertRowid);
+
+    // Frontend technologies
+    insertTech.run(frontendId, 1, "HTML", "HTML", "https://html.spec.whatwg.org/", "HTML", 72, 11, 25);
+    insertTech.run(frontendId, 2, "CSS", "CSS", "https://www.w3.org/TR/?tags%5B0%5D=css", "CSS", 78, 11, 25);
+    insertTech.run(frontendId, 3, "JS", "JS", "https://tc39.es/ecma262/", "JS", 87, 11, 25);
+    insertTech.run(frontendId, 4, "Typescript", "Typescript", "https://www.typescriptlang.org/", "TS", 71, 3.5, 6);
+    insertTech.run(frontendId, 5, "jQuery", "jQuery", "https://jquery.com/", "JQuery", 91, 8, 23);
+    insertTech.run(frontendId, 6, "React", "React", "https://react.dev/", "React", 74, 3.5, 8);
+    insertTech.run(frontendId, 7, "Redux", "Redux", "https://redux.js.org/", "Redux", 68, 2.5, 7);
+    insertTech.run(frontendId, 8, "ReactRouter", "ReactRouter", "https://reactrouter.com/en/main", "ReactRouter", 65, 2.5, 6);
+    insertTech.run(frontendId, 9, "FramerMotion", "FramerMotion", "https://www.framer.com/motion/", "FramerMotion", 65, 2, 5);
+    insertTech.run(frontendId, 10, "Bootstrap", "Bootstrap", "https://getbootstrap.com/", "Bootstrap", 76, 4, 8);
+    insertTech.run(frontendId, 11, "MUI", "MUI", "https://mui.com/material-ui/", "MUI", 68, 2, 5);
+
+    // Backend technologies
+    insertTech.run(backendId, 1, "PHP", "PHP", "https://www.php.net/", "PHP", 71, 8, 15);
+    insertTech.run(backendId, 2, "MySQL", "MySQL", "https://dev.mysql.com/doc/", "MySql", 67, 8, 13);
+    insertTech.run(backendId, 3, "Wordpress", "Wordpress", "https://wordpress.org/documentation/", "Wordpress", 78, 7, 12);
+    insertTech.run(backendId, 4, "Laravel", "Laravel", "https://laravel.com/docs/", "Laravel", 63, 3, 4);
+    insertTech.run(backendId, 5, "Inertia", "Inertia", "https://inertiajs.com/", "Inertia", 72, 1.5, 3);
+    insertTech.run(backendId, 6, "Yii2", "Yii2", "https://www.yiiframework.com/doc/guide/2.0/ru", "Yii", 56, 2, 2);
+
+    // Desktop technologies
+    insertTech.run(desktopId, 1, ".NET Framework", ".NET Framework", "https://learn.microsoft.com/en-us/dotnet/framework/", "DotNetFramework", 74, 11, 31);
+    insertTech.run(desktopId, 2, "SQLite", "SQLite", "https://www.sqlite.org/", "SQLite", 65, 7, 8);
+    insertTech.run(desktopId, 3, "MS SQL Server", "MS SQL Server", "https://learn.microsoft.com/en-us/sql/sql-server", "MSSQLServer", 56, 5, 16);
+    insertTech.run(desktopId, 4, "Visual C#", "Visual C#", "https://learn.microsoft.com/en-us/dotnet/csharp/", "CSharp", 75, 11, 31);
+    insertTech.run(desktopId, 5, "WPF", "WPF", "https://learn.microsoft.com/en-us/dotnet/desktop/wpf", "Windows", 70, 8, 26);
+    insertTech.run(desktopId, 6, "1C", "1C", "https://its.1c.ru/db/v838doc", "OneC", 73, 6, 22);
   });
 
   transaction();

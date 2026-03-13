@@ -90,6 +90,30 @@ export type SoftSkillRow = {
     level_values: string;
 };
 
+export type TechnologyCategory = {
+    id: number;
+    slug: string;
+    sort_order: number;
+    icon: string | null;
+    icon_svg?: string;
+    label_en: string;
+    label_ru: string;
+};
+
+export type TechnologyRow = {
+    id: number;
+    category_id: number;
+    sort_order: number;
+    name_en: string;
+    name_ru: string;
+    docs_link: string | null;
+    icon: string | null;
+    icon_svg?: string;
+    skill_level: number;
+    experience_years: number;
+    projects_count: number;
+};
+
 export type ResumeData = {
     generalData: GeneralDataRow[];
     educationItems: EducationItem[];
@@ -100,6 +124,8 @@ export type ResumeData = {
     questionnaireItems: QuestionnaireItem[];
     achievements: AchievementRow[];
     metrics: MetricRow[];
+    technologyCategories: TechnologyCategory[];
+    technologies: TechnologyRow[];
 };
 
 export const ResumeDataContext = createContext<ResumeData>({
@@ -112,6 +138,8 @@ export const ResumeDataContext = createContext<ResumeData>({
     questionnaireItems: [],
     achievements: [],
     metrics: [],
+    technologyCategories: [],
+    technologies: [],
 });
 
 export function useResumeData(): ResumeData {

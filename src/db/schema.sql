@@ -216,7 +216,6 @@ CREATE TABLE IF NOT EXISTS technologies (
   skill_level INTEGER NOT NULL DEFAULT 0,
   experience_years REAL NOT NULL DEFAULT 0,
   projects_count INTEGER NOT NULL DEFAULT 0,
-  color TEXT,
   sort_order INTEGER NOT NULL DEFAULT 0
 );
 

@@ -78,7 +78,7 @@ export default function TechDescriptionBlock({
                     {
                         label: t("Skills_tab"),
                         icon: <MusclesIcon sx={{ fontSize: "20px", margin: "0px 3px 2px 0px" }} />,
-                        link: `/about/skills/hard`,
+                        link: `/about/specifications/hard-skills`,
                     },
                 ],
             }}
