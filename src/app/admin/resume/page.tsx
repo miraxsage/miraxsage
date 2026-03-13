@@ -213,7 +213,7 @@ const TAB_LABELS = [
     "Education",
     "Labor",
     "Questionnaire",
-    "Achievements",
+    "Experience",
     "Metrics",
     "Soft Skills",
     "Hard Skills",
@@ -978,6 +978,150 @@ function SortableTechRow({ tech, lang, lk, lv, updateItem, updateItemAndSave, sa
 }
 
 // ---------------------------------------------------------------------------
+// Experience Tab
+// ---------------------------------------------------------------------------
+
+const EXPERIENCE_PURPLE = "#8174AB";
+
+interface ExperienceTabProps {
+    achievements: AchievementItem[];
+    experience_projects: ExperienceProjectItem[];
+    technology_categories: TechnologyCategoryItem[];
+    lang: "en" | "ru";
+    lk: (base: string) => string;
+    lv: (item: any, base: string) => string;
+    updateItem: <K extends keyof ResumeData>(section: K, id: number | string, key: string, value: string) => void;
+    saveSection: (section: keyof ResumeData) => void;
+    reorderItems: (section: keyof ResumeData, items: Array<{ id: number | string }>) => void;
+    deleteItem: (section: keyof ResumeData, id: number | string) => void;
+    addItem: (section: keyof ResumeData, item: any) => void;
+}
+
+function ExperienceTab({
+    achievements,
+    experience_projects,
+    technology_categories,
+    lang,
+    lk,
+    lv,
+    updateItem,
+    saveSection,
+    reorderItems,
+    deleteItem,
+    addItem,
+}: ExperienceTabProps) {
+    const theme = useTheme();
+    const [subTab, setSubTab] = useState(0);
+
+    const sortedCats = useMemo(
+        () => [...technology_categories].sort((a, b) => a.sort_order - b.sort_order),
+        [technology_categories],
+    );
+
+    const proj = experience_projects[0];
+
+    return (
+        <Box>
+            <Tabs
+                value={subTab}
+                onChange={(_, v) => setSubTab(v)}
+                sx={{
+                    borderBottom: `1px solid ${theme.palette.divider}`,
+                    mb: 2,
+                    "& .MuiTabs-indicator": { backgroundColor: EXPERIENCE_PURPLE },
+                    "& .Mui-selected": { color: `${EXPERIENCE_PURPLE} !important` },
+                }}
+            >
+                <Tab label={__("Achievements", lang)} />
+                <Tab label={__("Projects", lang)} />
+                <Tab label={__("Technologies", lang)} />
+            </Tabs>
+
+            {subTab === 0 && (
+                <SortableList
+                    items={achievements}
+                    onReorder={(items) => reorderItems("achievements", items)}
+                    onDelete={(id) => deleteItem("achievements", id)}
+                    onAdd={() =>
+                        addItem("achievements", {
+                            id: 0,
+                            sort_order: 0,
+                            content_en: "",
+                            content_ru: "",
+                        } as AchievementItem)
+                    }
+                    addLabel={__("Add Achievement", lang)}
+                    renderItem={(item) => (
+                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                            <Field
+                                label={__("Content", lang)}
+                                value={lv(item, "content")}
+                                onChange={(v) => updateItem("achievements", item.id, lk("content"), v)}
+                                onBlur={() => saveSection("achievements")}
+                                multiline
+                                sx={{ flex: "1 1 100%" }}
+                            />
+                        </Box>
+                    )}
+                />
+            )}
+
+            {subTab === 1 && (
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    <Field
+                        label={__("Text", lang) + " (RU)"}
+                        value={proj?.text_ru ?? ""}
+                        onChange={(v) => proj && updateItem("experience_projects", proj.id, "text_ru", v)}
+                        onBlur={() => saveSection("experience_projects")}
+                        multiline
+                        sx={{ width: "100%" }}
+                    />
+                    <Field
+                        label={__("Text", lang) + " (EN)"}
+                        value={proj?.text_en ?? ""}
+                        onChange={(v) => proj && updateItem("experience_projects", proj.id, "text_en", v)}
+                        onBlur={() => saveSection("experience_projects")}
+                        multiline
+                        sx={{ width: "100%" }}
+                    />
+                </Box>
+            )}
+
+            {subTab === 2 && (
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                    {sortedCats.map((cat) => (
+                        <Box key={cat.id}>
+                            <Typography
+                                variant="subtitle2"
+                                sx={{ mb: 1, color: EXPERIENCE_PURPLE, fontWeight: 600 }}
+                            >
+                                {lv(cat, "label")}
+                            </Typography>
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                                <Field
+                                    label={__("Description", lang) + " (RU)"}
+                                    value={cat.description_ru ?? ""}
+                                    onChange={(v) => updateItem("technology_categories", cat.id, "description_ru", v)}
+                                    onBlur={() => saveSection("technology_categories")}
+                                    multiline
+                                />
+                                <Field
+                                    label={__("Description", lang) + " (EN)"}
+                                    value={cat.description_en ?? ""}
+                                    onChange={(v) => updateItem("technology_categories", cat.id, "description_en", v)}
+                                    onBlur={() => saveSection("technology_categories")}
+                                    multiline
+                                />
+                            </Box>
+                        </Box>
+                    ))}
+                </Box>
+            )}
+        </Box>
+    );
+}
+
+// ---------------------------------------------------------------------------
 // Page Component
 // ---------------------------------------------------------------------------
 
@@ -1298,32 +1442,22 @@ export default function AdminResumePage() {
                     </AdminSection>
                 );
 
-            // ----- ACHIEVEMENTS -----
+            // ----- EXPERIENCE -----
             case 5:
                 return (
-                    <AdminSection
-                        saving={saving}
-                        error={error}
-                        success={success}
-                    >
-                        <SortableList
-                            items={data.achievements}
-                            onReorder={(items) => reorderItems("achievements", items)}
-                            onDelete={(id) => deleteItem("achievements", id)}
-                            onAdd={() =>
-                                addItem("achievements", {
-                                    id: 0,
-                                    sort_order: 0,
-                                    content_en: "",
-                                    content_ru: "",
-                                } as AchievementItem)
-                            }
-                            addLabel={__("Add Achievement", lang)}
-                            renderItem={(item) => (
-                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                    <Field label={__("Content", lang)} value={lv(item, "content")} onChange={(v) => updateItem("achievements", item.id, lk("content"), v)} onBlur={() => saveSection("achievements")} multiline sx={{ flex: "1 1 100%" }} />
-                                </Box>
-                            )}
+                    <AdminSection saving={saving} error={error} success={success}>
+                        <ExperienceTab
+                            achievements={data.achievements}
+                            experience_projects={data.experience_projects}
+                            technology_categories={data.technology_categories}
+                            lang={lang}
+                            lk={lk}
+                            lv={lv}
+                            updateItem={updateItem}
+                            saveSection={saveSection}
+                            reorderItems={reorderItems}
+                            deleteItem={deleteItem}
+                            addItem={addItem}
                         />
                     </AdminSection>
                 );
