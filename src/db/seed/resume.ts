@@ -434,17 +434,29 @@ export default function seedResume(db: Database.Database) {
 
     // ─── Technology Categories & Technologies ───────────────────────────
     const insertTechCat = db.prepare(
-      `INSERT INTO technology_categories (slug, sort_order, icon, label_en, label_ru)
-       VALUES (?, ?, ?, ?, ?)`
+      `INSERT INTO technology_categories (slug, sort_order, icon, label_en, label_ru, description_en, description_ru)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
     );
     const insertTech = db.prepare(
       `INSERT INTO technologies (category_id, sort_order, name_en, name_ru, docs_link, icon, skill_level, experience_years, projects_count)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
     );
 
-    const frontendId = Number(insertTechCat.run("frontend", 1, "Markup", "Frontend", "Frontend").lastInsertRowid);
-    const backendId = Number(insertTechCat.run("backend", 2, "Terminal", "Backend", "Backend").lastInsertRowid);
-    const desktopId = Number(insertTechCat.run("desktop", 3, "PersonalVideo", "Desktop", "Desktop").lastInsertRowid);
+    const frontendId = Number(insertTechCat.run(
+      "frontend", 1, "Markup", "Frontend", "Frontend",
+      "With a special passion, I approach the development of user interfaces, graphic and software design, as well as frontend development, viewing them as a fusion of various technologies hidden from the user, yet ultimately giving rise to a creative and unique product before their eyes. I've been familiar with frontend development since 2011 when I wrote my first plugin for Opera using jQuery. Currently, I actively engage in the development and am intrigued by complex projects using modern technology stacks.",
+      "С особенной любовью отношусь к разработке пользовательских интерфейсов, графическому, программному дизайну и фронтенду как объединению множества технологий, скрытых от пользователя, но в итоге рождающих перед его глазами конечный творческий и уникальный продукт. С фронтенд разработкой я дружу еще с 2011 года, когда написал свой первый плагин для Opera на jQuery. Сейчас участвую в разработке и интересуюсь сложными проектами на современном стеке технологий."
+    ).lastInsertRowid);
+    const backendId = Number(insertTechCat.run(
+      "backend", 2, "Terminal", "Backend", "Backend",
+      "Taking into account my personal interest and the influence of historical circumstances, I have been actively involved in and continue to engage in independent development of full-fledged web solutions, including the backend part. Currently, my most common basic stack includes PHP, MySQL, CMS WordPress, and the Laravel Framework. I am currently exploring Node.js and related technologies for backend development in JavaScript.",
+      "С учетом личного интереса и силы исторических обстоятельств я активно занимался и занимаюсь самостоятельной разработкой полноценных веб решений в том числе и backend-части. Сегодня мой самый распространенный базовый стек здесь это PHP, MySQL, CMS Wordpress, Laravel Framework. В настоящее время интересуюсь Node.JS и связанными технологиями относительно backend-разработки на JavaScript."
+    ).lastInsertRowid);
+    const desktopId = Number(insertTechCat.run(
+      "desktop", 3, "PersonalVideo", "Desktop", "Desktop",
+      "During my university studies and professional career, I have written a large number of programs of varying complexity, ranging from simple utility tools and educational demonstration projects to serious applications. I have been actively engaged in self-learning, recognizing the importance of user interface convenience and attractiveness. With great interest, I mastered Windows Presentation Foundation (WPF), a system for building user interfaces with visually appealing capabilities (a graphical subsystem within the .NET Framework that utilizes the XAML language). I actively used and integrated external UI customization libraries.",
+      "Во время учебы в университете и профессиональной деятельности написал большое количество программ различного уровня от простых вспомогательных утилит и учебных демонстрационных проектов до серьезных приложений. Активно занимался самостоятельным изучением. Высоко оценивая важность удобства и привлекательности пользовательского интерфейса, с большим интересом освоил Windows Presentation Foundation — систему для построения пользовательского интерфейса (UI) с визуально привлекательными возможностями (графическая подсистема в составе .NET Framework, использующая язык XAML), активно использовал и интегрировал внешние библиотеки UI-кастомизации."
+    ).lastInsertRowid);
 
     // Frontend technologies
     insertTech.run(frontendId, 1, "HTML", "HTML", "https://html.spec.whatwg.org/", "HTML", 72, 11, 25);
@@ -474,6 +486,12 @@ export default function seedResume(db: Database.Database) {
     insertTech.run(desktopId, 4, "Visual C#", "Visual C#", "https://learn.microsoft.com/en-us/dotnet/csharp/", "CSharp", 75, 11, 31);
     insertTech.run(desktopId, 5, "WPF", "WPF", "https://learn.microsoft.com/en-us/dotnet/desktop/wpf", "Windows", 70, 8, 26);
     insertTech.run(desktopId, 6, "1C", "1C", "https://its.1c.ru/db/v838doc", "OneC", 73, 6, 22);
+
+    // ─── Experience Projects ─────────────────────────────────────────────
+    db.prepare(`INSERT INTO resume_experience_projects (text_en, text_ru) VALUES (?, ?)`).run(
+      "During my professional career spanning over 10 years in software development, I have independently completed over 50 projects using various technologies. These range from application configurations on the 1C platform and .NET Framework to commercial web projects on PHP and JS utilizing CMS, libraries, and frameworks such as WordPress, Laravel, jQuery, React, and others. Additionally, I actively strive to learn new development and administration technologies such as Node.js, Docker, and Linux.",
+      "За время профессиональной деятельности на протяжении уже более 10 лет в области разработки программного обеспечения самостоятельно реализовано более 50 проектов с использованием различных технологий от прикладных конфигураций на платформе 1C, .NET Framework, Excel VBA до коммерческих веб-проектов на PHP и JS с использованием CMS, библиотек и фреймворков Wordpress, Laravel, jQuery, React и пр. Также стараюсь активно заниматься изучением новых технологий разработки и администрирования, Node.JS, Docker, Linux."
+    );
   });
 
   transaction();

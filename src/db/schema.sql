@@ -172,6 +172,13 @@ CREATE TABLE IF NOT EXISTS resume_achievements (
   content_ru TEXT NOT NULL
 );
 
+-- Resume: experience projects text
+CREATE TABLE IF NOT EXISTS resume_experience_projects (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  text_en TEXT NOT NULL DEFAULT '',
+  text_ru TEXT NOT NULL DEFAULT ''
+);
+
 -- Resume: soft skills
 CREATE TABLE IF NOT EXISTS resume_soft_skills (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -202,7 +209,9 @@ CREATE TABLE IF NOT EXISTS technology_categories (
   sort_order INTEGER NOT NULL DEFAULT 0,
   icon TEXT,
   label_en TEXT NOT NULL,
-  label_ru TEXT NOT NULL
+  label_ru TEXT NOT NULL,
+  description_en TEXT NOT NULL DEFAULT '',
+  description_ru TEXT NOT NULL DEFAULT ''
 );
 
 -- Technologies

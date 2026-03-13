@@ -152,6 +152,12 @@ interface MetricItem {
     text: string;
 }
 
+interface ExperienceProjectItem {
+    id: number;
+    text_en: string;
+    text_ru: string;
+}
+
 interface TechnologyCategoryItem {
     id: number;
     slug: string;
@@ -159,6 +165,8 @@ interface TechnologyCategoryItem {
     icon: string;
     label_en: string;
     label_ru: string;
+    description_en: string;
+    description_ru: string;
 }
 
 interface TechnologyItem {
@@ -185,6 +193,7 @@ interface ResumeData {
     achievements: AchievementItem[];
     soft_skills: SoftSkillItem[];
     metrics: MetricItem[];
+    experience_projects: ExperienceProjectItem[];
     technology_categories: TechnologyCategoryItem[];
     technologies: TechnologyItem[];
 }
@@ -205,9 +214,9 @@ const TAB_LABELS = [
     "Labor",
     "Questionnaire",
     "Achievements",
+    "Metrics",
     "Soft Skills",
     "Hard Skills",
-    "Metrics",
     "General Labels",
 ];
 
@@ -756,6 +765,8 @@ function HardSkillsTab({ categories, technologies, lang, lk, lv, updateItem, upd
             icon: "",
             label_en: "",
             label_ru: "",
+            description_en: "",
+            description_ru: "",
         };
         const newCats = [...categories, newCat];
         setData((prev) => prev ? { ...prev, technology_categories: newCats } : prev);
@@ -1317,8 +1328,25 @@ export default function AdminResumePage() {
                     </AdminSection>
                 );
 
+            // ----- METRICS -----
+            case 6: {
+                const metric = data.metrics[0];
+                return (
+                    <AdminSection saving={saving} error={error} success={success}>
+                        <Field
+                            label={__("Text", lang)}
+                            value={metric?.text ?? ""}
+                            onChange={(v) => metric && updateItem("metrics", metric.id, "text", v)}
+                            onBlur={() => saveSection("metrics")}
+                            multiline
+                            sx={{ width: "100%" }}
+                        />
+                    </AdminSection>
+                );
+            }
+
             // ----- SOFT SKILLS -----
-            case 6:
+            case 7:
                 return (
                     <AdminSection
                         saving={saving}
@@ -1357,7 +1385,7 @@ export default function AdminResumePage() {
                 );
 
             // ----- HARD SKILLS -----
-            case 7:
+            case 8:
                 return (
                     <AdminSection saving={saving} error={error} success={success}>
                         <HardSkillsTab
@@ -1374,23 +1402,6 @@ export default function AdminResumePage() {
                         />
                     </AdminSection>
                 );
-
-            // ----- METRICS -----
-            case 8: {
-                const metric = data.metrics[0];
-                return (
-                    <AdminSection saving={saving} error={error} success={success}>
-                        <Field
-                            label={__("Text", lang)}
-                            value={metric?.text ?? ""}
-                            onChange={(v) => metric && updateItem("metrics", metric.id, "text", v)}
-                            onBlur={() => saveSection("metrics")}
-                            multiline
-                            sx={{ width: "100%" }}
-                        />
-                    </AdminSection>
-                );
-            }
 
             // ----- GENERAL LABELS -----
             case 9:

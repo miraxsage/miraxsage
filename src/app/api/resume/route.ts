@@ -16,6 +16,7 @@ const SECTION_TABLES: Record<string, string> = {
     achievements: "resume_achievements",
     soft_skills: "resume_soft_skills",
     metrics: "resume_metrics",
+    experience_projects: "resume_experience_projects",
     technology_categories: "technology_categories",
     technologies: "technologies",
 };
@@ -50,6 +51,7 @@ export async function GET() {
             .all();
         const soft_skills = db.prepare("SELECT * FROM resume_soft_skills ORDER BY sort_order").all();
         const metrics = db.prepare("SELECT * FROM resume_metrics").all();
+        const experience_projects = db.prepare("SELECT * FROM resume_experience_projects LIMIT 1").all();
         const technology_categories = db.prepare("SELECT * FROM technology_categories ORDER BY sort_order").all();
         const technologies = db.prepare("SELECT * FROM technologies ORDER BY sort_order").all();
 
@@ -64,6 +66,7 @@ export async function GET() {
             achievements,
             soft_skills,
             metrics,
+            experience_projects,
             technology_categories,
             technologies,
         });

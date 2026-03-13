@@ -72,6 +72,12 @@ export type MetricRow = {
     text: string;
 };
 
+export type ExperienceProjectRow = {
+    id: number;
+    text_en: string;
+    text_ru: string;
+};
+
 export type AchievementRow = {
     id: number;
     sort_order: number;
@@ -98,6 +104,8 @@ export type TechnologyCategory = {
     icon_svg?: string;
     label_en: string;
     label_ru: string;
+    description_en: string;
+    description_ru: string;
 };
 
 export type TechnologyRow = {
@@ -124,6 +132,7 @@ export type ResumeData = {
     questionnaireItems: QuestionnaireItem[];
     achievements: AchievementRow[];
     metrics: MetricRow[];
+    experienceProjects: ExperienceProjectRow[];
     technologyCategories: TechnologyCategory[];
     technologies: TechnologyRow[];
 };
@@ -138,6 +147,7 @@ export const ResumeDataContext = createContext<ResumeData>({
     questionnaireItems: [],
     achievements: [],
     metrics: [],
+    experienceProjects: [],
     technologyCategories: [],
     technologies: [],
 });
