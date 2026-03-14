@@ -1,42 +1,49 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
+import { motion } from "framer-motion";
 import {
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
     Box,
     Typography,
     Button,
     TextField,
-    Card,
-    CardContent,
     Tabs,
     Tab,
     useTheme,
     IconButton,
-    Collapse,
     Checkbox,
     FormControlLabel,
-    Select,
-    MenuItem,
-    InputLabel,
-    FormControl,
-    Slider,
-    Chip,
     Alert,
     CircularProgress,
-    alpha,
+    MenuItem,
 } from "@mui/material";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import EditIcon from "@mui/icons-material/Edit";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import DoneIcon from "@mui/icons-material/Done";
-import CodeIcon from "@mui/icons-material/Code";
-import { useAdminData, useLocalizedField, AdminSection } from "@/features/admin-editor";
+import { useAdminData, useLocalizedField, AdminSection, IconPickerButton } from "@/features/admin-editor";
 import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
+import iconMap from "@/shared/lib/iconMap";
+import { ICON_MAP } from "@/entities/resume/model/iconMap";
+import { getMuiIcon } from "@/shared/lib/muiIconsLoader";
+
+const ALL_CUSTOM_ICONS: Record<string, React.FC> = { ...iconMap, ...ICON_MAP };
+
+function DomainIconPreview({ icon }: { icon: string }) {
+    if (!icon) return null;
+    const Custom = ALL_CUSTOM_ICONS[icon] as React.ComponentType<{ fontSize?: string }> | undefined;
+    if (Custom) return <Custom fontSize="small" />;
+    const Mui = getMuiIcon(icon);
+    if (Mui) return <Mui fontSize="small" />;
+    return null;
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -45,7 +52,8 @@ import { getThemeColor } from "@/shared/lib/theme";
 interface Technology {
     id: number;
     category_id: number;
-    name: string;
+    name_en: string;
+    name_ru: string;
     docs_link: string;
     icon: string;
     skill_level: number;
@@ -119,21 +127,6 @@ function blankProject(): Project {
     };
 }
 
-function blankTechnology(categoryId: number): Technology {
-    return {
-        id: nextTempId(),
-        category_id: categoryId,
-        name: "",
-        docs_link: "",
-        icon: "",
-        skill_level: 50,
-        experience_years: 0,
-        projects_count: 0,
-        color: "#888888",
-        sort_order: 0,
-    };
-}
-
 // ---------------------------------------------------------------------------
 // Projects Tab
 // ---------------------------------------------------------------------------
@@ -141,8 +134,6 @@ function blankTechnology(categoryId: number): Technology {
 function ProjectsTab() {
     const theme = useTheme();
     const menuText = getThemeColor("menuText", theme);
-    const regularText = getThemeColor("regularText", theme);
-    const barBg = getThemeColor("barBackground", theme);
     const { lang, lk, lv } = useLocalizedField();
 
     const {
@@ -158,8 +149,9 @@ function ProjectsTab() {
     projectsRef.current = projects;
 
     const [techCategories, setTechCategories] = useState<TechnologyCategory[]>([]);
+    const [projectDomains, setProjectDomains] = useState<ProjectDomain[]>([]);
     const [expandedId, setExpandedId] = useState<number | null>(null);
-    const [savingId, setSavingId] = useState<number | null>(null);
+    const [savingCount, setSavingCount] = useState(0);
     const [localError, setLocalError] = useState("");
     const [localSuccess, setLocalSuccess] = useState("");
 
@@ -167,6 +159,10 @@ function ProjectsTab() {
         fetch("/api/technologies")
             .then((r) => r.json())
             .then((cats: TechnologyCategory[]) => setTechCategories(cats))
+            .catch(() => {});
+        fetch("/api/project-domains")
+            .then((r) => r.json())
+            .then((d: ProjectDomain[]) => setProjectDomains(d))
             .catch(() => {});
     }, []);
 
@@ -198,7 +194,7 @@ function ProjectsTab() {
     };
 
     const handleSave = async (project: Project) => {
-        setSavingId(project.id);
+        setSavingCount((c) => c + 1);
         setLocalError("");
         setLocalSuccess("");
         try {
@@ -224,7 +220,7 @@ function ProjectsTab() {
         } catch (err) {
             setLocalError(err instanceof Error ? err.message : __("Save failed", lang));
         } finally {
-            setSavingId(null);
+            setSavingCount((c) => c - 1);
         }
     };
 
@@ -273,6 +269,11 @@ function ProjectsTab() {
 
     return (
         <Box>
+            {savingCount > 0 && (
+                <Box sx={{ position: "fixed", top: 16, right: 24, zIndex: 1300 }}>
+                    <CircularProgress size={22} />
+                </Box>
+            )}
             {(error || localError) && (
                 <Alert severity="error" sx={{ mb: 2 }}>
                     {error || localError}
@@ -296,323 +297,333 @@ function ProjectsTab() {
 
             {(projects ?? []).map((project) => {
                 const isExpanded = expandedId === project.id;
-                const isSaving = savingId === project.id;
                 const isNew = project.id < 0;
                 return (
-                    <Card
+                    <Accordion
                         key={project.id}
-                        elevation={0}
+                        expanded={isExpanded}
+                        onChange={() => {}}
+                        disableGutters
                         sx={{
-                            mb: 1.5,
+                            mb: 1,
+                            background: getThemeColor("titleBg", theme),
+                            boxShadow: "none",
                             border: `1px solid ${theme.palette.divider}`,
-                            background: barBg,
+                            borderRadius: "6px !important",
+                            overflow: "hidden",
+                            "&:before": { display: "none" },
+                            "& .MuiAccordionSummary-root": { minHeight: "42px", padding: "0 14px", cursor: "default" },
+                            "& .MuiAccordionSummary-content": { margin: "8px 0", width: "100%" },
+                            "& .MuiAccordionDetails-root": {
+                                padding: "12px",
+                                background: getThemeColor("layoutBackground", theme),
+                                borderTop: `1px solid ${theme.palette.divider}`,
+                            },
                         }}
                     >
-                        <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-                            {/* Header row */}
+                        <AccordionSummary>
+                            <Box sx={{ display: "flex", alignItems: "center", width: "100%", gap: 1 }} onClick={(e) => e.stopPropagation()}>
+                                <IconButton size="small" onClick={() => toggleExpand(project.id)} sx={{ flexShrink: 0, color: getThemeColor("regularIcon", theme) }}>
+                                    {isExpanded ? <ExpandMoreIcon fontSize="small" /> : <ChevronRightIcon fontSize="small" />}
+                                </IconButton>
+                                {(() => {
+                                    const dom = projectDomains.find((d) => d.name_en === project.domain);
+                                    return dom?.icon ? (
+                                        <Box sx={{ flexShrink: 0, display: "flex", color: getThemeColor("regularIcon", theme) }}>
+                                            <DomainIconPreview icon={dom.icon} />
+                                        </Box>
+                                    ) : null;
+                                })()}
+                                <Typography
+                                    onClick={() => toggleExpand(project.id)}
+                                    sx={{ flex: "1 1 auto", fontSize: "1rem", cursor: "pointer", userSelect: "none" }}
+                                >
+                                    {lv(project, "name") || "(untitled)"}
+                                </Typography>
+                                <IconButton size="small" onClick={() => handleDelete(project.id)} sx={{ flexShrink: 0, color: getThemeColor("tabIcon", theme), "&:hover": { color: theme.palette.error.main } }}>
+                                    <DeleteIcon fontSize="small" />
+                                </IconButton>
+                            </Box>
+                        </AccordionSummary>
+                        <AccordionDetails>
                             <Box
                                 sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "space-between",
-                                    gap: 1,
+                                    display: "grid",
+                                    gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                                    gap: 2,
                                 }}
                             >
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flex: 1 }}>
-                                    <Typography sx={{ fontWeight: 600, color: menuText }}>
-                                        {lv(project, "name") || "(untitled)"}
-                                    </Typography>
-                                    {project.slug && (
-                                        <Chip
-                                            label={project.slug}
-                                            size="small"
-                                            sx={{ fontSize: "0.75rem" }}
-                                        />
-                                    )}
-                                    {project.year > 0 && (
-                                        <Typography variant="body2" sx={{ color: regularText }}>
-                                            {project.year}
-                                        </Typography>
-                                    )}
-                                    {project.status && (
-                                        <Chip
-                                            label={project.status}
-                                            size="small"
-                                            color={project.status === "active" ? "success" : "default"}
-                                            sx={{ fontSize: "0.7rem" }}
-                                        />
-                                    )}
-                                    {isSaving && <CircularProgress size={14} />}
-                                </Box>
-                                <Box sx={{ display: "flex", gap: 0.5 }}>
-                                    <IconButton size="small" onClick={() => toggleExpand(project.id)}>
-                                        {isExpanded ? (
-                                            <ExpandLessIcon fontSize="small" />
-                                        ) : (
-                                            <EditIcon fontSize="small" />
-                                        )}
-                                    </IconButton>
-                                    <IconButton
-                                        size="small"
-                                        onClick={() => handleDelete(project.id)}
-                                        sx={{ color: theme.palette.error.main }}
-                                    >
-                                        <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                </Box>
-                            </Box>
-
-                            {/* Expanded editor */}
-                            <Collapse in={isExpanded}>
-                                <Box
-                                    sx={{
-                                        mt: 2,
-                                        display: "grid",
-                                        gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                                        gap: 2,
+                                <TextField
+                                    label={__("Name", lang)}
+                                    size="small"
+                                    fullWidth
+                                    value={lv(project, "name")}
+                                    onChange={(e) => updateField(project.id, lk("name") as keyof Project, e.target.value)}
+                                    onBlur={() => autoSaveProject(project.id)}
+                                />
+                                <TextField
+                                    label={__("Short Name", lang)}
+                                    size="small"
+                                    fullWidth
+                                    value={lv(project, "short_name")}
+                                    onChange={(e) =>
+                                        updateField(project.id, lk("short_name") as keyof Project, e.target.value)
+                                    }
+                                    onBlur={() => autoSaveProject(project.id)}
+                                />
+                                <TextField
+                                    label={__("Slug", lang)}
+                                    size="small"
+                                    fullWidth
+                                    value={project.slug ?? ""}
+                                    onChange={(e) => updateField(project.id, "slug", e.target.value)}
+                                    onBlur={() => autoSaveProject(project.id)}
+                                />
+                                <TextField
+                                    label={__("Domain", lang)}
+                                    size="small"
+                                    fullWidth
+                                    select
+                                    value={project.domain ?? ""}
+                                    onChange={(e) => {
+                                        updateField(project.id, "domain", e.target.value);
+                                        if (project.id >= 0) {
+                                            autoSaveProjectWith({ ...project, domain: e.target.value });
+                                        }
+                                    }}
+                                    SelectProps={{
+                                        renderValue: (val) => {
+                                            const dom = projectDomains.find((d) => d.name_en === val);
+                                            if (!dom) return val as string || "—";
+                                            return (
+                                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                                    {dom.icon && <DomainIconPreview icon={dom.icon} />}
+                                                    {lv(dom, "name")}
+                                                </Box>
+                                            );
+                                        },
                                     }}
                                 >
-                                    <TextField
-                                        label={__("Slug", lang)}
-                                        size="small"
-                                        fullWidth
-                                        value={project.slug ?? ""}
-                                        onChange={(e) => updateField(project.id, "slug", e.target.value)}
-                                        onBlur={() => autoSaveProject(project.id)}
-                                    />
-                                    <TextField
-                                        label={__("Name", lang)}
-                                        size="small"
-                                        fullWidth
-                                        value={lv(project, "name")}
-                                        onChange={(e) => updateField(project.id, lk("name") as keyof Project, e.target.value)}
-                                        onBlur={() => autoSaveProject(project.id)}
-                                    />
-                                    <TextField
-                                        label={__("Short Name", lang)}
-                                        size="small"
-                                        fullWidth
-                                        value={lv(project, "short_name")}
-                                        onChange={(e) =>
-                                            updateField(project.id, lk("short_name") as keyof Project, e.target.value)
+                                    <MenuItem value="">—</MenuItem>
+                                    {projectDomains.map((d) => (
+                                        <MenuItem key={d.id} value={d.name_en} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                            {d.icon && <DomainIconPreview icon={d.icon} />}
+                                            {lv(d, "name")}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                                <TextField
+                                    label={__("Description", lang)}
+                                    size="small"
+                                    fullWidth
+                                    multiline
+                                    minRows={2}
+                                    value={lv(project, "description")}
+                                    onChange={(e) =>
+                                        updateField(project.id, lk("description") as keyof Project, e.target.value)
+                                    }
+                                    onBlur={() => autoSaveProject(project.id)}
+                                    sx={{ gridColumn: { md: "1 / -1" } }}
+                                />
+                                <TextField
+                                    label={__("Year", lang)}
+                                    size="small"
+                                    type="number"
+                                    value={project.year ?? 0}
+                                    onChange={(e) =>
+                                        updateField(project.id, "year", Number(e.target.value))
+                                    }
+                                    onBlur={() => autoSaveProject(project.id)}
+                                />
+                                <TextField
+                                    label={__("Rating", lang)}
+                                    size="small"
+                                    type="number"
+                                    value={project.rating ?? 0}
+                                    onChange={(e) =>
+                                        updateField(project.id, "rating", Number(e.target.value))
+                                    }
+                                    onBlur={() => autoSaveProject(project.id)}
+                                />
+                                <TextField
+                                    label={__("Status", lang)}
+                                    size="small"
+                                    fullWidth
+                                    select
+                                    value={project.status ?? ""}
+                                    onChange={(e) => {
+                                        updateField(project.id, "status", e.target.value);
+                                        if (project.id >= 0) {
+                                            autoSaveProjectWith({ ...project, status: e.target.value });
                                         }
-                                        onBlur={() => autoSaveProject(project.id)}
-                                    />
-                                    <TextField
-                                        label={__("Domain", lang)}
-                                        size="small"
-                                        fullWidth
-                                        value={project.domain ?? ""}
-                                        onChange={(e) => updateField(project.id, "domain", e.target.value)}
-                                        onBlur={() => autoSaveProject(project.id)}
-                                    />
-                                    <TextField
-                                        label={__("Description", lang)}
-                                        size="small"
-                                        fullWidth
-                                        multiline
-                                        minRows={2}
-                                        value={lv(project, "description")}
-                                        onChange={(e) =>
-                                            updateField(project.id, lk("description") as keyof Project, e.target.value)
+                                    }}
+                                >
+                                    <MenuItem value="developing">{__("Developing", lang)}</MenuItem>
+                                    <MenuItem value="completed">{__("Completed", lang)}</MenuItem>
+                                </TextField>
+                                <TextField
+                                    label={__("Participating", lang)}
+                                    size="small"
+                                    fullWidth
+                                    select
+                                    value={project.participating ?? ""}
+                                    onChange={(e) => {
+                                        updateField(project.id, "participating", e.target.value);
+                                        if (project.id >= 0) {
+                                            autoSaveProjectWith({ ...project, participating: e.target.value });
                                         }
-                                        onBlur={() => autoSaveProject(project.id)}
-                                        sx={{ gridColumn: { md: "1 / -1" } }}
-                                    />
-                                    <TextField
-                                        label={__("Year", lang)}
-                                        size="small"
-                                        type="number"
-                                        value={project.year ?? 0}
-                                        onChange={(e) =>
-                                            updateField(project.id, "year", Number(e.target.value))
+                                    }}
+                                >
+                                    <MenuItem value="team">{__("Team", lang)}</MenuItem>
+                                    <MenuItem value="selfown">{__("Selfown", lang)}</MenuItem>
+                                </TextField>
+                                <TextField
+                                    label={__("Dev Time (months)", lang)}
+                                    size="small"
+                                    type="number"
+                                    value={project.dev_time_months ?? 0}
+                                    onChange={(e) =>
+                                        updateField(
+                                            project.id,
+                                            "dev_time_months",
+                                            Number(e.target.value),
+                                        )
+                                    }
+                                    onBlur={() => autoSaveProject(project.id)}
+                                />
+                                <TextField
+                                    label={__("GitHub Link", lang)}
+                                    size="small"
+                                    fullWidth
+                                    value={project.github_link ?? ""}
+                                    onChange={(e) =>
+                                        updateField(project.id, "github_link", e.target.value)
+                                    }
+                                    onBlur={() => autoSaveProject(project.id)}
+                                />
+                                <TextField
+                                    label={__("Images Count", lang)}
+                                    size="small"
+                                    type="number"
+                                    value={project.images_count ?? 0}
+                                    onChange={(e) =>
+                                        updateField(
+                                            project.id,
+                                            "images_count",
+                                            Number(e.target.value),
+                                        )
+                                    }
+                                    onBlur={() => autoSaveProject(project.id)}
+                                />
+                                <TextField
+                                    label={__("Cover Brightness", lang)}
+                                    size="small"
+                                    fullWidth
+                                    select
+                                    value={project.cover_brightness ?? ""}
+                                    onChange={(e) => {
+                                        updateField(project.id, "cover_brightness", e.target.value);
+                                        if (project.id >= 0) {
+                                            autoSaveProjectWith({ ...project, cover_brightness: e.target.value as unknown as number });
                                         }
-                                        onBlur={() => autoSaveProject(project.id)}
-                                    />
-                                    <TextField
-                                        label={__("Rating", lang)}
-                                        size="small"
-                                        type="number"
-                                        value={project.rating ?? 0}
-                                        onChange={(e) =>
-                                            updateField(project.id, "rating", Number(e.target.value))
-                                        }
-                                        onBlur={() => autoSaveProject(project.id)}
-                                    />
-                                    <TextField
-                                        label={__("Status", lang)}
-                                        size="small"
-                                        fullWidth
-                                        value={project.status ?? ""}
-                                        onChange={(e) =>
-                                            updateField(project.id, "status", e.target.value)
-                                        }
-                                        onBlur={() => autoSaveProject(project.id)}
-                                    />
-                                    <TextField
-                                        label={__("Participating", lang)}
-                                        size="small"
-                                        fullWidth
-                                        value={project.participating ?? ""}
-                                        onChange={(e) =>
-                                            updateField(project.id, "participating", e.target.value)
-                                        }
-                                        onBlur={() => autoSaveProject(project.id)}
-                                    />
-                                    <TextField
-                                        label={__("Dev Time (months)", lang)}
-                                        size="small"
-                                        type="number"
-                                        value={project.dev_time_months ?? 0}
-                                        onChange={(e) =>
-                                            updateField(
-                                                project.id,
-                                                "dev_time_months",
-                                                Number(e.target.value),
-                                            )
-                                        }
-                                        onBlur={() => autoSaveProject(project.id)}
-                                    />
-                                    <TextField
-                                        label={__("GitHub Link", lang)}
-                                        size="small"
-                                        fullWidth
-                                        value={project.github_link ?? ""}
-                                        onChange={(e) =>
-                                            updateField(project.id, "github_link", e.target.value)
-                                        }
-                                        onBlur={() => autoSaveProject(project.id)}
-                                    />
-                                    <TextField
-                                        label={__("Images Count", lang)}
-                                        size="small"
-                                        type="number"
-                                        value={project.images_count ?? 0}
-                                        onChange={(e) =>
-                                            updateField(
-                                                project.id,
-                                                "images_count",
-                                                Number(e.target.value),
-                                            )
-                                        }
-                                        onBlur={() => autoSaveProject(project.id)}
-                                    />
-                                    <TextField
-                                        label={__("Cover Brightness", lang)}
-                                        size="small"
-                                        type="number"
-                                        value={project.cover_brightness ?? 50}
-                                        onChange={(e) =>
-                                            updateField(
-                                                project.id,
-                                                "cover_brightness",
-                                                Number(e.target.value),
-                                            )
-                                        }
-                                        onBlur={() => autoSaveProject(project.id)}
-                                    />
-                                    <TextField
-                                        label={__("Sort Order", lang)}
-                                        size="small"
-                                        type="number"
-                                        value={project.sort_order ?? 0}
-                                        onChange={(e) =>
-                                            updateField(
-                                                project.id,
-                                                "sort_order",
-                                                Number(e.target.value),
-                                            )
-                                        }
-                                        onBlur={() => autoSaveProject(project.id)}
-                                    />
+                                    }}
+                                >
+                                    <MenuItem value="">{__("Light cover", lang)}</MenuItem>
+                                    <MenuItem value="dark">{__("Dark cover", lang)}</MenuItem>
+                                </TextField>
 
-                                    {/* Technologies checkboxes */}
-                                    <Box sx={{ gridColumn: { md: "1 / -1" } }}>
-                                        <Typography
-                                            variant="subtitle2"
-                                            sx={{ fontWeight: 600, color: menuText, mb: 1 }}
+                                {/* Technologies checkboxes */}
+                                <Box sx={{ gridColumn: { md: "1 / -1" } }}>
+                                    <Typography
+                                        variant="subtitle2"
+                                        sx={{ fontWeight: 600, color: menuText, mb: 1 }}
+                                    >
+                                        {__("Technologies", lang)}
+                                    </Typography>
+                                    {techCategories.map((cat) => (
+                                        <Box
+                                            key={cat.id}
+                                            component="fieldset"
+                                            sx={{
+                                                mb: 1.5,
+                                                border: `1px solid ${theme.palette.divider}`,
+                                                borderRadius: "4px",
+                                                padding: "2px 20px 8px",
+                                                "& > legend": {
+                                                    fontSize: "0.75em",
+                                                    fontWeight: 400,
+                                                    color: theme.palette.text.secondary,
+                                                    textTransform: "none",
+                                                    letterSpacing: "0.00938em",
+                                                    padding: "0 5px",
+                                                },
+                                            }}
                                         >
-                                            {__("Technologies", lang)}
-                                        </Typography>
-                                        {techCategories.map((cat) => (
-                                            <Box key={cat.id} sx={{ mb: 1.5 }}>
-                                                <Typography
-                                                    variant="caption"
-                                                    sx={{
-                                                        fontWeight: 600,
-                                                        color: regularText,
-                                                        textTransform: "uppercase",
-                                                        letterSpacing: 0.5,
-                                                    }}
-                                                >
-                                                    {lang === "en" ? cat.label_en : cat.label_ru}
-                                                </Typography>
-                                                <Box
-                                                    sx={{
-                                                        display: "flex",
-                                                        flexWrap: "wrap",
-                                                        gap: 0.5,
-                                                        mt: 0.5,
-                                                    }}
-                                                >
-                                                    {cat.technologies.map((tech) => {
-                                                        const checked = project.technologies.some(
-                                                            (t) => t.id === tech.id,
-                                                        );
-                                                        return (
-                                                            <FormControlLabel
-                                                                key={tech.id}
-                                                                control={
-                                                                    <Checkbox
-                                                                        size="small"
-                                                                        checked={checked}
-                                                                        onChange={() => {
-                                                                            if (isNew) {
-                                                                                toggleTech(project.id, tech);
-                                                                                return;
-                                                                            }
-                                                                            const newTechs = checked
-                                                                                ? project.technologies.filter((t) => t.id !== tech.id)
-                                                                                : [...project.technologies, tech];
-                                                                            const newProject = { ...project, technologies: newTechs };
-                                                                            toggleTech(project.id, tech);
-                                                                            autoSaveProjectWith(newProject);
-                                                                        }}
-                                                                    />
-                                                                }
-                                                                label={tech.name}
-                                                                sx={{
-                                                                    gap: 0.5,
-                                                                    "& .MuiTypography-root": {
-                                                                        fontSize: "0.85rem",
-                                                                    },
-                                                                }}
-                                                            />
-                                                        );
-                                                    })}
-                                                </Box>
-                                            </Box>
-                                        ))}
-                                    </Box>
-
-                                    {/* Create button only for new projects */}
-                                    {isNew && (
-                                        <Box sx={{ gridColumn: { md: "1 / -1" }, display: "flex", gap: 1 }}>
-                                            <Button
-                                                variant="outlined"
-                                                color="regular"
-                                                onClick={() => handleSave(project)}
-                                                disabled={isSaving}
-                                                startIcon={isSaving ? <CircularProgress size={16} /> : undefined}
+                                            <legend>{lang === "en" ? cat.label_en : cat.label_ru}</legend>
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    flexWrap: "wrap",
+                                                    gap: 0.5,
+                                                }}
                                             >
-                                                {isSaving ? __("Creating...", lang) : __("Create Project", lang)}
-                                            </Button>
+                                                {cat.technologies.map((tech) => {
+                                                    const checked = project.technologies.some(
+                                                        (t) => t.id === tech.id,
+                                                    );
+                                                    return (
+                                                        <FormControlLabel
+                                                            key={tech.id}
+                                                            control={
+                                                                <Checkbox
+                                                                    size="small"
+                                                                    checked={checked}
+                                                                    onChange={() => {
+                                                                        if (isNew) {
+                                                                            toggleTech(project.id, tech);
+                                                                            return;
+                                                                        }
+                                                                        const newTechs = checked
+                                                                            ? project.technologies.filter((t) => t.id !== tech.id)
+                                                                            : [...project.technologies, tech];
+                                                                        const newProject = { ...project, technologies: newTechs };
+                                                                        toggleTech(project.id, tech);
+                                                                        autoSaveProjectWith(newProject);
+                                                                    }}
+                                                                />
+                                                            }
+                                                            label={lang === "en" ? tech.name_en : tech.name_ru}
+                                                            sx={{
+                                                                gap: 0.5,
+                                                                "& .MuiTypography-root": {
+                                                                    fontSize: "0.85rem",
+                                                                },
+                                                            }}
+                                                        />
+                                                    );
+                                                })}
+                                            </Box>
                                         </Box>
-                                    )}
+                                    ))}
                                 </Box>
-                            </Collapse>
-                        </CardContent>
-                    </Card>
+
+                                {/* Create button only for new projects */}
+                                {isNew && (
+                                    <Box sx={{ gridColumn: { md: "1 / -1" }, display: "flex", gap: 1 }}>
+                                        <Button
+                                            variant="outlined"
+                                            color="regular"
+                                            onClick={() => handleSave(project)}
+                                            disabled={savingCount > 0}
+                                            startIcon={savingCount > 0 ? <CircularProgress size={16} /> : undefined}
+                                        >
+                                            {savingCount > 0 ? __("Creating...", lang) : __("Create Project", lang)}
+                                        </Button>
+                                    </Box>
+                                )}
+                            </Box>
+                        </AccordionDetails>
+                    </Accordion>
                 );
             })}
         </Box>
@@ -620,439 +631,7 @@ function ProjectsTab() {
 }
 
 // ---------------------------------------------------------------------------
-// Technologies Tab
-// ---------------------------------------------------------------------------
-
-function TechnologiesTab() {
-    const theme = useTheme();
-    const menuText = getThemeColor("menuText", theme);
-    const barBg = getThemeColor("barBackground", theme);
-    const { lang } = useLocalizedField();
-
-    const {
-        data: categories,
-        loading,
-        error,
-        refetch,
-    } = useAdminData<TechnologyCategory[]>({ url: "/api/technologies" });
-
-    const [editingTech, setEditingTech] = useState<Technology | null>(null);
-    const [localError, setLocalError] = useState("");
-    const [localSuccess, setLocalSuccess] = useState("");
-    const [saving, setSaving] = useState(false);
-
-    const allCategories = categories ?? [];
-
-    const handleStartEdit = (tech: Technology) => {
-        setEditingTech({ ...tech });
-    };
-
-    const handleAddTech = (categoryId: number) => {
-        setEditingTech(blankTechnology(categoryId));
-    };
-
-    const handleCancelEdit = () => {
-        setEditingTech(null);
-    };
-
-    const handleSaveTech = async (techData?: Technology) => {
-        const t = techData ?? editingTech;
-        if (!t) return;
-        setSaving(true);
-        setLocalError("");
-        setLocalSuccess("");
-        try {
-            const isNew = t.id < 0;
-            const res = await fetch("/api/technologies", {
-                method: isNew ? "POST" : "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(t),
-            });
-            if (!res.ok) {
-                const errBody = await res.json().catch(() => null);
-                throw new Error(errBody?.error || __("Save failed", lang));
-            }
-            if (isNew) {
-                setLocalSuccess(__("Technology created", lang));
-                setTimeout(() => setLocalSuccess(""), 3000);
-                setEditingTech(null);
-                refetch();
-            }
-        } catch (err) {
-            setLocalError(err instanceof Error ? err.message : __("Save failed", lang));
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    const handleDeleteTech = async (id: number) => {
-        if (!confirm(__("Delete this technology?", lang))) return;
-        try {
-            const res = await fetch("/api/technologies", {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id }),
-            });
-            if (!res.ok) throw new Error(__("Delete failed", lang));
-            refetch();
-        } catch (err) {
-            setLocalError(err instanceof Error ? err.message : __("Delete failed", lang));
-        }
-    };
-
-    if (loading) {
-        return (
-            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 48px)" }}>
-                <CircularProgress />
-            </Box>
-        );
-    }
-
-    return (
-        <Box>
-            {(error || localError) && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                    {error || localError}
-                </Alert>
-            )}
-            {localSuccess && (
-                <Alert severity="success" sx={{ mb: 2 }}>
-                    {localSuccess}
-                </Alert>
-            )}
-
-            {allCategories.map((cat) => (
-                <Box key={cat.id} sx={{ mb: 3 }}>
-                    <Box
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            mb: 1.5,
-                        }}
-                    >
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: menuText }}>
-                            {lang === "en" ? cat.label_en : cat.label_ru}
-                        </Typography>
-                        <Button
-                            size="small"
-                            variant="outlined"
-                            color="regular"
-                            startIcon={<AddIcon />}
-                            onClick={() => handleAddTech(cat.id)}
-                        >
-                            {__("Add Technology", lang)}
-                        </Button>
-                    </Box>
-
-                    {cat.technologies.map((tech) => (
-                        <Card
-                            key={tech.id}
-                            elevation={0}
-                            sx={{
-                                mb: 1,
-                                border: `1px solid ${theme.palette.divider}`,
-                                background: barBg,
-                            }}
-                        >
-                            <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 } }}>
-                                {editingTech && editingTech.id === tech.id ? (
-                                    <TechEditForm
-                                        tech={editingTech}
-                                        setTech={setEditingTech}
-                                        categories={allCategories}
-                                        onSave={handleSaveTech}
-                                        onClose={handleCancelEdit}
-                                        saving={saving}
-                                    />
-                                ) : (
-                                    <Box
-                                        sx={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "space-between",
-                                        }}
-                                    >
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: 1.5,
-                                                flex: 1,
-                                            }}
-                                        >
-                                            {tech.icon && (
-                                                <Box
-                                                    component="span"
-                                                    sx={{ fontSize: "1.1rem", lineHeight: 1 }}
-                                                >
-                                                    {tech.icon}
-                                                </Box>
-                                            )}
-                                            <Typography
-                                                sx={{ fontWeight: 500, color: menuText, fontSize: "0.9rem" }}
-                                            >
-                                                {tech.name}
-                                            </Typography>
-                                            <Chip
-                                                label={`Skill: ${tech.skill_level}%`}
-                                                size="small"
-                                                sx={{ fontSize: "0.7rem" }}
-                                            />
-                                            <Chip
-                                                label={`${tech.experience_years}y exp`}
-                                                size="small"
-                                                sx={{ fontSize: "0.7rem" }}
-                                            />
-                                            {tech.color && (
-                                                <Box
-                                                    sx={{
-                                                        width: 14,
-                                                        height: 14,
-                                                        borderRadius: "50%",
-                                                        background: tech.color,
-                                                        border: `1px solid ${theme.palette.divider}`,
-                                                    }}
-                                                />
-                                            )}
-                                        </Box>
-                                        <Box sx={{ display: "flex", gap: 0.5 }}>
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => handleStartEdit(tech)}
-                                            >
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => handleDeleteTech(tech.id)}
-                                                sx={{ color: theme.palette.error.main }}
-                                            >
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
-                                        </Box>
-                                    </Box>
-                                )}
-                            </CardContent>
-                        </Card>
-                    ))}
-
-                    {/* Inline new technology form */}
-                    {editingTech && editingTech.id < 0 && editingTech.category_id === cat.id && (
-                        <Card
-                            elevation={0}
-                            sx={{
-                                mb: 1,
-                                border: `1px dashed ${theme.palette.primary.main}`,
-                                background: alpha(theme.palette.primary.main, 0.03),
-                            }}
-                        >
-                            <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 } }}>
-                                <TechEditForm
-                                    tech={editingTech}
-                                    setTech={setEditingTech}
-                                    categories={allCategories}
-                                    onSave={handleSaveTech}
-                                    onClose={handleCancelEdit}
-                                    saving={saving}
-                                />
-                            </CardContent>
-                        </Card>
-                    )}
-                </Box>
-            ))}
-        </Box>
-    );
-}
-
-// ---------------------------------------------------------------------------
-// Technology Edit Form (shared between edit & add)
-// ---------------------------------------------------------------------------
-
-function TechEditForm({
-    tech,
-    setTech,
-    categories,
-    onSave,
-    onClose,
-    saving,
-}: {
-    tech: Technology;
-    setTech: (t: Technology | null) => void;
-    categories: TechnologyCategory[];
-    onSave: (techData?: Technology) => void;
-    onClose: () => void;
-    saving: boolean;
-}) {
-    const { lang } = useLocalizedField();
-    const isNew = tech.id < 0;
-
-    const update = (field: keyof Technology, value: unknown) => {
-        setTech({ ...tech, [field]: value });
-    };
-
-    const updateAndSave = (field: keyof Technology, value: unknown) => {
-        if (isNew) {
-            update(field, value);
-            return;
-        }
-        const newTech = { ...tech, [field]: value };
-        setTech(newTech);
-        onSave(newTech);
-    };
-
-    return (
-        <Box
-            sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" },
-                gap: 1.5,
-                alignItems: "start",
-            }}
-        >
-            <TextField
-                label={__("Name", lang)}
-                size="small"
-                fullWidth
-                value={tech.name ?? ""}
-                onChange={(e) => update("name", e.target.value)}
-                onBlur={() => !isNew && onSave()}
-            />
-            <FormControl size="small" fullWidth>
-                <InputLabel>{__("Category", lang)}</InputLabel>
-                <Select
-                    value={tech.category_id}
-                    label={__("Category", lang)}
-                    onChange={(e) => updateAndSave("category_id", Number(e.target.value))}
-                >
-                    {categories.map((c) => (
-                        <MenuItem key={c.id} value={c.id}>
-                            {lang === "en" ? c.label_en : c.label_ru}
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-            <TextField
-                label={__("Docs Link", lang)}
-                size="small"
-                fullWidth
-                value={tech.docs_link ?? ""}
-                onChange={(e) => update("docs_link", e.target.value)}
-                onBlur={() => !isNew && onSave()}
-            />
-            <TextField
-                label={__("Icon", lang)}
-                size="small"
-                fullWidth
-                value={tech.icon ?? ""}
-                onChange={(e) => update("icon", e.target.value)}
-                onBlur={() => !isNew && onSave()}
-            />
-            <Box>
-                <Typography variant="caption" sx={{ mb: 0.5, display: "block" }}>
-                    {__("Skill Level", lang)}: {tech.skill_level}%
-                </Typography>
-                <Slider
-                    value={tech.skill_level}
-                    onChange={(_, val) => update("skill_level", val as number)}
-                    onChangeCommitted={(_, val) => updateAndSave("skill_level", val as number)}
-                    min={0}
-                    max={100}
-                    size="small"
-                />
-            </Box>
-            <TextField
-                label={__("Experience (years)", lang)}
-                size="small"
-                type="number"
-                fullWidth
-                value={tech.experience_years ?? 0}
-                onChange={(e) => update("experience_years", Number(e.target.value))}
-                onBlur={() => !isNew && onSave()}
-            />
-            <TextField
-                label={__("Projects Count", lang)}
-                size="small"
-                type="number"
-                fullWidth
-                value={tech.projects_count ?? 0}
-                onChange={(e) => update("projects_count", Number(e.target.value))}
-                onBlur={() => !isNew && onSave()}
-            />
-            <TextField
-                label={__("Color", lang)}
-                size="small"
-                fullWidth
-                value={tech.color ?? ""}
-                onChange={(e) => update("color", e.target.value)}
-                onBlur={() => !isNew && onSave()}
-                InputProps={{
-                    startAdornment: (
-                        <Box
-                            sx={{
-                                width: 16,
-                                height: 16,
-                                borderRadius: "50%",
-                                background: tech.color || "#888",
-                                mr: 1,
-                                flexShrink: 0,
-                            }}
-                        />
-                    ),
-                }}
-            />
-            <TextField
-                label={__("Sort Order", lang)}
-                size="small"
-                type="number"
-                fullWidth
-                value={tech.sort_order ?? 0}
-                onChange={(e) => update("sort_order", Number(e.target.value))}
-                onBlur={() => !isNew && onSave()}
-            />
-            <Box
-                sx={{
-                    gridColumn: { sm: "1 / -1" },
-                    display: "flex",
-                    gap: 1,
-                    mt: 0.5,
-                }}
-            >
-                {isNew ? (
-                    <>
-                        <Button
-                            variant="outlined"
-                            color="regular"
-                            size="small"
-                            onClick={() => onSave()}
-                            disabled={saving}
-                            startIcon={saving ? <CircularProgress size={14} /> : undefined}
-                        >
-                            {saving ? __("Creating...", lang) : __("Create", lang)}
-                        </Button>
-                        <Button variant="outlined" color="regular" size="small" onClick={onClose}>
-                            {__("Cancel", lang)}
-                        </Button>
-                    </>
-                ) : (
-                    <Button
-                        variant="outlined"
-                        color="regular"
-                        size="small"
-                        startIcon={saving ? <CircularProgress size={14} /> : <DoneIcon />}
-                        onClick={onClose}
-                        disabled={saving}
-                    >
-                        {saving ? __("Saving...", lang) : __("Done", lang)}
-                    </Button>
-                )}
-            </Box>
-        </Box>
-    );
-}
-
-// ---------------------------------------------------------------------------
-// Main Page
+// General Labels Tab
 // ---------------------------------------------------------------------------
 
 function GeneralLabelsTab() {
@@ -1100,6 +679,265 @@ function GeneralLabelsTab() {
     );
 }
 
+// ---------------------------------------------------------------------------
+// References Tab
+// ---------------------------------------------------------------------------
+
+const REFERENCES_PURPLE = "#8174AB";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function useSubTabIndicator(tab: number, extraDeps: any[] = []) {
+    const tabsRef = useRef<HTMLDivElement | null>(null);
+    const [mounted, setMounted] = useState(false);
+    const [style, setStyle] = useState({ left: 0, width: 0 });
+
+    const measure = useCallback(() => {
+        const container = tabsRef.current;
+        if (!container) return;
+        const activeTab = container.querySelectorAll(".MuiTab-root")[tab] as HTMLElement | null;
+        const scroller = container.querySelector(".MuiTabs-scroller") as HTMLElement | null;
+        if (activeTab && scroller) {
+            const scrollerRect = scroller.getBoundingClientRect();
+            const tabRect = activeTab.getBoundingClientRect();
+            const left = tabRect.left - scrollerRect.left;
+            const width = tabRect.width;
+            setStyle((prev) => (prev.left === left && prev.width === width ? prev : { left, width }));
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tab, ...extraDeps]);
+
+    const callbackRef = useCallback((node: HTMLDivElement | null) => {
+        tabsRef.current = node;
+        if (node) setMounted(true);
+    }, []);
+
+    useLayoutEffect(measure, [measure]);
+    useEffect(() => {
+        if (mounted) measure();
+    }, [mounted, measure]);
+
+    return { callbackRef, style };
+}
+
+interface ProjectDomain {
+    id: number;
+    name_en: string;
+    name_ru: string;
+    icon: string;
+    sort_order: number;
+}
+
+let _nextDomainTempId = -1;
+
+function ReferencesTab() {
+    const theme = useTheme();
+    const { lang } = useLocalizedField();
+    const [subTab, setSubTab] = useState(0);
+    const { callbackRef, style: indicatorStyle } = useSubTabIndicator(subTab, [lang]);
+
+    return (
+        <Box>
+            <Box sx={{ position: "relative", mt: 0, mb: 2 }}>
+                <Tabs
+                    ref={callbackRef}
+                    value={subTab}
+                    onChange={(_, v) => setSubTab(v)}
+                    TabIndicatorProps={{ style: { display: "none" } }}
+                    sx={{
+                        borderBottom: `1px solid ${theme.palette.divider}`,
+                        "& .MuiTab-root": { textTransform: "none", fontWeight: 500 },
+                        "& .Mui-selected": { color: `${REFERENCES_PURPLE} !important` },
+                    }}
+                >
+                    <Tab label={__("Domains", lang)} />
+                </Tabs>
+                <motion.div
+                    animate={{ left: indicatorStyle.left, width: indicatorStyle.width }}
+                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                    style={{
+                        position: "absolute",
+                        bottom: 0,
+                        height: 2,
+                        backgroundColor: REFERENCES_PURPLE,
+                        pointerEvents: "none",
+                    }}
+                />
+            </Box>
+
+            {subTab === 0 && <DomainsSection />}
+        </Box>
+    );
+}
+
+function DomainsSection() {
+    const theme = useTheme();
+    const { lang, lk, lv } = useLocalizedField();
+
+    const {
+        data: domains,
+        setData: setDomains,
+        loading,
+        error,
+        refetch,
+    } = useAdminData<ProjectDomain[]>({ url: "/api/project-domains" });
+
+    const domainsRef = useRef<ProjectDomain[] | null>(null);
+    domainsRef.current = domains;
+
+    const [savingId, setSavingId] = useState<number | null>(null);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [localError, setLocalError] = useState("");
+    const [localSuccess, setLocalSuccess] = useState("");
+
+    const updateField = (id: number, field: keyof ProjectDomain, value: unknown) => {
+        setDomains((prev) =>
+            prev ? prev.map((d) => (d.id === id ? { ...d, [field]: value } : d)) : prev,
+        );
+    };
+
+    const handleSave = async (domain: ProjectDomain) => {
+        setSavingId(domain.id);
+        setLocalError("");
+        setLocalSuccess("");
+        try {
+            const isNew = domain.id < 0;
+            const res = await fetch("/api/project-domains", {
+                method: isNew ? "POST" : "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(domain),
+            });
+            if (!res.ok) {
+                const errBody = await res.json().catch(() => null);
+                throw new Error(errBody?.error || __("Save failed", lang));
+            }
+            if (isNew) {
+                setLocalSuccess(__("Domain created", lang));
+                setTimeout(() => setLocalSuccess(""), 3000);
+                refetch();
+            }
+        } catch (err) {
+            setLocalError(err instanceof Error ? err.message : __("Save failed", lang));
+        } finally {
+            setSavingId(null);
+        }
+    };
+
+    const autoSave = (id: number) => {
+        if (!domainsRef.current) return;
+        const domain = domainsRef.current.find((d) => d.id === id);
+        if (!domain || domain.id < 0) return;
+        handleSave(domain);
+    };
+
+    const handleDelete = async (id: number) => {
+        if (id < 0) {
+            setDomains((prev) => (prev ? prev.filter((d) => d.id !== id) : prev));
+            return;
+        }
+        if (!confirm(__("Delete this domain?", lang))) return;
+        setDeletingId(id);
+        setLocalError("");
+        setLocalSuccess("");
+        try {
+            const res = await fetch("/api/project-domains", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id }),
+            });
+            if (!res.ok) throw new Error(__("Delete failed", lang));
+            refetch();
+        } catch (err) {
+            setLocalError(err instanceof Error ? err.message : __("Delete failed", lang));
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
+    const handleAdd = () => {
+        const d: ProjectDomain = { id: _nextDomainTempId--, name_en: "", name_ru: "", icon: "", sort_order: 0 };
+        setDomains((prev) => (prev ? [...prev, d] : [d]));
+    };
+
+    if (loading) {
+        return (
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 200px)" }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    return (
+        <Box>
+            {(error || localError) && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                    {error || localError}
+                </Alert>
+            )}
+            {localSuccess && (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                    {localSuccess}
+                </Alert>
+            )}
+
+            <Box sx={{ border: `1px solid ${theme.palette.divider}`, borderRadius: "6px", overflow: "hidden" }}>
+                {(domains ?? []).map((domain, i) => {
+                    const isNew = domain.id < 0;
+                    const isSaving = savingId === domain.id;
+                    const isDeleting = deletingId === domain.id;
+                    return (
+                        <Box
+                            key={domain.id}
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                                padding: "6px 12px",
+                                borderTop: i > 0 ? `1px solid ${theme.palette.divider}` : "none",
+                            }}
+                        >
+                            <IconPickerButton value={domain.icon} onChange={(v) => { updateField(domain.id, "icon", v); if (!isNew) { const d = { ...domain, icon: v }; handleSave(d); } }} />
+                            <TextField
+                                size="small"
+                                fullWidth
+                                placeholder={__("Name", lang)}
+                                value={lv(domain, "name")}
+                                onChange={(e) => updateField(domain.id, lk("name") as keyof ProjectDomain, e.target.value)}
+                                onBlur={() => autoSave(domain.id)}
+                                sx={{ flex: "1 1 auto" }}
+                            />
+                            {(isSaving || isDeleting) && <CircularProgress size={14} />}
+                            {isNew && (
+                                <Button
+                                    variant="outlined"
+                                    color="regular"
+                                    size="small"
+                                    onClick={() => handleSave(domain)}
+                                    disabled={isSaving}
+                                >
+                                    {isSaving ? __("Creating...", lang) : __("Create", lang)}
+                                </Button>
+                            )}
+                            <IconButton size="small" onClick={() => handleDelete(domain.id)} sx={{ flexShrink: 0, color: getThemeColor("tabIcon", theme), "&:hover": { color: theme.palette.error.main } }}>
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
+                        </Box>
+                    );
+                })}
+            </Box>
+
+            <Button
+                variant="outlined"
+                color="regular"
+                startIcon={<AddIcon />}
+                onClick={handleAdd}
+                sx={{ mt: 1.5 }}
+            >
+                {__("Add Domain", lang)}
+            </Button>
+        </Box>
+    );
+}
+
 export default function AdminProjectsPage() {
     const theme = useTheme();
     const menuText = getThemeColor("menuText", theme);
@@ -1111,7 +949,7 @@ export default function AdminProjectsPage() {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
                 <RocketLaunchIcon sx={{ color: theme.palette.primary.main, fontSize: 28 }} />
                 <Typography variant="h5" sx={{ fontWeight: 600, color: menuText }}>
-                    {__("Projects & Technologies", lang)}
+                    {__("Projects", lang)}
                 </Typography>
             </Box>
 
@@ -1119,18 +957,18 @@ export default function AdminProjectsPage() {
                 value={tab}
                 onChange={(_, v) => setTab(v)}
                 sx={{
-                    mb: 3,
+                    mb: tab === 1 ? 0 : 3,
                     borderBottom: `1px solid ${theme.palette.divider}`,
                     "& .MuiTab-root": { textTransform: "none", fontWeight: 500 },
                 }}
             >
-                <Tab label={__("Projects", lang)} icon={<RocketLaunchIcon />} iconPosition="start" />
-                <Tab label={__("Technologies", lang)} icon={<CodeIcon />} iconPosition="start" />
+                <Tab label={__("List", lang)} />
+                <Tab label={__("References", lang)} />
                 <Tab label={__("General Labels", lang)} />
             </Tabs>
 
             {tab === 0 && <ProjectsTab />}
-            {tab === 1 && <TechnologiesTab />}
+            {tab === 1 && <ReferencesTab />}
             {tab === 2 && <GeneralLabelsTab />}
         </Box>
     );

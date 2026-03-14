@@ -18,6 +18,7 @@
     "experience": "опыт",
     "technologies": "технологии",
     "achievements": "достижения",
+    "list": "список",
     "specifications": "характиристики",
     "soft-skills": "гибкие навыки",
     "hard-skills": "технические",
@@ -312,5 +313,12 @@
     "indicator 3": "Показатель 3",
     "hard skills": "Технические навыки",
     "category_acc": "Категория",
-    "technology_acc": "Технология"
+    "technology_acc": "Технология",
+    "references": "справочники",
+    "domains": "домены",
+    "add domain": "добавить домен",
+    "delete this domain?": "удалить этот домен?",
+    "domain created": "домен создан",
+    "light cover": "светлая обложка",
+    "dark cover": "тёмная обложка"
 }
