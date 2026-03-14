@@ -56,12 +56,16 @@ export default function AboutBlocksIntegrator<K extends keyof AboutCategoriesTyp
     const visibleCategories = useVisibleCategories();
     const [activeCat] = useState(category);
     const [expandedBlocks, setExpandedBlocks] = useState<string[]>([]);
-    const visibleSubSlugs = hasSubcategories(activeCat)
-        ? new Set(Object.keys(visibleCategories[activeCat as AboutContentfulCategories]?.items ?? {}))
-        : new Set<string>();
-    const visibleBlocks = hasSubcategories(activeCat)
-        ? (blocks[activeCat] as readonly (readonly [string, React.FC])[]).filter(([b]) => visibleSubSlugs.has(b))
-        : [];
+    const visibleSubItems = hasSubcategories(activeCat)
+        ? visibleCategories[activeCat as AboutContentfulCategories]?.items ?? {}
+        : {};
+    const visibleSubOrder = Object.keys(visibleSubItems);
+    const blocksMap = hasSubcategories(activeCat)
+        ? new Map((blocks[activeCat] as readonly (readonly [string, React.FC])[]).map(([b, c]) => [b, c]))
+        : new Map<string, React.FC>();
+    const visibleBlocks = visibleSubOrder
+        .filter((b) => blocksMap.has(b))
+        .map((b) => [b, blocksMap.get(b)!] as const);
     if (!selectedBlock || !hasSubcategories(activeCat) || visibleBlocks.every(([b]) => b != selectedBlock))
         selectedBlock = undefined;
     const onBlockToggle = (block: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
