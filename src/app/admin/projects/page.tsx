@@ -88,6 +88,7 @@ interface Project {
     participating: string;
     dev_time_months: number;
     github_link: string;
+    site_link: string;
     images_count: number;
     cover_brightness: number;
     sort_order: number;
@@ -120,6 +121,7 @@ function blankProject(): Project {
         participating: "",
         dev_time_months: 0,
         github_link: "",
+        site_link: "",
         images_count: 0,
         cover_brightness: 50,
         sort_order: 0,
@@ -498,6 +500,16 @@ function ProjectsTab() {
                                     value={project.github_link ?? ""}
                                     onChange={(e) =>
                                         updateField(project.id, "github_link", e.target.value)
+                                    }
+                                    onBlur={() => autoSaveProject(project.id)}
+                                />
+                                <TextField
+                                    label={__("Site Link", lang)}
+                                    size="small"
+                                    fullWidth
+                                    value={project.site_link ?? ""}
+                                    onChange={(e) =>
+                                        updateField(project.id, "site_link", e.target.value)
                                     }
                                     onBlur={() => autoSaveProject(project.id)}
                                 />
