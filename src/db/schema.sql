@@ -245,6 +245,10 @@ CREATE TABLE IF NOT EXISTS projects (
   participating TEXT NOT NULL DEFAULT 'selfown',
   dev_time_months REAL,
   github_link TEXT,
+  site_link TEXT NOT NULL DEFAULT '',
+  media_id TEXT UNIQUE,
+  content_en TEXT NOT NULL DEFAULT '',
+  content_ru TEXT NOT NULL DEFAULT '',
   images_count INTEGER NOT NULL DEFAULT 0,
   cover_brightness TEXT,
   sort_order INTEGER NOT NULL DEFAULT 0
@@ -255,6 +259,22 @@ CREATE TABLE IF NOT EXISTS project_technologies (
   project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
   technology_id INTEGER NOT NULL REFERENCES technologies(id) ON DELETE CASCADE,
   PRIMARY KEY (project_id, technology_id)
+);
+
+-- Project images
+CREATE TABLE IF NOT EXISTS project_images (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  slug TEXT NOT NULL,
+  original_ext TEXT NOT NULL,
+  title_en TEXT NOT NULL DEFAULT '',
+  title_ru TEXT NOT NULL DEFAULT '',
+  description_en TEXT NOT NULL DEFAULT '',
+  description_ru TEXT NOT NULL DEFAULT '',
+  is_cover INTEGER NOT NULL DEFAULT 0,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(project_id, slug)
 );
 
 -- Project content (rich text per locale)
