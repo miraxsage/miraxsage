@@ -97,7 +97,7 @@ export async function PUT(request: NextRequest) {
         const items = Array.isArray(data) ? data : [data];
 
         // Sections that are FK parents: use UPSERT to avoid cascading child deletions
-        const FK_PARENT_SECTIONS = new Set(["technology_categories", "education_items", "labor_items"]);
+        const FK_PARENT_SECTIONS = new Set(["categories", "technology_categories", "education_items", "labor_items"]);
 
         const transaction = db.transaction(() => {
             if (FK_PARENT_SECTIONS.has(section)) {

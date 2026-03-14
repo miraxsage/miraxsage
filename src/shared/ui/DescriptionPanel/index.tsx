@@ -48,7 +48,8 @@ export function LinkButton({ link, children, sx, borders, onClick }: LinkButtonP
         <Box
             component="a"
             sx={{
-                display: "block",
+                display: "flex",
+                alignItems: "center",
                 padding: "8px 18px",
                 borderStyle: "solid",
                 userSelect: "none",
@@ -138,7 +139,7 @@ export default function DescriptionPanel({
                             {b.icon && (
                                 <Box
                                     component="span"
-                                    sx={{ "& .MuiSvgIcon-root": { fontSize: "20px" }, marginRight: "8px" }}
+                                    sx={{ display: "inline-flex", alignItems: "center", "& .MuiSvgIcon-root": { fontSize: "20px", verticalAlign: "middle" }, marginRight: "8px" }}
                                 >
                                     {b.icon}
                                 </Box>

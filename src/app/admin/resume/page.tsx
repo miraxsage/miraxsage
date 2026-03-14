@@ -1026,6 +1026,7 @@ function ExperienceTab({
                 value={subTab}
                 onChange={(_, v) => setSubTab(v)}
                 sx={{
+                    mt: -3,
                     borderBottom: `1px solid ${theme.palette.divider}`,
                     mb: 2,
                     "& .MuiTabs-indicator": { backgroundColor: EXPERIENCE_PURPLE },
@@ -1067,53 +1068,48 @@ function ExperienceTab({
             )}
 
             {subTab === 1 && (
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                    <Field
-                        label={__("Text", lang) + " (RU)"}
-                        value={proj?.text_ru ?? ""}
-                        onChange={(v) => proj && updateItem("experience_projects", proj.id, "text_ru", v)}
-                        onBlur={() => saveSection("experience_projects")}
-                        multiline
-                        sx={{ width: "100%" }}
-                    />
-                    <Field
-                        label={__("Text", lang) + " (EN)"}
-                        value={proj?.text_en ?? ""}
-                        onChange={(v) => proj && updateItem("experience_projects", proj.id, "text_en", v)}
-                        onBlur={() => saveSection("experience_projects")}
-                        multiline
-                        sx={{ width: "100%" }}
-                    />
-                </Box>
+                <Field
+                    label={__("Text", lang)}
+                    value={proj ? lv(proj, "text") : ""}
+                    onChange={(v) => proj && updateItem("experience_projects", proj.id, lk("text"), v)}
+                    onBlur={() => saveSection("experience_projects")}
+                    multiline
+                    sx={{ width: "100%" }}
+                />
             )}
 
             {subTab === 2 && (
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                     {sortedCats.map((cat) => (
-                        <Box key={cat.id}>
-                            <Typography
-                                variant="subtitle2"
-                                sx={{ mb: 1, color: EXPERIENCE_PURPLE, fontWeight: 600 }}
-                            >
-                                {lv(cat, "label")}
-                            </Typography>
-                            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                        <Accordion key={cat.id} disableGutters sx={{
+                            background: getThemeColor("titleBg", theme),
+                            boxShadow: "none",
+                            border: `1px solid ${theme.palette.divider}`,
+                            borderRadius: "6px !important",
+                            overflow: "hidden",
+                            "&:before": { display: "none" },
+                            "& .MuiAccordionSummary-root": { minHeight: "42px", padding: "0 14px" },
+                            "& .MuiAccordionSummary-content": { margin: "8px 0" },
+                            "& .MuiAccordionDetails-root": {
+                                padding: "12px",
+                                background: getThemeColor("layoutBackground", theme),
+                                borderTop: `1px solid ${theme.palette.divider}`,
+                            },
+                        }}>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                <Typography variant="body2">{lv(cat, "label")}</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
                                 <Field
-                                    label={__("Description", lang) + " (RU)"}
-                                    value={cat.description_ru ?? ""}
-                                    onChange={(v) => updateItem("technology_categories", cat.id, "description_ru", v)}
+                                    label={__("Description", lang)}
+                                    value={lv(cat, "description")}
+                                    onChange={(v) => updateItem("technology_categories", cat.id, lk("description"), v)}
                                     onBlur={() => saveSection("technology_categories")}
                                     multiline
+                                    sx={{ width: "100%" }}
                                 />
-                                <Field
-                                    label={__("Description", lang) + " (EN)"}
-                                    value={cat.description_en ?? ""}
-                                    onChange={(v) => updateItem("technology_categories", cat.id, "description_en", v)}
-                                    onBlur={() => saveSection("technology_categories")}
-                                    multiline
-                                />
-                            </Box>
-                        </Box>
+                            </AccordionDetails>
+                        </Accordion>
                     ))}
                 </Box>
             )}
@@ -1163,12 +1159,15 @@ export default function AdminResumePage() {
     dataRef.current = data;
 
     const [tab, setTab] = useState(0);
+    const dirtySections = useRef<Set<string>>(new Set());
 
     // -- Generic save helpers -----------------------------------------------
 
     const saveSection = useCallback(
         (section: keyof ResumeData) => {
             if (!dataRef.current) return;
+            if (!dirtySections.current.has(section)) return;
+            dirtySections.current.delete(section);
             save({ section, data: dataRef.current[section] });
         },
         [save],
@@ -1182,6 +1181,7 @@ export default function AdminResumePage() {
             const newSection = (dataRef.current[section] as unknown as Array<Record<string, unknown>>).map((item) =>
                 item.id === id ? { ...item, [key]: value } : item,
             );
+            dirtySections.current.add(section);
             setData((prev) => {
                 if (!prev) return prev;
                 return { ...prev, [section]: newSection } as unknown as ResumeData;
