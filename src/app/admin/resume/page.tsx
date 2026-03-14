@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useMemo, useRef } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect, useLayoutEffect } from "react";
+import { motion } from "framer-motion";
 import {
     Box,
     Button,
@@ -1159,6 +1160,47 @@ export default function AdminResumePage() {
     dataRef.current = data;
 
     const [tab, setTab] = useState(0);
+    const tabsRef = useRef<HTMLDivElement | null>(null);
+    const [tabsMounted, setTabsMounted] = useState(false);
+    const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+
+    // Measure active tab position for custom animated indicator (visual coords)
+    const measureIndicator = useCallback(() => {
+        const container = tabsRef.current;
+        if (!container) return;
+        const activeTab = container.querySelectorAll(".MuiTab-root")[tab] as HTMLElement | null;
+        const scroller = container.querySelector(".MuiTabs-scroller") as HTMLElement | null;
+        if (activeTab && scroller) {
+            const scrollerRect = scroller.getBoundingClientRect();
+            const tabRect = activeTab.getBoundingClientRect();
+            const left = tabRect.left - scrollerRect.left;
+            const width = tabRect.width;
+            setIndicatorStyle((prev) =>
+                prev.left === left && prev.width === width ? prev : { left, width },
+            );
+        }
+    }, [tab]);
+
+    // Callback ref: fires when Tabs mounts (regardless of which loading flag finishes last)
+    const tabsCallbackRef = useCallback((node: HTMLDivElement | null) => {
+        tabsRef.current = node;
+        if (node) setTabsMounted(true);
+    }, []);
+
+    useLayoutEffect(measureIndicator, [measureIndicator]);
+    // Re-measure once Tabs mounts and on tab changes
+    useEffect(() => {
+        if (tabsMounted) measureIndicator();
+    }, [tabsMounted, measureIndicator]);
+    // Re-measure when scroller scrolls (e.g. MUI scrolling tab into view)
+    useEffect(() => {
+        const scroller = tabsRef.current?.querySelector(".MuiTabs-scroller");
+        if (!scroller) return;
+        const onScroll = () => measureIndicator();
+        scroller.addEventListener("scroll", onScroll);
+        return () => scroller.removeEventListener("scroll", onScroll);
+    }, [tabsMounted, measureIndicator]);
+
     const dirtySections = useRef<Set<string>>(new Set());
 
     // -- Generic save helpers -----------------------------------------------
@@ -1568,22 +1610,37 @@ export default function AdminResumePage() {
                 </Typography>
             </Box>
 
-            <Tabs
-                value={tab}
-                onChange={(_, v) => setTab(v)}
-                variant="scrollable"
-                scrollButtons="auto"
-                sx={{
-                    mb: 3,
-                    borderBottom: 1,
-                    borderColor: "divider",
-                    "& .MuiTab-root": { textTransform: "none", fontWeight: 500 },
-                }}
-            >
-                {TAB_LABELS.map((label) => (
-                    <Tab key={label} label={__(label, lang)} />
-                ))}
-            </Tabs>
+            <Box sx={{ position: "relative", mb: 3 }}>
+                <Tabs
+                    ref={tabsCallbackRef}
+                    value={tab}
+                    onChange={(_, v) => setTab(v)}
+                    variant="scrollable"
+                    scrollButtons="auto"
+                    TabIndicatorProps={{ style: { display: "none" } }}
+                    sx={{
+                        borderBottom: 1,
+                        borderColor: "divider",
+                        "& .MuiTab-root": { textTransform: "none", fontWeight: 500 },
+                        "& .MuiTabScrollButton-root.Mui-disabled": { width: 0, opacity: 0, transition: "width 0.3s, opacity 0.3s" },
+                    }}
+                >
+                    {TAB_LABELS.map((label) => (
+                        <Tab key={label} label={__(label, lang)} />
+                    ))}
+                </Tabs>
+                <motion.div
+                    animate={{ left: indicatorStyle.left, width: indicatorStyle.width }}
+                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                    style={{
+                        position: "absolute",
+                        bottom: 0,
+                        height: 2,
+                        backgroundColor: theme.palette.primary.main,
+                        pointerEvents: "none",
+                    }}
+                />
+            </Box>
 
             {renderContent()}
         </Box>
