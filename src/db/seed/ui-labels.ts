@@ -27,8 +27,7 @@ const labels = [
     { key: "message", value_en: "message", value_ru: "сообщение", category: "landing" },
 
     // ── resume_general ──────────────────────────────────────────────────
-    { key: "present time", value_en: "present time", value_ru: "настоящее время", category: "resume_general" },
-    { key: "Level", value_en: "Level", value_ru: "Уровень", category: "resume_general" },
+{ key: "Level", value_en: "Level", value_ru: "Уровень", category: "resume_general" },
     { key: "Experience", value_en: "Experience", value_ru: "Опыт", category: "resume_general" },
     { key: "Technology", value_en: "Technology", value_ru: "Технология", category: "resume_general" },
     { key: "Proficiency level", value_en: "Proficiency level", value_ru: "Уровень владения", category: "resume_general" },
@@ -36,7 +35,6 @@ const labels = [
     { key: "Spread", value_en: "Spread", value_ru: "Распределение", category: "resume_general" },
     { key: "Statistic", value_en: "Statistic", value_ru: "Статистика", category: "resume_general" },
     { key: "Projects_tab", value_en: "Projects", value_ru: "Проектов", category: "resume_general" },
-    { key: "Projects_tab_alt", value_en: "Projects", value_ru: "Портфолио", category: "resume_general" },
     { key: "Skills_tab", value_en: "Skills", value_ru: "Навыки", category: "resume_general" },
 
     // ── projects_general ────────────────────────────────────────────────

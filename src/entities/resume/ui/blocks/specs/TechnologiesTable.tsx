@@ -240,7 +240,7 @@ export default function TechnologiesTable({ data, withoutBottomBorder }: Technol
                             {belowlg && (
                                 <>
                                     <Box style={{ borderTopWidth: 0 }}></Box>
-                                    <Box className="grid-title">{t("Projects_tab_alt")}</Box>
+                                    <Box className="grid-title">{t("Projects_tab")}</Box>
                                 </>
                             )}
                             <Box

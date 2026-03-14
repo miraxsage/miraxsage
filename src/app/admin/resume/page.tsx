@@ -210,14 +210,9 @@ function nextTempId() {
 
 const TAB_LABELS = [
     "Categories",
-    "General",
-    "Education",
-    "Labor",
-    "Questionnaire",
+    "Biography",
+    "Specifications",
     "Experience",
-    "Metrics",
-    "Soft Skills",
-    "Hard Skills",
     "General Labels",
 ];
 
@@ -982,7 +977,225 @@ function SortableTechRow({ tech, lang, lk, lv, updateItem, updateItemAndSave, sa
 // Experience Tab
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Biography (General + Education + Labor + Questionnaire) — nested sub-tabs
+// ---------------------------------------------------------------------------
+
+interface BiographyTabProps {
+    general_data: GeneralDataItem[];
+    education_items: EducationItem[];
+    education_data: EducationDataItem[];
+    labor_items: LaborItem[];
+    labor_data: LaborDataItem[];
+    questionnaire_items: QuestionnaireItem[];
+    lang: "en" | "ru";
+    lk: (base: string) => string;
+    lv: (item: any, base: string) => string;
+    updateItem: <K extends keyof ResumeData>(section: K, id: number | string, key: string, value: string) => void;
+    updateItemAndSave: <K extends keyof ResumeData>(section: K, id: number | string, key: string, value: string) => void;
+    saveSection: (section: keyof ResumeData) => void;
+    reorderItems: (section: keyof ResumeData, items: Array<{ id: number | string }>) => void;
+    deleteItem: (section: keyof ResumeData, id: number | string) => void;
+    addItem: (section: keyof ResumeData, item: any) => void;
+    setData: React.Dispatch<React.SetStateAction<ResumeData | null>>;
+    save: (body: unknown, options?: { method?: string; successMessage?: string }) => Promise<unknown>;
+    dataRef: React.RefObject<ResumeData | null>;
+}
+
+function BiographyTab({
+    general_data,
+    education_items,
+    education_data,
+    labor_items,
+    labor_data,
+    questionnaire_items,
+    lang,
+    lk,
+    lv,
+    updateItem,
+    updateItemAndSave,
+    saveSection,
+    reorderItems,
+    deleteItem,
+    addItem,
+    setData,
+    save,
+    dataRef,
+}: BiographyTabProps) {
+    const theme = useTheme();
+    const [subTab, setSubTab] = useState(0);
+    const { callbackRef, style: indicatorStyle } = useSubTabIndicator(subTab, [lang]);
+
+    return (
+        <Box>
+            <Box sx={{ position: "relative", mt: -3, mb: 2 }}>
+                <Tabs
+                    ref={callbackRef}
+                    value={subTab}
+                    onChange={(_, v) => setSubTab(v)}
+                    TabIndicatorProps={{ style: { display: "none" } }}
+                    sx={{
+                        borderBottom: `1px solid ${theme.palette.divider}`,
+                        "& .Mui-selected": { color: `${EXPERIENCE_PURPLE} !important` },
+                    }}
+                >
+                    <Tab label={__("General", lang)} />
+                    <Tab label={__("Education", lang)} />
+                    <Tab label={__("Labor", lang)} />
+                    <Tab label={__("Questionnaire", lang)} />
+                </Tabs>
+                <motion.div
+                    animate={{ left: indicatorStyle.left, width: indicatorStyle.width }}
+                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                    style={{
+                        position: "absolute",
+                        bottom: 0,
+                        height: 2,
+                        backgroundColor: EXPERIENCE_PURPLE,
+                        pointerEvents: "none",
+                    }}
+                />
+            </Box>
+
+            {subTab === 0 && (
+                <SortableList
+                    items={general_data}
+                    onReorder={(items) => reorderItems("general_data", items)}
+                    onDelete={(id) => deleteItem("general_data", id)}
+                    onAdd={() =>
+                        addItem("general_data", {
+                            id: 0,
+                            sort_order: 0,
+                            field_key: "",
+                            label_en: "",
+                            label_ru: "",
+                            value_en: "",
+                            value_ru: "",
+                            value_format: "rich",
+                        } as GeneralDataItem)
+                    }
+                    addLabel={__("Add Field", lang)}
+                    renderItem={(item) => (
+                        <Box sx={{ display: "flex", gap: 1, alignItems: "center", width: "100%" }}>
+                            <AdminKeyChip label={__(item.field_key.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase()), lang)} sx={{ flexShrink: 0, width: "180px" }} />
+                            <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("general_data", item.id, lk("label"), v)} onBlur={() => saveSection("general_data")} sx={{ flex: "0 0 25%" }} />
+                            <Field label={__("Value", lang)} value={lv(item, "value")} onChange={(v) => updateItem("general_data", item.id, lk("value"), v)} onBlur={() => saveSection("general_data")} sx={{ flex: "1 1 auto" }} />
+                        </Box>
+                    )}
+                />
+            )}
+
+            {subTab === 1 && (
+                <ResumeTreeSection
+                    items={education_items as unknown as TreeItem[]}
+                    data={education_data as unknown as TreeDataItem[]}
+                    foreignKey="education_item_id"
+                    onItemsChange={(newItems) => {
+                        setData((prev) => prev ? { ...prev, education_items: newItems as unknown as EducationItem[] } : prev);
+                    }}
+                    onDataChange={(newData) => {
+                        setData((prev) => prev ? { ...prev, education_data: newData as unknown as EducationDataItem[] } : prev);
+                    }}
+                    onSave={(newItems, newData) => {
+                        const itemsToSave = newItems ?? dataRef.current?.education_items;
+                        const dataToSave = newData ?? dataRef.current?.education_data;
+                        if (itemsToSave) save({ section: "education_items", data: itemsToSave });
+                        if (dataToSave) save({ section: "education_data", data: dataToSave });
+                    }}
+                    nextTempId={nextTempId}
+                />
+            )}
+
+            {subTab === 2 && (
+                <ResumeTreeSection
+                    items={labor_items as unknown as TreeItem[]}
+                    data={labor_data as unknown as TreeDataItem[]}
+                    foreignKey="labor_item_id"
+                    onItemsChange={(newItems) => {
+                        setData((prev) => prev ? { ...prev, labor_items: newItems as unknown as LaborItem[] } : prev);
+                    }}
+                    onDataChange={(newData) => {
+                        setData((prev) => prev ? { ...prev, labor_data: newData as unknown as LaborDataItem[] } : prev);
+                    }}
+                    onSave={(newItems, newData) => {
+                        const itemsToSave = newItems ?? dataRef.current?.labor_items;
+                        const dataToSave = newData ?? dataRef.current?.labor_data;
+                        if (itemsToSave) save({ section: "labor_items", data: itemsToSave });
+                        if (dataToSave) save({ section: "labor_data", data: dataToSave });
+                    }}
+                    nextTempId={nextTempId}
+                />
+            )}
+
+            {subTab === 3 && (
+                <SortableList
+                    items={questionnaire_items}
+                    onReorder={(items) => reorderItems("questionnaire_items", items)}
+                    onDelete={(id) => deleteItem("questionnaire_items", id)}
+                    onAdd={() =>
+                        addItem("questionnaire_items", {
+                            id: 0,
+                            sort_order: 0,
+                            question_en: "",
+                            question_ru: "",
+                            answer_en: "",
+                            answer_ru: "",
+                            icon: "",
+                            parent_id: null,
+                        } as QuestionnaireItem)
+                    }
+                    addLabel={__("Add Question", lang)}
+                    renderItem={(item) => (
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                <IconPickerButton value={item.icon} onChange={(v) => updateItemAndSave("questionnaire_items", item.id, "icon", v)} />
+                                <Field label={__("Question", lang)} value={lv(item, "question")} onChange={(v) => updateItem("questionnaire_items", item.id, lk("question"), v)} onBlur={() => saveSection("questionnaire_items")} sx={{ flex: "1 1 auto" }} />
+                            </Box>
+                            <Field label={__("Answer", lang)} value={lv(item, "answer")} onChange={(v) => updateItem("questionnaire_items", item.id, lk("answer"), v)} onBlur={() => saveSection("questionnaire_items")} multiline sx={{ flex: "1 1 100%" }} />
+                        </Box>
+                    )}
+                />
+            )}
+        </Box>
+    );
+}
+
 const EXPERIENCE_PURPLE = "#8174AB";
+
+/** Reusable animated indicator for nested sub-tabs (framer-motion spring, same as main tabs). */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function useSubTabIndicator(tab: number, extraDeps: any[] = []) {
+    const tabsRef = useRef<HTMLDivElement | null>(null);
+    const [mounted, setMounted] = useState(false);
+    const [style, setStyle] = useState({ left: 0, width: 0 });
+
+    const measure = useCallback(() => {
+        const container = tabsRef.current;
+        if (!container) return;
+        const activeTab = container.querySelectorAll(".MuiTab-root")[tab] as HTMLElement | null;
+        const scroller = container.querySelector(".MuiTabs-scroller") as HTMLElement | null;
+        if (activeTab && scroller) {
+            const scrollerRect = scroller.getBoundingClientRect();
+            const tabRect = activeTab.getBoundingClientRect();
+            const left = tabRect.left - scrollerRect.left;
+            const width = tabRect.width;
+            setStyle((prev) => (prev.left === left && prev.width === width ? prev : { left, width }));
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tab, ...extraDeps]);
+
+    const callbackRef = useCallback((node: HTMLDivElement | null) => {
+        tabsRef.current = node;
+        if (node) setMounted(true);
+    }, []);
+
+    useLayoutEffect(measure, [measure]);
+    useEffect(() => {
+        if (mounted) measure();
+    }, [mounted, measure]);
+
+    return { callbackRef, style };
+}
 
 interface ExperienceTabProps {
     achievements: AchievementItem[];
@@ -1013,6 +1226,7 @@ function ExperienceTab({
 }: ExperienceTabProps) {
     const theme = useTheme();
     const [subTab, setSubTab] = useState(0);
+    const { callbackRef, style: indicatorStyle } = useSubTabIndicator(subTab, [lang]);
 
     const sortedCats = useMemo(
         () => [...technology_categories].sort((a, b) => a.sort_order - b.sort_order),
@@ -1023,21 +1237,33 @@ function ExperienceTab({
 
     return (
         <Box>
-            <Tabs
-                value={subTab}
-                onChange={(_, v) => setSubTab(v)}
-                sx={{
-                    mt: -3,
-                    borderBottom: `1px solid ${theme.palette.divider}`,
-                    mb: 2,
-                    "& .MuiTabs-indicator": { backgroundColor: EXPERIENCE_PURPLE },
-                    "& .Mui-selected": { color: `${EXPERIENCE_PURPLE} !important` },
-                }}
-            >
-                <Tab label={__("Achievements", lang)} />
-                <Tab label={__("Projects", lang)} />
-                <Tab label={__("Technologies", lang)} />
-            </Tabs>
+            <Box sx={{ position: "relative", mt: -3, mb: 2 }}>
+                <Tabs
+                    ref={callbackRef}
+                    value={subTab}
+                    onChange={(_, v) => setSubTab(v)}
+                    TabIndicatorProps={{ style: { display: "none" } }}
+                    sx={{
+                        borderBottom: `1px solid ${theme.palette.divider}`,
+                        "& .Mui-selected": { color: `${EXPERIENCE_PURPLE} !important` },
+                    }}
+                >
+                    <Tab label={__("Achievements", lang)} />
+                    <Tab label={__("Projects", lang)} />
+                    <Tab label={__("Technologies", lang)} />
+                </Tabs>
+                <motion.div
+                    animate={{ left: indicatorStyle.left, width: indicatorStyle.width }}
+                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                    style={{
+                        position: "absolute",
+                        bottom: 0,
+                        height: 2,
+                        backgroundColor: EXPERIENCE_PURPLE,
+                        pointerEvents: "none",
+                    }}
+                />
+            </Box>
 
             {subTab === 0 && (
                 <SortableList
@@ -1119,6 +1345,141 @@ function ExperienceTab({
 }
 
 // ---------------------------------------------------------------------------
+// Specifications (Soft Skills + Hard Skills + Metrics) — nested sub-tabs
+// ---------------------------------------------------------------------------
+
+interface SpecificationsTabProps {
+    soft_skills: SoftSkillItem[];
+    metrics: MetricItem[];
+    technology_categories: TechnologyCategoryItem[];
+    technologies: TechnologyItem[];
+    lang: "en" | "ru";
+    lk: (base: string) => string;
+    lv: (item: any, base: string) => string;
+    updateItem: <K extends keyof ResumeData>(section: K, id: number | string, key: string, value: string) => void;
+    updateItemAndSave: <K extends keyof ResumeData>(section: K, id: number | string, key: string, value: string) => void;
+    saveSection: (section: keyof ResumeData) => void;
+    reorderItems: (section: keyof ResumeData, items: Array<{ id: number | string }>) => void;
+    deleteItem: (section: keyof ResumeData, id: number | string) => void;
+    addItem: (section: keyof ResumeData, item: any) => void;
+    setData: React.Dispatch<React.SetStateAction<ResumeData | null>>;
+    save: (body: unknown, options?: { method?: string; successMessage?: string }) => Promise<unknown>;
+}
+
+function SpecificationsTab({
+    soft_skills,
+    metrics,
+    technology_categories,
+    technologies,
+    lang,
+    lk,
+    lv,
+    updateItem,
+    updateItemAndSave,
+    saveSection,
+    reorderItems,
+    deleteItem,
+    addItem,
+    setData,
+    save,
+}: SpecificationsTabProps) {
+    const theme = useTheme();
+    const [subTab, setSubTab] = useState(0);
+    const { callbackRef, style: indicatorStyle } = useSubTabIndicator(subTab, [lang]);
+
+    const metric = metrics[0];
+
+    return (
+        <Box>
+            <Box sx={{ position: "relative", mt: -3, mb: 2 }}>
+                <Tabs
+                    ref={callbackRef}
+                    value={subTab}
+                    onChange={(_, v) => setSubTab(v)}
+                    TabIndicatorProps={{ style: { display: "none" } }}
+                    sx={{
+                        borderBottom: `1px solid ${theme.palette.divider}`,
+                        "& .Mui-selected": { color: `${EXPERIENCE_PURPLE} !important` },
+                    }}
+                >
+                    <Tab label={__("Soft Skills", lang)} />
+                    <Tab label={__("Hard Skills", lang)} />
+                    <Tab label={__("Metrics", lang)} />
+                </Tabs>
+                <motion.div
+                    animate={{ left: indicatorStyle.left, width: indicatorStyle.width }}
+                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                    style={{
+                        position: "absolute",
+                        bottom: 0,
+                        height: 2,
+                        backgroundColor: EXPERIENCE_PURPLE,
+                        pointerEvents: "none",
+                    }}
+                />
+            </Box>
+
+            {subTab === 0 && (
+                <SortableList
+                    items={soft_skills}
+                    onReorder={(items) => reorderItems("soft_skills", items)}
+                    onDelete={(id) => deleteItem("soft_skills", id)}
+                    onAdd={() =>
+                        addItem("soft_skills", {
+                            id: 0,
+                            slug: "",
+                            label_en: "",
+                            label_ru: "",
+                            description_en: "",
+                            description_ru: "",
+                            icon: "",
+                            level_values: "[]",
+                        } as SoftSkillItem)
+                    }
+                    addLabel={__("Add Soft Skill", lang)}
+                    renderItem={(item) => (
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                            <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                                <IconPickerButton value={item.icon} onChange={(v) => updateItemAndSave("soft_skills", item.id, "icon", v)} />
+                                <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("soft_skills", item.id, lk("label"), v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 auto" }} />
+                            </Box>
+                            <Field label={__("Description", lang)} value={lv(item, "description")} onChange={(v) => updateItem("soft_skills", item.id, lk("description"), v)} onBlur={() => saveSection("soft_skills")} multiline />
+                            <LevelValuesEditor item={item} updateItem={updateItem} saveSection={saveSection} lang={lang} />
+                        </Box>
+                    )}
+                />
+            )}
+
+            {subTab === 1 && (
+                <HardSkillsTab
+                    categories={technology_categories}
+                    technologies={technologies}
+                    lang={lang}
+                    lk={lk}
+                    lv={lv}
+                    updateItem={updateItem}
+                    updateItemAndSave={updateItemAndSave}
+                    saveSection={saveSection}
+                    setData={setData}
+                    save={save}
+                />
+            )}
+
+            {subTab === 2 && (
+                <Field
+                    label={__("Text", lang)}
+                    value={metric?.text ?? ""}
+                    onChange={(v) => metric && updateItem("metrics", metric.id, "text", v)}
+                    onBlur={() => saveSection("metrics")}
+                    multiline
+                    sx={{ width: "100%" }}
+                />
+            )}
+        </Box>
+    );
+}
+
+// ---------------------------------------------------------------------------
 // Page Component
 // ---------------------------------------------------------------------------
 
@@ -1179,7 +1540,7 @@ export default function AdminResumePage() {
                 prev.left === left && prev.width === width ? prev : { left, width },
             );
         }
-    }, [tab]);
+    }, [tab, lang]);
 
     // Callback ref: fires when Tabs mounts (regardless of which loading flag finishes last)
     const tabsCallbackRef = useCallback((node: HTMLDivElement | null) => {
@@ -1360,132 +1721,59 @@ export default function AdminResumePage() {
                     </AdminSection>
                 );
 
-            // ----- GENERAL DATA -----
+            // ----- BIOGRAPHY (General + Education + Labor + Questionnaire) -----
             case 1:
                 return (
-                    <AdminSection
-                        saving={saving}
-                        error={error}
-                        success={success}
-                    >
-                        <SortableList
-                            items={data.general_data}
-                            onReorder={(items) => reorderItems("general_data", items)}
-                            onDelete={(id) => deleteItem("general_data", id)}
-                            onAdd={() =>
-                                addItem("general_data", {
-                                    id: 0,
-                                    sort_order: 0,
-                                    field_key: "",
-                                    label_en: "",
-                                    label_ru: "",
-                                    value_en: "",
-                                    value_ru: "",
-                                    value_format: "rich",
-                                } as GeneralDataItem)
-                            }
-                            addLabel={__("Add Field", lang)}
-                            renderItem={(item) => (
-                                <Box sx={{ display: "flex", gap: 1, alignItems: "center", width: "100%" }}>
-                                    <AdminKeyChip label={__(item.field_key.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase()), lang)} sx={{ flexShrink: 0, width: "180px" }} />
-                                    <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("general_data", item.id, lk("label"), v)} onBlur={() => saveSection("general_data")} sx={{ flex: "0 0 25%" }} />
-                                    <Field label={__("Value", lang)} value={lv(item, "value")} onChange={(v) => updateItem("general_data", item.id, lk("value"), v)} onBlur={() => saveSection("general_data")} sx={{ flex: "1 1 auto" }} />
-                                </Box>
-                            )}
+                    <AdminSection saving={saving} error={error} success={success}>
+                        <BiographyTab
+                            general_data={data.general_data}
+                            education_items={data.education_items}
+                            education_data={data.education_data}
+                            labor_items={data.labor_items}
+                            labor_data={data.labor_data}
+                            questionnaire_items={data.questionnaire_items}
+                            lang={lang}
+                            lk={lk}
+                            lv={lv}
+                            updateItem={updateItem}
+                            updateItemAndSave={updateItemAndSave}
+                            saveSection={saveSection}
+                            reorderItems={reorderItems}
+                            deleteItem={deleteItem}
+                            addItem={addItem}
+                            setData={setData}
+                            save={save}
+                            dataRef={dataRef}
                         />
                     </AdminSection>
                 );
 
-            // ----- EDUCATION -----
+            // ----- SPECIFICATIONS (Soft Skills + Hard Skills + Metrics) -----
             case 2:
                 return (
                     <AdminSection saving={saving} error={error} success={success}>
-                        <ResumeTreeSection
-                            items={data.education_items as unknown as TreeItem[]}
-                            data={data.education_data as unknown as TreeDataItem[]}
-                            foreignKey="education_item_id"
-                            onItemsChange={(newItems) => {
-                                setData((prev) => prev ? { ...prev, education_items: newItems as unknown as EducationItem[] } : prev);
-                            }}
-                            onDataChange={(newData) => {
-                                setData((prev) => prev ? { ...prev, education_data: newData as unknown as EducationDataItem[] } : prev);
-                            }}
-                            onSave={(newItems, newData) => {
-                                const itemsToSave = newItems ?? dataRef.current?.education_items;
-                                const dataToSave = newData ?? dataRef.current?.education_data;
-                                if (itemsToSave) save({ section: "education_items", data: itemsToSave });
-                                if (dataToSave) save({ section: "education_data", data: dataToSave });
-                            }}
-                            nextTempId={nextTempId}
-                        />
-                    </AdminSection>
-                );
-
-            // ----- LABOR -----
-            case 3:
-                return (
-                    <AdminSection saving={saving} error={error} success={success}>
-                        <ResumeTreeSection
-                            items={data.labor_items as unknown as TreeItem[]}
-                            data={data.labor_data as unknown as TreeDataItem[]}
-                            foreignKey="labor_item_id"
-                            onItemsChange={(newItems) => {
-                                setData((prev) => prev ? { ...prev, labor_items: newItems as unknown as LaborItem[] } : prev);
-                            }}
-                            onDataChange={(newData) => {
-                                setData((prev) => prev ? { ...prev, labor_data: newData as unknown as LaborDataItem[] } : prev);
-                            }}
-                            onSave={(newItems, newData) => {
-                                const itemsToSave = newItems ?? dataRef.current?.labor_items;
-                                const dataToSave = newData ?? dataRef.current?.labor_data;
-                                if (itemsToSave) save({ section: "labor_items", data: itemsToSave });
-                                if (dataToSave) save({ section: "labor_data", data: dataToSave });
-                            }}
-                            nextTempId={nextTempId}
-                        />
-                    </AdminSection>
-                );
-
-            // ----- QUESTIONNAIRE -----
-            case 4:
-                return (
-                    <AdminSection
-                        saving={saving}
-                        error={error}
-                        success={success}
-                    >
-                        <SortableList
-                            items={data.questionnaire_items}
-                            onReorder={(items) => reorderItems("questionnaire_items", items)}
-                            onDelete={(id) => deleteItem("questionnaire_items", id)}
-                            onAdd={() =>
-                                addItem("questionnaire_items", {
-                                    id: 0,
-                                    sort_order: 0,
-                                    question_en: "",
-                                    question_ru: "",
-                                    answer_en: "",
-                                    answer_ru: "",
-                                    icon: "",
-                                    parent_id: null,
-                                } as QuestionnaireItem)
-                            }
-                            addLabel={__("Add Question", lang)}
-                            renderItem={(item) => (
-                                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                        <IconPickerButton value={item.icon} onChange={(v) => updateItemAndSave("questionnaire_items", item.id, "icon", v)} />
-                                        <Field label={__("Question", lang)} value={lv(item, "question")} onChange={(v) => updateItem("questionnaire_items", item.id, lk("question"), v)} onBlur={() => saveSection("questionnaire_items")} sx={{ flex: "1 1 auto" }} />
-                                    </Box>
-                                    <Field label={__("Answer", lang)} value={lv(item, "answer")} onChange={(v) => updateItem("questionnaire_items", item.id, lk("answer"), v)} onBlur={() => saveSection("questionnaire_items")} multiline sx={{ flex: "1 1 100%" }} />
-                                </Box>
-                            )}
+                        <SpecificationsTab
+                            soft_skills={data.soft_skills}
+                            metrics={data.metrics}
+                            technology_categories={data.technology_categories}
+                            technologies={data.technologies}
+                            lang={lang}
+                            lk={lk}
+                            lv={lv}
+                            updateItem={updateItem}
+                            updateItemAndSave={updateItemAndSave}
+                            saveSection={saveSection}
+                            reorderItems={reorderItems}
+                            deleteItem={deleteItem}
+                            addItem={addItem}
+                            setData={setData}
+                            save={save}
                         />
                     </AdminSection>
                 );
 
             // ----- EXPERIENCE -----
-            case 5:
+            case 3:
                 return (
                     <AdminSection saving={saving} error={error} success={success}>
                         <ExperienceTab
@@ -1504,83 +1792,8 @@ export default function AdminResumePage() {
                     </AdminSection>
                 );
 
-            // ----- METRICS -----
-            case 6: {
-                const metric = data.metrics[0];
-                return (
-                    <AdminSection saving={saving} error={error} success={success}>
-                        <Field
-                            label={__("Text", lang)}
-                            value={metric?.text ?? ""}
-                            onChange={(v) => metric && updateItem("metrics", metric.id, "text", v)}
-                            onBlur={() => saveSection("metrics")}
-                            multiline
-                            sx={{ width: "100%" }}
-                        />
-                    </AdminSection>
-                );
-            }
-
-            // ----- SOFT SKILLS -----
-            case 7:
-                return (
-                    <AdminSection
-                        saving={saving}
-                        error={error}
-                        success={success}
-                    >
-                        <SortableList
-                            items={data.soft_skills}
-                            onReorder={(items) => reorderItems("soft_skills", items)}
-                            onDelete={(id) => deleteItem("soft_skills", id)}
-                            onAdd={() =>
-                                addItem("soft_skills", {
-                                    id: 0,
-                                    slug: "",
-                                    label_en: "",
-                                    label_ru: "",
-                                    description_en: "",
-                                    description_ru: "",
-                                    icon: "",
-                                    level_values: "[]",
-                                } as SoftSkillItem)
-                            }
-                            addLabel={__("Add Soft Skill", lang)}
-                            renderItem={(item) => (
-                                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                                    <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                                        <IconPickerButton value={item.icon} onChange={(v) => updateItemAndSave("soft_skills", item.id, "icon", v)} />
-                                        <Field label={__("Label", lang)} value={lv(item, "label")} onChange={(v) => updateItem("soft_skills", item.id, lk("label"), v)} onBlur={() => saveSection("soft_skills")} sx={{ flex: "1 1 auto" }} />
-                                    </Box>
-                                    <Field label={__("Description", lang)} value={lv(item, "description")} onChange={(v) => updateItem("soft_skills", item.id, lk("description"), v)} onBlur={() => saveSection("soft_skills")} multiline />
-                                    <LevelValuesEditor item={item} updateItem={updateItem} saveSection={saveSection} lang={lang} />
-                                </Box>
-                            )}
-                        />
-                    </AdminSection>
-                );
-
-            // ----- HARD SKILLS -----
-            case 8:
-                return (
-                    <AdminSection saving={saving} error={error} success={success}>
-                        <HardSkillsTab
-                            categories={data.technology_categories}
-                            technologies={data.technologies}
-                            lang={lang}
-                            lk={lk}
-                            lv={lv}
-                            updateItem={updateItem}
-                            updateItemAndSave={updateItemAndSave}
-                            saveSection={saveSection}
-                            setData={setData}
-                            save={save}
-                        />
-                    </AdminSection>
-                );
-
             // ----- GENERAL LABELS -----
-            case 9:
+            case 4:
                 return (
                     <AdminSection
                         saving={labelsSaving}
