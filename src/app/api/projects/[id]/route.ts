@@ -28,14 +28,14 @@ export async function GET(request: NextRequest, context: RouteContext) {
             )
             .all(id);
 
-        const content = db
-            .prepare("SELECT * FROM project_content WHERE project_id = ?")
+        const images = db
+            .prepare("SELECT * FROM project_images WHERE project_id = ? ORDER BY sort_order")
             .all(id);
 
         return jsonResponse({
             ...project,
             technologies,
-            content,
+            images,
         });
     } catch (error) {
         console.error("Project GET error:", error);

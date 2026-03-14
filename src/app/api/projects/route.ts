@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { requireAuth } from "@/shared/api/auth";
 import { jsonResponse, errorResponse } from "@/shared/api/response";
+import { generateMediaId } from "@/shared/lib/mediaId";
 
 export async function GET() {
     try {
@@ -54,6 +55,10 @@ export async function POST(request: NextRequest) {
         }
 
         const db = getDb();
+
+        if (!projectFields.media_id) {
+            projectFields.media_id = generateMediaId();
+        }
 
         const columns = Object.keys(projectFields);
         const placeholders = columns.map(() => "?").join(", ");
