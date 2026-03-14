@@ -28,7 +28,7 @@ import categories, {
     hasSubcategories,
 } from "@/entities/resume/model/categories";
 import CustomScrollbar from "@/shared/ui/Scrollbar";
-import { usePathname, useParams, useRouter } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import AboutBlocksIntegrator from "./BlocksIntegrator";
 import { motion } from "framer-motion";
 import CustomBreadcrumbs from "@/shared/ui/Breadcrumbs";
@@ -59,7 +59,6 @@ export default function About() {
     const theme = useTheme();
 
     const rawParams = useParams<{ params?: string[] }>();
-    const router = useRouter();
     const pathname = usePathname();
     const params = {
         category: rawParams.params?.[0],
@@ -123,8 +122,9 @@ export default function About() {
             if (block && !catBlocks.includes(block)) block = catBlocks[0];
         }
         if (block != selectedCat) setSelectedCat(block);
-        if (cat != actualParams.category || block != actualParams.block)
-            router.push(`/about${cat ? `/${cat}${block ? `/${block}` : ``}` : ``}`);
+        const newPath = `/about${cat ? `/${cat}${block ? `/${block}` : ``}` : ``}`;
+        if (window.location.pathname !== newPath)
+            window.history.pushState(null, "", newPath);
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

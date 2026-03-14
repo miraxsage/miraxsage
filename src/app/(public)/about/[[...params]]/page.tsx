@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 import About from "@/entities/resume/ui/About";
 
 export function generateStaticParams() {

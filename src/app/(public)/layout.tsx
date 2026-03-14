@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 import { getDb } from "@/db";
 import MainLayout from "@/widgets/layout/MainLayout";
 import type { HeaderItem } from "@/widgets/layout/TopMenu";
