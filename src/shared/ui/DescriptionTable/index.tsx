@@ -275,6 +275,7 @@ export default function DescriptionTable({
                     userSelect: "text",
                     cursor: "auto",
                     display: "grid",
+                    alignContent: "start",
                     marginBottom: "-1px",
                     borderColor: theme.palette.divider,
                     borderStyle: "solid",

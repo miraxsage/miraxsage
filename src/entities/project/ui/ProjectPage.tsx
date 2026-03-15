@@ -118,8 +118,6 @@ export default function ProjectPage() {
                     color: getThemeColor("regularIcon", theme),
                     fontSize: "20px",
                     marginRight: "8px",
-                    position: "relative",
-                    top: "-2px",
                 },
                 [theme.breakpoints.down("sm")]: {
                     gridTemplateColumns: "auto auto auto",
@@ -132,20 +130,20 @@ export default function ProjectPage() {
             <LinkButton
                 borders="bottom"
                 sx={{
-                    textAlign: lessLg ? "center" : "right",
+                    justifyContent: lessLg ? "center" : "flex-end",
                 }}
                 link={
                     prevProjSlug ? getProjectsNavigationLink({ project: prevProjSlug }, curProjectLocation!) : undefined
                 }
             >
-                <div style={{ opacity: prevProjSlug ? 1 : 0.5 }}>
+                <div style={{ opacity: prevProjSlug ? 1 : 0.5, display: "flex", alignItems: "center" }}>
                     <ArrowBackIcon />
                     {lessLg && <br />}
                     {t("Previous")}
                 </div>
             </LinkButton>
             <LinkButton
-                sx={{ textAlign: "center" }}
+                sx={{ justifyContent: "center" }}
                 borders="right-bottom-left"
                 link={getProjectsNavigationLink({ project: "all" }, curProjectLocation!)}
             >
@@ -159,13 +157,13 @@ export default function ProjectPage() {
                     nextProjSlug ? getProjectsNavigationLink({ project: nextProjSlug }, curProjectLocation!) : undefined
                 }
                 sx={{
-                    textAlign: lessLg ? "center" : "left",
+                    justifyContent: lessLg ? "center" : "flex-start",
                     "& .MuiSvgIcon-root": {
                         margin: "0px 0px 0px 8px",
                     },
                 }}
             >
-                <div style={{ opacity: nextProjSlug ? 1 : 0.5 }}>
+                <div style={{ opacity: nextProjSlug ? 1 : 0.5, display: "flex", alignItems: "center" }}>
                     {lessLg ? <ArrowForwardIcon /> : t("Next")}
                     {lessLg && <br />}
                     {lessLg ? t("Next") : <ArrowForwardIcon />}
@@ -309,7 +307,7 @@ export default function ProjectPage() {
                                                                 },
                                                             }}
                                                         >
-                                                            {!lessLg && projectCarousel}
+                                                            {!lessLg && <Box sx={{ mb: 2 }}>{projectCarousel}</Box>}
                                                             {content.current[lang]}
                                                         </Box>
                                                     }

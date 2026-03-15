@@ -96,8 +96,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
         await writeFile(originalPath, buffer);
 
         await sharp(buffer)
-            .resize({ width: 400, withoutEnlargement: true })
-            .webp({ quality: 75 })
+            .resize({ width: 450, withoutEnlargement: true })
+            .webp({ quality: 80 })
             .toFile(tinyPath);
 
         const maxOrder = db

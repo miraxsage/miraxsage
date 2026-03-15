@@ -15,7 +15,7 @@ export function dbProjectToProjectInterface(p: ProjectData): ProjectInterface {
         participating: p.participating as "team" | "selfown",
         devTimeMonths: p.dev_time_months,
         ...(p.github_link ? { gitHubLink: p.github_link } : {}),
-        technologies: p.technologies.map((tech) => tech.name as string as TechnologiesList),
+        technologies: p.technologies.map((tech) => (tech.name_en ?? tech.name) as string as TechnologiesList),
         images: ((p as any).images_data as Array<unknown> | undefined)?.length ?? 0,
         ...(p.cover_brightness ? { coverBrightmess: p.cover_brightness as "ligth" | "dark" } : {}),
         ...(p.media_id ? { mediaId: p.media_id } : {}),

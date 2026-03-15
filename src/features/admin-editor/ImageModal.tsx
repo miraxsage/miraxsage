@@ -694,7 +694,7 @@ export default function ImageModal({
                             />
                         }
                         label={
-                            <Typography variant="body2">Использовать как обложку</Typography>
+                            <Typography variant="body2">{__("Use as Cover", globalLang)}</Typography>
                         }
                     />
                 </Box>
@@ -706,7 +706,7 @@ export default function ImageModal({
                     color="regular"
                     onClick={() => { revertForm(); onClose(); }}
                 >
-                    Отмена
+                    {__("Cancel", globalLang)}
                 </Button>
                 <Button
                     variant="outlined"

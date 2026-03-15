@@ -74,6 +74,8 @@ export default function ProjectCarousel({ project, onImageClick }: ProjectCarous
             grabCursor: true,
             pagination: {
                 el: ".swiper-pagination",
+                dynamicBullets: true,
+                dynamicMainBullets: 5,
             },
             breakpoints: {
                 0: {

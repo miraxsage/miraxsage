@@ -194,26 +194,24 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
                             color: getThemeColor("regularIcon", theme),
                             fontSize: "20px",
                             marginRight: "8px",
-                            position: "relative",
-                            top: "-2px",
                         },
                     }}
                 >
                     <LinkButton
                         borders="right-bottom"
                         sx={{
-                            textAlign: "right",
+                            justifyContent: "flex-end",
                             ...(lessLg ? { padding: "9px 4px 0px 9px" } : {}),
                         }}
                         onClick={!isFirstImage ? () => navigate("prev") : undefined}
                     >
-                        <div style={{ opacity: !isFirstImage ? 1 : 0.5 }}>
+                        <div style={{ opacity: !isFirstImage ? 1 : 0.5, display: "flex", alignItems: "center" }}>
                             <ArrowBackIcon />
                             {!lessLg && t("Previous_alt")}
                         </div>
                     </LinkButton>
                     <LinkButton borders="bottom" onClick={scale > 0.5 ? () => setScale(scale - 0.1) : undefined}>
-                        <div style={{ opacity: scale > 0.5 ? 1 : 0.5 }}>
+                        <div style={{ opacity: scale > 0.5 ? 1 : 0.5, display: "flex", alignItems: "center" }}>
                             <ZoomOutIcon />
                             {lessLg ? "-" : t("Zoom_out")}
                         </div>
@@ -223,7 +221,7 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
                         {muchSmall ? t("Back") : t("To description")}
                     </LinkButton>
                     <LinkButton borders="bottom" onClick={scale < 1.5 ? () => setScale(scale + 0.1) : undefined}>
-                        <div style={{ opacity: scale < 1.5 ? 1 : 0.5 }}>
+                        <div style={{ opacity: scale < 1.5 ? 1 : 0.5, display: "flex", alignItems: "center" }}>
                             <ZoomInIcon />
                             {lessLg ? "+" : t("Zoom_in")}
                         </div>
@@ -239,7 +237,7 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
                         }}
                         onClick={!isLastImage ? () => navigate("next") : undefined}
                     >
-                        <div style={{ opacity: !isLastImage ? 1 : 0.5 }}>
+                        <div style={{ opacity: !isLastImage ? 1 : 0.5, display: "flex", alignItems: "center" }}>
                             {!lessLg && t("Next_alt")}
                             <ArrowForwardIcon />
                         </div>

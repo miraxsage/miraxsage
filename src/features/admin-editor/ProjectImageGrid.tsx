@@ -214,7 +214,7 @@ export default function ProjectImageGrid({
                 variant="subtitle2"
                 sx={{ fontWeight: 600, color: menuText, mb: 1 }}
             >
-                Изображения
+                {__("Images", lang)}
             </Typography>
 
             <DndContext
@@ -262,7 +262,7 @@ export default function ProjectImageGrid({
                 onClick={handleAddClick}
                 sx={{ mt: loading ? 0 : 1 }}
             >
-                Изображение
+                {__("Image", lang)}
             </Button>
 
             <ImageModal

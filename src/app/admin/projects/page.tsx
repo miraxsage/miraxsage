@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, useMemo, useLayoutEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
     Accordion,
     AccordionSummary,
@@ -27,6 +27,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import ImageIcon from "@mui/icons-material/Image";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useAdminData, useLocalizedField, AdminSection, IconPickerButton, ProjectImageGrid, RichTextEditor, ImageMarkerNode, ImageMarkerPlugin, ImageDragPlugin, ImagePickerModal, ImageMarkerContext, ImageModal, dispatchImageInsert, dispatchSaveSelection } from "@/features/admin-editor";
 import type { ProjectImage } from "@/entities/project/model/projectImage";
 import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
@@ -184,7 +185,7 @@ function ProjectContentEditor({
                 variant="subtitle2"
                 sx={{ fontWeight: 600, color: menuText, mb: 1 }}
             >
-                Контент
+                {__("Content", lang)}
             </Typography>
             <ImageMarkerContext.Provider value={markerCtx}>
                 <RichTextEditor
@@ -260,6 +261,8 @@ function ProjectsTab() {
     const [projectImages, setProjectImages] = useState<Record<number, ProjectImage[]>>({});
     const [loadingImages, setLoadingImages] = useState<Record<number, boolean>>({});
     const [savingCount, setSavingCount] = useState(0);
+    const [saveIndicator, setSaveIndicator] = useState<"hidden" | "saving" | "success">("hidden");
+    const saveTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
     const [localError, setLocalError] = useState("");
     const [localSuccess, setLocalSuccess] = useState("");
 
@@ -318,6 +321,9 @@ function ProjectsTab() {
 
     const handleSave = async (project: Project) => {
         setSavingCount((c) => c + 1);
+        saveTimersRef.current.forEach(clearTimeout);
+        saveTimersRef.current = [];
+        setSaveIndicator("saving");
         setLocalError("");
         setLocalSuccess("");
         try {
@@ -343,7 +349,18 @@ function ProjectsTab() {
         } catch (err) {
             setLocalError(err instanceof Error ? err.message : __("Save failed", lang));
         } finally {
-            setSavingCount((c) => c - 1);
+            setSavingCount((c) => {
+                const next = c - 1;
+                if (next === 0) {
+                    const t1 = setTimeout(() => {
+                        setSaveIndicator("success");
+                        const t2 = setTimeout(() => setSaveIndicator("hidden"), 1500);
+                        saveTimersRef.current.push(t2);
+                    }, 400);
+                    saveTimersRef.current.push(t1);
+                }
+                return next;
+            });
         }
     };
 
@@ -392,11 +409,51 @@ function ProjectsTab() {
 
     return (
         <Box>
-            {savingCount > 0 && (
-                <Box sx={{ position: "fixed", top: 16, right: 24, zIndex: 1300 }}>
-                    <CircularProgress size={22} />
-                </Box>
-            )}
+            <AnimatePresence>
+                {saveIndicator !== "hidden" && (
+                    <motion.div
+                        key="save-indicator"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        style={{
+                            position: "fixed",
+                            top: 16,
+                            right: 16,
+                            zIndex: 1300,
+                            display: "flex",
+                            alignItems: "center",
+                        }}
+                    >
+                        <AnimatePresence mode="wait">
+                            {saveIndicator === "saving" ? (
+                                <motion.div
+                                    key="spinner"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.15 }}
+                                    style={{ display: "flex" }}
+                                >
+                                    <CircularProgress size={20} color="inherit" />
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    key="check"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.15 }}
+                                    style={{ display: "flex" }}
+                                >
+                                    <CheckCircleIcon sx={{ color: theme.palette.success.main, fontSize: 24 }} />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
+                )}
+            </AnimatePresence>
             {(error || localError) && (
                 <Alert severity="error" sx={{ mb: 2 }}>
                     {error || localError}

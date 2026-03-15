@@ -4,19 +4,10 @@ import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import MusclesIcon from "@/shared/icons/MusclesIcon";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import CustomBreadcrumbs from "@/shared/ui/Breadcrumbs";
-// TODO: Migrate TechnologiesList and technologies from pages - currently referencing old path
-// import { TechnologiesList, technologies } from "@/components/pages/About/Blocks/specs/Technologies";
+import { TechnologiesList, technologies } from "@/entities/resume/ui/blocks/specs/Technologies";
 import { Box, SxProps } from "@mui/material";
 import { useThemeColor } from "@/shared/lib/theme";
 import { useLanguage } from "@/shared/lib/store/appearanceSlice";
-
-// TODO: These types and data should be imported from the migrated pages module once available
-type TechnologiesList<T extends "Techs" | "Cats"> = T extends "Techs" ? string : string;
-const technologies: Record<string, [string, string, React.ComponentType, unknown, unknown, unknown, string][]> = {
-    frontend: [],
-    backend: [],
-    desktop: [],
-};
 
 function Separator() {
     return <Box sx={{ color: useThemeColor("regularText"), opacity: 0.5 }}>+</Box>;
@@ -49,9 +40,9 @@ export default function TechnologiesCrumbs({
             separator={<Separator />}
             withoutExpandIcon={true}
         >
-            {techsItems.map(([tech, datalink, Icon, , , , color]) => ({
+            {techsItems.map(([tech, datalink, Icon]) => ({
                 label: tech,
-                iconColor: contrast ? color : undefined,
+                iconColor: undefined,
                 icon: <Icon />,
                 subitems: [
                     {
