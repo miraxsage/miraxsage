@@ -115,7 +115,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
                     `INSERT INTO project_images (project_id, slug, original_ext, title_en, title_ru, description_en, description_ru, is_cover, sort_order)
                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
                 ).run(id, slugRaw, ext, title_en, title_ru, description_en, description_ru, is_cover, sort_order);
-                db.prepare("UPDATE projects SET images_count = (SELECT COUNT(*) FROM project_images WHERE project_id = ?) WHERE id = ?").run(id, id);
                 return info.lastInsertRowid;
             })();
         } catch (dbError) {
@@ -183,6 +182,12 @@ export async function PUT(request: NextRequest, context: RouteContext) {
             const setClauses = updates.map((k) => `${k} = ?`).join(", ");
             const values = updates.map((k) => fields[k] ?? null);
             db.prepare(`UPDATE project_images SET ${setClauses} WHERE id = ?`).run(...values, image_id);
+
+            // Ensure there is always a cover: if none left, assign to the first image
+            const hasCover = db.prepare("SELECT 1 FROM project_images WHERE project_id = ? AND is_cover = 1").get(id);
+            if (!hasCover) {
+                db.prepare("UPDATE project_images SET is_cover = 1 WHERE id = (SELECT id FROM project_images WHERE project_id = ? ORDER BY sort_order LIMIT 1)").run(id);
+            }
         })();
 
         const updated = db.prepare("SELECT * FROM project_images WHERE id = ?").get(image_id);
@@ -219,7 +224,6 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 
         db.transaction(() => {
             db.prepare("DELETE FROM project_images WHERE id = ?").run(image_id);
-            db.prepare("UPDATE projects SET images_count = (SELECT COUNT(*) FROM project_images WHERE project_id = ?) WHERE id = ?").run(id, id);
             for (const col of ["content_en", "content_ru"]) {
                 const project = db.prepare(`SELECT ${col} FROM projects WHERE id = ?`).get(id) as Record<string, string>;
                 const content = project[col];
@@ -229,6 +233,11 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
                         id
                     );
                 }
+            }
+            // Ensure there is always a cover after deletion
+            const hasCover = db.prepare("SELECT 1 FROM project_images WHERE project_id = ? AND is_cover = 1").get(id);
+            if (!hasCover) {
+                db.prepare("UPDATE project_images SET is_cover = 1 WHERE id = (SELECT id FROM project_images WHERE project_id = ? ORDER BY sort_order LIMIT 1)").run(id);
             }
         })();
 

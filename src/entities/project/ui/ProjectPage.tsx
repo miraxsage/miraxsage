@@ -1,7 +1,8 @@
 "use client";
 import { Box, SxProps, useMediaQuery, useTheme } from "@mui/material";
 import ProjectsBreadcrumbs from "@/entities/project/ui/ProjectsBreadcrumbs";
-import { isProjectSlug, getProjectsArray } from "@/entities/project/model/projects";
+import { isProjectSlug, getProjectsArray, ProjectInterface } from "@/entities/project/model/projects";
+import ProjectContentRenderer from "@/entities/project/ui/ProjectContentRenderer";
 import { useParams } from "next/navigation";
 import ProjectInfoTable from "@/entities/project/ui/ProjectInfoTable";
 import CustomScrollbar from "@/shared/ui/Scrollbar";
@@ -22,7 +23,6 @@ import { getThemeColor } from "@/shared/lib/theme";
 import ProjectCarousel from "@/entities/project/ui/ProjectCarousel";
 import ProjectImageViewer from "@/entities/project/ui/ProjectImageViewer";
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
-import __ from "@/shared/lib/i18n/translation";
 import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import { useRouter } from "next/navigation";
 
@@ -48,7 +48,7 @@ function OptionalCustomScrollbar({
 
 export default function ProjectPage() {
     const [refreshState, refresh] = useState<boolean>(false);
-    const [beingViewedImage, setBeingViewedImage] = useState<number | undefined>();
+    const [beingViewedImage, setBeingViewedImage] = useState<number | string | undefined>();
     const screenMode = useScreenMode();
     const slug = useParams().slug as string;
     const theme = useTheme();
@@ -89,15 +89,23 @@ export default function ProjectPage() {
             ? null
             : locatedProjects[curProjIndex + 1].slug;
     useEffect(() => {
-        (async () => {
-            try {
-                const Module = await import(`@/entities/project/content/${slug}/${lang}`);
-                content.current[lang] = <Module.Component onImageClick={(img: number) => setBeingViewedImage(img)} />;
-            } catch {
-                content.current[lang] = lang == "ru" ? "Описание проекта отсутствует" : "Project's description absents";
-            }
-            refresh(!refreshState);
-        })();
+        const projectData: ProjectInterface | undefined = getProjectsArray().find((p) => p.slug === slug);
+        if (projectData?.content?.[lang]) {
+            content.current[lang] = (
+                <ProjectContentRenderer
+                    html={projectData.content[lang]}
+                    mediaId={projectData.mediaId || ""}
+                    images={(projectData.imageRecords ?? []).map((r) => ({ slug: r.slug, original_ext: r.originalExt }))}
+                    onImageClick={(imgSlug) => {
+                        const idx = (projectData.imageRecords ?? []).findIndex((i) => i.slug === imgSlug);
+                        if (idx >= 0) setBeingViewedImage(imgSlug);
+                    }}
+                />
+            );
+        } else {
+            content.current[lang] = lang === "ru" ? "Описание проекта отсутствует" : "Project description not available";
+        }
+        refresh(!refreshState);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lang, slug]);
 

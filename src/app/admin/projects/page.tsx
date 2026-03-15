@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, useLayoutEffect } from "react";
 import { motion } from "framer-motion";
 import {
     Accordion,
@@ -19,30 +19,35 @@ import {
     Alert,
     CircularProgress,
     MenuItem,
+    Divider,
 } from "@mui/material";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import { useAdminData, useLocalizedField, AdminSection, IconPickerButton } from "@/features/admin-editor";
+import ImageIcon from "@mui/icons-material/Image";
+import { useAdminData, useLocalizedField, AdminSection, IconPickerButton, ProjectImageGrid, RichTextEditor, ImageMarkerNode, ImageMarkerPlugin, ImageDragPlugin, ImagePickerModal, ImageMarkerContext, ImageModal, dispatchImageInsert, dispatchSaveSelection } from "@/features/admin-editor";
+import type { ProjectImage } from "@/entities/project/model/projectImage";
 import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
 import iconMap from "@/shared/lib/iconMap";
 import { ICON_MAP } from "@/entities/resume/model/iconMap";
-import { getMuiIcon } from "@/shared/lib/muiIconsLoader";
+import { useMuiIconsModule } from "@/shared/lib/muiIconsLoader";
 
 const ALL_CUSTOM_ICONS: Record<string, React.FC> = { ...iconMap, ...ICON_MAP };
 
 function DomainIconPreview({ icon }: { icon: string }) {
+    const muiModule = useMuiIconsModule();
     if (!icon) return null;
     const Custom = ALL_CUSTOM_ICONS[icon] as React.ComponentType<{ fontSize?: string }> | undefined;
     if (Custom) return <Custom fontSize="small" />;
-    const Mui = getMuiIcon(icon);
+    const Mui = muiModule?.[icon];
     if (Mui) return <Mui fontSize="small" />;
-    return null;
+    // Reserve space while MUI icons are loading
+    return <Box sx={{ width: 20, height: 20, flexShrink: 0 }} />;
 }
 
 // ---------------------------------------------------------------------------
@@ -89,7 +94,9 @@ interface Project {
     dev_time_months: number;
     github_link: string;
     site_link: string;
-    images_count: number;
+    media_id: string;
+    content_en: string;
+    content_ru: string;
     cover_brightness: number;
     sort_order: number;
     technologies: Technology[];
@@ -122,11 +129,108 @@ function blankProject(): Project {
         dev_time_months: 0,
         github_link: "",
         site_link: "",
-        images_count: 0,
+        media_id: "",
+        content_en: "",
+        content_ru: "",
         cover_brightness: 50,
         sort_order: 0,
         technologies: [],
     };
+}
+
+// ---------------------------------------------------------------------------
+// Content editor with image picker
+// ---------------------------------------------------------------------------
+
+function ProjectContentEditor({
+    project,
+    images,
+    onContentChange,
+    onBlur,
+    onImagesChange,
+}: {
+    project: Project;
+    images: ProjectImage[];
+    onContentChange: (field: string, html: string) => void;
+    onBlur: () => void;
+    onImagesChange: (images: ProjectImage[]) => void;
+}) {
+    const { lang, lk } = useLocalizedField();
+    const theme = useTheme();
+    const menuText = getThemeColor("menuText", theme);
+    const [pickerOpen, setPickerOpen] = useState(false);
+    const [markerModalOpen, setMarkerModalOpen] = useState(false);
+    const [markerModalIndex, setMarkerModalIndex] = useState(0);
+
+    const handleMarkerClick = useCallback(
+        (slug: string) => {
+            const idx = images.findIndex((img) => img.slug === slug);
+            if (idx >= 0) {
+                setMarkerModalIndex(idx);
+                setMarkerModalOpen(true);
+            }
+        },
+        [images],
+    );
+
+    const markerCtx = useMemo(
+        () => ({ images, mediaId: project.media_id, onImageClick: handleMarkerClick }),
+        [images, project.media_id, handleMarkerClick],
+    );
+
+    return (
+        <Box sx={{ gridColumn: { md: "1 / -1" }, mt: 1 }}>
+            <Typography
+                variant="subtitle2"
+                sx={{ fontWeight: 600, color: menuText, mb: 1 }}
+            >
+                Контент
+            </Typography>
+            <ImageMarkerContext.Provider value={markerCtx}>
+                <RichTextEditor
+                    key={lang}
+                    value={project[lk("content") as "content_en" | "content_ru"] ?? ""}
+                    onChange={(html) => onContentChange(lk("content"), html)}
+                    onBlur={onBlur}
+                    extraNodes={[ImageMarkerNode]}
+                    extraPlugins={<><ImageMarkerPlugin /><ImageDragPlugin /></>}
+                    toolbarExtra={
+                        <>
+                            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                            <IconButton
+                                size="small"
+                                onClick={() => { dispatchSaveSelection(); setPickerOpen(true); }}
+                                sx={{
+                                    color: theme.palette.primary.main,
+                                    border: `1px solid ${theme.palette.primary.main}`,
+                                    borderRadius: 1,
+                                }}
+                            >
+                                <ImageIcon fontSize="small" />
+                            </IconButton>
+                        </>
+                    }
+                />
+            </ImageMarkerContext.Provider>
+            <ImagePickerModal
+                open={pickerOpen}
+                onClose={() => setPickerOpen(false)}
+                images={images}
+                mediaId={project.media_id}
+                onSelect={(slug) => dispatchImageInsert(slug)}
+            />
+            <ImageModal
+                open={markerModalOpen}
+                onClose={() => setMarkerModalOpen(false)}
+                projectId={project.id}
+                mediaId={project.media_id}
+                images={images}
+                initialIndex={markerModalIndex}
+                mode="view"
+                onImagesChange={onImagesChange}
+            />
+        </Box>
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -153,6 +257,8 @@ function ProjectsTab() {
     const [techCategories, setTechCategories] = useState<TechnologyCategory[]>([]);
     const [projectDomains, setProjectDomains] = useState<ProjectDomain[]>([]);
     const [expandedId, setExpandedId] = useState<number | null>(null);
+    const [projectImages, setProjectImages] = useState<Record<number, ProjectImage[]>>({});
+    const [loadingImages, setLoadingImages] = useState<Record<number, boolean>>({});
     const [savingCount, setSavingCount] = useState(0);
     const [localError, setLocalError] = useState("");
     const [localSuccess, setLocalSuccess] = useState("");
@@ -168,8 +274,23 @@ function ProjectsTab() {
             .catch(() => {});
     }, []);
 
+    const fetchProjectImages = useCallback((id: number) => {
+        setLoadingImages((prev) => ({ ...prev, [id]: true }));
+        fetch(`/api/projects/${id}/images`)
+            .then((r) => r.json())
+            .then((imgs) => setProjectImages((prev) => ({ ...prev, [id]: Array.isArray(imgs) ? imgs : imgs.data ?? [] })))
+            .catch(() => {})
+            .finally(() => setLoadingImages((prev) => ({ ...prev, [id]: false })));
+    }, []);
+
     const toggleExpand = (id: number) => {
-        setExpandedId((prev) => (prev === id ? null : id));
+        setExpandedId((prev) => {
+            const next = prev === id ? null : id;
+            if (next !== null && id > 0 && !projectImages[id]) {
+                fetchProjectImages(id);
+            }
+            return next;
+        });
     };
 
     const updateField = (id: number, field: keyof Project, value: unknown) => {
@@ -306,6 +427,7 @@ function ProjectsTab() {
                         expanded={isExpanded}
                         onChange={() => {}}
                         disableGutters
+                        slotProps={{ transition: { unmountOnExit: true } }}
                         sx={{
                             mb: 1,
                             background: getThemeColor("titleBg", theme),
@@ -331,7 +453,7 @@ function ProjectsTab() {
                                 {(() => {
                                     const dom = projectDomains.find((d) => d.name_en === project.domain);
                                     return dom?.icon ? (
-                                        <Box sx={{ flexShrink: 0, display: "flex", color: getThemeColor("regularIcon", theme) }}>
+                                        <Box sx={{ flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, color: getThemeColor("regularIcon", theme) }}>
                                             <DomainIconPreview icon={dom.icon} />
                                         </Box>
                                     ) : null;
@@ -513,21 +635,7 @@ function ProjectsTab() {
                                     }
                                     onBlur={() => autoSaveProject(project.id)}
                                 />
-                                <TextField
-                                    label={__("Images Count", lang)}
-                                    size="small"
-                                    type="number"
-                                    value={project.images_count ?? 0}
-                                    onChange={(e) =>
-                                        updateField(
-                                            project.id,
-                                            "images_count",
-                                            Number(e.target.value),
-                                        )
-                                    }
-                                    onBlur={() => autoSaveProject(project.id)}
-                                />
-                                <TextField
+<TextField
                                     label={__("Cover Brightness", lang)}
                                     size="small"
                                     fullWidth
@@ -618,6 +726,36 @@ function ProjectsTab() {
                                         </Box>
                                     ))}
                                 </Box>
+
+                                {/* Image grid */}
+                                {!isNew && project.media_id && (
+                                    <Box sx={{ gridColumn: { md: "1 / -1" } }}>
+                                        <ProjectImageGrid
+                                            projectId={project.id}
+                                            mediaId={project.media_id}
+                                            images={projectImages[project.id] ?? []}
+                                            onImagesChange={(imgs) =>
+                                                setProjectImages((prev) => ({ ...prev, [project.id]: imgs }))
+                                            }
+                                            loading={!!loadingImages[project.id]}
+                                        />
+                                    </Box>
+                                )}
+
+                                {/* Content editor */}
+                                {!isNew && project.media_id && (
+                                    <ProjectContentEditor
+                                        project={project}
+                                        images={projectImages[project.id] ?? []}
+                                        onContentChange={(field, html) =>
+                                            updateField(project.id, field as keyof Project, html)
+                                        }
+                                        onBlur={() => autoSaveProject(project.id)}
+                                        onImagesChange={(imgs) =>
+                                            setProjectImages((prev) => ({ ...prev, [project.id]: imgs }))
+                                        }
+                                    />
+                                )}
 
                                 {/* Create button only for new projects */}
                                 {isNew && (

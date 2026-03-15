@@ -18,7 +18,7 @@ import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 
 type ProjectImageViewerProps = {
     project: ProjectInterface;
-    image: number;
+    image: number | string;
     onClose: () => void;
 };
 type ImageSource = { src: string; img?: HTMLImageElement; num: number; height?: number; width?: number };
@@ -103,26 +103,53 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
         return action;
     }, 1);
     const imageSource = useRef<{ prev?: ImageSource; cur: ImageSource } | null>(null);
-    const curImage = imageSource.current?.cur.num ?? image;
-    const isFirstImage = curImage == 1;
-    const isLastImage = curImage == project.images;
+
+    const useNewImages = !!(project.imageRecords && project.imageRecords.length > 0 && project.mediaId);
+    const sortedRecords = useNewImages
+        ? [...project.imageRecords!].sort((a, b) => a.sortOrder - b.sortOrder)
+        : [];
+
+    // Convert incoming image prop to a 0-based index for new images, or 1-based number for legacy
+    const resolveInitialIndex = (): number => {
+        if (useNewImages) {
+            if (typeof image === "string") {
+                const idx = sortedRecords.findIndex((r) => r.slug === image);
+                return idx >= 0 ? idx : 0;
+            }
+            // number passed for new images — treat as 0-based index
+            return typeof image === "number" ? image : 0;
+        }
+        return typeof image === "number" ? image : 1;
+    };
+
+    const curImage = imageSource.current?.cur.num ?? resolveInitialIndex();
+    const isFirstImage = useNewImages ? curImage === 0 : curImage === 1;
+    const isLastImage = useNewImages ? curImage === sortedRecords.length - 1 : curImage === project.images;
     const lessLg = useMediaQuery(theme.breakpoints.down("lg"));
     const muchSmall = useMediaQuery("@media (max-width: 520px)");
 
+    const buildImageSrc = (idx: number): string => {
+        if (useNewImages) {
+            const record = sortedRecords[idx];
+            return `/img/projects/${project.mediaId}/${record.slug}${record.originalExt}`;
+        }
+        return `/img/projects/${project.slug}/${idx}.jpg`;
+    };
+
     const setCurImage = (img: number, initial?: boolean) => {
-        if (img == imageSource.current?.cur.num) return;
+        if (img === imageSource.current?.cur.num) return;
         if (!initial) {
             setLoading(true);
         }
         const newImageSource = new Image();
         newImageSource.onload = (e) => {
-            if (imageSource.current?.cur.num != img) return;
+            if (imageSource.current?.cur.num !== img) return;
             const target = e.target as HTMLImageElement;
             imageSource.current.cur.height = target.height;
             imageSource.current.cur.width = target.width;
             setLoading(false);
         };
-        newImageSource.src = `/img/projects/${project.slug}/${img}.jpg`;
+        newImageSource.src = buildImageSrc(img);
         imageSource.current = {
             prev: loading ? imageSource.current?.prev : imageSource.current?.cur,
             cur: {
@@ -134,13 +161,13 @@ export default function ProjectImageViewer({ project, image, onClose }: ProjectI
     };
 
     const navigate = (to: "prev" | "next") => {
-        if (to == "prev" && isFirstImage) return;
-        if (to == "next" && isLastImage) return;
-        setCurImage(curImage + (to == "prev" ? -1 : 1));
+        if (to === "prev" && isFirstImage) return;
+        if (to === "next" && isLastImage) return;
+        setCurImage(curImage + (to === "prev" ? -1 : 1));
     };
 
     useEffect(() => {
-        setCurImage(image, true);
+        setCurImage(resolveInitialIndex(), true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

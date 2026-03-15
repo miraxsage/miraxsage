@@ -16,6 +16,17 @@ export type ProjectInterface = {
     technologies: TechnologiesList[];
     images: number;
     coverBrightmess?: "ligth" | "dark";
+    mediaId?: string;
+    siteLink?: string;
+    content?: { en: string; ru: string };
+    imageRecords?: Array<{
+        slug: string;
+        originalExt: string;
+        isCover: boolean;
+        sortOrder: number;
+        titleEn: string;
+        titleRu: string;
+    }>;
 };
 
 const _staticProjects = [
@@ -489,5 +500,3 @@ export function getProjectsArray(): ProjectInterface[] {
 export function isProjectSlug(slug: string): slug is ProjectsList {
     return getProjectsArray().some((p) => p.slug == slug);
 }
-
-export const projects = _staticProjects;

@@ -16,10 +16,13 @@ export interface ProjectData {
     participating: string;
     dev_time_months: number;
     github_link: string;
-    images_count: number;
     cover_brightness: string;
     sort_order: number;
     technologies: Array<Record<string, unknown>>;
+    media_id: string;
+    site_link: string;
+    content_en: string;
+    content_ru: string;
 }
 
 export function getProjects(): ProjectData[] {
@@ -45,13 +48,25 @@ export function getProjects(): ProjectData[] {
         techByProject.get(pid)!.push(tech);
     }
 
+    const allImages = db
+        .prepare("SELECT * FROM project_images ORDER BY sort_order")
+        .all() as Array<Record<string, unknown>>;
+
+    const imagesByProject = new Map<number, Array<Record<string, unknown>>>();
+    for (const img of allImages) {
+        const pid = img.project_id as number;
+        if (!imagesByProject.has(pid)) imagesByProject.set(pid, []);
+        imagesByProject.get(pid)!.push(img);
+    }
+
     return projects.map((p) => ({
         ...(p as unknown as ProjectData),
         technologies: techByProject.get(p.id as number) || [],
+        images_data: imagesByProject.get(p.id as number) || [],
     }));
 }
 
-export function getProject(idOrSlug: string | number): (ProjectData & { content: Array<Record<string, unknown>> }) | null {
+export function getProject(idOrSlug: string | number): (ProjectData & { images_data: Array<Record<string, unknown>> }) | null {
     const db = getDb();
 
     const project = typeof idOrSlug === "number" || /^\d+$/.test(String(idOrSlug))
@@ -68,13 +83,13 @@ export function getProject(idOrSlug: string | number): (ProjectData & { content:
         )
         .all(project.id) as Array<Record<string, unknown>>;
 
-    const content = db
-        .prepare("SELECT * FROM project_content WHERE project_id = ?")
+    const images = db
+        .prepare("SELECT * FROM project_images WHERE project_id = ? ORDER BY sort_order")
         .all(project.id) as Array<Record<string, unknown>>;
 
     return {
         ...(project as unknown as ProjectData),
         technologies,
-        content,
+        images_data: images,
     };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { Box, useTheme } from "@mui/material";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
@@ -18,8 +18,13 @@ import {
     $getRoot,
     $createParagraphNode,
     $createTextNode,
+    $isTextNode,
+    $isElementNode,
+    $isDecoratorNode,
     type EditorState,
     type LexicalEditor,
+    type Klass,
+    type LexicalNode,
 } from "lexical";
 import { FORMAT_TEXT_COMMAND } from "lexical";
 import {
@@ -37,8 +42,9 @@ import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import TitleIcon from "@mui/icons-material/Title";
 import { getThemeColor } from "@/shared/lib/theme";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
+import { $createImageMarkerNode } from "./ImageMarkerNode";
 
-function ToolbarPlugin() {
+function ToolbarPlugin({ toolbarExtra }: { toolbarExtra?: React.ReactNode }) {
     const [editor] = useLexicalComposerContext();
     const theme = useTheme();
 
@@ -100,36 +106,118 @@ function ToolbarPlugin() {
             >
                 <FormatListNumberedIcon fontSize="small" />
             </IconButton>
+            {toolbarExtra}
         </Box>
     );
 }
 
-function HtmlInitPlugin({ html }: { html: string }) {
+function HtmlInitPlugin({ html, hasImageMarkers, onReady }: { html: string; hasImageMarkers?: boolean; onReady?: () => void }) {
     const [editor] = useLexicalComposerContext();
 
-    useEffect(() => {
-        if (!html) return;
-        editor.update(() => {
-            const root = $getRoot();
-            root.clear();
-            if (html.trim().startsWith("<")) {
-                const parser = new DOMParser();
-                const dom = parser.parseFromString(html, "text/html");
-                const nodes = $generateNodesFromDOM(editor, dom);
-                if (nodes.length > 0) {
-                    root.append(...nodes);
-                } else {
-                    const p = $createParagraphNode();
-                    p.append($createTextNode(html));
-                    root.append(p);
+    useLayoutEffect(() => {
+        if (!html) {
+            onReady?.();
+            return;
+        }
+        try {
+            editor.update(() => {
+                const root = $getRoot();
+                root.clear();
+
+                // Pre-process: wrap bare text and <br> in <p> tags at DOM level
+                const wrapper = document.createElement("div");
+                wrapper.innerHTML = html;
+                const cleaned = document.createElement("div");
+                const blockTags = new Set(["P", "H1", "H2", "H3", "H4", "H5", "H6", "UL", "OL", "DIV", "BLOCKQUOTE", "TABLE", "HR"]);
+
+                for (let i = 0; i < wrapper.childNodes.length; i++) {
+                    const child = wrapper.childNodes[i];
+                    if (child.nodeType === Node.ELEMENT_NODE) {
+                        const el = child as HTMLElement;
+                        if (blockTags.has(el.tagName)) {
+                            cleaned.appendChild(el.cloneNode(true));
+                        } else if (el.tagName === "BR") {
+                            // skip bare <br>
+                        } else {
+                            // inline element — wrap in <p>
+                            const p = document.createElement("p");
+                            p.appendChild(el.cloneNode(true));
+                            cleaned.appendChild(p);
+                        }
+                    } else if (child.nodeType === Node.TEXT_NODE) {
+                        const text = child.textContent || "";
+                        if (text.trim()) {
+                            const p = document.createElement("p");
+                            p.textContent = text;
+                            cleaned.appendChild(p);
+                        }
+                    }
                 }
-            } else {
-                const p = $createParagraphNode();
-                p.append($createTextNode(html));
-                root.append(p);
-            }
-        });
-        // Only run on mount
+
+                if (cleaned.childNodes.length === 0) {
+                    cleaned.innerHTML = "<p></p>";
+                }
+
+                const dom = new DOMParser().parseFromString(cleaned.innerHTML, "text/html");
+                const nodes = $generateNodesFromDOM(editor, dom);
+
+                const validNodes: LexicalNode[] = [];
+                for (const node of nodes) {
+                    if ($isElementNode(node) || $isDecoratorNode(node)) {
+                        validNodes.push(node);
+                    } else if ($isTextNode(node)) {
+                        const text = node.getTextContent();
+                        if (text && text.trim()) {
+                            const p = $createParagraphNode();
+                            p.append($createTextNode(text));
+                            validNodes.push(p);
+                        }
+                    }
+                }
+
+                if (validNodes.length > 0) {
+                    root.append(...validNodes);
+                } else {
+                    root.append($createParagraphNode());
+                }
+
+                if (hasImageMarkers) {
+                    const IMAGE_MARKER_RE = /\[Image:([a-z0-9_-]+)\]/;
+                    const nodesToProcess: { node: LexicalNode; parent: LexicalNode }[] = [];
+                    root.getChildren().forEach((child) => {
+                        if ($isElementNode(child)) {
+                            child.getChildren().forEach((node) => {
+                                if ($isTextNode(node) && IMAGE_MARKER_RE.test(node.getTextContent())) {
+                                    nodesToProcess.push({ node, parent: child });
+                                }
+                            });
+                        }
+                    });
+                    for (const { node, parent } of nodesToProcess) {
+                        const text = node.getTextContent();
+                        const parts = text.split(/(\[Image:[a-z0-9_-]+\])/);
+                        const newNodes: LexicalNode[] = [];
+                        for (const part of parts) {
+                            const match = part.match(/^\[Image:([a-z0-9_-]+)\]$/);
+                            if (match) {
+                                newNodes.push($createImageMarkerNode(match[1]));
+                            } else if (part && part.trim()) {
+                                const p = $createParagraphNode();
+                                p.append($createTextNode(part));
+                                newNodes.push(p);
+                            }
+                        }
+                        for (const n of newNodes.reverse()) {
+                            parent.insertAfter(n);
+                        }
+                        parent.remove();
+                    }
+                }
+            }, { tag: "history-merge" });
+        } catch (e) {
+            console.error("HtmlInitPlugin error:", e);
+        }
+        onReady?.();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -141,6 +229,9 @@ interface RichTextEditorProps {
     onChange: (html: string) => void;
     onBlur?: () => void;
     minHeight?: number;
+    extraNodes?: Klass<LexicalNode>[];
+    extraPlugins?: React.ReactNode;
+    toolbarExtra?: React.ReactNode;
 }
 
 export default function RichTextEditor({
@@ -148,8 +239,13 @@ export default function RichTextEditor({
     onChange,
     onBlur,
     minHeight = 120,
+    extraNodes,
+    extraPlugins,
+    toolbarExtra,
 }: RichTextEditorProps) {
     const theme = useTheme();
+    const hasMarkers = !!extraNodes?.length;
+    const readyRef = useRef(!hasMarkers);
 
     const initialConfig = {
         namespace: "AdminEditor",
@@ -170,11 +266,12 @@ export default function RichTextEditor({
                 listitem: "editor-li",
             },
         },
-        nodes: [HeadingNode, QuoteNode, ListNode, ListItemNode, LinkNode, AutoLinkNode],
+        nodes: [HeadingNode, QuoteNode, ListNode, ListItemNode, LinkNode, AutoLinkNode, ...(extraNodes ?? [])],
         onError: (error: Error) => console.error("Lexical error:", error),
     };
 
     const handleChange = (editorState: EditorState, editor: LexicalEditor) => {
+        if (!readyRef.current) return;
         editorState.read(() => {
             const html = $generateHtmlFromNodes(editor);
             onChange(html);
@@ -195,7 +292,7 @@ export default function RichTextEditor({
             }}
         >
             <LexicalComposer initialConfig={initialConfig}>
-                <ToolbarPlugin />
+                <ToolbarPlugin toolbarExtra={toolbarExtra} />
                 <Box sx={{ position: "relative" }}>
                     <RichTextPlugin
                         contentEditable={
@@ -229,7 +326,8 @@ export default function RichTextEditor({
                 <HistoryPlugin />
                 <ListPlugin />
                 <LinkPlugin />
-                <HtmlInitPlugin html={value} />
+                <HtmlInitPlugin html={value} hasImageMarkers={hasMarkers} onReady={() => { readyRef.current = true; }} />
+                {extraPlugins}
             </LexicalComposer>
         </Box>
     );

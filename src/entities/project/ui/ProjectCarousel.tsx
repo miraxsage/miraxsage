@@ -44,7 +44,7 @@ declare global {
 
 type ProjectCarouselProps = {
     project: ProjectInterface;
-    onImageClick?: (image: number) => void;
+    onImageClick?: (image: number | string) => void;
 };
 
 export default function ProjectCarousel({ project, onImageClick }: ProjectCarouselProps) {
@@ -103,54 +103,65 @@ export default function ProjectCarousel({ project, onImageClick }: ProjectCarous
         return () => swiper?.destroy();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    const slides = Array.from(new Array(project.images)).map((_e, i) => (
-        <swiper-slide key={i}>
-            <Box
-                sx={{
-                    height: "200px",
-                    overflow: "hidden",
-                    position: "relative",
-                    boxSizing: "border-box",
-                }}
-                onClick={() => onImageClick?.(i + 1)}
-            >
-                <Box className="loader-container" sx={{ position: "absolute", width: "100%", height: "100%" }}>
-                    <SimpleSpinner />
-                </Box>
-                <ProjectCardImage
-                    slug={project.slug as ProjectsList}
-                    img={i + 1}
-                    lazyLoading={true}
+    const useNewImages = project.imageRecords && project.imageRecords.length > 0;
+    const sortedRecords = useNewImages
+        ? [...project.imageRecords!].sort((a, b) => a.sortOrder - b.sortOrder)
+        : [];
+    const slideCount = useNewImages ? sortedRecords.length : project.images;
+    const slides = Array.from(new Array(slideCount)).map((_e, i) => {
+        const record = useNewImages ? sortedRecords[i] : undefined;
+        return (
+            <swiper-slide key={useNewImages ? record!.slug : i}>
+                <Box
                     sx={{
-                        height: "100%",
-                        "&  img": {
-                            height: "100%",
-                            width: "100%",
-                            objectFit: "cover",
-                            objectPosition: "center",
-                        },
-                        "&:after": {
-                            content: '""',
-                            display: "block",
-                            position: "absolute",
-                            top: 0,
-                            right: 0,
-                            height: "100%",
-                            width: "5px",
-                            background: getThemeColor("layoutBackground", theme),
-                        },
+                        height: "200px",
+                        overflow: "hidden",
+                        position: "relative",
+                        boxSizing: "border-box",
                     }}
-                    onImageLoad={(e) => {
-                        if (e.target)
-                            (e.target as HTMLElement)
-                                .closest("swiper-slide")
-                                ?.querySelector(":scope .loader-container")
-                                ?.remove();
-                    }}
-                />
-            </Box>
-        </swiper-slide>
-    ));
+                    onClick={() => onImageClick?.(useNewImages ? record!.slug : i + 1)}
+                >
+                    <Box className="loader-container" sx={{ position: "absolute", width: "100%", height: "100%" }}>
+                        <SimpleSpinner />
+                    </Box>
+                    <ProjectCardImage
+                        slug={project.slug as ProjectsList}
+                        img={useNewImages ? undefined : i + 1}
+                        mediaId={useNewImages ? project.mediaId : undefined}
+                        imageSlug={record?.slug}
+                        originalExt={record?.originalExt}
+                        lazyLoading={true}
+                        sx={{
+                            height: "100%",
+                            "&  img": {
+                                height: "100%",
+                                width: "100%",
+                                objectFit: "cover",
+                                objectPosition: "center",
+                            },
+                            "&:after": {
+                                content: '""',
+                                display: "block",
+                                position: "absolute",
+                                top: 0,
+                                right: 0,
+                                height: "100%",
+                                width: "5px",
+                                background: getThemeColor("layoutBackground", theme),
+                            },
+                        }}
+                        onImageLoad={(e) => {
+                            if (e.target)
+                                (e.target as HTMLElement)
+                                    .closest("swiper-slide")
+                                    ?.querySelector(":scope .loader-container")
+                                    ?.remove();
+                        }}
+                    />
+                </Box>
+            </swiper-slide>
+        );
+    });
     return (
         <Box
             sx={{

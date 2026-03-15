@@ -6,7 +6,7 @@ import { jsonResponse, errorResponse, successResponse } from "@/shared/api/respo
 
 type RouteContext = { params: Promise<{ id: string }> };
 
-export async function GET(request: NextRequest, context: RouteContext) {
+export async function GET(_request: NextRequest, context: RouteContext) {
     try {
         const { id } = await context.params;
         const db = getDb();

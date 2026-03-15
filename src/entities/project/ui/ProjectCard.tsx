@@ -92,18 +92,24 @@ function Title({ children }: { children: string }) {
 export type ProjectCardImageProps = {
     slug: ProjectsList;
     img?: number;
+    mediaId?: string;
+    imageSlug?: string;
+    originalExt?: string;
     component?: React.ElementType;
     lazyLoading?: boolean;
     onImageLoad?: React.ReactEventHandler<HTMLImageElement>;
     sx?: SxProps;
 };
 
-export function ProjectCardImage({ slug, img, component, lazyLoading, onImageLoad, sx }: ProjectCardImageProps) {
+export function ProjectCardImage({ slug, img, mediaId, imageSlug, originalExt: _originalExt, component, lazyLoading, onImageLoad, sx }: ProjectCardImageProps) {
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;
     const [loading, setLoading] = useState(true);
     const project: ProjectInterface | undefined = getProjectsArray().find((p) => p.slug == slug);
     if (!slug || !project) return null;
+    const src = mediaId && imageSlug
+        ? `/img/projects/${mediaId}/${imageSlug}-tiny.webp`
+        : `/img/projects/${slug}/${img ? img + "_preview" : "cover"}.jpg`;
     return (
         <Box
             component={component}
@@ -148,7 +154,7 @@ export function ProjectCardImage({ slug, img, component, lazyLoading, onImageLoa
                     if (onImageLoad) onImageLoad(e);
                 }}
                 data-img-num={img}
-                src={`/img/projects/${slug}/${img ? img + "_preview" : "cover"}.jpg`}
+                src={src}
             />
             <motion.span
                 style={{
@@ -164,7 +170,7 @@ export function ProjectCardImage({ slug, img, component, lazyLoading, onImageLoa
             >
                 <SimpleSpinner />
             </motion.span>
-            <img data-img-num={img} src={`/img/projects/${slug}/${img ? img + "_preview" : "cover"}.jpg`} />
+            <img data-img-num={img} src={src} />
         </Box>
     );
 }
@@ -306,7 +312,12 @@ export default function ProjectCard({ project, sx, style, onClick }: ProjectCard
                     },
                 }}
             >
-                <ProjectCardImage slug={project.slug as ProjectsList} sx={{ borderRadius: "8px 8px 0px 0px" }} />
+                <ProjectCardImage
+                    slug={project.slug as ProjectsList}
+                    mediaId={project.mediaId}
+                    imageSlug={project.imageRecords?.find((r) => r.isCover)?.slug}
+                    sx={{ borderRadius: "8px 8px 0px 0px" }}
+                />
                 <Title>{project.name[lang]}</Title>
                 <Box
                     className="flex"

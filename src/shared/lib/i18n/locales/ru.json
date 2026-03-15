@@ -321,5 +321,10 @@
     "domain created": "домен создан",
     "light cover": "светлая обложка",
     "dark cover": "тёмная обложка",
-    "site link": "ссылка на сайт"
+    "site link": "ссылка на сайт",
+    "slug already exists for this project": "Слаг уже существует для этого проекта",
+    "save": "сохранить",
+    "loading...": "загрузка...",
+    "select": "выбрать",
+    "select image": "выберите изображение"
 }

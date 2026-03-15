@@ -44,5 +44,12 @@ upgrade/
 # Build info
 tsconfig.tsbuildinfo
 
+# AI-generated plans/specs
+docs/
+.superpowers/
+
+# Utility scripts
+scripts/
+
 # Misc
 *.local
