@@ -63,6 +63,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
             <Box
                 sx={{
                     flex: 1,
+                    minWidth: 0,
                     height: "100vh",
                     background: getThemeColor("layoutBackground", theme),
                 }}

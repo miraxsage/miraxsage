@@ -19,6 +19,7 @@ const SECTION_TABLES: Record<string, string> = {
     experience_projects: "resume_experience_projects",
     technology_categories: "technology_categories",
     technologies: "technologies",
+    code_snippets: "code_snippets",
 };
 
 export async function GET() {
@@ -54,6 +55,7 @@ export async function GET() {
         const experience_projects = db.prepare("SELECT * FROM resume_experience_projects LIMIT 1").all();
         const technology_categories = db.prepare("SELECT * FROM technology_categories ORDER BY sort_order").all();
         const technologies = db.prepare("SELECT * FROM technologies ORDER BY sort_order").all();
+        const code_snippets = db.prepare("SELECT * FROM code_snippets ORDER BY sort_order").all();
 
         return jsonResponse({
             categories,
@@ -69,6 +71,7 @@ export async function GET() {
             experience_projects,
             technology_categories,
             technologies,
+            code_snippets,
         });
     } catch (error) {
         console.error("Resume GET error:", error);

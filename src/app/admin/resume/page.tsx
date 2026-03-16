@@ -18,6 +18,12 @@ import {
     Switch,
     Paper,
     Tooltip,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    ListItemIcon,
+    ListItemText,
 } from "@mui/material";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -48,6 +54,9 @@ import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import ResumeTreeSection from "@/features/admin-editor/ResumeTreeSection";
 import type { TreeItem, TreeDataItem } from "@/features/admin-editor/ResumeTreeSection";
 import { __ } from "@/shared/lib/i18n";
+import { getIconComponent } from "@/shared/lib/iconMap";
+import CustomCodeEditor from "@/shared/ui/CodeEditor";
+import { langs } from "@uiw/codemirror-extensions-langs";
 import { getThemeColor } from "@/shared/lib/theme";
 
 // ---------------------------------------------------------------------------
@@ -183,6 +192,14 @@ interface TechnologyItem {
     projects_count: number;
 }
 
+interface CodeSnippetItem {
+    id: number;
+    technology_id: number;
+    language: string;
+    sort_order: number;
+    code: string;
+}
+
 interface ResumeData {
     categories: Category[];
     general_data: GeneralDataItem[];
@@ -197,6 +214,7 @@ interface ResumeData {
     experience_projects: ExperienceProjectItem[];
     technology_categories: TechnologyCategoryItem[];
     technologies: TechnologyItem[];
+    code_snippets: CodeSnippetItem[];
 }
 
 // ---------------------------------------------------------------------------
@@ -213,6 +231,7 @@ const TAB_LABELS = [
     "Biography",
     "Specifications",
     "Experience",
+    "Snippets",
     "General Labels",
 ];
 
@@ -1480,6 +1499,362 @@ function SpecificationsTab({
 }
 
 // ---------------------------------------------------------------------------
+// Snippets Tab
+// ---------------------------------------------------------------------------
+
+const SNIPPET_LANG_OPTIONS = [
+    { value: "js", label: "JavaScript" },
+    { value: "jsx", label: "JSX" },
+    { value: "ts", label: "TypeScript" },
+    { value: "tsx", label: "TSX" },
+    { value: "html", label: "HTML" },
+    { value: "css", label: "CSS" },
+    { value: "php", label: "PHP" },
+    { value: "sql", label: "SQL" },
+    { value: "cs", label: "C#" },
+    { value: "c", label: "C" },
+    { value: "cpp", label: "C++" },
+    { value: "py", label: "Python" },
+    { value: "java", label: "Java" },
+    { value: "go", label: "Go" },
+    { value: "rs", label: "Rust" },
+    { value: "json", label: "JSON" },
+    { value: "yaml", label: "YAML" },
+    { value: "xml", label: "XML" },
+    { value: "markdown", label: "Markdown" },
+    { value: "bash", label: "Bash" },
+];
+
+interface SnippetsTabProps {
+    code_snippets: CodeSnippetItem[];
+    technology_categories: TechnologyCategoryItem[];
+    technologies: TechnologyItem[];
+    lang: "en" | "ru";
+    lv: (item: any, base: string) => string;
+    setData: React.Dispatch<React.SetStateAction<ResumeData | null>>;
+    save: (body: unknown, options?: { method?: string; successMessage?: string }) => Promise<unknown>;
+}
+
+function SnippetItemRow({ snippet, catTechs, usedTechIds, expanded, onToggle, lang, lv, onChangeTech, onChangeLang, onChangeCode, onDelete }: {
+    snippet: CodeSnippetItem;
+    catTechs: TechnologyItem[];
+    usedTechIds: Set<number>;
+    expanded: boolean;
+    onToggle: () => void;
+    lang: "en" | "ru";
+    lv: (item: any, base: string) => string;
+    onChangeTech: (techId: number) => void;
+    onChangeLang: (language: string) => void;
+    onChangeCode: (code: string) => void;
+    onDelete: () => void;
+}) {
+    const theme = useTheme();
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: snippet.id });
+    const style = { transform: CSS.Transform.toString(transform), transition };
+
+    const availableTechs = catTechs.filter((t) => t.id === snippet.technology_id || !usedTechIds.has(t.id));
+    const selectedTech = catTechs.find((t) => t.id === snippet.technology_id);
+
+    const langKey = snippet.language as keyof typeof langs | undefined;
+    const langExtension = langKey && langKey in langs ? [(langs as Record<string, () => any>)[langKey]()] : [];
+
+    const [editorHeight, setEditorHeight] = useState(500);
+    useEffect(() => {
+        const h = Math.round(window.innerHeight * 2 / 3);
+        setEditorHeight(h);
+        const onResize = () => setEditorHeight(Math.round(window.innerHeight * 2 / 3));
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+    }, []);
+
+    return (
+        <Box ref={setNodeRef} style={style} sx={{ opacity: isDragging ? 0.5 : 1, minWidth: 0 }}>
+            <Accordion
+                expanded={expanded}
+                onChange={() => {}}
+                disableGutters
+                sx={{
+                    background: getThemeColor("barBackground", theme),
+                    boxShadow: "none",
+                    minWidth: 0,
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: "4px !important",
+                    "&:before": { display: "none" },
+                    "& .MuiAccordionSummary-root": { minHeight: "42px", padding: "0 10px", cursor: "default" },
+                    "& .MuiAccordionSummary-content": { margin: "6px 0", width: "100%" },
+                    "& .MuiAccordionDetails-root": {
+                        padding: "12px",
+                        borderTop: `1px solid ${theme.palette.divider}`,
+                    },
+                }}
+            >
+                <AccordionSummary>
+                    <Box sx={{ display: "flex", alignItems: "center", width: "100%", gap: 1 }} onClick={(e) => e.stopPropagation()}>
+                        <IconButton size="small" {...attributes} {...listeners} sx={{ cursor: "grab", flexShrink: 0 }}>
+                            <DragIndicatorIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton size="small" onClick={onToggle} sx={{ flexShrink: 0, color: getThemeColor("regularIcon", theme) }}>
+                            {expanded ? <ExpandMoreIcon fontSize="small" /> : <ChevronRightIcon fontSize="small" />}
+                        </IconButton>
+                        <FormControl size="small" sx={{ minWidth: 200, flex: "1 1 0" }}>
+                            <InputLabel>{__("Technology", lang)}</InputLabel>
+                            <Select
+                                value={snippet.technology_id}
+                                label={__("Technology", lang)}
+                                onChange={(e) => onChangeTech(Number(e.target.value))}
+                                renderValue={() => {
+                                    if (!selectedTech) return "";
+                                    const Icon = getIconComponent(selectedTech.icon);
+                                    return (
+                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                            <Box sx={{ width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Icon /></Box>
+                                            {lv(selectedTech, "name")}
+                                        </Box>
+                                    );
+                                }}
+                            >
+                                {availableTechs.map((tech) => {
+                                    const Icon = getIconComponent(tech.icon);
+                                    return (
+                                        <MenuItem key={tech.id} value={tech.id}>
+                                            <ListItemIcon sx={{ minWidth: 28 }}>
+                                                <Box sx={{ width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center" }}><Icon /></Box>
+                                            </ListItemIcon>
+                                            <ListItemText>{lv(tech, "name")}</ListItemText>
+                                        </MenuItem>
+                                    );
+                                })}
+                            </Select>
+                        </FormControl>
+                        <FormControl size="small" sx={{ minWidth: 140 }}>
+                            <InputLabel>{__("Language", lang)}</InputLabel>
+                            <Select
+                                value={snippet.language}
+                                label={__("Language", lang)}
+                                onChange={(e) => onChangeLang(e.target.value)}
+                            >
+                                {SNIPPET_LANG_OPTIONS.map((opt) => (
+                                    <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <IconButton size="small" onClick={onDelete} sx={{ flexShrink: 0, color: getThemeColor("tabIcon", theme), "&:hover": { color: theme.palette.error.main } }}>
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Box>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <Box sx={{
+                        border: `1px solid ${theme.palette.divider}`,
+                        borderRadius: "4px",
+                        overflow: "hidden",
+                        height: `${editorHeight}px`,
+                        "& .cm-scroller": {
+                            maxHeight: `${editorHeight - 4}px`,
+                            "&::-webkit-scrollbar": { width: "7px", height: "7px" },
+                            "&::-webkit-scrollbar-track": { background: "transparent" },
+                            "&::-webkit-scrollbar-thumb": {
+                                background: getThemeColor("scrollbarHandle", theme),
+                                borderRadius: "3px",
+                                border: "2px solid transparent",
+                                backgroundClip: "content-box",
+                            },
+                            "&::-webkit-scrollbar-thumb:hover": {
+                                background: getThemeColor("scrollbarHoverHandle", theme),
+                                border: "2px solid transparent",
+                                backgroundClip: "content-box",
+                            },
+                            "&::-webkit-scrollbar-corner": { background: "transparent" },
+                        },
+                    }}>
+                        <CustomCodeEditor
+                            value={snippet.code}
+                            onChange={onChangeCode}
+                            extensions={langExtension}
+                            readOnly={false}
+                            editable={true}
+                            lineHighlight
+                        />
+                    </Box>
+                </AccordionDetails>
+            </Accordion>
+        </Box>
+    );
+}
+
+function SnippetsTab({ code_snippets, technology_categories, technologies, lang, lv, setData, save }: SnippetsTabProps) {
+    const theme = useTheme();
+    const [expandedCats, setExpandedCats] = useState<Set<number>>(new Set());
+    const [expandedSnippets, setExpandedSnippets] = useState<Set<number>>(new Set());
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    );
+
+    const sortedCats = useMemo(
+        () => [...technology_categories].sort((a, b) => a.sort_order - b.sort_order),
+        [technology_categories],
+    );
+
+    const toggleCat = (id: number) => {
+        setExpandedCats((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id); else next.add(id);
+            return next;
+        });
+    };
+
+    const toggleSnippet = (id: number) => {
+        setExpandedSnippets((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id); else next.add(id);
+            return next;
+        });
+    };
+
+    const codeChangeTimers = useRef<Map<number, NodeJS.Timeout>>(new Map());
+
+    const updateSnippetField = (id: number, field: string, value: unknown, immediate?: boolean) => {
+        const newSnippets = code_snippets.map((s) => (s.id === id ? { ...s, [field]: value } : s));
+        setData((prev) => prev ? { ...prev, code_snippets: newSnippets } : prev);
+        if (field === "code" && !immediate) {
+            const existing = codeChangeTimers.current.get(id);
+            if (existing) clearTimeout(existing);
+            codeChangeTimers.current.set(id, setTimeout(() => {
+                codeChangeTimers.current.delete(id);
+                save({ section: "code_snippets", data: newSnippets });
+            }, 1000));
+        } else {
+            save({ section: "code_snippets", data: newSnippets });
+        }
+    };
+
+    const handleSnippetDragEnd = (catId: number) => (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
+        const catTechIds = new Set(technologies.filter((t) => t.category_id === catId).map((t) => t.id));
+        const catSnippets = code_snippets.filter((s) => catTechIds.has(s.technology_id)).sort((a, b) => a.sort_order - b.sort_order);
+        const oldIndex = catSnippets.findIndex((s) => s.id === active.id);
+        const newIndex = catSnippets.findIndex((s) => s.id === over.id);
+        const reordered = stampSortOrder(arrayMove(catSnippets, oldIndex, newIndex));
+        const otherSnippets = code_snippets.filter((s) => !catTechIds.has(s.technology_id));
+        const all = [...otherSnippets, ...reordered];
+        setData((prev) => prev ? { ...prev, code_snippets: all } : prev);
+        save({ section: "code_snippets", data: all });
+    };
+
+    const addSnippet = (catId: number) => {
+        const catTechs = technologies.filter((t) => t.category_id === catId);
+        const usedTechIds = new Set(code_snippets.map((s) => s.technology_id));
+        const availableTech = catTechs.find((t) => !usedTechIds.has(t.id));
+        if (!availableTech) return;
+        const catTechIds = new Set(catTechs.map((t) => t.id));
+        const catSnippets = code_snippets.filter((s) => catTechIds.has(s.technology_id));
+        const newSnippet: CodeSnippetItem = {
+            id: nextTempId(),
+            technology_id: availableTech.id,
+            language: "js",
+            sort_order: catSnippets.length + 1,
+            code: "",
+        };
+        const all = [...code_snippets, newSnippet];
+        setData((prev) => prev ? { ...prev, code_snippets: all } : prev);
+        save({ section: "code_snippets", data: all });
+        setExpandedCats((prev) => new Set(prev).add(catId));
+    };
+
+    const deleteSnippet = (id: number) => {
+        const newSnippets = code_snippets.filter((s) => s.id !== id);
+        setData((prev) => prev ? { ...prev, code_snippets: newSnippets } : prev);
+        save({ section: "code_snippets", data: newSnippets });
+    };
+
+    const usedTechIds = new Set(code_snippets.map((s) => s.technology_id));
+
+    return (
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1, minWidth: 0 }}>
+            {sortedCats.map((cat) => {
+                const catTechs = technologies.filter((t) => t.category_id === cat.id).sort((a, b) => a.sort_order - b.sort_order);
+                const catTechIds = new Set(catTechs.map((t) => t.id));
+                const catSnippets = code_snippets.filter((s) => catTechIds.has(s.technology_id)).sort((a, b) => a.sort_order - b.sort_order);
+                const expanded = expandedCats.has(cat.id);
+                const hasAvailableTech = catTechs.some((t) => !usedTechIds.has(t.id));
+
+                return (
+                    <Accordion
+                        key={cat.id}
+                        expanded={expanded}
+                        onChange={() => {}}
+                        disableGutters
+                        sx={{
+                            background: getThemeColor("titleBg", theme),
+                            boxShadow: "none",
+                            border: `1px solid ${theme.palette.divider}`,
+                            borderRadius: "6px !important",
+                            overflow: "hidden",
+                            "&:before": { display: "none" },
+                            "& .MuiAccordionSummary-root": { minHeight: "42px", padding: "0 14px", cursor: "default" },
+                            "& .MuiAccordionSummary-content": { margin: "8px 0" },
+                            "& .MuiAccordionDetails-root": {
+                                padding: "12px",
+                                background: getThemeColor("layoutBackground", theme),
+                                borderTop: `1px solid ${theme.palette.divider}`,
+                            },
+                        }}
+                    >
+                        <AccordionSummary>
+                            <Box sx={{ display: "flex", alignItems: "center", width: "100%", gap: 1 }} onClick={(e) => e.stopPropagation()}>
+                                <IconButton size="small" onClick={() => toggleCat(cat.id)} sx={{ flexShrink: 0, color: getThemeColor("regularIcon", theme) }}>
+                                    {expanded ? <ExpandMoreIcon fontSize="small" /> : <ChevronRightIcon fontSize="small" />}
+                                </IconButton>
+                                <Typography variant="body2">{lv(cat, "label")}</Typography>
+                                <AdminKeyChip label={`${catSnippets.length} / ${catTechs.length}`} sx={{ ml: "auto" }} />
+                            </Box>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleSnippetDragEnd(cat.id)}>
+                                    <SortableContext items={catSnippets.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+                                        {catSnippets.map((snippet) => (
+                                            <SnippetItemRow
+                                                key={snippet.id}
+                                                snippet={snippet}
+                                                catTechs={catTechs}
+                                                usedTechIds={usedTechIds}
+                                                expanded={expandedSnippets.has(snippet.id)}
+                                                onToggle={() => toggleSnippet(snippet.id)}
+                                                lang={lang}
+                                                lv={lv}
+                                                onChangeTech={(techId) => updateSnippetField(snippet.id, "technology_id", techId)}
+                                                onChangeLang={(language) => updateSnippetField(snippet.id, "language", language)}
+                                                onChangeCode={(code) => updateSnippetField(snippet.id, "code", code)}
+                                                onDelete={() => deleteSnippet(snippet.id)}
+                                            />
+                                        ))}
+                                    </SortableContext>
+                                </DndContext>
+                                {hasAvailableTech && (
+                                    <Button
+                                        variant="outlined"
+                                        color="regular"
+                                        startIcon={<AddIcon />}
+                                        onClick={() => addSnippet(cat.id)}
+                                        sx={{ alignSelf: "flex-start" }}
+                                    >
+                                        {__("Snippet", lang)}
+                                    </Button>
+                                )}
+                            </Box>
+                        </AccordionDetails>
+                    </Accordion>
+                );
+            })}
+        </Box>
+    );
+}
+
+// ---------------------------------------------------------------------------
 // Page Component
 // ---------------------------------------------------------------------------
 
@@ -1792,8 +2167,24 @@ export default function AdminResumePage() {
                     </AdminSection>
                 );
 
-            // ----- GENERAL LABELS -----
+            // ----- SNIPPETS -----
             case 4:
+                return (
+                    <AdminSection saving={saving} error={error} success={success}>
+                        <SnippetsTab
+                            code_snippets={data.code_snippets}
+                            technology_categories={data.technology_categories}
+                            technologies={data.technologies}
+                            lang={lang}
+                            lv={lv}
+                            setData={setData}
+                            save={save}
+                        />
+                    </AdminSection>
+                );
+
+            // ----- GENERAL LABELS -----
+            case 5:
                 return (
                     <AdminSection
                         saving={labelsSaving}

@@ -315,14 +315,11 @@ CREATE TABLE IF NOT EXISTS ui_labels (
   category TEXT NOT NULL DEFAULT 'general'
 );
 
--- Code snippets
+-- Code snippets (one per technology)
 CREATE TABLE IF NOT EXISTS code_snippets (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  slug TEXT NOT NULL UNIQUE,
-  title TEXT NOT NULL,
-  language TEXT NOT NULL DEFAULT 'typescript',
+  technology_id INTEGER NOT NULL UNIQUE REFERENCES technologies(id) ON DELETE CASCADE,
+  language TEXT NOT NULL DEFAULT 'js',
   sort_order INTEGER NOT NULL DEFAULT 0,
-  code TEXT NOT NULL DEFAULT '',
-  description_en TEXT NOT NULL DEFAULT '',
-  description_ru TEXT NOT NULL DEFAULT ''
+  code TEXT NOT NULL DEFAULT ''
 );

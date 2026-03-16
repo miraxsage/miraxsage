@@ -1,33 +1,109 @@
 "use client";
 import AccentedTreeView from "@/shared/ui/AccentedTreeView";
-import CSharpIcon from "@/shared/icons/CSharpIcon";
-import JSIcon from "@/shared/icons/JSIcon";
-import MarkupIcon from "@/shared/icons/MarkupIcon";
-import MySqlIcon from "@/shared/icons/MySqlIcon";
-import OneCIcon from "@/shared/icons/OneCIcon";
-import PHPIcon from "@/shared/icons/PHPIcon";
-import ReactIcon from "@/shared/icons/ReactIcon";
-import TSIcon from "@/shared/icons/TSIcon";
-import WindowsIcon from "@/shared/icons/WindowsIcon";
-import WordpressIcon from "@/shared/icons/WordpressIcon";
-import { Box, alpha, useMediaQuery, useTheme } from "@mui/material";
-import TerminalIcon from "@/shared/icons/TerminalIcon";
-import PersonalVideoIcon from "@mui/icons-material/PersonalVideo";
+import { Box, alpha, keyframes, useMediaQuery, useTheme } from "@mui/material";
+import LogoIcon from "@/shared/icons/Logo";
 import SnippetEditor from "./SnippetEditor";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import CustomScrollbar from "@/shared/ui/Scrollbar";
 import { motion } from "framer-motion";
 import CategoriesToolbar from "@/shared/ui/CategoriesToolbar";
 import { getThemeColor } from "@/shared/lib/theme";
+import { getIconComponent } from "@/shared/lib/iconMap";
+import { useLanguage } from "@/shared/lib/store/appearanceSlice";
+
+const loaderBars1 = keyframes({
+    "0%, 100%": { backgroundSize: "20% 100%" },
+    "33%, 66%": { backgroundSize: "20% 40%" },
+});
+const loaderBars2 = keyframes({
+    "0%, 33%": { backgroundPosition: "0 0, 50% 100%, 100% 0" },
+    "66%, 100%": { backgroundPosition: "0 100%, 50% 0, 100% 100%" },
+});
+
+interface SnippetData {
+    id: number;
+    technology_id: number;
+    tech_name_en: string;
+    tech_name_ru: string;
+    tech_icon: string;
+    language: string;
+    sort_order: number;
+    code: string;
+}
+
+interface CategoryData {
+    id: number;
+    slug: string;
+    icon: string;
+    label_en: string;
+    label_ru: string;
+    sort_order: number;
+    snippets: SnippetData[];
+}
 
 export default function AboutSpecsSnippetsBlock() {
-    const [lang, setLang] = useState("js");
+    const [selectedSnippetId, setSelectedSnippetId] = useState<string | null>(null);
+    const [categories, setCategories] = useState<CategoryData[]>([]);
+    const [loading, setLoading] = useState(true);
     const theme = useTheme();
+    const { lang } = useLanguage();
     const lessLg = useMediaQuery(theme.breakpoints.down("lg"));
     const [catsCollapsed, setCatsCollapsed] = useState(lessLg);
     const [changeExpandedNodes, setChangeExpandedNodes] = useState<string[] | undefined>();
     const lastScreenLessLgRef = useRef(lessLg);
     const catsCollapsedBeforeResizeRef = useRef(false);
+
+    useEffect(() => {
+        fetch("/api/snippets")
+            .then((r) => r.json())
+            .then((data: CategoryData[]) => {
+                setCategories(data);
+                // Select first snippet by default
+                for (const cat of data) {
+                    if (cat.snippets.length > 0) {
+                        setSelectedSnippetId(String(cat.snippets[0].id));
+                        break;
+                    }
+                }
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
+    }, []);
+
+    const allSnippetsMap = useMemo(() => {
+        const map = new Map<string, SnippetData>();
+        for (const cat of categories) {
+            for (const s of cat.snippets) {
+                map.set(String(s.id), s);
+            }
+        }
+        return map;
+    }, [categories]);
+
+    const selectedSnippet = selectedSnippetId ? allSnippetsMap.get(selectedSnippetId) : null;
+
+    const treeItems = useMemo(() => {
+        return categories.map((cat) => {
+            const CatIcon = getIconComponent(cat.icon);
+            return {
+                id: `cat_${cat.id}`,
+                title: lang === "ru" ? cat.label_ru : cat.label_en,
+                icon: <CatIcon />,
+                notSelectable: true,
+                children: cat.snippets.map((s) => {
+                    const TechIcon = getIconComponent(s.tech_icon);
+                    return {
+                        id: String(s.id),
+                        title: lang === "ru" ? (s.tech_name_ru || s.tech_name_en) : s.tech_name_en,
+                        icon: <TechIcon />,
+                    };
+                }),
+            };
+        });
+    }, [categories, lang]);
+
+    const categoryIds = useMemo(() => categories.map((c) => `cat_${c.id}`), [categories]);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useLayoutEffect(() => {
         if (changeExpandedNodes) setChangeExpandedNodes(undefined);
@@ -40,6 +116,35 @@ export default function AboutSpecsSnippetsBlock() {
         }
     });
 
+    if (loading) {
+        return (
+            <Box sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+            }}>
+                <Box sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "15px",
+                    alignItems: "center",
+                    color: theme.palette.mode === "dark" ? "#2c2f3e" : "#d1d1d1",
+                }}>
+                    <Box sx={{ "& svg": { width: 45, height: 45 } }}>
+                        <LogoIcon />
+                    </Box>
+                    <Box sx={{
+                        width: "25px",
+                        aspectRatio: "5/4",
+                        background: "no-repeat linear-gradient(currentColor 0 0), no-repeat linear-gradient(currentColor 0 0), no-repeat linear-gradient(currentColor 0 0)",
+                        animation: `${loaderBars1} 1s infinite, ${loaderBars2} 1s infinite`,
+                    }} />
+                </Box>
+            </Box>
+        );
+    }
+
     return (
         <>
             <Box
@@ -48,7 +153,6 @@ export default function AboutSpecsSnippetsBlock() {
                     height: "100%",
                     width: "100%",
                     gridTemplate: "minmax(0, 1fr) / auto minmax(0, 1fr)",
-                    //marginRight: "-14px",
                 }}
             >
                 <motion.div
@@ -103,89 +207,19 @@ export default function AboutSpecsSnippetsBlock() {
                                 setChangeExpandedNodes([]);
                             }}
                             onUnfold={() => {
-                                setChangeExpandedNodes(["frontend", "backend", "desktop"]);
+                                setChangeExpandedNodes(categoryIds);
                             }}
                         />
                         <CustomScrollbar right="2px" top="2px" bottom="3px">
                             <AccentedTreeView
                                 intend={catsCollapsed ? "small" : "regular"}
                                 expandedNodes={changeExpandedNodes}
-                                initiallyExpandedNodes={["frontend", "backend"]}
+                                initiallyExpandedNodes={categoryIds.slice(0, 2)}
                                 selectionMode="single"
-                                selectedItems={lang}
-                                onItemsSelect={(item) => setLang(item.id)}
+                                selectedItems={selectedSnippetId ?? ""}
+                                onItemsSelect={(item) => setSelectedSnippetId(item.id)}
                             >
-                                {[
-                                    {
-                                        id: "frontend",
-                                        title: "Frontend",
-                                        icon: <MarkupIcon />,
-                                        notSelectable: true,
-                                        children: [
-                                            {
-                                                id: "js",
-                                                title: "JavaScript",
-                                                icon: <JSIcon />,
-                                            },
-                                            {
-                                                id: "ts",
-                                                title: "TypeScript",
-                                                icon: <TSIcon />,
-                                            },
-                                            {
-                                                id: "react",
-                                                title: "React",
-                                                icon: <ReactIcon />,
-                                            },
-                                        ],
-                                    },
-                                    {
-                                        id: "backend",
-                                        title: "Backend",
-                                        icon: <TerminalIcon />,
-                                        notSelectable: true,
-                                        children: [
-                                            {
-                                                id: "php",
-                                                title: "PHP",
-                                                icon: <PHPIcon />,
-                                            },
-                                            {
-                                                id: "wp",
-                                                title: "Wordpress",
-                                                icon: <WordpressIcon />,
-                                            },
-                                            {
-                                                id: "mysql",
-                                                title: "MySQL",
-                                                icon: <MySqlIcon />,
-                                            },
-                                        ],
-                                    },
-                                    {
-                                        id: "desktop",
-                                        title: "Desktop",
-                                        icon: <PersonalVideoIcon />,
-                                        notSelectable: true,
-                                        children: [
-                                            {
-                                                id: "cs",
-                                                title: "Visual C#",
-                                                icon: <CSharpIcon />,
-                                            },
-                                            {
-                                                id: "wpf",
-                                                title: "WPF",
-                                                icon: <WindowsIcon />,
-                                            },
-                                            {
-                                                id: "onec",
-                                                title: "1C",
-                                                icon: <OneCIcon />,
-                                            },
-                                        ],
-                                    },
-                                ]}
+                                {treeItems}
                             </AccentedTreeView>
                         </CustomScrollbar>
                     </motion.div>
@@ -208,7 +242,9 @@ export default function AboutSpecsSnippetsBlock() {
                         },
                     }}
                 >
-                    <SnippetEditor lang={lang} />
+                    {selectedSnippet ? (
+                        <SnippetEditor code={selectedSnippet.code} language={selectedSnippet.language} />
+                    ) : null}
                 </CustomScrollbar>
             </Box>
         </>
