@@ -36,6 +36,7 @@ const KEY_LABELS: Record<string, { en: string; ru: string }> = {
     "In window": { en: "Window mode", ru: "Оконный режим" },
     "Console": { en: "Console", ru: "Консоль" },
     "User interface": { en: "User interface", ru: "Интерфейс" },
+    "Footer": { en: "Footer", ru: "Футер" },
     // details_navigation
     "Home": { en: "Home", ru: "Главная" },
     "Resume": { en: "Resume", ru: "Резюме" },

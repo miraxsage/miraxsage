@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useRouter } from "next/navigation";
 
 interface UseAdminDataOptions<T> {
     url: string;
@@ -9,7 +8,6 @@ interface UseAdminDataOptions<T> {
 }
 
 export default function useAdminData<T>({ url, transform }: UseAdminDataOptions<T>) {
-    const router = useRouter();
     const [data, setData] = useState<T | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -63,7 +61,6 @@ export default function useAdminData<T>({ url, transform }: UseAdminDataOptions<
                 const result = await res.json();
                 setSuccess(options?.successMessage || "Saved successfully");
                 timeoutRef.current = setTimeout(() => setSuccess(""), 3000);
-                router.refresh();
                 return result;
             } catch (err) {
                 const msg = err instanceof Error ? err.message : "Save failed";
@@ -73,7 +70,7 @@ export default function useAdminData<T>({ url, transform }: UseAdminDataOptions<
                 setSaving(false);
             }
         },
-        [url, router],
+        [url],
     );
 
     const scheduleAutoSave = useCallback(

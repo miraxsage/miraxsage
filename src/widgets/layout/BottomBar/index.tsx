@@ -7,6 +7,7 @@ import { useThemeColor } from "@/shared/lib/theme";
 import { useColorMode } from "@/shared/lib/store/appearanceSlice";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
 import DynamicIcon from "@/shared/ui/DynamicIcon";
+import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 
 export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
     const theme = useTheme();
@@ -15,6 +16,8 @@ export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
     };
     const isDarkMode = useColorMode().dark;
     const smScreen = useMediaQuery(theme.breakpoints.down("sm"));
+    const t = useUiLabels();
+    const footerText = t("Footer").replace(/\[CurrentYear\]/g, String(new Date().getFullYear()));
     return (
         <Box
             component="footer"
@@ -43,7 +46,7 @@ export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
                         }}
                         style={{ color: alpha(theme.palette.divider, isDarkMode ? 0.5 : 1) }}
                     >
-                        © 2024-{new Date().getFullYear()} Miraxsage
+                        {footerText}
                     </Box>
                 </>
             )}

@@ -10,6 +10,7 @@ build/
 dist/
 
 # Database temp files
+data/portfolio.db
 data/*.db-journal
 data/*.db-shm
 data/*.db-wal

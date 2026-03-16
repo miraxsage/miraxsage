@@ -19,6 +19,7 @@ const labels = [
     { key: "In window", value_en: "In window", value_ru: "В окне", category: "details_ui" },
     { key: "Console", value_en: "Console", value_ru: "Консоль", category: "details_ui" },
     { key: "User interface", value_en: "User interface", value_ru: "Интерфейс", category: "details_ui" },
+    { key: "Footer", value_en: "© 2024-[CurrentYear] Miraxsage", value_ru: "© 2024-[CurrentYear] Miraxsage", category: "details_ui" },
 
     // ── landing ─────────────────────────────────────────────────────────
     { key: "developer", value_en: "developer", value_ru: "разработчик", category: "landing" },

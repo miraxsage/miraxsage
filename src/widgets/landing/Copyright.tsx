@@ -44,9 +44,11 @@ export default function Copyright({ footer, contacts }: { footer: FooterItem[]; 
                     lineHeight: 1.25,
                 }}
             >
-                {footer.map((item) =>
-                    renderContent(lang.ru ? item.content_ru : item.content_en, color)
-                )}
+                {footer.map((item) => {
+                    const text = (lang.ru ? item.content_ru : item.content_en)
+                        .replace(/\[CurrentYear\]/g, String(new Date().getFullYear()));
+                    return renderContent(text, color);
+                })}
                 <Box
                     sx={{
                         display: "grid",

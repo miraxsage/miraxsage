@@ -30,7 +30,7 @@ export default function UiLabelsEditor({ category, items, onUpdate, onSave }: Ui
             {filteredItems.map((item) => (
                 <Fragment key={item.id}>
                     <Chip
-                        label={item.key}
+                        label={__(item.key.replace(/_/g, " "), lang).replace(/^./, (c) => c.toUpperCase())}
                         size="small"
                         variant="outlined"
                         sx={{ justifyContent: "flex-start", fontFamily: "monospace", fontSize: "0.8rem", color: "#E4E4E5", "& .MuiChip-label": { padding: "6px 12px" } }}
