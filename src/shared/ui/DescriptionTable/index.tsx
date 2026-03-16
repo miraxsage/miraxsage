@@ -282,7 +282,7 @@ export default function DescriptionTable({
                     borderTopWidth: withoutTopBorder ? "0px" : "1px",
                     [theme.breakpoints.up("2xl")]: {
                         gridTemplateColumns:
-                            maxWidth == "1 col" ? "auto minmax(auto, 1fr) 1fr" : "auto auto 1fr auto auto 1fr",
+                            maxWidth == "1 col" ? "40px minmax(auto, 1fr) 1fr" : "40px auto 1fr 40px auto 1fr",
                         "& .grid-full-title": {
                             gridColumn: maxWidth == "1 col" ? "span 2" : "span 1",
                         },
@@ -291,7 +291,7 @@ export default function DescriptionTable({
                         },
                     },
                     [theme.breakpoints.between("lg", "2xl")]: {
-                        gridTemplateColumns: "auto auto 1fr",
+                        gridTemplateColumns: "40px auto 1fr",
                         "& .grid-full-title": {
                             gridColumn: "span 2",
                         },
@@ -300,7 +300,7 @@ export default function DescriptionTable({
                         },
                     },
                     [theme.breakpoints.down("lg")]: {
-                        gridTemplateColumns: "auto 1fr",
+                        gridTemplateColumns: "40px 1fr",
                         "& .grid-value": {
                             gridColumn: "span 2",
                         },
@@ -317,6 +317,7 @@ export default function DescriptionTable({
                     },
                     "& > .grid-title": {
                         background: getThemeColor("titleBg", theme),
+                        gap: "6px",
                     },
                     "& > .grid-first-title": {
                         justifyContent: "center",

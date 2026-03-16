@@ -15,7 +15,7 @@ export default function ProjectInfoTable({ project: slug }: { project: ProjectsL
     const t = useUiLabels();
     return (
         <Box sx={{ marginLeft: "-1px" }}>
-            <DescriptionTable withoutTopBorder={true} maxWidth="1 col">
+            <DescriptionTable withoutTopBorder={true} withoutBottomBorder={true} maxWidth="1 col">
                 {[
                     [t("Full name"), project.name[lang], { fullLine: true }],
                     [t("Description"), project.description[lang], { fullLine: true }],

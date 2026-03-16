@@ -115,7 +115,7 @@ export default function AdminSidebar({ onNavigate }: AdminSidebarProps) {
             </Box>
 
             {/* Navigation */}
-            <Box sx={{ flex: 1, overflow: "auto" }}>
+            <Box sx={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column", justifyContent: "center" }}>
                 <AccentedTabs
                     activeTab={activePath}
                     orientation="vertical"

@@ -42,9 +42,12 @@ export function SpecialButton({ children, link, sx }: SpecialButtonProps) {
                 lineHeight: 1.1,
                 textAlign: "left",
                 justifyContent: "start",
-                "& .MuiSvgIcon-root": {
+                gap: "10px",
+                "& .MuiSvgIcon-root, & svg": {
                     fontSize: "25px",
-                    marginRight: "10px",
+                    width: "25px",
+                    height: "25px",
+                    flexShrink: 0,
                 },
                 border: "1px solid white",
                 padding: "12px 20px",

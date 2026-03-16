@@ -338,6 +338,10 @@ function ContactButton({
             action={action}
             sx={{
                 borderColor: borders.replaceAll("0", "transparent").replaceAll("1", contactBorderColor),
+                "& svg:not(.MuiSvgIcon-root)": {
+                    marginRight: "8px",
+                    fontSize: "19px",
+                },
                 "&:hover": {
                     borderColor: hoverBorders.replaceAll("0", "transparent").replaceAll("1", contactBorderColor),
                     color: contactsColor,

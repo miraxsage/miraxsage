@@ -141,11 +141,11 @@ function SortableImageCell({
                     right: 2,
                     opacity: 0,
                     transition: "opacity 0.2s",
-                    bgcolor: "error.main",
+                    bgcolor: "rgba(128,128,128,0.7)",
                     color: "#fff",
                     width: 22,
                     height: 22,
-                    "&:hover": { bgcolor: "error.dark" },
+                    "&:hover": { bgcolor: "error.main" },
                 }}
             >
                 <DeleteIcon sx={{ fontSize: 14 }} />

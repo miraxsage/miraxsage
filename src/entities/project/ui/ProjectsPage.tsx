@@ -1,6 +1,16 @@
 "use client";
 import CustomBreadcrumbs, { BreadcrumbItem } from "@/shared/ui/Breadcrumbs";
-import { Box, alpha, useMediaQuery, useTheme } from "@mui/material";
+import { Box, alpha, keyframes, useMediaQuery, useTheme } from "@mui/material";
+import LogoIcon from "@/shared/icons/Logo";
+
+const loaderBars1 = keyframes({
+    "0%, 100%": { backgroundSize: "20% 100%" },
+    "33%, 66%": { backgroundSize: "20% 40%" },
+});
+const loaderBars2 = keyframes({
+    "0%, 33%": { backgroundPosition: "0 0, 50% 100%, 100% 0" },
+    "66%, 100%": { backgroundPosition: "0 100%, 50% 0, 100% 100%" },
+});
 import CustomScrollbar from "@/shared/ui/Scrollbar";
 import DownIcon from "@mui/icons-material/South";
 import UpIcon from "@mui/icons-material/North";
@@ -21,6 +31,9 @@ import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import { useRouter } from "next/navigation";
 
 export default function Projects() {
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+
     const lang = useLanguage().lang;
     const t = useUiLabels();
     useEffect(() => {
@@ -61,6 +74,7 @@ export default function Projects() {
             >
                 <motion.div
                     onClick={() => setFilterMenuShown(false)}
+                    initial={{ opacity: 0, visibility: "collapse" }}
                     animate={{
                         opacity: filterMenuShown ? 1 : 0,
                         visibility: filterMenuShown ? "visible" : "collapse",
@@ -125,8 +139,47 @@ export default function Projects() {
                     className="grid h-full w-full"
                     sx={{
                         gridTemplateRows: "37px auto minmax(0, 1fr)",
+                        position: "relative",
                     }}
                 >
+                    <Box
+                        sx={{
+                            position: "absolute",
+                            inset: 0,
+                            zIndex: 10,
+                            background: getThemeColor("layoutBackground", theme),
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            opacity: mounted ? 0 : 1,
+                            visibility: mounted ? "hidden" : "visible",
+                            transition: "opacity 0.25s ease, visibility 0s linear 0.25s",
+                            pointerEvents: "none",
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "15px",
+                                alignItems: "center",
+                                color: theme.palette.mode === "dark" ? "#2c2f3e" : "#d1d1d1",
+                            }}
+                        >
+                            <Box sx={{ "& svg": { width: 45, height: 45 } }}>
+                                <LogoIcon />
+                            </Box>
+                            <Box
+                                sx={{
+                                    width: "25px",
+                                    aspectRatio: "5/4",
+                                    background:
+                                        "no-repeat linear-gradient(currentColor 0 0), no-repeat linear-gradient(currentColor 0 0), no-repeat linear-gradient(currentColor 0 0)",
+                                    animation: `${loaderBars1} 1s infinite, ${loaderBars2} 1s infinite`,
+                                }}
+                            />
+                        </Box>
+                    </Box>
                     <Box className="flex">
                         {lessLg && (
                             <ToolbarButton

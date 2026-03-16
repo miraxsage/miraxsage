@@ -27,7 +27,7 @@ export default function ProjectsBreadcrumbs({ project, onBack }: ProjectsBreadcr
             <RevealAsideMenuButton />
             {project && (
                 <ToolbarButton
-                    sx={{ paddingLeft: "10.5px", paddingRight: "10.5px" }}
+                    sx={{ width: "40px", paddingLeft: "10.5px", paddingRight: "10.5px" }}
                     onClick={onBack ? onBack : () => router.back()}
                 >
                     <ArrowBackIcon />

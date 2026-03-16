@@ -161,7 +161,7 @@ const AccentedTreeItem = styled(TreeItem, {
                 fontSize: "19px",
             },
             "& .MuiTreeItem-content .MuiTreeItem-label": {
-                paddingLeft: "5px",
+                paddingLeft: "8px",
             },
             "& .MuiTreeItem-iconContainer .MuiCheckbox-root": {
                 padding: "0px",
