@@ -166,6 +166,9 @@ export default function AccentedTabs({
                               borderRightWidth: "1px",
                               borderRightStyle: "solid",
                               borderRightColor: "divider",
+                              "&:last-of-type": {
+                                  borderRightWidth: 0,
+                              },
                               ...(accentMode == "primaryStrong"
                                   ? {}
                                   : {
@@ -204,9 +207,8 @@ export default function AccentedTabs({
                                   height: "1px",
                                   background: theme.palette.divider,
                               },
-                              "&:nth-last-of-type(1)::before": {
-                                  width: "100%",
-                                  left: 0,
+                              "&:last-of-type::before": {
+                                  display: "none",
                               },
                           }),
                     "&:hover": {

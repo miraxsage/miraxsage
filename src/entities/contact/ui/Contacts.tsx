@@ -180,7 +180,7 @@ export default function Contacts({ contacts, content }: { contacts: ContactItem[
             {!md && (
                 <Box sx={{ display: "flex", borderBottom: 1, borderColor: "divider" }}>
                     <RevealAsideMenuButton />
-                    <CustomBreadcrumbs sx={{ padding: "6px 8px", margin: 0, flexGrow: 1 }}>
+                    <CustomBreadcrumbs sx={{ padding: "6px 8px", margin: 0, flexGrow: 1, "& .MuiBreadcrumbs-ol": { justifyContent: "center" } }}>
                         {(() => {
                             const items = [
                                 { label: "Miraxsage", link: "/" },

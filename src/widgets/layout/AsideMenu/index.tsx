@@ -33,6 +33,9 @@ export default function AsideMenu() {
                 width: "65px",
                 maxWidth: asideMenuVisibility.shown ? "65px" : "0px",
                 transition: "max-width 0.3s ease, border-right-width 0.3s ease",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
             }}
         >
             <AccentedTabs

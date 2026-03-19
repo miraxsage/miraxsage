@@ -27,13 +27,14 @@ export default function ProjectsBreadcrumbs({ project, onBack }: ProjectsBreadcr
             <RevealAsideMenuButton />
             {project && (
                 <ToolbarButton
-                    sx={{ width: "40px", paddingLeft: "10.5px", paddingRight: "10.5px" }}
+                    sx={{ width: "39px", paddingLeft: "10.5px", paddingRight: "10.5px" }}
+                    dividerSize="full"
                     onClick={onBack ? onBack : () => router.back()}
                 >
                     <ArrowBackIcon />
                 </ToolbarButton>
             )}
-            <CustomBreadcrumbs sx={{ padding: "6px 8px", margin: 0, flexGrow: 1 }}>
+            <CustomBreadcrumbs sx={{ padding: "6px 8px", margin: 0, flexGrow: 1, "& .MuiBreadcrumbs-ol": { justifyContent: "center" } }}>
                 {(() => {
                     const items = [
                         ...(lessSm ? [] : [{ label: "Miraxsage", link: "/" }]),

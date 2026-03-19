@@ -209,8 +209,9 @@ export default function About() {
                 gridTemplate: "auto 1px minmax(0, 1fr) / auto minmax(0, 1fr)",
             }}
         >
-            <RevealAsideMenuButton />
-            <CustomBreadcrumbs sx={{ padding: "6px 8px", margin: 0 }}>
+            <Box sx={{ display: "flex", gridColumn: "1 / -1" }}>
+                <RevealAsideMenuButton />
+                <CustomBreadcrumbs sx={{ padding: "6px 8px", margin: 0, flexGrow: 1, "& .MuiBreadcrumbs-ol": { justifyContent: "center" } }}>
                 {(() => {
                     const items = [
                         ...(lessSm
@@ -262,6 +263,7 @@ export default function About() {
                     return items;
                 })()}
             </CustomBreadcrumbs>
+            </Box>
             <Box
                 sx={{
                     borderBottom: `1px solid ${theme.palette.divider}`,

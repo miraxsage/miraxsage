@@ -863,7 +863,7 @@ function GeneralLabelsTab() {
 
     if (loading) {
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 200px)" }}>
                 <CircularProgress />
             </Box>
         );

@@ -119,6 +119,7 @@ export default function TopMenu({ headerItems }: { headerItems: HeaderItem[] }) 
                 iconMode={true}
                 onClick={siteMapVisibility.toggle}
                 sx={{
+                    width: 64,
                     transition: "all 0.4s",
                     ...(siteMapVisibility.shown
                         ? {
@@ -139,9 +140,11 @@ export default function TopMenu({ headerItems }: { headerItems: HeaderItem[] }) 
             {smScreen ? (
                 <MobileRootBreadcrumb headerItems={headerItems} />
             ) : (
-                <AccentedTabs underline={false} mode="full" onTabSelect={onTabSelect}>
-                    {tabs}
-                </AccentedTabs>
+                <Box sx={{ flex: 1, display: "flex", justifyContent: "center" }}>
+                    <AccentedTabs underline={false} mode="full" onTabSelect={onTabSelect}>
+                        {tabs}
+                    </AccentedTabs>
+                </Box>
             )}
         </Box>
     );

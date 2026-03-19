@@ -1,10 +1,9 @@
 "use client";
 
-import { Box, alpha, useMediaQuery, useTheme } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { HorizontalPanelButton } from "@/shared/ui/PanelButtons";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useThemeColor } from "@/shared/lib/theme";
-import { useColorMode } from "@/shared/lib/store/appearanceSlice";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
 import DynamicIcon from "@/shared/ui/DynamicIcon";
 import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
@@ -14,7 +13,6 @@ export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
     const goTo = (link: string) => () => {
         window.open(link, "_blank");
     };
-    const isDarkMode = useColorMode().dark;
     const smScreen = useMediaQuery(theme.breakpoints.down("sm"));
     const t = useUiLabels();
     const footerText = t("Footer").replace(/\[CurrentYear\]/g, String(new Date().getFullYear()));
@@ -44,7 +42,7 @@ export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
                             lineHeight: "1.2rem",
                             justifyContent: "center",
                         }}
-                        style={{ color: alpha(theme.palette.divider, isDarkMode ? 0.5 : 1) }}
+                        style={{ color: theme.palette.divider }}
                     >
                         {footerText}
                     </Box>
@@ -55,7 +53,7 @@ export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
                     key={contact.id}
                     onClick={goTo(contact.url)}
                     dividerSide="left"
-                    dividerSize={i === 0 ? (smScreen ? "removed" : "full") : "squeezed"}
+                    dividerSize={i === 0 ? "removed" : "squeezed"}
                     iconMode={true}
                 >
                     <DynamicIcon svg={contact.icon_svg} name={contact.icon} />

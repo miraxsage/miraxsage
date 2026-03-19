@@ -72,7 +72,7 @@ export default function AdminLoginPage() {
                             mb: 3,
                         }}
                     >
-                        <Box sx={{ width: 56, height: 56, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", "& svg": { width: 50, height: 50 } }}>
+                        <Box sx={{ width: 56, height: 56, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", color: getThemeColor("menuText", theme), "& svg": { width: 50, height: 50 } }}>
                             <LogoIcon />
                         </Box>
                         <Typography
