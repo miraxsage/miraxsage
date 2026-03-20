@@ -11,16 +11,12 @@ export default function AppHydration({ children }: { children: React.ReactNode }
         try {
             const stored = localStorage.getItem("appearanceConfig");
             if (stored) {
-                const parsed = JSON.parse(stored);
-                dispatch(hydratePreferences(parsed));
+                dispatch(hydratePreferences(JSON.parse(stored)));
             } else {
-                const lang = getDefaultLanguage();
-                if (lang !== "ru") {
-                    dispatch(hydratePreferences({ language: lang }));
-                }
+                dispatch(hydratePreferences({ language: getDefaultLanguage() }));
             }
         } catch {
-            // ignore parse errors
+            dispatch(hydratePreferences({}));
         }
     }, [dispatch]);
 

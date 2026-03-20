@@ -319,7 +319,7 @@ export default function ProjectPage() {
                                                 initial={{ opacity: 0 }}
                                                 animate={{ opacity: 1 }}
                                                 exit={{ opacity: 0 }}
-                                                transition={{ duration: 0.1, delay: swapDir ? 0.15 : 0 }}
+                                                transition={{ duration: 0.2, delay: 0.4 }}
                                                 style={{ gridArea: "1/1/1/1", height: "100%" }}
                                             >
                                                 <AppSpinner withoutBg={true} compact={true} />

@@ -7,7 +7,8 @@ import { CustomScrollbarStylesContainer } from "@/shared/ui/Scrollbar";
 import CommonStylesContext from "@/shared/styles/CommonStylesContext";
 import TranslationsProvider from "@/shared/lib/i18n/TranslationsProvider";
 import { getTranslations } from "@/shared/lib/i18n/getTranslations";
-import AppHydration from "@/shared/lib/store/AppHydration";
+import { cookies } from "next/headers";
+import { defaultConfig } from "@/shared/lib/store/appearanceSlice";
 
 export const metadata: Metadata = {
     title: "Miraxsage",
@@ -20,23 +21,34 @@ export const metadata: Metadata = {
     },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+async function getAppearanceFromCookies(): Promise<typeof defaultConfig> {
+    try {
+        const cookieStore = await cookies();
+        const raw = cookieStore.get("appearanceConfig")?.value;
+        if (!raw) return defaultConfig;
+        const parsed = JSON.parse(decodeURIComponent(raw));
+        return { ...defaultConfig, ...parsed };
+    } catch {
+        return defaultConfig;
+    }
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
     const translations = getTranslations();
+    const appearance = await getAppearanceFromCookies();
     return (
-        <html lang="en" suppressHydrationWarning>
+        <html lang={appearance.language} suppressHydrationWarning>
             <body>
-                <StoreProvider>
-                    <AppHydration>
-                        <TranslationsProvider translations={translations}>
-                            <ThemeProvider>
-                                <CommonStylesContext>
-                                    <CustomScrollbarStylesContainer>
-                                        <AppContent>{children}</AppContent>
-                                    </CustomScrollbarStylesContainer>
-                                </CommonStylesContext>
-                            </ThemeProvider>
-                        </TranslationsProvider>
-                    </AppHydration>
+                <StoreProvider initialAppearance={appearance}>
+                    <TranslationsProvider translations={translations}>
+                        <ThemeProvider>
+                            <CommonStylesContext>
+                                <CustomScrollbarStylesContainer>
+                                    <AppContent>{children}</AppContent>
+                                </CustomScrollbarStylesContainer>
+                            </CommonStylesContext>
+                        </ThemeProvider>
+                    </TranslationsProvider>
                 </StoreProvider>
             </body>
         </html>

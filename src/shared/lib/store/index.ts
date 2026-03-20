@@ -4,11 +4,16 @@ import appearanceSlice, {
 } from "./appearanceSlice";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
-export const makeStore = () =>
+export type AppearanceState = ReturnType<typeof appearanceSlice>;
+
+export const makeStore = (preloadedAppearance?: Partial<AppearanceState>) =>
     configureStore({
         reducer: {
             appearance: appearanceSlice,
         },
+        ...(preloadedAppearance
+            ? { preloadedState: { appearance: { ...appearanceSlice(undefined, { type: "" }), ...preloadedAppearance } } }
+            : {}),
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware().prepend(appearanceListener),
     });

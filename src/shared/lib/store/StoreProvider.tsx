@@ -1,8 +1,16 @@
 "use client";
 
+import { useRef } from "react";
 import { Provider } from "react-redux";
-import store from "./index";
+import { makeStore, type AppearanceState } from "./index";
 
-export default function StoreProvider({ children }: { children: React.ReactNode }) {
-    return <Provider store={store}>{children}</Provider>;
+export default function StoreProvider({
+    children,
+    initialAppearance,
+}: {
+    children: React.ReactNode;
+    initialAppearance?: Partial<AppearanceState>;
+}) {
+    const storeRef = useRef(makeStore(initialAppearance));
+    return <Provider store={storeRef.current}>{children}</Provider>;
 }

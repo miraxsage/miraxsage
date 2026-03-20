@@ -3,7 +3,6 @@
 import { PayloadAction, createListenerMiddleware, createSlice } from "@reduxjs/toolkit";
 import { TypeOrItsAnyInnerField } from "@/shared/types/common";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import { setCookie } from "@/shared/lib/cookie";
 import { setCurrentLanguage } from "@/shared/lib/i18n/translation";
 
 interface AppearanceConfig {
@@ -58,7 +57,6 @@ const slice = createSlice({
         language: (state, newLanguage: PayloadAction<AppearanceConfig["language"]>) => {
             state.language = newLanguage.payload;
             if (typeof window !== "undefined") {
-                setCookie("lang", state.language);
                 document.documentElement.lang = state.language;
             }
         },
@@ -83,11 +81,9 @@ appearanceListener.startListening({
     effect(_action, api) {
         const state = api.getState().appearance;
         setCurrentLanguage(state.language);
-        if (typeof localStorage === "undefined") return;
-        localStorage.setItem(
-            "appearanceConfig",
-            JSON.stringify({ ...state, siteMapVisibility: "collapsed" })
-        );
+        if (typeof document === "undefined") return;
+        const value = JSON.stringify({ ...state, siteMapVisibility: "collapsed" });
+        document.cookie = `appearanceConfig=${encodeURIComponent(value)}; path=/; max-age=${60 * 60 * 24 * 365}`;
     },
 });
 const listener = appearanceListener.middleware;
@@ -96,7 +92,7 @@ export default slice.reducer;
 
 export const { hydratePreferences, colorMode, language, viewMode, screenMode, asideMenuVisibility } = slice.actions;
 
-export { getDefaultLanguage };
+export { defaultConfig, getDefaultLanguage };
 
 export { listener };
 
