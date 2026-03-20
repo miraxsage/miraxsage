@@ -12,6 +12,7 @@ import { CategoryLabelsContext, CategoryLabelsMap } from "@/entities/resume/mode
 import { UiLabelsContext, UiLabelsMap } from "@/entities/ui-labels/model/uiLabelsContext";
 import { ResumeDataContext, ResumeData } from "@/entities/resume/model/resumeDataContext";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
+import { SiteSettingsContext, SiteSettings } from "@/shared/lib/siteSettings";
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -20,15 +21,17 @@ interface LayoutProps {
     uiLabels: UiLabelsMap;
     resumeData: ResumeData;
     contacts: ContactItem[];
+    siteSettings: SiteSettings;
 }
 
-export default function MainLayout({ children, headerItems, categoryLabels, uiLabels, resumeData, contacts }: LayoutProps) {
+export default function MainLayout({ children, headerItems, categoryLabels, uiLabels, resumeData, contacts, siteSettings }: LayoutProps) {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode == "dark";
     const smallHeight = useMediaQuery("@media (max-height:450px)");
     const glowColor = getThemeColor("layoutGlow", theme);
     const screenMode = useScreenMode();
     return (
+        <SiteSettingsContext.Provider value={siteSettings}>
         <UiLabelsContext.Provider value={uiLabels}>
         <CategoryLabelsContext.Provider value={categoryLabels}>
         <ResumeDataContext.Provider value={resumeData}>
@@ -100,5 +103,6 @@ export default function MainLayout({ children, headerItems, categoryLabels, uiLa
         </ResumeDataContext.Provider>
         </CategoryLabelsContext.Provider>
         </UiLabelsContext.Provider>
+        </SiteSettingsContext.Provider>
     );
 }

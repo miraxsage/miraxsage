@@ -6,6 +6,7 @@ import type { UiLabelsMap } from "@/entities/ui-labels/model/uiLabelsContext";
 import type { ResumeData } from "@/entities/resume/model/resumeDataContext";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
 import { resolveIconSvg } from "@/shared/lib/resolveIconSvg";
+import { getSiteSettings } from "@/shared/lib/getSiteSettings";
 
 function getHeaderItems(): HeaderItem[] {
     const db = getDb();
@@ -78,5 +79,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     const uiLabels = getUiLabels();
     const resumeData = getResumeData();
     const contacts = getContacts();
-    return <MainLayout headerItems={headerItems} categoryLabels={categoryLabels} uiLabels={uiLabels} resumeData={resumeData} contacts={contacts}>{children}</MainLayout>;
+    const siteSettings = getSiteSettings();
+    return <MainLayout headerItems={headerItems} categoryLabels={categoryLabels} uiLabels={uiLabels} resumeData={resumeData} contacts={contacts} siteSettings={siteSettings}>{children}</MainLayout>;
 }

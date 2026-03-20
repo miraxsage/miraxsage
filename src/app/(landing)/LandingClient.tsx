@@ -10,6 +10,7 @@ import { ScrollObservable } from "@/widgets/landing/types";
 import type { LandingButton, TitleVariant, InfoBlock, GetCloserItem, FooterItem, ContactItem } from "@/widgets/landing/MainSlide";
 import { UiLabelsContext, UiLabelsMap } from "@/entities/ui-labels/model/uiLabelsContext";
 import { CategoryLabelsContext, CategoryLabelsMap } from "@/entities/resume/model/categoryLabels";
+import { SiteSettingsContext, SiteSettings } from "@/shared/lib/siteSettings";
 
 interface LandingClientProps {
     buttons: LandingButton[];
@@ -20,9 +21,10 @@ interface LandingClientProps {
     getCloser: GetCloserItem | null;
     footer: FooterItem[];
     contacts: ContactItem[];
+    siteSettings: SiteSettings;
 }
 
-export default function LandingClient({ buttons, titleVariants, uiLabels, categoryLabels, infoBlocks, getCloser, footer, contacts }: LandingClientProps) {
+export default function LandingClient({ buttons, titleVariants, uiLabels, categoryLabels, infoBlocks, getCloser, footer, contacts, siteSettings }: LandingClientProps) {
     const rootRef = useRef<HTMLDivElement>();
     const [scrollObservable, setScrollObservable] = useState<ScrollObservable | undefined>();
     useEffect(() => {
@@ -71,6 +73,7 @@ export default function LandingClient({ buttons, titleVariants, uiLabels, catego
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (
+        <SiteSettingsContext.Provider value={siteSettings}>
         <UiLabelsContext.Provider value={uiLabels}>
         <CategoryLabelsContext.Provider value={categoryLabels}>
         <CustomScrollbar ref={rootRef} className="landing-background-scroll-view" sx={{ width: "100%" }}>
@@ -82,5 +85,6 @@ export default function LandingClient({ buttons, titleVariants, uiLabels, catego
         </CustomScrollbar>
         </CategoryLabelsContext.Provider>
         </UiLabelsContext.Provider>
+        </SiteSettingsContext.Provider>
     );
 }

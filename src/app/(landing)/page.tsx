@@ -4,6 +4,7 @@ import type { LandingButton, TitleVariant, InfoBlock, GetCloserItem, FooterItem,
 import type { UiLabelsMap } from "@/entities/ui-labels/model/uiLabelsContext";
 import type { CategoryLabelEntry } from "@/entities/resume/model/categoryLabels";
 import { resolveIconSvg } from "@/shared/lib/resolveIconSvg";
+import { getSiteSettings } from "@/shared/lib/getSiteSettings";
 
 function getLandingButtons(): LandingButton[] {
     const db = getDb();
@@ -77,5 +78,6 @@ export default function Landing() {
     const getCloser = getGetCloser();
     const footer = getFooter();
     const contacts = getContacts();
-    return <LandingClient buttons={buttons} titleVariants={titleVariants} uiLabels={uiLabels} categoryLabels={categoryLabels} infoBlocks={infoBlocks} getCloser={getCloser} footer={footer} contacts={contacts} />;
+    const siteSettings = getSiteSettings();
+    return <LandingClient buttons={buttons} titleVariants={titleVariants} uiLabels={uiLabels} categoryLabels={categoryLabels} infoBlocks={infoBlocks} getCloser={getCloser} footer={footer} contacts={contacts} siteSettings={siteSettings} />;
 }

@@ -11,6 +11,7 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import { useAppearance, useColorMode, useLanguage } from "@/shared/lib/store/appearanceSlice";
 import MiraxsageIcon from "@/shared/icons/MiraxsageIcon";
+import { useSiteSettings } from "@/shared/lib/siteSettings";
 import { useEffect, useRef, useState } from "react";
 import { AnimatedGeometricWaves } from "./AnimatedGeometricWaves";
 import { GlobalStyles } from "@mui/material";
@@ -338,6 +339,8 @@ function SlideContent({ buttons, titleVariants, contacts }: { buttons: LandingBu
     const titles = titleVariants.map((v) => (lang === "en" ? v.text_en : v.text_ru));
     const isDarkMode = useColorMode().dark;
     const colorModeHook = useColorMode();
+    const siteSettings = useSiteSettings();
+    const customAvatarSrc = isDarkMode ? siteSettings.avatar_dark : siteSettings.avatar_light;
     const smallScreen = useMediaQuery(theme.breakpoints.down("sm"));
     const showAvatarDividers = useMediaQuery("(max-height: 850px)");
     const langHook = useLanguage();
@@ -476,7 +479,9 @@ function SlideContent({ buttons, titleVariants, contacts }: { buttons: LandingBu
                                         },
                                     }}
                                 >
-                                    <MiraxsageIcon contrast={true} />
+                                    {customAvatarSrc
+                                        ? <Box component="img" src={customAvatarSrc} alt="Avatar" sx={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                                        : <MiraxsageIcon contrast={true} />}
                                 </Box>
                             </Box>
 

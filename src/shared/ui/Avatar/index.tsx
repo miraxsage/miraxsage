@@ -2,9 +2,13 @@
 
 import MiraxsageIcon from "@/shared/icons/MiraxsageIcon";
 import { Box, alpha, useTheme } from "@mui/material";
+import { useSiteSettings } from "@/shared/lib/siteSettings";
 
-export default function Avatar() {
+export default function Avatar({ contrast }: { contrast?: boolean }) {
     const theme = useTheme();
+    const isDarkMode = theme.palette.mode === "dark";
+    const settings = useSiteSettings();
+    const customSrc = isDarkMode ? settings.avatar_dark : settings.avatar_light;
     const gridPaleColor = alpha(theme.palette.divider, 0.25);
     const gridStrongColor = alpha(theme.palette.divider, 0.4);
     return (
@@ -45,9 +49,22 @@ export default function Avatar() {
                   )`,
             }}
         >
-            <Box sx={{ width: "248px" }}>
-                <MiraxsageIcon />
-            </Box>
+            {customSrc ? (
+                <Box
+                    component="img"
+                    src={customSrc}
+                    alt="Avatar"
+                    sx={{
+                        maxWidth: "100%",
+                        maxHeight: "100%",
+                        objectFit: "contain",
+                    }}
+                />
+            ) : (
+                <Box sx={{ width: "248px" }}>
+                    <MiraxsageIcon contrast={contrast} />
+                </Box>
+            )}
         </Box>
     );
 }

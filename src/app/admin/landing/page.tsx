@@ -18,6 +18,7 @@ import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
+import AvatarUploader from "./AvatarUploader";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -79,12 +80,13 @@ type SectionKey = keyof LandingData;
 // Helpers
 // ---------------------------------------------------------------------------
 
-const SECTION_TAB_KEYS: { key: SectionKey | "landing"; label: string }[] = [
+const SECTION_TAB_KEYS: { key: SectionKey | "landing" | "avatar"; label: string }[] = [
     { key: "landing", label: "General Labels" },
     { key: "buttons", label: "Buttons" },
     { key: "title_variants", label: "Qualifications" },
     { key: "info_blocks", label: "Info Blocks" },
     { key: "footer", label: "Footer" },
+    { key: "avatar", label: "Avatar" },
 ];
 
 let tempIdCounter = -1;
@@ -473,6 +475,9 @@ export default function AdminLandingPage() {
                     />
                 );
             })()}
+
+            {/* ===== Avatar ===== */}
+            {tab === 5 && <AvatarUploader />}
         </AdminSection>
     );
 }
