@@ -15,6 +15,7 @@ import TeamBlock from "./TeamBlock";
 import { useEffect, useRef } from "react";
 import { rangeProgress, round } from "@/shared/lib/math";
 import AchievementsBlock from "./AchievementsBlock";
+import GenericBlock from "./GenericBlock";
 import { debounce } from "@/shared/lib/common";
 
 type AboutSlideProps = {
@@ -90,11 +91,11 @@ export function AboutSlide({ scrollObservable, infoBlocks }: AboutSlideProps) {
                             "#about-scrolling-placeholder"
                         ) as HTMLElement;
                         vars.scrollingPlaceholderHeight =
-                            vars.blocksInnerScrollHeights.reduce((sum, cur) => sum + cur) +
-                            (vars.blocksKeys.length - 1) * vars.halfvh -
+                            vars.blocksInnerScrollHeights.reduce((sum, cur) => sum + cur, 0) +
+                            Math.max(0, vars.blocksKeys.length - 1) * vars.halfvh -
                             vw * 0.1763269807;
                     }
-                    vars.scollingPlaceholder.style.height = vars.scrollingPlaceholderHeight + "px";
+
                     const {
                         halfvh,
                         pxToAboutSlide,
@@ -104,23 +105,30 @@ export function AboutSlide({ scrollObservable, infoBlocks }: AboutSlideProps) {
                         scollingPlaceholder,
                     } = screenVarsRef.current!;
 
+                    if (blocksKeys.length === 0 || !scollingPlaceholder) return;
+
+                    scollingPlaceholder.style.height = vars.scrollingPlaceholderHeight + "px";
+
                     let mainPos = 0;
                     let margin = "";
 
                     if (scrollObservable.scrollTop < halfvh) {
                         mainPos = -rangeProgress(scrollObservable.scrollTop, 0, halfvh) * pxToAboutSlide;
                         rootRef.current.style.position = "relative";
-                        blocksElements[0]!.style.translate = "0 0";
-                        blocksElements.forEach((el, i) => (el!.style.visibility = i == 0 ? "visible" : "hidden"));
+                        if (blocksElements[0]) {
+                            blocksElements[0].style.translate = "0 0";
+                        }
+                        blocksElements.forEach((el, i) => { if (el) el.style.visibility = i == 0 ? "visible" : "hidden"; });
                     } else {
                         let scroll = scrollObservable.scrollTop - halfvh;
                         let hideRemined = false;
                         for (let i = 0; i < blocksKeys.length; i++) {
-                            const block = blocksElements[i]!;
+                            const block = blocksElements[i];
+                            if (!block) continue;
                             const prevBlock = i > 0 ? blocksElements[i - 1] : null;
                             if (i > 0) {
                                 if (hideRemined) {
-                                    prevBlock!.style.zIndex = "";
+                                    if (prevBlock) prevBlock.style.zIndex = "";
                                     block.style.visibility = "hidden";
                                     continue;
                                 } else block.style.visibility = "visible";
@@ -133,24 +141,28 @@ export function AboutSlide({ scrollObservable, infoBlocks }: AboutSlideProps) {
                                     }% 140% 125% round 0 0 100vw 100vw)`;
                                     const smoothProgress = Math.sin((progress * Math.PI) / 2);
                                     const smoothInProgress = 1.5 * progress ** 0.25 - 0.5;
-                                    prevBlock!.style.translate =
-                                        "0 -" +
-                                        (halfvh * 0.7 * smoothProgress + blocksInnerScrollHeights[i - 1]) +
-                                        "px";
-                                    prevBlock!.style.scale = (1 - 0.05 * smoothProgress).toString();
-                                    prevBlock!.style.opacity = (
-                                        1 - rangeProgress(Math.max(0, smoothInProgress), 0.6, 1)
-                                    ).toString();
-                                    if (!smallScreen)
-                                        prevBlock!.style.filter = `blur(${rangeProgress(progress, 0.4, 1) * 10}px)`;
-                                    prevBlock!.style.zIndex = !hideRemined && progress < 0.5 ? "1" : "";
+                                    if (prevBlock) {
+                                        prevBlock.style.translate =
+                                            "0 -" +
+                                            (halfvh * 0.7 * smoothProgress + blocksInnerScrollHeights[i - 1]) +
+                                            "px";
+                                        prevBlock.style.scale = (1 - 0.05 * smoothProgress).toString();
+                                        prevBlock.style.opacity = (
+                                            1 - rangeProgress(Math.max(0, smoothInProgress), 0.6, 1)
+                                        ).toString();
+                                        if (!smallScreen)
+                                            prevBlock.style.filter = `blur(${rangeProgress(progress, 0.4, 1) * 10}px)`;
+                                        prevBlock.style.zIndex = !hideRemined && progress < 0.5 ? "1" : "";
+                                    }
                                     hideRemined = true;
                                 } else {
                                     block.style.translate = "0 0";
                                     block.style.clipPath = "";
-                                    prevBlock!.style.opacity = "0";
-                                    prevBlock!.style.filter = "";
-                                    prevBlock!.style.zIndex = "";
+                                    if (prevBlock) {
+                                        prevBlock.style.opacity = "0";
+                                        prevBlock.style.filter = "";
+                                        prevBlock.style.zIndex = "";
+                                    }
                                     scroll -= halfvh;
                                 }
                             }
@@ -166,18 +178,20 @@ export function AboutSlide({ scrollObservable, infoBlocks }: AboutSlideProps) {
                             }
                         }
                         if (scroll > 0 && !hideRemined) {
-                            const lastBlock = blocksElements.at(-1)!;
-                            const progress = rangeProgress(scroll, 0, halfvh * 1.2);
-                            const smoothProgress = Math.sin((progress * Math.PI) / 2);
-                            const smoothInProgress = 1.5 * progress ** 0.25 - 0.5;
-                            lastBlock!.style.translate =
-                                "0 -" + (halfvh * 0.7 * smoothProgress + blocksInnerScrollHeights.at(-1)!) + "px";
-                            lastBlock!.style.scale = (1 - 0.05 * smoothProgress).toString();
-                            lastBlock!.style.opacity = (
-                                1 - rangeProgress(Math.max(0, smoothInProgress), 0.5, 1)
-                            ).toString();
-                            if (!smallScreen)
-                                lastBlock!.style.filter = `blur(${rangeProgress(progress, 0.4, 1) * 10}px)`;
+                            const lastBlock = blocksElements.at(-1);
+                            if (lastBlock) {
+                                const progress = rangeProgress(scroll, 0, halfvh * 1.2);
+                                const smoothProgress = Math.sin((progress * Math.PI) / 2);
+                                const smoothInProgress = 1.5 * progress ** 0.25 - 0.5;
+                                lastBlock.style.translate =
+                                    "0 -" + (halfvh * 0.7 * smoothProgress + (blocksInnerScrollHeights.at(-1) ?? 0)) + "px";
+                                lastBlock.style.scale = (1 - 0.05 * smoothProgress).toString();
+                                lastBlock.style.opacity = (
+                                    1 - rangeProgress(Math.max(0, smoothInProgress), 0.5, 1)
+                                ).toString();
+                                if (!smallScreen)
+                                    lastBlock.style.filter = `blur(${rangeProgress(progress, 0.4, 1) * 10}px)`;
+                            }
 
                             scollingPlaceholder.style.height =
                                 vars.scrollingPlaceholderHeight -
@@ -286,12 +300,14 @@ export function AboutSlide({ scrollObservable, infoBlocks }: AboutSlideProps) {
                         margin: "0 auto",
                     }}
                 >
-                    {infoBlocks.map((block) => {
+                    {infoBlocks.map((block, i) => {
                         const Block = blockComponents[block.slug];
-                        if (!Block) return null;
                         const title = parseTitleParts(lang.ru ? block.title_ru : block.title_en);
                         const content = lang.ru ? block.content_ru : block.content_en;
-                        return <Block key={block.slug} id={`${block.slug}-block`} title={title} content={content} />;
+                        if (Block) {
+                            return <Block key={block.slug} id={`${block.slug}-block`} title={title} content={content} />;
+                        }
+                        return <GenericBlock key={block.slug} id={`${block.slug}-block`} title={title} content={content} illustration={block.illustration} order={i % 2 === 0 ? "left" : "right"} />;
                     })}
                 </Box>
             </Box>

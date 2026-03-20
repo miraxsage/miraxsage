@@ -10,6 +10,7 @@ import {
     FormControlLabel,
     Typography,
     CircularProgress,
+    MenuItem,
     useTheme,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
@@ -401,11 +402,19 @@ export default function AdminLandingPage() {
                                     <TextField
                                         label={__("Illustration", lang)}
                                         size="small"
+                                        select
                                         value={item.illustration}
-                                        onChange={(e) => updateItem("info_blocks", item.id, "illustration", e.target.value)}
-                                        onBlur={() => saveSection("info_blocks")}
+                                        onChange={(e) => updateItemAndSave("info_blocks", item.id, "illustration", e.target.value)}
                                         sx={{ flex: 1, minWidth: 140 }}
-                                    />
+                                    >
+                                        <MenuItem value="">({__("None", lang)})</MenuItem>
+                                        <MenuItem value="Developer Illustration">{__("Developer", lang)}</MenuItem>
+                                        <MenuItem value="Web Developer Illustration">{__("Web Developer", lang)}</MenuItem>
+                                        <MenuItem value="Skills Illustration">{__("Skills", lang)}</MenuItem>
+                                        <MenuItem value="Experience Illustration">{__("Experience", lang)}</MenuItem>
+                                        <MenuItem value="Achievements Illustration">{__("Achievements", lang)}</MenuItem>
+                                        <MenuItem value="Team Illustration">{__("Team", lang)}</MenuItem>
+                                    </TextField>
                                 </FieldRow>
                                 <TextField
                                     label={__("Content", lang)}

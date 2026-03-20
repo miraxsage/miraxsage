@@ -72,7 +72,9 @@ export async function PUT(request: NextRequest) {
 
             if (items.length === 0) return;
 
-            const columns = Object.keys(items[0]);
+            // Exclude id for new items (negative temp ids) so AUTOINCREMENT works
+            const allColumns = Object.keys(items[0]);
+            const columns = allColumns.filter((col) => col !== "id");
             const placeholders = columns.map(() => "?").join(", ");
             const stmt = db.prepare(
                 `INSERT INTO ${tableName} (${columns.join(", ")}) VALUES (${placeholders})`,
