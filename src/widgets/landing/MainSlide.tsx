@@ -130,20 +130,26 @@ function TypingShield({ titles, gradientSx }: { titles: string[]; gradientSx: Re
     const [cursorShown, setCursorShown] = useState(false);
     const basicTypingDelay = 120;
     const theme = useTheme();
+    const shouldAdvanceRef = useRef(false);
+    useEffect(() => {
+        if (shouldAdvanceRef.current) {
+            shouldAdvanceRef.current = false;
+            setCurrentTitle((idx) => (idx >= titles.length - 1 ? 0 : idx + 1));
+        }
+    });
     useEffect(() => {
         let nextDelay = basicTypingDelay;
+        const len = plainTitle.length;
         const textTypingHandler = () => {
             setTypedSymbols((cur) => {
-                const changeDirection = cur == plainTitle.length || cur == -1;
+                const changeDirection = cur == len || cur == -1;
                 if (changeDirection) {
                     cur = -1 * cur;
                     if (cur == 1) {
-                        setCurrentTitle((currentTitleIndex) =>
-                            currentTitleIndex >= titles.length - 1 ? 0 : currentTitleIndex + 1
-                        );
+                        shouldAdvanceRef.current = true;
                     }
                 }
-                const advancedDelay = cur == plainTitle.length - 1 ? 1800 : 0;
+                const advancedDelay = cur == len - 1 ? 1800 : 0;
                 nextDelay = advancedDelay != 0 ? advancedDelay : (cur < 0 ? 0.5 : 1) * basicTypingDelay;
                 return changeDirection ? cur : cur + 1;
             });
