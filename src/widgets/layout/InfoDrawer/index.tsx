@@ -8,6 +8,7 @@ import { cubicBezier, motion } from "framer-motion";
 import CustomScrollbar from "@/shared/ui/Scrollbar";
 import { useInfoDrawerData } from "@/shared/lib/infoDrawerData";
 import DynamicIcon from "@/shared/ui/DynamicIcon";
+import StatsBlocks from "./StatsBlocks";
 
 export default function InfoDrawer() {
     const theme = useTheme();
@@ -155,6 +156,14 @@ export default function InfoDrawer() {
                                     },
                                 }}
                                 dangerouslySetInnerHTML={{ __html: copyright }}
+                            />
+                        )}
+
+                        {/* GitHub Stats Blocks */}
+                        {data.blocks.length > 0 && (
+                            <StatsBlocks
+                                blocks={data.blocks}
+                                username={data.github_username}
                             />
                         )}
                     </Box>

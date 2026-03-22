@@ -13,10 +13,40 @@ import {
 } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
 import { SortableList, AdminSection, useAdminData, useLocalizedField, AdminKeyChip, IconPickerButton, RichTextEditor } from "@/features/admin-editor";
+import SortableBlocksGrid from "@/features/admin-editor/SortableBlocksGrid";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
+import type { InfoDrawerBlock } from "@/shared/lib/infoDrawerDefaults";
 import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
+import Chip from "@mui/material/Chip";
+
+interface InfoDrawerAdminData {
+    blocks?: InfoDrawerBlock[];
+    [key: string]: unknown;
+}
+
+const BLOCK_LABEL_KEYS: Record<string, string> = {
+    profile: "Profile overview",
+    calendar: "Contribution calendar",
+    stats: "Stats",
+    streak: "Streak",
+    languages_repo: "Languages by repo",
+    languages_commits: "Languages by commits",
+    commits_hour: "Commits by hour",
+    activity: "Activity graph",
+};
+
+const DEFAULT_BLOCKS: InfoDrawerBlock[] = [
+    { id: "profile", sort_order: 0, is_visible: 1, col_span: 2, variant: 0 },
+    { id: "calendar", sort_order: 1, is_visible: 1, col_span: 2, variant: 0 },
+    { id: "stats", sort_order: 2, is_visible: 1, col_span: 1, variant: 0 },
+    { id: "streak", sort_order: 3, is_visible: 1, col_span: 1, variant: 0 },
+    { id: "languages_repo", sort_order: 4, is_visible: 1, col_span: 1, variant: 0 },
+    { id: "languages_commits", sort_order: 5, is_visible: 1, col_span: 1, variant: 0 },
+    { id: "commits_hour", sort_order: 6, is_visible: 1, col_span: 1, variant: 0 },
+    { id: "activity", sort_order: 7, is_visible: 1, col_span: 2, variant: 0 },
+];
 
 // ---------------------------------------------------------------------------
 // Types
@@ -82,7 +112,7 @@ export default function AdminDetailsPage() {
         url: "/api/contacts",
     });
 
-    const { data: infoData, setData: setInfoData, loading: infoLoading, saving: infoSaving, error: infoError, success: infoSuccess, save: infoSave } = useAdminData<Record<string, string>>({
+    const { data: infoData, setData: setInfoData, loading: infoLoading, saving: infoSaving, error: infoError, success: infoSuccess, save: infoSave } = useAdminData<InfoDrawerAdminData>({
         url: "/api/info-drawer",
     });
 
@@ -138,7 +168,7 @@ export default function AdminDetailsPage() {
         labelsSave({ category, data: categoryItems });
     };
 
-    const infoFields = infoData ?? {};
+    const infoFields = infoData ?? {} as InfoDrawerAdminData;
 
     const updateInfoField = (key: string, value: string) => {
         setInfoData((prev) => (prev ? { ...prev, [key]: value } : prev));
@@ -147,12 +177,52 @@ export default function AdminDetailsPage() {
     const updateInfoFieldAndSave = (key: string, value: string) => {
         const updated = { ...infoFields, [key]: value };
         setInfoData(updated);
-        infoSave(updated);
+        // Save only key-value fields, not blocks
+        const { blocks: _b, ...kvFields } = updated;
+        infoSave(kvFields);
     };
 
-    const saveInfo = (overrides?: Record<string, string>) => {
-        infoSave(overrides ?? infoFields);
+    const saveInfo = () => {
+        const { blocks: _b, ...kvFields } = infoFields;
+        infoSave(kvFields);
     };
+
+    // Blocks state
+    const blocks: InfoDrawerBlock[] = (infoData?.blocks as InfoDrawerBlock[] | undefined) ?? DEFAULT_BLOCKS;
+    const visibleBlocks = blocks.filter((b) => b.is_visible).sort((a, b) => a.sort_order - b.sort_order);
+    const hiddenBlocks = blocks.filter((b) => !b.is_visible);
+
+    const saveBlocks = (updated: InfoDrawerBlock[]) => {
+        const ordered = updated.map((b, i) => ({ ...b, sort_order: i }));
+        setInfoData((prev) => (prev ? { ...prev, blocks: ordered } : prev));
+        infoSave({ blocks: ordered });
+    };
+
+    const handleBlockReorder = (reordered: InfoDrawerBlock[]) => {
+        const all = [...reordered.map((b, i) => ({ ...b, sort_order: i })), ...hiddenBlocks];
+        setInfoData((prev) => (prev ? { ...prev, blocks: all } : prev));
+        infoSave({ blocks: all });
+    };
+
+    const handleBlockUpdate = (id: string, field: string, value: number) => {
+        const updated = blocks.map((b) => (b.id === id ? { ...b, [field]: value } : b));
+        setInfoData((prev) => (prev ? { ...prev, blocks: updated } : prev));
+        infoSave({ blocks: updated });
+    };
+
+    const handleBlockHide = (id: string) => {
+        const updated = blocks.map((b) => (b.id === id ? { ...b, is_visible: 0 } : b));
+        saveBlocks(updated);
+    };
+
+    const handleBlockShow = (id: string) => {
+        const updated = blocks.map((b) => (b.id === id ? { ...b, is_visible: 1, sort_order: blocks.length } : b));
+        saveBlocks(updated);
+    };
+
+    // Resolve github username from contacts
+    const ghContact = contacts.find((c) => c.url?.includes("github.com/"));
+    const githubUsername = ghContact ? ghContact.url.replace(/\/$/, "").split("/").pop() ?? "miraxsage" : "miraxsage";
 
     const chipLabel = (key: string) => KEY_LABELS[key]?.[lang] ?? key;
 
@@ -289,13 +359,13 @@ export default function AdminDetailsPage() {
                     {/* Status */}
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <IconPickerButton
-                            value={infoFields.status_icon ?? "WorkOutline"}
+                            value={String(infoFields.status_icon ?? "WorkOutline")}
                             onChange={(v) => updateInfoFieldAndSave("status_icon", v)}
                         />
                         <TextField
                             label={__("Status", lang)}
                             size="small"
-                            value={infoFields[lk("status_text")] ?? ""}
+                            value={String(infoFields[lk("status_text")] ?? "")}
                             onChange={(e) => updateInfoField(lk("status_text"), e.target.value)}
                             onBlur={() => saveInfo()}
                             sx={{ flex: 1 }}
@@ -305,13 +375,13 @@ export default function AdminDetailsPage() {
                     {/* Timezone */}
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <IconPickerButton
-                            value={infoFields.timezone_icon ?? "Schedule"}
+                            value={String(infoFields.timezone_icon ?? "Schedule")}
                             onChange={(v) => updateInfoFieldAndSave("timezone_icon", v)}
                         />
                         <TextField
                             label={__("Timezone", lang)}
                             size="small"
-                            value={infoFields.timezone ?? ""}
+                            value={String(infoFields.timezone ?? "")}
                             onChange={(e) => updateInfoField("timezone", e.target.value)}
                             onBlur={() => saveInfo()}
                             sx={{ flex: 1 }}
@@ -321,13 +391,13 @@ export default function AdminDetailsPage() {
                     {/* Location */}
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <IconPickerButton
-                            value={infoFields.location_icon ?? "LocationOn"}
+                            value={String(infoFields.location_icon ?? "LocationOn")}
                             onChange={(v) => updateInfoFieldAndSave("location_icon", v)}
                         />
                         <TextField
                             label={__("Location", lang)}
                             size="small"
-                            value={infoFields[lk("location")] ?? ""}
+                            value={String(infoFields[lk("location")] ?? "")}
                             onChange={(e) => updateInfoField(lk("location"), e.target.value)}
                             onBlur={() => saveInfo()}
                             sx={{ flex: 1 }}
@@ -345,13 +415,48 @@ export default function AdminDetailsPage() {
                     <Box>
                         <RichTextEditor
                             key={`copyright_${lang}`}
-                            value={infoFields[lk("copyright")] ?? ""}
+                            value={String(infoFields[lk("copyright")] ?? "")}
                             onChange={(html) => updateInfoField(lk("copyright"), html)}
                             onBlur={() => saveInfo()}
                             minHeight={0}
                             maxHeight="50vh"
                         />
                     </Box>
+
+                    {/* GitHub Stats */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                        <Box sx={{ flex: 1, height: "1px", background: theme.palette.divider }} />
+                        <Typography variant="subtitle2" sx={{ color: menuText, whiteSpace: "nowrap" }}>
+                            {__("GitHub Stats", lang)}
+                        </Typography>
+                        <Box sx={{ flex: 1, height: "1px", background: theme.palette.divider }} />
+                    </Box>
+
+                    {/* Hidden blocks chips */}
+                    {hiddenBlocks.length > 0 && (
+                        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                            {hiddenBlocks.map((b) => (
+                                <Chip
+                                    key={b.id}
+                                    label={__(BLOCK_LABEL_KEYS[b.id] ?? b.id, lang)}
+                                    size="small"
+                                    onClick={() => handleBlockShow(b.id)}
+                                    sx={{ cursor: "pointer" }}
+                                />
+                            ))}
+                        </Box>
+                    )}
+
+                    {/* Visible blocks grid */}
+                    {visibleBlocks.length > 0 && (
+                        <SortableBlocksGrid
+                            blocks={visibleBlocks}
+                            onReorder={handleBlockReorder}
+                            onUpdate={handleBlockUpdate}
+                            onHide={handleBlockHide}
+                            username={githubUsername}
+                        />
+                    )}
                 </Box>
             )}
         </AdminSection>

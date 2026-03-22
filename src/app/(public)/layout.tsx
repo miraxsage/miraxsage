@@ -81,6 +81,20 @@ function getInfoDrawerData(): InfoDrawerData {
     data.status_icon_svg = resolveIconSvg(data.status_icon);
     data.timezone_icon_svg = resolveIconSvg(data.timezone_icon);
     data.location_icon_svg = resolveIconSvg(data.location_icon);
+
+    // Fetch blocks
+    const blocks = db
+        .prepare("SELECT id, sort_order, is_visible, col_span, variant FROM info_drawer_blocks ORDER BY sort_order")
+        .all() as InfoDrawerData["blocks"];
+    data.blocks = blocks;
+
+    // Resolve github username from contact_info
+    const ghRow = db.prepare("SELECT url FROM contact_info WHERE url LIKE '%github.com/%' LIMIT 1").get() as { url: string } | undefined;
+    if (ghRow?.url) {
+        const match = ghRow.url.replace(/\/$/, "").split("/").pop();
+        if (match) data.github_username = match;
+    }
+
     return data;
 }
 

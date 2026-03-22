@@ -1,3 +1,11 @@
+export interface InfoDrawerBlock {
+    id: string;
+    sort_order: number;
+    is_visible: number;
+    col_span: number;
+    variant: number;
+}
+
 export interface InfoDrawerData {
     copyright_en: string;
     copyright_ru: string;
@@ -12,6 +20,8 @@ export interface InfoDrawerData {
     location_icon_svg?: string;
     location_en: string;
     location_ru: string;
+    github_username: string;
+    blocks: InfoDrawerBlock[];
 }
 
 export const defaultInfoDrawerData: InfoDrawerData = {
@@ -25,4 +35,6 @@ export const defaultInfoDrawerData: InfoDrawerData = {
     location_icon: "LocationOn",
     location_en: "",
     location_ru: "",
+    github_username: "miraxsage",
+    blocks: [],
 };

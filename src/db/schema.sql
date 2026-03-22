@@ -321,6 +321,15 @@ CREATE TABLE IF NOT EXISTS info_drawer (
   value TEXT NOT NULL DEFAULT ''
 );
 
+-- Info drawer blocks (GitHub stats widgets)
+CREATE TABLE IF NOT EXISTS info_drawer_blocks (
+  id TEXT PRIMARY KEY,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  is_visible INTEGER NOT NULL DEFAULT 1,
+  col_span INTEGER NOT NULL DEFAULT 1 CHECK(col_span IN (1, 2)),
+  variant INTEGER NOT NULL DEFAULT 0
+);
+
 -- Code snippets (one per technology)
 CREATE TABLE IF NOT EXISTS code_snippets (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
