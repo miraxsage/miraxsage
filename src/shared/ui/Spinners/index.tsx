@@ -6,11 +6,10 @@ import LogoIcon from "@/shared/icons/Logo";
 export function AppSpinner({ compact, withoutBg }: { compact?: boolean; withoutBg?: boolean }) {
     const stylesId = compact ? "app-loader-compact-styles" : "app-loader-styles";
     useEffect(() => {
-        if (typeof localStorage === "undefined") return;
-        const appearanceConfig = JSON.parse(localStorage.getItem("appearanceConfig") ?? "{}") ?? {
-            colorMode: "dark",
-            language: "ru",
-        };
+        const cookieMatch = document.cookie.match(/appearanceConfig=([^;]+)/);
+        const appearanceConfig = cookieMatch
+            ? JSON.parse(decodeURIComponent(cookieMatch[1]))
+            : { colorMode: "dark" };
         const bg =
             appearanceConfig.colorMode == "light"
                 ? compact
@@ -78,11 +77,10 @@ export function AppSpinner({ compact, withoutBg }: { compact?: boolean; withoutB
 
 export function SimpleSpinner() {
     useEffect(() => {
-        if (typeof localStorage === "undefined") return;
-        const appearanceConfig = JSON.parse(localStorage.getItem("appearanceConfig") ?? "{}") ?? {
-            colorMode: "dark",
-            language: "ru",
-        };
+        const cookieMatch = document.cookie.match(/appearanceConfig=([^;]+)/);
+        const appearanceConfig = cookieMatch
+            ? JSON.parse(decodeURIComponent(cookieMatch[1]))
+            : { colorMode: "dark" };
         const fg = appearanceConfig.colorMode == "light" ? "#d1d1d1" : "#2c2f3e";
         if (document.querySelector("head style#loader-styles")) return;
         const loaderStyles = document.createElement("style");

@@ -126,8 +126,8 @@ function SortableBlockItem({ block, onUpdate, onHide, data, username, theme }: S
                 <Typography
                     {...attributes}
                     {...listeners}
-                    variant="subtitle2"
-                    sx={{ cursor: "grab", flex: 1 }}
+                    variant="subtitle1"
+                    sx={{ cursor: "grab", flex: 1, fontWeight: 500 }}
                 >
                     {__(BLOCK_LABEL_KEYS[block.id] ?? block.id)}
                 </Typography>
@@ -174,7 +174,7 @@ function SortableBlockItem({ block, onUpdate, onHide, data, username, theme }: S
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            py: 3,
+                            minHeight: 150,
                         }}
                     >
                         <BarsLoader color={theme.palette.divider} />

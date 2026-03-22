@@ -58,6 +58,9 @@ import { getIconComponent } from "@/shared/lib/iconMap";
 import CustomCodeEditor from "@/shared/ui/CodeEditor";
 import { langs } from "@uiw/codemirror-extensions-langs";
 import { getThemeColor } from "@/shared/lib/theme";
+import Chip from "@mui/material/Chip";
+import SortableBlocksGrid from "@/features/admin-editor/SortableBlocksGrid";
+import type { InfoDrawerBlock } from "@/shared/lib/infoDrawerDefaults";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -1387,7 +1390,7 @@ interface SpecificationsTabProps {
 
 function SpecificationsTab({
     soft_skills,
-    metrics,
+    metrics: _metrics,
     technology_categories,
     technologies,
     lang,
@@ -1406,7 +1409,61 @@ function SpecificationsTab({
     const [subTab, setSubTab] = useState(0);
     const { callbackRef, style: indicatorStyle } = useSubTabIndicator(subTab, [lang]);
 
-    const metric = metrics[0];
+    // GitHub Stats blocks
+    const { data: blocksData, setData: setBlocksData, save: blocksSave } = useAdminData<{ blocks?: InfoDrawerBlock[] }>({
+        url: "/api/info-drawer",
+    });
+
+    const DEFAULT_BLOCKS: InfoDrawerBlock[] = [
+        { id: "profile", sort_order: 0, is_visible: 1, col_span: 2, variant: 0 },
+        { id: "calendar", sort_order: 1, is_visible: 1, col_span: 2, variant: 0 },
+        { id: "stats", sort_order: 2, is_visible: 1, col_span: 1, variant: 0 },
+        { id: "streak", sort_order: 3, is_visible: 1, col_span: 1, variant: 0 },
+        { id: "languages_repo", sort_order: 4, is_visible: 1, col_span: 1, variant: 0 },
+        { id: "languages_commits", sort_order: 5, is_visible: 1, col_span: 1, variant: 0 },
+        { id: "commits_hour", sort_order: 6, is_visible: 1, col_span: 1, variant: 0 },
+        { id: "activity", sort_order: 7, is_visible: 1, col_span: 2, variant: 0 },
+    ];
+
+    const BLOCK_LABEL_KEYS: Record<string, string> = {
+        profile: "Profile overview",
+        calendar: "Contribution calendar",
+        stats: "Stats",
+        streak: "Streak",
+        languages_repo: "Languages by repo",
+        languages_commits: "Languages by commits",
+        commits_hour: "Commits by hour",
+        activity: "Activity graph",
+    };
+
+    const blocks: InfoDrawerBlock[] = (blocksData?.blocks as InfoDrawerBlock[] | undefined) ?? DEFAULT_BLOCKS;
+    const visibleBlocks = blocks.filter((b) => b.is_visible).sort((a, b) => a.sort_order - b.sort_order);
+    const hiddenBlocks = blocks.filter((b) => !b.is_visible);
+
+    const saveBlocksArr = (updated: InfoDrawerBlock[]) => {
+        const ordered = updated.map((b, i) => ({ ...b, sort_order: i }));
+        setBlocksData((prev) => (prev ? { ...prev, blocks: ordered } : prev));
+        blocksSave({ blocks: ordered });
+    };
+    const handleBlockReorder = (reordered: InfoDrawerBlock[]) => {
+        const all = [...reordered.map((b, i) => ({ ...b, sort_order: i })), ...hiddenBlocks];
+        setBlocksData((prev) => (prev ? { ...prev, blocks: all } : prev));
+        blocksSave({ blocks: all });
+    };
+    const handleBlockUpdate = (id: string, field: string, value: number) => {
+        const updated = blocks.map((b) => (b.id === id ? { ...b, [field]: value } : b));
+        setBlocksData((prev) => (prev ? { ...prev, blocks: updated } : prev));
+        blocksSave({ blocks: updated });
+    };
+    const handleBlockHide = (id: string) => {
+        saveBlocksArr(blocks.map((b) => (b.id === id ? { ...b, is_visible: 0 } : b)));
+    };
+    const handleBlockShow = (id: string) => {
+        saveBlocksArr(blocks.map((b) => (b.id === id ? { ...b, is_visible: 1, sort_order: blocks.length } : b)));
+    };
+
+    // Resolve GitHub username from contacts (passed via window context or hardcoded)
+    const githubUsername = "miraxsage";
 
     return (
         <Box>
@@ -1485,14 +1542,31 @@ function SpecificationsTab({
             )}
 
             {subTab === 2 && (
-                <Field
-                    label={__("Text", lang)}
-                    value={metric?.text ?? ""}
-                    onChange={(v) => metric && updateItem("metrics", metric.id, "text", v)}
-                    onBlur={() => saveSection("metrics")}
-                    multiline
-                    sx={{ width: "100%" }}
-                />
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                    {hiddenBlocks.length > 0 && (
+                        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                            {hiddenBlocks.map((b) => (
+                                <Chip
+                                    key={b.id}
+                                    label={__(BLOCK_LABEL_KEYS[b.id] ?? b.id, lang)}
+                                    size="small"
+                                    onClick={() => handleBlockShow(b.id)}
+                                    sx={{ cursor: "pointer" }}
+                                />
+                            ))}
+                        </Box>
+                    )}
+
+                    {visibleBlocks.length > 0 && (
+                        <SortableBlocksGrid
+                            blocks={visibleBlocks}
+                            onReorder={handleBlockReorder}
+                            onUpdate={handleBlockUpdate}
+                            onHide={handleBlockHide}
+                            username={githubUsername}
+                        />
+                    )}
+                </Box>
             )}
         </Box>
     );

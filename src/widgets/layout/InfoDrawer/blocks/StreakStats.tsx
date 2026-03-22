@@ -35,6 +35,8 @@ export default function StreakStats({ streak }: StreakStatsProps) {
                 textAlign: "center",
                 fontFamily: "Cascadia",
                 height: "100%",
+                gap: 3,
+                flexWrap: "wrap",
             }}
         >
             {columns.map(({ icon: Icon, label, key, suffix }) => (
@@ -55,7 +57,7 @@ export default function StreakStats({ streak }: StreakStatsProps) {
                         {suffix && (
                             <Typography
                                 sx={{
-                                    fontSize: "0.7rem",
+                                    fontSize: "0.82rem",
                                     color: labelColor,
                                     fontFamily: "Cascadia",
                                 }}
@@ -66,7 +68,7 @@ export default function StreakStats({ streak }: StreakStatsProps) {
                     </Box>
                     <Typography
                         sx={{
-                            fontSize: "0.72rem",
+                            fontSize: "0.85rem",
                             color: labelColor,
                             fontFamily: "Cascadia",
                             lineHeight: 1.2,

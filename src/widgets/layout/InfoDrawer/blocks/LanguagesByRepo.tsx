@@ -27,8 +27,10 @@ export default function LanguagesByRepo({ languages }: LanguagesByRepoProps) {
             sx={{
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "center",
                 gap: 2,
                 fontFamily: "Cascadia",
+                height: "100%",
             }}
         >
             <Stack spacing={0.5} sx={{ minWidth: 90 }}>
@@ -45,7 +47,7 @@ export default function LanguagesByRepo({ languages }: LanguagesByRepoProps) {
                         />
                         <Typography
                             sx={{
-                                fontSize: "0.72rem",
+                                fontSize: "0.95rem",
                                 color: labelColor,
                                 fontFamily: "Cascadia",
                                 whiteSpace: "nowrap",

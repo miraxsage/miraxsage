@@ -38,7 +38,7 @@ export default function StatsBlocks({ blocks, username }: StatsBlocksProps) {
 
     if (loading) {
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 4, mt: 2 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
                 <CircularProgress size={28} sx={{ color: theme.palette.primary.main }} />
             </Box>
         );
@@ -52,7 +52,6 @@ export default function StatsBlocks({ blocks, username }: StatsBlocksProps) {
                 display: "grid",
                 gridTemplateColumns: smScreen ? "1fr" : "1fr 1fr",
                 gap: 1.5,
-                mt: 2.5,
             }}
         >
             {visibleBlocks.map((block) => (

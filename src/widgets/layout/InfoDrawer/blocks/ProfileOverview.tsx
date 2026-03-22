@@ -24,7 +24,7 @@ interface ProfileOverviewProps {
 export default function ProfileOverview({ profile, totalContributions }: ProfileOverviewProps) {
     const theme = useTheme();
     const nameColor = getThemeColor("menuText", theme);
-    const labelColor = getThemeColor("regularText", theme);
+    const labelColor = getThemeColor("menuText", theme);
     const accentColor = theme.palette.primary.main;
 
     const currentYear = new Date().getFullYear();
@@ -51,7 +51,7 @@ export default function ProfileOverview({ profile, totalContributions }: Profile
             </Typography>
             <Typography
                 sx={{
-                    fontSize: "0.82rem",
+                    fontSize: "0.95rem",
                     color: labelColor,
                     fontFamily: "Cascadia",
                     lineHeight: 1.2,
@@ -72,7 +72,7 @@ export default function ProfileOverview({ profile, totalContributions }: Profile
                         <Icon sx={{ fontSize: 16, color: accentColor }} />
                         <Typography
                             sx={{
-                                fontSize: "0.75rem",
+                                fontSize: "0.88rem",
                                 color: labelColor,
                                 fontFamily: "Cascadia",
                             }}

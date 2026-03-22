@@ -60,7 +60,7 @@ export default function ActivityGraph({ calendar }: ActivityGraphProps) {
                             fontFamily: "Cascadia",
                             fill: labelColor,
                         },
-                        valueFormatter: (date: Date) => months[date.getMonth()],
+                        valueFormatter: (date: Date) => `${months[date.getMonth()]} ${date.getDate()}`,
                     },
                 ]}
                 yAxis={[

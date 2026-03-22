@@ -46,7 +46,7 @@ export default function StatsCard({ stats }: StatsCardProps) {
                     <Icon sx={{ fontSize: 18, color: theme.palette.primary.main }} />
                     <Typography
                         sx={{
-                            fontSize: "0.82rem",
+                            fontSize: "0.95rem",
                             color: labelColor,
                             fontFamily: "Cascadia",
                             flex: 1,
@@ -56,7 +56,7 @@ export default function StatsCard({ stats }: StatsCardProps) {
                     </Typography>
                     <Typography
                         sx={{
-                            fontSize: "0.82rem",
+                            fontSize: "0.95rem",
                             fontWeight: 600,
                             color: valueColor,
                             fontFamily: "Cascadia",
