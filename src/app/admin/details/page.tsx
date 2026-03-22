@@ -12,7 +12,7 @@ import {
     useTheme,
 } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
-import { SortableList, AdminSection, useAdminData, useLocalizedField, AdminKeyChip, IconPickerButton } from "@/features/admin-editor";
+import { SortableList, AdminSection, useAdminData, useLocalizedField, AdminKeyChip, IconPickerButton, RichTextEditor } from "@/features/admin-editor";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
@@ -60,6 +60,7 @@ function nextTempId() {
 const TAB_KEYS = [
     { key: "contacts" as const, label: "Contacts" },
     { key: "general_labels" as const, label: "General Labels" },
+    { key: "info" as const, label: "Info" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -79,6 +80,10 @@ export default function AdminDetailsPage() {
 
     const { data: contactsData, setData: setContactsData, loading: contactsLoading, saving: contactsSaving, error: contactsError, success: contactsSuccess, save: contactsSave } = useAdminData<{ contact_info: ContactItem[] }>({
         url: "/api/contacts",
+    });
+
+    const { data: infoData, setData: setInfoData, loading: infoLoading, saving: infoSaving, error: infoError, success: infoSuccess, save: infoSave } = useAdminData<Record<string, string>>({
+        url: "/api/info-drawer",
     });
 
     const contacts = contactsData?.contact_info ?? [];
@@ -133,9 +138,25 @@ export default function AdminDetailsPage() {
         labelsSave({ category, data: categoryItems });
     };
 
+    const infoFields = infoData ?? {};
+
+    const updateInfoField = (key: string, value: string) => {
+        setInfoData((prev) => (prev ? { ...prev, [key]: value } : prev));
+    };
+
+    const updateInfoFieldAndSave = (key: string, value: string) => {
+        const updated = { ...infoFields, [key]: value };
+        setInfoData(updated);
+        infoSave(updated);
+    };
+
+    const saveInfo = (overrides?: Record<string, string>) => {
+        infoSave(overrides ?? infoFields);
+    };
+
     const chipLabel = (key: string) => KEY_LABELS[key]?.[lang] ?? key;
 
-    if (labelsLoading || contactsLoading) {
+    if (labelsLoading || contactsLoading || infoLoading) {
         return (
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 48px)" }}>
                 <CircularProgress />
@@ -147,9 +168,9 @@ export default function AdminDetailsPage() {
         <AdminSection
             title={__("Details", lang)}
             icon={<TuneIcon sx={{ color: theme.palette.primary.main, fontSize: 28 }} />}
-            saving={tab === 0 ? contactsSaving : labelsSaving}
-            error={tab === 0 ? contactsError : labelsError}
-            success={tab === 0 ? contactsSuccess : labelsSuccess}
+            saving={tab === 0 ? contactsSaving : tab === 1 ? labelsSaving : infoSaving}
+            error={tab === 0 ? contactsError : tab === 1 ? labelsError : infoError}
+            success={tab === 0 ? contactsSuccess : tab === 1 ? labelsSuccess : infoSuccess}
         >
             <Tabs
                 value={tab}
@@ -250,6 +271,87 @@ export default function AdminDetailsPage() {
                             />
                         </Fragment>
                     ))}
+                </Box>
+            )}
+
+            {/* ===== Info Drawer ===== */}
+            {tab === 2 && (
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                    {/* Status & Location */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                        <Box sx={{ flex: 1, height: "1px", background: theme.palette.divider }} />
+                        <Typography variant="subtitle2" sx={{ color: menuText, whiteSpace: "nowrap" }}>
+                            {__("Status & Location", lang)}
+                        </Typography>
+                        <Box sx={{ flex: 1, height: "1px", background: theme.palette.divider }} />
+                    </Box>
+
+                    {/* Status */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <IconPickerButton
+                            value={infoFields.status_icon ?? "WorkOutline"}
+                            onChange={(v) => updateInfoFieldAndSave("status_icon", v)}
+                        />
+                        <TextField
+                            label={__("Status", lang)}
+                            size="small"
+                            value={infoFields[lk("status_text")] ?? ""}
+                            onChange={(e) => updateInfoField(lk("status_text"), e.target.value)}
+                            onBlur={() => saveInfo()}
+                            sx={{ flex: 1 }}
+                        />
+                    </Box>
+
+                    {/* Timezone */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <IconPickerButton
+                            value={infoFields.timezone_icon ?? "Schedule"}
+                            onChange={(v) => updateInfoFieldAndSave("timezone_icon", v)}
+                        />
+                        <TextField
+                            label={__("Timezone", lang)}
+                            size="small"
+                            value={infoFields.timezone ?? ""}
+                            onChange={(e) => updateInfoField("timezone", e.target.value)}
+                            onBlur={() => saveInfo()}
+                            sx={{ flex: 1 }}
+                        />
+                    </Box>
+
+                    {/* Location */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <IconPickerButton
+                            value={infoFields.location_icon ?? "LocationOn"}
+                            onChange={(v) => updateInfoFieldAndSave("location_icon", v)}
+                        />
+                        <TextField
+                            label={__("Location", lang)}
+                            size="small"
+                            value={infoFields[lk("location")] ?? ""}
+                            onChange={(e) => updateInfoField(lk("location"), e.target.value)}
+                            onBlur={() => saveInfo()}
+                            sx={{ flex: 1 }}
+                        />
+                    </Box>
+
+                    {/* Copyright / Cookie Rich Text */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: -1 }}>
+                        <Box sx={{ flex: 1, height: "1px", background: theme.palette.divider }} />
+                        <Typography variant="subtitle2" sx={{ color: menuText, whiteSpace: "nowrap" }}>
+                            {__("Copyright & Cookies", lang)}
+                        </Typography>
+                        <Box sx={{ flex: 1, height: "1px", background: theme.palette.divider }} />
+                    </Box>
+                    <Box>
+                        <RichTextEditor
+                            key={`copyright_${lang}`}
+                            value={infoFields[lk("copyright")] ?? ""}
+                            onChange={(html) => updateInfoField(lk("copyright"), html)}
+                            onBlur={() => saveInfo()}
+                            minHeight={0}
+                            maxHeight="50vh"
+                        />
+                    </Box>
                 </Box>
             )}
         </AdminSection>

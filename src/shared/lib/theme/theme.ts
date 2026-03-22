@@ -139,6 +139,13 @@ export const lightTheme = createTheme(
                     },
                 },
             },
+            MuiButton: {
+                styleOverrides: {
+                    outlined: {
+                        borderColor: "#c7c7c7",
+                    },
+                },
+            },
         },
     }) as ThemeOptions
 );
@@ -214,6 +221,13 @@ export const darkTheme = createTheme(
                 styleOverrides: {
                     tooltip: {
                         backgroundColor: "#1d1f2d",
+                    },
+                },
+            },
+            MuiButton: {
+                styleOverrides: {
+                    outlined: {
+                        borderColor: "#2f314a",
                     },
                 },
             },

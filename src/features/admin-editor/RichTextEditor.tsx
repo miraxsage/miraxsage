@@ -41,6 +41,7 @@ import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import TitleIcon from "@mui/icons-material/Title";
 import { getThemeColor } from "@/shared/lib/theme";
+import __ from "@/shared/lib/i18n/translation";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { $createImageMarkerNode } from "./ImageMarkerNode";
 
@@ -229,6 +230,7 @@ interface RichTextEditorProps {
     onChange: (html: string) => void;
     onBlur?: () => void;
     minHeight?: number;
+    maxHeight?: number | string;
     extraNodes?: Klass<LexicalNode>[];
     extraPlugins?: React.ReactNode;
     toolbarExtra?: React.ReactNode;
@@ -239,6 +241,7 @@ export default function RichTextEditor({
     onChange,
     onBlur,
     minHeight = 120,
+    maxHeight,
     extraNodes,
     extraPlugins,
     toolbarExtra,
@@ -293,7 +296,7 @@ export default function RichTextEditor({
         >
             <LexicalComposer initialConfig={initialConfig}>
                 <ToolbarPlugin toolbarExtra={toolbarExtra} />
-                <Box sx={{ position: "relative" }}>
+                <Box sx={{ position: "relative", ...(maxHeight ? { maxHeight, overflowY: "auto" } : {}) }}>
                     <RichTextPlugin
                         contentEditable={
                             <ContentEditable
@@ -316,7 +319,7 @@ export default function RichTextEditor({
                                     pointerEvents: "none",
                                 }}
                             >
-                                Enter content...
+                                {__("Enter content...")}
                             </Box>
                         }
                         ErrorBoundary={LexicalErrorBoundary}

@@ -315,6 +315,12 @@ CREATE TABLE IF NOT EXISTS ui_labels (
   category TEXT NOT NULL DEFAULT 'general'
 );
 
+-- Info drawer (key-value settings for the info panel)
+CREATE TABLE IF NOT EXISTS info_drawer (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL DEFAULT ''
+);
+
 -- Code snippets (one per technology)
 CREATE TABLE IF NOT EXISTS code_snippets (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -7,6 +7,8 @@ import type { ResumeData } from "@/entities/resume/model/resumeDataContext";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
 import { resolveIconSvg } from "@/shared/lib/resolveIconSvg";
 import { getSiteSettings } from "@/shared/lib/getSiteSettings";
+import type { InfoDrawerData } from "@/shared/lib/infoDrawerDefaults";
+import { defaultInfoDrawerData } from "@/shared/lib/infoDrawerDefaults";
 
 function getHeaderItems(): HeaderItem[] {
     const db = getDb();
@@ -67,6 +69,21 @@ function getResumeData(): ResumeData {
     return { generalData, educationItems, educationData, laborItems, laborData, softSkills, questionnaireItems, achievements, metrics, experienceProjects, technologyCategories, technologies };
 }
 
+function getInfoDrawerData(): InfoDrawerData {
+    const db = getDb();
+    const rows = db.prepare("SELECT key, value FROM info_drawer").all() as { key: string; value: string }[];
+    const data = { ...defaultInfoDrawerData };
+    for (const row of rows) {
+        if (row.key in data) {
+            (data as unknown as Record<string, string>)[row.key] = row.value;
+        }
+    }
+    data.status_icon_svg = resolveIconSvg(data.status_icon);
+    data.timezone_icon_svg = resolveIconSvg(data.timezone_icon);
+    data.location_icon_svg = resolveIconSvg(data.location_icon);
+    return data;
+}
+
 function getContacts(): ContactItem[] {
     const db = getDb();
     const rows = db.prepare("SELECT * FROM contact_info WHERE is_visible = 1 ORDER BY sort_order").all() as ContactItem[];
@@ -80,5 +97,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     const resumeData = getResumeData();
     const contacts = getContacts();
     const siteSettings = getSiteSettings();
-    return <MainLayout headerItems={headerItems} categoryLabels={categoryLabels} uiLabels={uiLabels} resumeData={resumeData} contacts={contacts} siteSettings={siteSettings}>{children}</MainLayout>;
+    const infoDrawerData = getInfoDrawerData();
+    return <MainLayout headerItems={headerItems} categoryLabels={categoryLabels} uiLabels={uiLabels} resumeData={resumeData} contacts={contacts} siteSettings={siteSettings} infoDrawerData={infoDrawerData}>{children}</MainLayout>;
 }

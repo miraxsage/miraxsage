@@ -48,8 +48,8 @@ const CustomScrollbar = forwardRef(
             >
                 <OverlayScrollbarsComponent
                     style={{ height: "100%" }}
-                    options={{ scrollbars: { autoHide: "move" } }}
                     {...props}
+                    options={{ scrollbars: { autoHide: "move" }, ...props.options }}
                 >
                     {children}
                 </OverlayScrollbarsComponent>

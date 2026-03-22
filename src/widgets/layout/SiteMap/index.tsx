@@ -447,7 +447,7 @@ export default function SiteMap({ contacts }: { contacts: ContactItem[] }) {
                 >
                     <CloseIcon />
                 </IconButton>
-                <CustomScrollbar>
+                <CustomScrollbar options={{ overflow: { x: "hidden" } }}>
                     <Box
                         sx={{
                             padding: "20px 35px",

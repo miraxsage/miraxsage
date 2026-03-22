@@ -298,8 +298,8 @@ export default function About() {
                         display: "grid",
                         gridTemplateColumns: "minmax(0, 1fr)",
                         gridTemplateRows: "auto minmax(0, 1fr)",
-                        width: catsCollapsed ? "39px" : "285px",
-                        minWidth: 0,
+                        width: catsCollapsed ? "39px" : "230px",
+                        flexShrink: 0,
                         overflow: "hidden",
                         transition: mounted ? "width 0.3s ease" : "none",
                         ...(lessLg
@@ -346,7 +346,7 @@ export default function About() {
                                 background: getThemeColor("layoutBackground", theme),
                                 overflow: "hidden",
                                 minHeight: "100%",
-                                width: catsCollapsed ? "39px" : "285px",
+                                width: catsCollapsed ? "39px" : "230px",
                                 transition: mounted ? "width 0.3s ease" : "none",
                             }}
                         >

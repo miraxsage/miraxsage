@@ -1,12 +1,13 @@
 "use client";
 
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, alpha, useMediaQuery, useTheme } from "@mui/material";
 import { HorizontalPanelButton } from "@/shared/ui/PanelButtons";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { useThemeColor } from "@/shared/lib/theme";
+import { getThemeColor, useThemeColor } from "@/shared/lib/theme";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
 import DynamicIcon from "@/shared/ui/DynamicIcon";
 import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
+import { useInfoDrawerVisibility } from "@/shared/lib/store/appearanceSlice";
 
 export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
     const theme = useTheme();
@@ -16,6 +17,7 @@ export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
     const smScreen = useMediaQuery(theme.breakpoints.down("sm"));
     const t = useUiLabels();
     const footerText = t("Footer").replace(/\[CurrentYear\]/g, String(new Date().getFullYear()));
+    const infoDrawerVisibility = useInfoDrawerVisibility();
     return (
         <Box
             component="footer"
@@ -29,7 +31,26 @@ export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
         >
             {!smScreen && (
                 <>
-                    <HorizontalPanelButton iconMode={true} sx={{ width: "64px" }}>
+                    <HorizontalPanelButton
+                        iconMode={true}
+                        onClick={infoDrawerVisibility.toggle}
+                        sx={{
+                            width: "64px",
+                            transition: "all 0.4s",
+                            ...(infoDrawerVisibility.shown
+                                ? {
+                                      "&.MuiButton-root": {
+                                          color: getThemeColor("accentedText", theme),
+                                          backgroundColor: alpha(getThemeColor("accentedBg", theme), 0.07),
+                                          "&:hover": {
+                                              backgroundColor: getThemeColor("accentedHoverBg", theme),
+                                              color: getThemeColor("accentedHoverText", theme),
+                                          },
+                                      },
+                                  }
+                                : {}),
+                        }}
+                    >
                         <InfoOutlinedIcon />
                     </HorizontalPanelButton>
                     <Box

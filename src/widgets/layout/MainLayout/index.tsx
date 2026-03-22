@@ -8,11 +8,13 @@ import AsideMenu from "@/widgets/layout/AsideMenu";
 import { getThemeColor } from "@/shared/lib/theme";
 import { useScreenMode } from "@/shared/lib/store/appearanceSlice";
 import SiteMap from "@/widgets/layout/SiteMap";
+import InfoDrawer from "@/widgets/layout/InfoDrawer";
 import { CategoryLabelsContext, CategoryLabelsMap } from "@/entities/resume/model/categoryLabels";
 import { UiLabelsContext, UiLabelsMap } from "@/entities/ui-labels/model/uiLabelsContext";
 import { ResumeDataContext, ResumeData } from "@/entities/resume/model/resumeDataContext";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
 import { SiteSettingsContext, SiteSettings } from "@/shared/lib/siteSettings";
+import { InfoDrawerDataContext, InfoDrawerData } from "@/shared/lib/infoDrawerData";
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -22,9 +24,10 @@ interface LayoutProps {
     resumeData: ResumeData;
     contacts: ContactItem[];
     siteSettings: SiteSettings;
+    infoDrawerData: InfoDrawerData;
 }
 
-export default function MainLayout({ children, headerItems, categoryLabels, uiLabels, resumeData, contacts, siteSettings }: LayoutProps) {
+export default function MainLayout({ children, headerItems, categoryLabels, uiLabels, resumeData, contacts, siteSettings, infoDrawerData }: LayoutProps) {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode == "dark";
     const smallHeight = useMediaQuery("@media (max-height:450px)");
@@ -32,6 +35,7 @@ export default function MainLayout({ children, headerItems, categoryLabels, uiLa
     const screenMode = useScreenMode();
     return (
         <SiteSettingsContext.Provider value={siteSettings}>
+        <InfoDrawerDataContext.Provider value={infoDrawerData}>
         <UiLabelsContext.Provider value={uiLabels}>
         <CategoryLabelsContext.Provider value={categoryLabels}>
         <ResumeDataContext.Provider value={resumeData}>
@@ -95,6 +99,7 @@ export default function MainLayout({ children, headerItems, categoryLabels, uiLa
                     <Box sx={{ flexGrow: 1, maxWidth: "100dvw", position: "relative" }}>
                         {children}
                         <SiteMap contacts={contacts} />
+                        <InfoDrawer />
                     </Box>
                 </Box>
                 {!smallHeight && <BottomBar contacts={contacts} />}
@@ -103,6 +108,7 @@ export default function MainLayout({ children, headerItems, categoryLabels, uiLa
         </ResumeDataContext.Provider>
         </CategoryLabelsContext.Provider>
         </UiLabelsContext.Provider>
+        </InfoDrawerDataContext.Provider>
         </SiteSettingsContext.Provider>
     );
 }

@@ -12,6 +12,7 @@ interface AppearanceConfig {
     screenMode: "full" | "window";
     asideMenuVisibility: "shown" | "collapsed";
     siteMapVisibility: "shown" | "collapsed";
+    infoDrawerVisibility: "shown" | "collapsed";
 }
 
 function getDefaultLanguage(): "ru" | "en" {
@@ -30,6 +31,7 @@ const defaultConfig: AppearanceConfig = {
     screenMode: "window",
     asideMenuVisibility: "shown",
     siteMapVisibility: "collapsed",
+    infoDrawerVisibility: "collapsed",
 };
 
 function getInitialConfig(): AppearanceConfig {
@@ -71,6 +73,11 @@ const slice = createSlice({
         },
         siteMapVisibility: (state, options: PayloadAction<AppearanceConfig["siteMapVisibility"]>) => {
             state.siteMapVisibility = options.payload;
+            if (options.payload === "shown") state.infoDrawerVisibility = "collapsed";
+        },
+        infoDrawerVisibility: (state, options: PayloadAction<AppearanceConfig["infoDrawerVisibility"]>) => {
+            state.infoDrawerVisibility = options.payload;
+            if (options.payload === "shown") state.siteMapVisibility = "collapsed";
         },
     },
 });
@@ -82,7 +89,7 @@ appearanceListener.startListening({
         const state = api.getState().appearance;
         setCurrentLanguage(state.language);
         if (typeof document === "undefined") return;
-        const value = JSON.stringify({ ...state, siteMapVisibility: "collapsed" });
+        const value = JSON.stringify({ ...state, siteMapVisibility: "collapsed", infoDrawerVisibility: "collapsed" });
         document.cookie = `appearanceConfig=${encodeURIComponent(value)}; path=/; max-age=${60 * 60 * 24 * 365}`;
     },
 });
@@ -225,5 +232,26 @@ export function useSiteMapVisibility() {
                 )
             ),
         toggle: () => dispatch(slice.actions.siteMapVisibility(smv == "shown" ? "collapsed" : "shown")),
+    };
+}
+
+export function useInfoDrawerVisibility() {
+    const idv = useAppearance((appearance) => appearance.infoDrawerVisibility);
+    const dispatch = useDispatch();
+    return {
+        value: idv,
+        shown: idv == "shown",
+        collapsed: idv == "collapsed",
+        update: (
+            newVisibility:
+                | AppearanceConfig["infoDrawerVisibility"]
+                | ((old: AppearanceConfig["infoDrawerVisibility"]) => AppearanceConfig["infoDrawerVisibility"])
+        ) =>
+            dispatch(
+                slice.actions.infoDrawerVisibility(
+                    typeof newVisibility == "function" ? newVisibility(idv) : newVisibility
+                )
+            ),
+        toggle: () => dispatch(slice.actions.infoDrawerVisibility(idv == "shown" ? "collapsed" : "shown")),
     };
 }

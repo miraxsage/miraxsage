@@ -343,5 +343,12 @@
     "team": "команда",
     "delete": "удалить",
     "theme": "тема",
-    "drag or click to select": "перетащите или нажмите для выбора"
+    "drag or click to select": "перетащите или нажмите для выбора",
+    "info": "инфо",
+    "copyright & cookies": "авторское право и куки",
+    "status & location": "статус и местоположение",
+    "timezone": "часовой пояс",
+    "location": "местоположение",
+    "add contact": "добавить контакт",
+    "enter content...": "введите содержимое..."
 }
