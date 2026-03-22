@@ -5,7 +5,7 @@ import StarIcon from "@mui/icons-material/Star";
 import CustomScrollbar from "@/shared/ui/Scrollbar";
 import { ProjectInterface, ProjectsList, getProjectsArray } from "@/entities/project/model/projects";
 import { getThemeColor } from "@/shared/lib/theme";
-import { useId, useState } from "react";
+import { useCallback, useId, useState } from "react";
 import { useAppearance, useColorMode } from "@/shared/lib/store/appearanceSlice";
 import { motion } from "framer-motion";
 import { SimpleSpinner } from "@/shared/ui/Spinners";
@@ -105,6 +105,9 @@ export function ProjectCardImage({ slug, img, mediaId, imageSlug, originalExt: _
     const theme = useTheme();
     const isDarkMode = useColorMode().dark;
     const [loading, setLoading] = useState(true);
+    const imgRef = useCallback((node: HTMLImageElement | null) => {
+        if (node && node.complete) setLoading(false);
+    }, []);
     const project: ProjectInterface | undefined = getProjectsArray().find((p) => p.slug == slug);
     if (!slug || !project) return null;
     const src = mediaId && imageSlug
@@ -148,11 +151,13 @@ export function ProjectCardImage({ slug, img, mediaId, imageSlug, originalExt: _
             }}
         >
             <img
+                ref={imgRef}
                 {...(lazyLoading ? { loading: "lazy" } : {})}
                 onLoad={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                     setLoading(false);
                     if (onImageLoad) onImageLoad(e);
                 }}
+                onError={() => setLoading(false)}
                 data-img-num={img}
                 src={src}
             />

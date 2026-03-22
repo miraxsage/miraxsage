@@ -260,6 +260,7 @@ export default function AccentedTabs({
                                     opacity: 0,
                                     fontSize: "20px",
                                     marginLeft: "4px",
+                                    verticalAlign: "middle",
                                     transition: "color 0.3s, opacity 0.2s",
                                     "&:hover": {
                                         color: accentedColor,
