@@ -298,6 +298,17 @@ CREATE TABLE IF NOT EXISTS contact_info (
   is_visible INTEGER NOT NULL DEFAULT 1
 );
 
+-- Sharing links for social sharing buttons
+CREATE TABLE IF NOT EXISTS sharing_links (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  type TEXT NOT NULL DEFAULT '',
+  title_en TEXT NOT NULL DEFAULT '',
+  title_ru TEXT NOT NULL DEFAULT '',
+  icon TEXT,
+  is_visible INTEGER NOT NULL DEFAULT 1
+);
+
 -- Contact page content sections
 CREATE TABLE IF NOT EXISTS contact_page_content (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

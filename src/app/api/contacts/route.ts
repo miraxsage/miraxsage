@@ -15,8 +15,11 @@ export async function GET() {
         const contact_page_content = db
             .prepare("SELECT * FROM contact_page_content")
             .all();
+        const sharing_links = db
+            .prepare("SELECT * FROM sharing_links ORDER BY sort_order")
+            .all();
 
-        return jsonResponse({ contact_info, contact_page_content });
+        return jsonResponse({ contact_info, contact_page_content, sharing_links });
     } catch (error) {
         console.error("Contacts GET error:", error);
         return errorResponse("Internal server error", 500);
@@ -33,7 +36,7 @@ export async function PUT(request: NextRequest) {
             return errorResponse("Section and data are required");
         }
 
-        const validSections = ["contact_info", "contact_page_content"];
+        const validSections = ["contact_info", "contact_page_content", "sharing_links"];
         if (!validSections.includes(section)) {
             return errorResponse(
                 `Invalid section. Valid sections: ${validSections.join(", ")}`,
@@ -61,7 +64,7 @@ export async function PUT(request: NextRequest) {
 
         transaction();
 
-        if (section === "contact_info") {
+        if (section === "contact_info" || section === "sharing_links") {
             for (const item of items) {
                 if (item.icon) invalidateIconCache(item.icon);
             }

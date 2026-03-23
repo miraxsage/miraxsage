@@ -28,9 +28,20 @@ interface ContactPageContent {
     content_ru: string;
 }
 
+interface SharingItem {
+    id: number;
+    sort_order: number;
+    type: string;
+    title_en: string;
+    title_ru: string;
+    icon: string;
+    is_visible: number;
+}
+
 interface ContactsData {
     contact_page_content: ContactPageContent[];
     contact_info: ContactItem[];
+    sharing_links: SharingItem[];
 }
 
 
@@ -140,6 +151,29 @@ export default function AdminContactsPage() {
         if (item) updateItem(item.id, lk("content"), value);
     };
 
+    // ---- Sharing links ----
+    const sharingLinks = data?.sharing_links ?? [];
+
+    const updateSharingLinks = (newLinks: SharingItem[]) => {
+        if (!data) return;
+        setData({ ...data, sharing_links: newLinks });
+    };
+
+    const updateSharingLink = (id: number | string, field: string, value: unknown) => {
+        updateSharingLinks(sharingLinks.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
+    };
+
+    const saveSharingLinks = (list?: SharingItem[]) => {
+        const ordered = (list ?? sharingLinks).map((s, i) => ({ ...s, sort_order: i }));
+        save({ section: "sharing_links", data: ordered });
+    };
+
+    const updateSharingLinkAndSave = (id: number | string, field: string, value: unknown) => {
+        const newLinks = sharingLinks.map((s) => (s.id === id ? { ...s, [field]: value } : s));
+        updateSharingLinks(newLinks);
+        saveSharingLinks(newLinks);
+    };
+
     // Local state prevents cursor jumping on every keystroke
     const [introText, setIntroText] = useState<string | null>(null);
 
@@ -182,7 +216,7 @@ export default function AdminContactsPage() {
             <AdminTabs
                 value={tab}
                 onChange={setTab}
-                labels={["List", "Page content", "General labels"]}
+                labels={["List", "Share", "Page content", "General labels"]}
                 lang={lang}
             />
 
@@ -247,6 +281,46 @@ export default function AdminContactsPage() {
                     error={error}
                     success={success}
                 >
+                    <SortableList
+                        items={sharingLinks}
+                        onReorder={(reordered) => {
+                            updateSharingLinks(reordered);
+                            saveSharingLinks(reordered);
+                        }}
+                        renderItem={(link) => (
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                <Switch
+                                    checked={link.is_visible === 1}
+                                    onChange={(e) =>
+                                        updateSharingLinkAndSave(link.id, "is_visible", e.target.checked ? 1 : 0)
+                                    }
+                                    size="small"
+                                    sx={{ flexShrink: 0 }}
+                                />
+                                <IconPickerButton
+                                    value={link.icon}
+                                    onChange={(v) => updateSharingLinkAndSave(link.id, "icon", v)}
+                                />
+                                <TextField
+                                    label={__("Title", lang)}
+                                    size="small"
+                                    value={lv(link, "title")}
+                                    onChange={(e) => updateSharingLink(link.id, lk("title"), e.target.value)}
+                                    onBlur={() => saveSharingLinks()}
+                                    sx={{ flex: 1, minWidth: 120 }}
+                                />
+                            </Box>
+                        )}
+                    />
+                </AdminSection>
+            )}
+
+            {tab === 2 && (
+                <AdminSection
+                    saving={saving}
+                    error={error}
+                    success={success}
+                >
                     <TextField
                         label={__("Contacts Headline (main)", lang)}
                         size="small"
@@ -279,7 +353,7 @@ export default function AdminContactsPage() {
                 </AdminSection>
             )}
 
-            {tab === 2 && (
+            {tab === 3 && (
                 <AdminSection
                     saving={labelsSaving}
                     error={labelsError}
