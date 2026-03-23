@@ -28,7 +28,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import ImageIcon from "@mui/icons-material/Image";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { useAdminData, useLocalizedField, AdminSection, IconPickerButton, ProjectImageGrid, RichTextEditor, ImageMarkerNode, ImageMarkerPlugin, ImageDragPlugin, ImagePickerModal, ImageMarkerContext, ImageModal, dispatchImageInsert, dispatchSaveSelection } from "@/features/admin-editor";
+import { useAdminData, useLocalizedField, AdminSection, AdminTabs, IconPickerButton, ProjectImageGrid, RichTextEditor, ImageMarkerNode, ImageMarkerPlugin, ImageDragPlugin, ImagePickerModal, ImageMarkerContext, ImageModal, dispatchImageInsert, dispatchSaveSelection } from "@/features/admin-editor";
 import type { ProjectImage } from "@/entities/project/model/projectImage";
 import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
@@ -1160,19 +1160,13 @@ export default function AdminProjectsPage() {
                 </Typography>
             </Box>
 
-            <Tabs
+            <AdminTabs
                 value={tab}
-                onChange={(_, v) => setTab(v)}
-                sx={{
-                    mb: tab === 1 ? 0 : 3,
-                    borderBottom: `1px solid ${theme.palette.divider}`,
-                    "& .MuiTab-root": { textTransform: "none", fontWeight: 500 },
-                }}
-            >
-                <Tab label={__("List", lang)} />
-                <Tab label={__("References", lang)} />
-                <Tab label={__("General Labels", lang)} />
-            </Tabs>
+                onChange={setTab}
+                labels={["List", "References", "General labels"]}
+                lang={lang}
+                sx={{ mb: tab === 1 ? 0 : 3 }}
+            />
 
             {tab === 0 && <ProjectsTab />}
             {tab === 1 && <ReferencesTab />}

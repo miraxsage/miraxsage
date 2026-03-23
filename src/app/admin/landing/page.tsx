@@ -3,8 +3,6 @@
 import { useState } from "react";
 import {
     Box,
-    Tabs,
-    Tab,
     TextField,
     Switch,
     FormControlLabel,
@@ -14,7 +12,7 @@ import {
     useTheme,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
-import { SortableList, AdminSection, useAdminData, useLocalizedField, IconPickerButton } from "@/features/admin-editor";
+import { SortableList, AdminSection, AdminTabs, useAdminData, useLocalizedField, IconPickerButton } from "@/features/admin-editor";
 import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
@@ -82,10 +80,10 @@ type SectionKey = keyof LandingData;
 // ---------------------------------------------------------------------------
 
 const SECTION_TAB_KEYS: { key: SectionKey | "landing" | "avatar"; label: string }[] = [
-    { key: "landing", label: "General Labels" },
+    { key: "landing", label: "General labels" },
     { key: "buttons", label: "Buttons" },
     { key: "title_variants", label: "Qualifications" },
-    { key: "info_blocks", label: "Info Blocks" },
+    { key: "info_blocks", label: "Info blocks" },
     { key: "footer", label: "Footer" },
     { key: "avatar", label: "Avatar" },
 ];
@@ -253,17 +251,12 @@ export default function AdminLandingPage() {
             error={error}
             success={success}
         >
-            <Tabs
+            <AdminTabs
                 value={tab}
-                onChange={(_, v) => setTab(v)}
-                variant="scrollable"
-                scrollButtons="auto"
-                sx={{ mb: 3, borderBottom: `1px solid ${theme.palette.divider}` }}
-            >
-                {SECTION_TAB_KEYS.map((s) => (
-                    <Tab key={s.key} label={__(s.label, lang)} />
-                ))}
-            </Tabs>
+                onChange={setTab}
+                labels={SECTION_TAB_KEYS.map((s) => s.label)}
+                lang={lang}
+            />
 
             {/* ===== General Labels ===== */}
             {tab === 0 && (

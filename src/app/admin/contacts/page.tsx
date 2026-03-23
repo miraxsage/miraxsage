@@ -5,14 +5,13 @@ import {
     Box,
     Typography,
     TextField,
-    Tabs,
-    Tab,
+    Switch,
     CircularProgress,
     useTheme,
 } from "@mui/material";
 import CallIcon from "@mui/icons-material/Call";
-import ArticleIcon from "@mui/icons-material/Article";
-import { AdminSection, useAdminData, useLocalizedField } from "@/features/admin-editor";
+import { AdminSection, AdminTabs, SortableList, useAdminData, useLocalizedField, IconPickerButton } from "@/features/admin-editor";
+import type { ContactItem } from "@/widgets/landing/MainSlide";
 import UiLabelsEditor from "@/features/admin-editor/UiLabelsEditor";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
@@ -31,6 +30,7 @@ interface ContactPageContent {
 
 interface ContactsData {
     contact_page_content: ContactPageContent[];
+    contact_info: ContactItem[];
 }
 
 
@@ -38,6 +38,10 @@ interface ContactsData {
 // Helpers
 // ---------------------------------------------------------------------------
 
+let tempIdCounter = -1;
+function nextTempId() {
+    return tempIdCounter--;
+}
 
 // ---------------------------------------------------------------------------
 // Main Page
@@ -72,6 +76,46 @@ export default function AdminContactsPage() {
         labelsSave({ category: "contacts_general", data: categoryItems });
     };
 
+    // ---- Contact list (moved from Details) ----
+    const contacts = data?.contact_info ?? [];
+
+    const updateContacts = (newContacts: ContactItem[]) => {
+        if (!data) return;
+        setData({ ...data, contact_info: newContacts });
+    };
+
+    const updateContact = (id: number | string, field: string, value: unknown) => {
+        updateContacts(contacts.map((c) => (c.id === id ? { ...c, [field]: value } : c)));
+    };
+
+    const saveContacts = (list?: ContactItem[]) => {
+        const ordered = (list ?? contacts).map((c, i) => ({ ...c, sort_order: i }));
+        save({ section: "contact_info", data: ordered });
+    };
+
+    const updateContactAndSave = (id: number | string, field: string, value: unknown) => {
+        const newContacts = contacts.map((c) => (c.id === id ? { ...c, [field]: value } : c));
+        updateContacts(newContacts);
+        saveContacts(newContacts);
+    };
+
+    const addContact = () => {
+        const newContact: ContactItem = {
+            id: nextTempId(),
+            sort_order: contacts.length,
+            type: "",
+            title_en: "",
+            title_ru: "",
+            icon: "",
+            url: "",
+            is_visible: 1,
+        };
+        const newContacts = [...contacts, newContact];
+        updateContacts(newContacts);
+        saveContacts(newContacts);
+    };
+
+    // ---- Page content ----
     const pageContent = data?.contact_page_content ?? [];
 
     const setPageContent = (items: ContactPageContent[]) => {
@@ -135,20 +179,69 @@ export default function AdminContactsPage() {
                 </Typography>
             </Box>
 
-            <Tabs
+            <AdminTabs
                 value={tab}
-                onChange={(_, v) => setTab(v)}
-                sx={{
-                    mb: 3,
-                    borderBottom: `1px solid ${theme.palette.divider}`,
-                    "& .MuiTab-root": { textTransform: "none", fontWeight: 500 },
-                }}
-            >
-                <Tab label={__("Page Content", lang)} icon={<ArticleIcon />} iconPosition="start" />
-                <Tab label={__("General Labels", lang)} />
-            </Tabs>
+                onChange={setTab}
+                labels={["List", "Page content", "General labels"]}
+                lang={lang}
+            />
 
             {tab === 0 && (
+                <AdminSection
+                    saving={saving}
+                    error={error}
+                    success={success}
+                >
+                    <SortableList
+                        items={contacts}
+                        onReorder={(reordered) => {
+                            updateContacts(reordered);
+                            saveContacts(reordered);
+                        }}
+                        onDelete={(id) => {
+                            const newContacts = contacts.filter((c) => c.id !== id);
+                            updateContacts(newContacts);
+                            saveContacts(newContacts);
+                        }}
+                        onAdd={addContact}
+                        addLabel={__("Add Contact", lang)}
+                        renderItem={(contact) => (
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                <Switch
+                                    checked={contact.is_visible === 1}
+                                    onChange={(e) =>
+                                        updateContactAndSave(contact.id, "is_visible", e.target.checked ? 1 : 0)
+                                    }
+                                    size="small"
+                                    sx={{ flexShrink: 0 }}
+                                />
+                                <IconPickerButton
+                                    value={contact.icon}
+                                    onChange={(v) => updateContactAndSave(contact.id, "icon", v)}
+                                />
+                                <TextField
+                                    label={__("Title", lang)}
+                                    size="small"
+                                    value={lv(contact, "title")}
+                                    onChange={(e) => updateContact(contact.id, lk("title"), e.target.value)}
+                                    onBlur={() => saveContacts()}
+                                    sx={{ flex: 1, minWidth: 120 }}
+                                />
+                                <TextField
+                                    label="URL"
+                                    size="small"
+                                    value={contact.url}
+                                    onChange={(e) => updateContact(contact.id, "url", e.target.value)}
+                                    onBlur={() => saveContacts()}
+                                    sx={{ flex: 2, minWidth: 200 }}
+                                />
+                            </Box>
+                        )}
+                    />
+                </AdminSection>
+            )}
+
+            {tab === 1 && (
                 <AdminSection
                     saving={saving}
                     error={error}
@@ -186,7 +279,7 @@ export default function AdminContactsPage() {
                 </AdminSection>
             )}
 
-            {tab === 1 && (
+            {tab === 2 && (
                 <AdminSection
                     saving={labelsSaving}
                     error={labelsError}

@@ -3,17 +3,13 @@
 import { useState, Fragment } from "react";
 import {
     Box,
-    Tabs,
-    Tab,
     TextField,
-    Switch,
     Typography,
     CircularProgress,
     useTheme,
 } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
-import { SortableList, AdminSection, useAdminData, useLocalizedField, AdminKeyChip, IconPickerButton, RichTextEditor } from "@/features/admin-editor";
-import type { ContactItem } from "@/widgets/landing/MainSlide";
+import { AdminSection, AdminTabs, useAdminData, useLocalizedField, AdminKeyChip, IconPickerButton, RichTextEditor } from "@/features/admin-editor";
 import type { UiLabelItem } from "@/features/admin-editor/UiLabelsEditor";
 import { __ } from "@/shared/lib/i18n";
 import { getThemeColor } from "@/shared/lib/theme";
@@ -55,15 +51,8 @@ const KEY_LABELS: Record<string, { en: string; ru: string }> = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-let tempIdCounter = -1;
-function nextTempId() {
-    return tempIdCounter--;
-}
-
-
 const TAB_KEYS = [
-    { key: "contacts" as const, label: "Contacts" },
-    { key: "general_labels" as const, label: "General Labels" },
+    { key: "general_labels" as const, label: "General labels" },
     { key: "info" as const, label: "Info" },
 ];
 
@@ -82,51 +71,9 @@ export default function AdminDetailsPage() {
         url: "/api/ui-labels",
     });
 
-    const { data: contactsData, setData: setContactsData, loading: contactsLoading, saving: contactsSaving, error: contactsError, success: contactsSuccess, save: contactsSave } = useAdminData<{ contact_info: ContactItem[] }>({
-        url: "/api/contacts",
-    });
-
     const { data: infoData, setData: setInfoData, loading: infoLoading, saving: infoSaving, error: infoError, success: infoSuccess, save: infoSave } = useAdminData<InfoDrawerAdminData>({
         url: "/api/info-drawer",
     });
-
-    const contacts = contactsData?.contact_info ?? [];
-
-    const updateContacts = (newContacts: ContactItem[]) => {
-        if (!contactsData) return;
-        setContactsData({ ...contactsData, contact_info: newContacts });
-    };
-
-    const updateContact = (id: number | string, field: string, value: unknown) => {
-        updateContacts(contacts.map((c) => (c.id === id ? { ...c, [field]: value } : c)));
-    };
-
-    const saveContacts = (list?: ContactItem[]) => {
-        const ordered = (list ?? contacts).map((c, i) => ({ ...c, sort_order: i }));
-        contactsSave({ section: "contact_info", data: ordered });
-    };
-
-    const updateContactAndSave = (id: number | string, field: string, value: unknown) => {
-        const newContacts = contacts.map((c) => (c.id === id ? { ...c, [field]: value } : c));
-        updateContacts(newContacts);
-        saveContacts(newContacts);
-    };
-
-    const addContact = () => {
-        const newContact: ContactItem = {
-            id: nextTempId(),
-            sort_order: contacts.length,
-            type: "",
-            title_en: "",
-            title_ru: "",
-            icon: "",
-            url: "",
-            is_visible: 1,
-        };
-        const newContacts = [...contacts, newContact];
-        updateContacts(newContacts);
-        saveContacts(newContacts);
-    };
 
     const labelsItems = labelsRaw ?? [];
 
@@ -163,7 +110,7 @@ export default function AdminDetailsPage() {
 
     const chipLabel = (key: string) => KEY_LABELS[key]?.[lang] ?? key;
 
-    if (labelsLoading || contactsLoading || infoLoading) {
+    if (labelsLoading || infoLoading) {
         return (
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "calc(100vh - 48px)" }}>
                 <CircularProgress />
@@ -175,74 +122,19 @@ export default function AdminDetailsPage() {
         <AdminSection
             title={__("Details", lang)}
             icon={<TuneIcon sx={{ color: theme.palette.primary.main, fontSize: 28 }} />}
-            saving={tab === 0 ? contactsSaving : tab === 1 ? labelsSaving : infoSaving}
-            error={tab === 0 ? contactsError : tab === 1 ? labelsError : infoError}
-            success={tab === 0 ? contactsSuccess : tab === 1 ? labelsSuccess : infoSuccess}
+            saving={tab === 0 ? labelsSaving : infoSaving}
+            error={tab === 0 ? labelsError : infoError}
+            success={tab === 0 ? labelsSuccess : infoSuccess}
         >
-            <Tabs
+            <AdminTabs
                 value={tab}
-                onChange={(_, v) => setTab(v)}
-                variant="scrollable"
-                scrollButtons="auto"
-                sx={{ mb: 3, borderBottom: `1px solid ${theme.palette.divider}` }}
-            >
-                {TAB_KEYS.map((s) => (
-                    <Tab key={s.key} label={__(s.label, lang)} />
-                ))}
-            </Tabs>
-
-            {/* ===== Contacts ===== */}
-            {tab === 0 && (
-                <SortableList
-                    items={contacts}
-                    onReorder={(reordered) => {
-                        updateContacts(reordered);
-                        saveContacts(reordered);
-                    }}
-                    onDelete={(id) => {
-                        const newContacts = contacts.filter((c) => c.id !== id);
-                        updateContacts(newContacts);
-                        saveContacts(newContacts);
-                    }}
-                    onAdd={addContact}
-                    addLabel={__("Add Contact", lang)}
-                    renderItem={(contact) => (
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            <Switch
-                                checked={contact.is_visible === 1}
-                                onChange={(e) =>
-                                    updateContactAndSave(contact.id, "is_visible", e.target.checked ? 1 : 0)
-                                }
-                                size="small"
-                                sx={{ flexShrink: 0 }}
-                            />
-                            <IconPickerButton
-                                value={contact.icon}
-                                onChange={(v) => updateContactAndSave(contact.id, "icon", v)}
-                            />
-                            <TextField
-                                label={__("Title", lang)}
-                                size="small"
-                                value={lv(contact, "title")}
-                                onChange={(e) => updateContact(contact.id, lk("title"), e.target.value)}
-                                onBlur={() => saveContacts()}
-                                sx={{ flex: 1, minWidth: 120 }}
-                            />
-                            <TextField
-                                label="URL"
-                                size="small"
-                                value={contact.url}
-                                onChange={(e) => updateContact(contact.id, "url", e.target.value)}
-                                onBlur={() => saveContacts()}
-                                sx={{ flex: 2, minWidth: 200 }}
-                            />
-                        </Box>
-                    )}
-                />
-            )}
+                onChange={setTab}
+                labels={TAB_KEYS.map((s) => s.label)}
+                lang={lang}
+            />
 
             {/* ===== General Labels ===== */}
-            {tab === 1 && (
+            {tab === 0 && (
                 <Box sx={{ display: "grid", gridTemplateColumns: "max-content 1fr", gap: 1.5, alignItems: "center" }}>
                     {labelsItems.filter((it) => it.category === "details_ui").map((item) => (
                         <Fragment key={item.id}>
@@ -282,7 +174,7 @@ export default function AdminDetailsPage() {
             )}
 
             {/* ===== Info Drawer ===== */}
-            {tab === 2 && (
+            {tab === 1 && (
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
                     {/* Status & Location */}
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>

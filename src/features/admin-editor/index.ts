@@ -1,3 +1,4 @@
+export { default as AdminTabs } from "./AdminTabs";
 export { default as SortableList } from "./SortableList";
 export { default as AdminKeyChip } from "./AdminKeyChip";
 export { default as RichTextEditor } from "./RichTextEditor";
