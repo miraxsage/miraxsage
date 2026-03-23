@@ -20,6 +20,8 @@ interface SharePopupProps {
      * "panel" — fixed panel: right-aligned with layout edge, bottom above footer
      */
     mode?: "dropdown" | "panel";
+    /** When true, popup width matches the anchor element width */
+    matchAnchorWidth?: boolean;
 }
 
 function ShareItems({ links, iconFontSize, onClose, lang }: {
@@ -73,7 +75,7 @@ function ShareItems({ links, iconFontSize, onClose, lang }: {
     );
 }
 
-export default function SharePopup({ anchorEl, open, onClose, preferDirection = "bottom", iconFontSize = "1.5rem", mode = "dropdown" }: SharePopupProps) {
+export default function SharePopup({ anchorEl, open, onClose, preferDirection = "bottom", iconFontSize = "1.5rem", mode = "dropdown", matchAnchorWidth = false }: SharePopupProps) {
     const sharingLinks = useSharingLinks();
     const lang = useLanguage();
     const theme = useTheme();
@@ -85,9 +87,30 @@ export default function SharePopup({ anchorEl, open, onClose, preferDirection = 
         const anchorRect = anchorEl.getBoundingClientRect();
         const margin = 8;
 
-        // Dropdown mode: calculate max height based on available space
-        const spaceBelow = window.innerHeight - anchorRect.bottom - margin;
-        const spaceAbove = anchorRect.top - margin;
+        // Find layout container (ancestor with border-radius) for bounds
+        let container: HTMLElement | null = anchorEl.parentElement;
+        while (container && container !== document.body) {
+            const br = getComputedStyle(container).borderRadius;
+            if (br && br !== "0px") break;
+            container = container.parentElement;
+        }
+        const containerRect = container?.getBoundingClientRect();
+        const containerTop = containerRect?.top ?? 0;
+        const containerBottom = containerRect?.bottom ?? window.innerHeight;
+
+        // Find header and footer within container for precise bounds
+        const headerEl = container?.querySelector("header") ?? container?.firstElementChild;
+        const headerBottom = headerEl
+            ? (headerEl as HTMLElement).getBoundingClientRect().bottom
+            : containerTop;
+        const footerEl = container?.querySelector("footer");
+        const footerTop = footerEl
+            ? footerEl.getBoundingClientRect().top
+            : containerBottom;
+
+        // Dropdown mode: calculate max height respecting header/footer bounds
+        const spaceBelow = footerTop - anchorRect.bottom - margin;
+        const spaceAbove = anchorRect.top - headerBottom - margin;
         const dropdownMaxHeight = preferDirection === "top"
             ? Math.max(spaceAbove, 120)
             : Math.max(Math.max(spaceBelow, spaceAbove), 120);
@@ -95,30 +118,16 @@ export default function SharePopup({ anchorEl, open, onClose, preferDirection = 
         if (mode !== "panel") return { panel: {}, dropdownMaxHeight };
 
         // Panel mode: fixed position right-aligned with layout container
-        const footerEl = anchorEl.closest("footer") ?? anchorEl.parentElement;
-        if (!footerEl) return { panel: {}, dropdownMaxHeight };
-        const footerRect = footerEl.getBoundingClientRect();
-        let container = footerEl.parentElement;
-        while (container && container !== document.body) {
-            const br = getComputedStyle(container).borderRadius;
-            if (br && br !== "0px") break;
-            container = container.parentElement;
-        }
-        const containerRect = container?.getBoundingClientRect();
+        const panelFooterEl = anchorEl.closest("footer") ?? anchorEl.parentElement;
+        if (!panelFooterEl) return { panel: {}, dropdownMaxHeight };
+        const panelFooterRect = panelFooterEl.getBoundingClientRect();
         const containerRight = containerRect ? window.innerWidth - containerRect.right : 0;
-        const containerTop = containerRect?.top ?? 0;
-        // Find the header: look for <header> element, or first child of the grid container
-        const headerEl = container?.querySelector("header")
-            ?? container?.firstElementChild;
-        const headerBottom = headerEl
-            ? (headerEl as HTMLElement).getBoundingClientRect().bottom
-            : containerTop;
 
         return {
             panel: {
                 right: containerRight,
-                bottom: window.innerHeight - footerRect.top,
-                maxHeight: footerRect.top - headerBottom,
+                bottom: window.innerHeight - panelFooterRect.top,
+                maxHeight: panelFooterRect.top - headerBottom,
             },
             dropdownMaxHeight,
         };
@@ -238,6 +247,8 @@ export default function SharePopup({ anchorEl, open, onClose, preferDirection = 
         );
     }
 
+    const anchorWidth = matchAnchorWidth && anchorEl ? anchorEl.offsetWidth : undefined;
+
     return (
         <Popper
             open={open}
@@ -247,10 +258,10 @@ export default function SharePopup({ anchorEl, open, onClose, preferDirection = 
                 { name: "flip", enabled: true },
                 { name: "offset", options: { offset: [0, 4] } },
             ]}
-            style={{ zIndex: theme.zIndex.modal }}
+            style={{ zIndex: theme.zIndex.modal, ...(anchorWidth ? { width: anchorWidth } : {}) }}
         >
             <ClickAwayListener onClickAway={onClose}>
-                <Paper elevation={8} sx={paperSx}>
+                <Paper elevation={8} sx={{ ...paperSx, ...(anchorWidth ? { minWidth: anchorWidth } : {}) }}>
                     <Box sx={{ ...scrollSx, maxHeight: positionInfo.dropdownMaxHeight }}>
                         <ShareItems links={visibleLinks} iconFontSize={iconFontSize} onClose={onClose} lang={lang} />
                     </Box>

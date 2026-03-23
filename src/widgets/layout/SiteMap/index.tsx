@@ -2,7 +2,7 @@
 
 import __ from "@/shared/lib/i18n/translation";
 import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
-import { Box, Button, IconButton, SxProps, alpha, styled, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Button, Collapse, IconButton, SxProps, alpha, styled, useMediaQuery, useTheme } from "@mui/material";
 import { ReactNode } from "react";
 import MessageIcon from "@mui/icons-material/Message";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
@@ -24,14 +24,18 @@ import HomeIcon from "@mui/icons-material/Home";
 import CloseIcon from "@mui/icons-material/Close";
 import PhoneIcon from "@mui/icons-material/Phone";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useColorMode, useLanguage, useScreenMode, useSiteMapVisibility, useViewMode } from "@/shared/lib/store/appearanceSlice";
 import { cubicBezier, motion } from "framer-motion";
 import AccentedTreeView, { AccentedTreeItemProps } from "@/shared/ui/AccentedTreeView";
 import { usePathname, useRouter } from "next/navigation";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { CategoryLabelsContext, useVisibleCategories } from "@/entities/resume/model/categoryLabels";
 import { capitalize } from "@/shared/lib/string";
 import type { AboutCategoriesInterface } from "@/entities/resume/model/categories";
+import { useSharingLinks, type SharingLink } from "@/shared/lib/sharingLinksContext";
+import getShareUrl from "@/shared/lib/getShareUrl";
 
 const TransparentButton = styled(Button)(({ theme }) => ({
     color: getThemeColor("regularText", theme),
@@ -127,8 +131,15 @@ function navigateToSection(
     const links = { ...staticLinks, ...extraLinks };
     if (section in links) {
         const link = links[section];
-        if (link.match("^(https?:|mailto:)")) window.open(link, "_blank");
-        else return router.push(link);
+        if (link.match("^(https?:|mailto:|viber:)")) {
+            if (link.startsWith("mailto:") || link.startsWith("viber:")) {
+                window.location.href = link;
+            } else {
+                window.open(link, "_blank", "noopener,noreferrer");
+            }
+            return;
+        }
+        return router.push(link);
     }
     if (section == "download-pdf") {
         window.open(`/${t("Resume filename")}.pdf`, "_blank");
@@ -149,15 +160,38 @@ function findActiveCategoriesData(data: AccentedTreeItemProps[], matches: Accent
     return matches;
 }
 
-function allCategoriesTreeViewData(pathname: string, contacts: ContactItem[], selectedItems?: string[], activePathData?: AccentedTreeItemProps[], labelFn?: (slug: string) => string, t?: (key: string) => string, ru?: boolean, cats?: AboutCategoriesInterface, labels?: import("@/entities/resume/model/categoryLabels").CategoryLabelsMap) {
+function allCategoriesTreeViewData(pathname: string, contacts: ContactItem[], selectedItems?: string[], activePathData?: AccentedTreeItemProps[], labelFn?: (slug: string) => string, t?: (key: string) => string, ru?: boolean, cats?: AboutCategoriesInterface, labels?: import("@/entities/resume/model/categoryLabels").CategoryLabelsMap, sharingLinks?: SharingLink[]) {
     const _ = t ?? __;
     const contactLinks = Object.fromEntries(contacts.map((c) => [c.type, c.url]));
-    const links = { ...staticLinks, ...contactLinks };
-    const contactChildren: AccentedTreeItemProps[] = contacts.map((c) => ({
-        id: c.type,
-        title: ru ? c.title_ru : c.title_en,
-        icon: <DynamicIcon svg={c.icon_svg} name={c.icon} />,
-    }));
+    const links: Record<string, string> = { ...staticLinks, ...contactLinks };
+    if (sharingLinks) {
+        const pageUrl = typeof window !== "undefined" ? window.location.href : "";
+        const pageTitle = typeof document !== "undefined" ? document.title : "";
+        sharingLinks.filter(l => l.is_visible === 1).forEach(link => {
+            links[`share-${link.type}`] = getShareUrl(link.type, pageUrl, pageTitle);
+        });
+    }
+    const contactChildren: AccentedTreeItemProps[] = contacts.map((c) => {
+        if (c.type === "share" && sharingLinks && sharingLinks.length > 0) {
+            const visibleLinks = sharingLinks.filter(l => l.is_visible === 1);
+            return {
+                id: c.type,
+                title: ru ? c.title_ru : c.title_en,
+                icon: <DynamicIcon svg={c.icon_svg} name={c.icon} />,
+                notSelectable: true,
+                children: visibleLinks.map(link => ({
+                    id: `share-${link.type}`,
+                    title: ru ? link.title_ru : link.title_en,
+                    icon: <DynamicIcon svg={link.icon_svg} name={link.icon} />,
+                })),
+            };
+        }
+        return {
+            id: c.type,
+            title: ru ? c.title_ru : c.title_en,
+            icon: <DynamicIcon svg={c.icon_svg} name={c.icon} />,
+        };
+    });
     contactChildren.push({ id: "write", title: _("Write"), icon: <MessageIcon /> });
     const data = [
         {
@@ -213,8 +247,9 @@ function MobileSiteMapTreeView({ contacts }: { contacts: ContactItem[] }) {
     const lang = useLanguage();
     const visibleCats = useVisibleCategories();
     const labels = useContext(CategoryLabelsContext);
+    const sharingLinks = useSharingLinks();
     const itemsToSelect: string[] = [];
-    const { data, links } = allCategoriesTreeViewData(pathname, contacts, itemsToSelect, undefined, labelFn, t, lang.ru, visibleCats, labels);
+    const { data, links } = allCategoriesTreeViewData(pathname, contacts, itemsToSelect, undefined, labelFn, t, lang.ru, visibleCats, labels, sharingLinks);
     return (
         <Box sx={{ display: "flex", flexDirection: "column" }}>
             <ColorModeButton sx={{ gridArea: "1/5/1/5" }} />
@@ -352,6 +387,125 @@ function ContactButton({
         >
             {content}
         </SpecialButton>
+    );
+}
+
+function ShareAccordion({
+    contact,
+    accented,
+    borders = "0 0 1 1",
+    hoverBorders = "0 1 1 1",
+}: {
+    contact: ContactItem;
+    accented: boolean;
+    borders?: string;
+    hoverBorders?: string;
+}) {
+    const [expanded, setExpanded] = useState(false);
+    const sharingLinks = useSharingLinks();
+    const visibleLinks = sharingLinks.filter((l) => l.is_visible === 1);
+    const lang = useLanguage();
+    const theme = useTheme();
+    const siteMapVisibility = useSiteMapVisibility();
+
+    if (visibleLinks.length === 0) return null;
+
+    const contactBorderColor = accented ? getThemeColor("secondaryText", theme) : theme.palette.divider;
+    const contactsColor = getThemeColor(accented ? "secondaryHoverText" : "regularText", theme);
+    const contactsBackground = accented ? getThemeColor("secondaryHoverBg", theme) : alpha(theme.palette.divider, 0.3);
+
+    // Snake border: determine which side the header has (even=left, odd=right)
+    const borderParts = borders.split(" ");
+    const isLeftSide = borderParts[3] === "1";
+    // Header keeps its original borders always (no removal of bottom)
+    const headerBorders = borders;
+    const headerHoverBorders = hoverBorders;
+    // Collapse wrapper: opposite side only, bottom appears on hover of next sibling
+    const collapseBorders = isLeftSide ? "0 1 0 0" : "0 0 0 1";
+
+    const handleShareClick = (linkType: string) => {
+        const pageUrl = typeof window !== "undefined" ? window.location.href : "";
+        const pageTitle = typeof document !== "undefined" ? document.title : "";
+        const url = getShareUrl(linkType, pageUrl, pageTitle);
+        if (url.startsWith("mailto:") || url.startsWith("viber:")) {
+            window.location.href = url;
+        } else {
+            window.open(url, "_blank", "noopener,noreferrer");
+        }
+        siteMapVisibility.update("collapsed");
+    };
+
+    return (
+        <Box sx={{
+            "&:has(+ button:hover) .share-links-wrapper": {
+                borderBottomColor: contactBorderColor,
+            },
+        }}>
+            <TransparentButton
+                onClick={() => setExpanded(!expanded)}
+                sx={{
+                    width: "100%",
+                    borderColor: headerBorders.replaceAll("0", "transparent").replaceAll("1", contactBorderColor),
+                    "& svg:not(.MuiSvgIcon-root)": {
+                        marginRight: "8px",
+                        fontSize: "19px",
+                    },
+                    "&:hover": {
+                        borderColor: headerHoverBorders.replaceAll("0", "transparent").replaceAll("1", contactBorderColor),
+                        color: contactsColor,
+                        background: contactsBackground,
+                        "& .MuiSvgIcon-root": accented ? { color: contactsColor } : {},
+                    },
+                }}
+            >
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        mr: "2px",
+                        ml: "-4px",
+                        "& .MuiSvgIcon-root": { fontSize: "16px !important", mr: "0px !important" },
+                    }}
+                >
+                    {expanded ? <ExpandMoreIcon /> : <ChevronRightIcon />}
+                </Box>
+                <DynamicIcon svg={contact.icon_svg} name={contact.icon} />
+                {lang.ru ? contact.title_ru : contact.title_en}
+            </TransparentButton>
+            <Collapse in={expanded}>
+                <Box className="share-links-wrapper" sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    border: "1px solid transparent",
+                    borderColor: collapseBorders.replaceAll("0", "transparent").replaceAll("1", contactBorderColor),
+                    transition: "border-color 0.2s",
+                }}>
+                    {visibleLinks.map((link) => (
+                        <TransparentButton
+                            key={link.id}
+                            onClick={() => handleShareClick(link.type)}
+                            sx={{
+                                width: "100%",
+                                pl: "30px",
+                                borderColor: "transparent",
+                                "& svg:not(.MuiSvgIcon-root)": {
+                                    marginRight: "8px",
+                                    fontSize: "19px",
+                                },
+                                "&:hover": {
+                                    borderColor: theme.palette.divider,
+                                    color: contactsColor,
+                                    background: contactsBackground,
+                                },
+                            }}
+                        >
+                            <DynamicIcon svg={link.icon_svg} name={link.icon} />
+                            {lang.ru ? link.title_ru : link.title_en}
+                        </TransparentButton>
+                    ))}
+                </Box>
+            </Collapse>
+        </Box>
     );
 }
 
@@ -713,15 +867,25 @@ export default function SiteMap({ contacts }: { contacts: ContactItem[] }) {
                                             },
                                         }}
                                     >
-                                        {contacts.map((c, i) => (
-                                            <ContactButton
-                                                key={c.id}
-                                                contact={c}
-                                                accented={isContactsPage}
-                                                borders={i % 2 === 0 ? "0 0 1 1" : "0 1 1 0"}
-                                                hoverBorders={i === 0 ? "1 1 1 1" : "0 1 1 1"}
-                                            />
-                                        ))}
+                                        {contacts.map((c, i) =>
+                                            c.type === "share" ? (
+                                                <ShareAccordion
+                                                    key={c.id}
+                                                    contact={c}
+                                                    accented={isContactsPage}
+                                                    borders={i % 2 === 0 ? "0 0 1 1" : "0 1 1 0"}
+                                                    hoverBorders={i === 0 ? "1 1 1 1" : "0 1 1 1"}
+                                                />
+                                            ) : (
+                                                <ContactButton
+                                                    key={c.id}
+                                                    contact={c}
+                                                    accented={isContactsPage}
+                                                    borders={i % 2 === 0 ? "0 0 1 1" : "0 1 1 0"}
+                                                    hoverBorders={i === 0 ? "1 1 1 1" : "0 1 1 1"}
+                                                />
+                                            )
+                                        )}
                                         <ContactButton contact={writeContact} accented={isContactsPage} borders="0 1 1 1" hoverBorders="0 1 1 1" />
                                     </Box>
                                 </Box>

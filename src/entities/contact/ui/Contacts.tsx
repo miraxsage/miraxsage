@@ -24,6 +24,7 @@ import classes from "classnames";
 import { RevealAsideMenuButton } from "@/widgets/layout/RevealAsideMenuButton";
 import { getThemeColor } from "@/shared/lib/theme";
 import { useRouter } from "next/navigation";
+import SharePopup, { useSharePopup } from "@/shared/ui/SharePopup";
 
 function contactData(contact: ContactItem, theme: Theme, ru: boolean): DescriptionTableData[number] {
     return [
@@ -104,6 +105,7 @@ export default function Contacts({ contacts, content }: { contacts: ContactItem[
     const screenMode = useScreenMode();
     const theme = useTheme();
     const md = useMediaQuery(theme.breakpoints.down("md"));
+    const sharePopup = useSharePopup();
     const [accentedSubmit, setAccentedButton] = useState(false);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -232,10 +234,43 @@ export default function Contacts({ contacts, content }: { contacts: ContactItem[
                             <CustomAccordion expandable={false} title={t("Social networks")}>
                                 <Box sx={{ marginLeft: "-1px" }}>
                                     <DescriptionTable withoutBottomBorder={true} withoutTopBorder={true}>
-                                        {contacts.map((c) => contactData(c, theme, lang === "ru"))}
+                                        {contacts.filter((c) => c.type !== "share").map((c) => contactData(c, theme, lang === "ru"))}
                                     </DescriptionTable>
                                 </Box>
                             </CustomAccordion>
+                            {(() => {
+                                const shareContact = contacts.find((c) => c.type === "share");
+                                if (!shareContact) return null;
+                                return (
+                                    <>
+                                        <Button
+                                            variant="outlined"
+                                            onClick={sharePopup.handleOpen}
+                                            sx={{
+                                                width: "100%",
+                                                justifyContent: "center",
+                                                gap: 1,
+                                                borderColor: "divider",
+                                                color: getThemeColor("regularText", theme),
+                                                borderRadius: "6px",
+                                                py: 1,
+                                                "&:hover": {
+                                                    borderColor: "divider",
+                                                    background: getThemeColor("regularHoverBg", theme),
+                                                },
+                                                "& .MuiSvgIcon-root, & svg:not(.MuiSvgIcon-root)": {
+                                                    fontSize: "20px",
+                                                    color: getThemeColor("regularHoverIcon", theme),
+                                                },
+                                            }}
+                                        >
+                                            <DynamicIcon svg={shareContact.icon_svg} name={shareContact.icon} />
+                                            {lang === "ru" ? shareContact.title_ru : shareContact.title_en}
+                                        </Button>
+                                        <SharePopup {...sharePopup} matchAnchorWidth />
+                                    </>
+                                );
+                            })()}
                             <CustomAccordion expandable={false} title={t("Feedback")}>
                                 <Box
                                     component="form"
