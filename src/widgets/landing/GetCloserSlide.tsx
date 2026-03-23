@@ -16,25 +16,28 @@ import MessageIcon from "@mui/icons-material/Message";
 import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 import Copyright from "./Copyright";
 import { useRouter } from "next/navigation";
+import SharePopup, { useSharePopup } from "@/shared/ui/SharePopup";
 
 type SpecialButtonProps = {
     children: ReactNode;
     sx?: SxProps;
-    link: string;
+    link?: string;
+    onClick?: React.MouseEventHandler<HTMLElement>;
 };
-export function SpecialButton({ children, link, sx }: SpecialButtonProps) {
+export function SpecialButton({ children, link, onClick, sx }: SpecialButtonProps) {
     const isDarkMode = useColorMode().dark;
     const theme = useTheme();
     const textColor = useLandingColor("contrast");
     const paleTextColor = isDarkMode ? lighten(theme.palette.divider, 0.35) : lighten(textColor, 0.2);
     const router = useRouter();
     const linkClick = () => {
+        if (!link) return;
         if (link.startsWith("/")) router.push(link);
         else window.open(link, "_blank");
     };
     return (
         <TransparentButton
-            onClick={linkClick}
+            onClick={onClick ?? linkClick}
             dividerSize="removed"
             sx={{
                 width: "225px",
@@ -90,6 +93,7 @@ export default function GetCloserSlide({ getCloser, footer, contacts }: { getClo
     const router = useRouter();
     const lang = useLanguage();
     const t = useUiLabels();
+    const sharePopup = useSharePopup();
     const catLabels = useContext(CategoryLabelsContext);
     const catLabel = (slug: string) => {
         const entry = catLabels[slug];
@@ -188,12 +192,18 @@ export default function GetCloserSlide({ getCloser, footer, contacts }: { getClo
                     ? `0px 0px ${isLast ? "0px" : "1px"} 1px`
                     : `0px 1px ${isLast ? "0px" : "1px"} 0px`;
                 return (
-                    <SpecialButton key={contact.id} link={contact.url} sx={{ borderWidth: bw, ...contactsOnlyBtnSx }}>
+                    <SpecialButton
+                        key={contact.id}
+                        link={contact.type === "share" ? undefined : contact.url}
+                        onClick={contact.type === "share" ? sharePopup.handleOpen : undefined}
+                        sx={{ borderWidth: bw, ...contactsOnlyBtnSx }}
+                    >
                         <DynamicIcon svg={contact.icon_svg} name={contact.icon} />
                         {(!sm || !hasTreeItems) && (lang.ru ? contact.title_ru : contact.title_en)}
                     </SpecialButton>
                 );
             })}
+            <SharePopup {...sharePopup} preferDirection="bottom" />
             <SpecialButton link="/interact" sx={contactsOnlyBtnSx}>
                 <MessageIcon />
                 {(!sm || !hasTreeItems) && t("Write")}

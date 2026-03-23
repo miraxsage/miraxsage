@@ -11,6 +11,7 @@ import type { LandingButton, TitleVariant, InfoBlock, GetCloserItem, FooterItem,
 import { UiLabelsContext, UiLabelsMap } from "@/entities/ui-labels/model/uiLabelsContext";
 import { CategoryLabelsContext, CategoryLabelsMap } from "@/entities/resume/model/categoryLabels";
 import { SiteSettingsContext, SiteSettings } from "@/shared/lib/siteSettings";
+import { SharingLinksContext, type SharingLink } from "@/shared/lib/sharingLinksContext";
 
 interface LandingClientProps {
     buttons: LandingButton[];
@@ -21,10 +22,11 @@ interface LandingClientProps {
     getCloser: GetCloserItem | null;
     footer: FooterItem[];
     contacts: ContactItem[];
+    sharingLinks: SharingLink[];
     siteSettings: SiteSettings;
 }
 
-export default function LandingClient({ buttons, titleVariants, uiLabels, categoryLabels, infoBlocks, getCloser, footer, contacts, siteSettings }: LandingClientProps) {
+export default function LandingClient({ buttons, titleVariants, uiLabels, categoryLabels, infoBlocks, getCloser, footer, contacts, sharingLinks, siteSettings }: LandingClientProps) {
     const rootRef = useRef<HTMLDivElement>();
     const [scrollObservable, setScrollObservable] = useState<ScrollObservable | undefined>();
     useEffect(() => {
@@ -74,6 +76,7 @@ export default function LandingClient({ buttons, titleVariants, uiLabels, catego
     }, []);
     return (
         <SiteSettingsContext.Provider value={siteSettings}>
+        <SharingLinksContext.Provider value={sharingLinks}>
         <UiLabelsContext.Provider value={uiLabels}>
         <CategoryLabelsContext.Provider value={categoryLabels}>
         <CustomScrollbar ref={rootRef} className="landing-background-scroll-view" sx={{ width: "100%" }}>
@@ -85,6 +88,7 @@ export default function LandingClient({ buttons, titleVariants, uiLabels, catego
         </CustomScrollbar>
         </CategoryLabelsContext.Provider>
         </UiLabelsContext.Provider>
+        </SharingLinksContext.Provider>
         </SiteSettingsContext.Provider>
     );
 }

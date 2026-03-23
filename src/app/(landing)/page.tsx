@@ -5,6 +5,7 @@ import type { UiLabelsMap } from "@/entities/ui-labels/model/uiLabelsContext";
 import type { CategoryLabelEntry } from "@/entities/resume/model/categoryLabels";
 import { resolveIconSvg } from "@/shared/lib/resolveIconSvg";
 import { getSiteSettings } from "@/shared/lib/getSiteSettings";
+import type { SharingLink } from "@/shared/lib/sharingLinksContext";
 
 function getLandingButtons(): LandingButton[] {
     const db = getDb();
@@ -47,6 +48,12 @@ function getContacts(): ContactItem[] {
     return rows.map((c) => ({ ...c, icon_svg: resolveIconSvg(c.icon) }));
 }
 
+function getSharingLinks(): SharingLink[] {
+    const db = getDb();
+    const rows = db.prepare("SELECT * FROM sharing_links WHERE is_visible = 1 ORDER BY sort_order").all() as SharingLink[];
+    return rows.map((l) => ({ ...l, icon_svg: resolveIconSvg(l.icon) }));
+}
+
 function getGetCloser(): GetCloserItem | null {
     const db = getDb();
     return (db.prepare("SELECT * FROM landing_get_closer LIMIT 1").get() as GetCloserItem) ?? null;
@@ -78,6 +85,7 @@ export default function Landing() {
     const getCloser = getGetCloser();
     const footer = getFooter();
     const contacts = getContacts();
+    const sharingLinks = getSharingLinks();
     const siteSettings = getSiteSettings();
-    return <LandingClient buttons={buttons} titleVariants={titleVariants} uiLabels={uiLabels} categoryLabels={categoryLabels} infoBlocks={infoBlocks} getCloser={getCloser} footer={footer} contacts={contacts} siteSettings={siteSettings} />;
+    return <LandingClient buttons={buttons} titleVariants={titleVariants} uiLabels={uiLabels} categoryLabels={categoryLabels} infoBlocks={infoBlocks} getCloser={getCloser} footer={footer} contacts={contacts} sharingLinks={sharingLinks} siteSettings={siteSettings} />;
 }

@@ -21,6 +21,7 @@ import { ScrollObservable } from "@/widgets/landing/types";
 import TransparentButton from "./TransparentButton";
 import { rangeProgress } from "@/shared/lib/math";
 import { useRouter } from "next/navigation";
+import SharePopup, { useSharePopup } from "@/shared/ui/SharePopup";
 
 export interface LandingButton {
     id: number;
@@ -348,6 +349,7 @@ function SlideContent({ buttons, titleVariants, contacts }: { buttons: LandingBu
     const siteSettings = useSiteSettings();
     const customAvatarSrc = isDarkMode ? siteSettings.avatar_dark : siteSettings.avatar_light;
     const smallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+    const sharePopup = useSharePopup();
     const showAvatarDividers = useMediaQuery("(max-height: 850px)");
     const langHook = useLanguage();
     const router = useRouter();
@@ -505,12 +507,15 @@ function SlideContent({ buttons, titleVariants, contacts }: { buttons: LandingBu
                                     {contacts.map((contact, i) => (
                                         <TransparentButton
                                             key={contact.id}
-                                            onClick={() => contact.url.startsWith("/") ? router.push(contact.url) : window.open(contact.url, "_blank")}
+                                            onClick={contact.type === "share"
+                                                ? sharePopup.handleOpen
+                                                : () => contact.url.startsWith("/") ? router.push(contact.url) : window.open(contact.url, "_blank")}
                                             dividerSize={i === contacts.length - 1 ? "collapsed" : undefined}
                                         >
                                             <DynamicIcon svg={contact.icon_svg} name={contact.icon} />
                                         </TransparentButton>
                                     ))}
+                                    <SharePopup {...sharePopup} preferDirection="bottom" />
                                 </Box>
                             </Box>
                         </Box>

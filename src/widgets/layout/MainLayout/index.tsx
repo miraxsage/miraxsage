@@ -15,6 +15,7 @@ import { ResumeDataContext, ResumeData } from "@/entities/resume/model/resumeDat
 import type { ContactItem } from "@/widgets/landing/MainSlide";
 import { SiteSettingsContext, SiteSettings } from "@/shared/lib/siteSettings";
 import { InfoDrawerDataContext, InfoDrawerData } from "@/shared/lib/infoDrawerData";
+import { SharingLinksContext, type SharingLink } from "@/shared/lib/sharingLinksContext";
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -23,11 +24,12 @@ interface LayoutProps {
     uiLabels: UiLabelsMap;
     resumeData: ResumeData;
     contacts: ContactItem[];
+    sharingLinks: SharingLink[];
     siteSettings: SiteSettings;
     infoDrawerData: InfoDrawerData;
 }
 
-export default function MainLayout({ children, headerItems, categoryLabels, uiLabels, resumeData, contacts, siteSettings, infoDrawerData }: LayoutProps) {
+export default function MainLayout({ children, headerItems, categoryLabels, uiLabels, resumeData, contacts, sharingLinks, siteSettings, infoDrawerData }: LayoutProps) {
     const theme = useTheme();
     const isDarkMode = theme.palette.mode == "dark";
     const smallHeight = useMediaQuery("@media (max-height:450px)");
@@ -35,6 +37,7 @@ export default function MainLayout({ children, headerItems, categoryLabels, uiLa
     const screenMode = useScreenMode();
     return (
         <SiteSettingsContext.Provider value={siteSettings}>
+        <SharingLinksContext.Provider value={sharingLinks}>
         <InfoDrawerDataContext.Provider value={infoDrawerData}>
         <UiLabelsContext.Provider value={uiLabels}>
         <CategoryLabelsContext.Provider value={categoryLabels}>
@@ -109,6 +112,7 @@ export default function MainLayout({ children, headerItems, categoryLabels, uiLa
         </CategoryLabelsContext.Provider>
         </UiLabelsContext.Provider>
         </InfoDrawerDataContext.Provider>
+        </SharingLinksContext.Provider>
         </SiteSettingsContext.Provider>
     );
 }

@@ -233,6 +233,8 @@ export default function AdminContactsPage() {
                             saveContacts(reordered);
                         }}
                         onDelete={(id) => {
+                            const item = contacts.find((c) => c.id === id);
+                            if (item?.type === "share") return;
                             const newContacts = contacts.filter((c) => c.id !== id);
                             updateContacts(newContacts);
                             saveContacts(newContacts);
@@ -261,14 +263,16 @@ export default function AdminContactsPage() {
                                     onBlur={() => saveContacts()}
                                     sx={{ flex: 1, minWidth: 120 }}
                                 />
-                                <TextField
-                                    label="URL"
-                                    size="small"
-                                    value={contact.url}
-                                    onChange={(e) => updateContact(contact.id, "url", e.target.value)}
-                                    onBlur={() => saveContacts()}
-                                    sx={{ flex: 2, minWidth: 200 }}
-                                />
+                                {contact.type !== "share" && (
+                                    <TextField
+                                        label="URL"
+                                        size="small"
+                                        value={contact.url}
+                                        onChange={(e) => updateContact(contact.id, "url", e.target.value)}
+                                        onBlur={() => saveContacts()}
+                                        sx={{ flex: 2, minWidth: 200 }}
+                                    />
+                                )}
                             </Box>
                         )}
                     />

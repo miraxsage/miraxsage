@@ -6,6 +6,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { getThemeColor, useThemeColor } from "@/shared/lib/theme";
 import type { ContactItem } from "@/widgets/landing/MainSlide";
 import DynamicIcon from "@/shared/ui/DynamicIcon";
+import SharePopup, { useSharePopup } from "@/shared/ui/SharePopup";
 import { useUiLabels } from "@/entities/ui-labels/model/uiLabelsContext";
 import { useInfoDrawerVisibility } from "@/shared/lib/store/appearanceSlice";
 
@@ -18,6 +19,7 @@ export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
     const t = useUiLabels();
     const footerText = t("Footer").replace(/\[CurrentYear\]/g, String(new Date().getFullYear()));
     const infoDrawerVisibility = useInfoDrawerVisibility();
+    const sharePopup = useSharePopup();
     return (
         <Box
             component="footer"
@@ -72,7 +74,7 @@ export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
             {contacts.map((contact, i) => (
                 <HorizontalPanelButton
                     key={contact.id}
-                    onClick={goTo(contact.url)}
+                    onClick={contact.type === "share" ? sharePopup.handleOpen : goTo(contact.url)}
                     dividerSide="left"
                     dividerSize={i === 0 ? "removed" : "squeezed"}
                     iconMode={true}
@@ -80,6 +82,7 @@ export default function BottomBar({ contacts }: { contacts: ContactItem[] }) {
                     <DynamicIcon svg={contact.icon_svg} name={contact.icon} />
                 </HorizontalPanelButton>
             ))}
+            <SharePopup {...sharePopup} mode="panel" />
         </Box>
     );
 }

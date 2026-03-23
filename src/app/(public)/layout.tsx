@@ -9,6 +9,7 @@ import { resolveIconSvg } from "@/shared/lib/resolveIconSvg";
 import { getSiteSettings } from "@/shared/lib/getSiteSettings";
 import type { InfoDrawerData } from "@/shared/lib/infoDrawerDefaults";
 import { defaultInfoDrawerData } from "@/shared/lib/infoDrawerDefaults";
+import type { SharingLink } from "@/shared/lib/sharingLinksContext";
 
 function getHeaderItems(): HeaderItem[] {
     const db = getDb();
@@ -104,13 +105,20 @@ function getContacts(): ContactItem[] {
     return rows.map((c) => ({ ...c, icon_svg: resolveIconSvg(c.icon) }));
 }
 
+function getSharingLinks(): SharingLink[] {
+    const db = getDb();
+    const rows = db.prepare("SELECT * FROM sharing_links WHERE is_visible = 1 ORDER BY sort_order").all() as SharingLink[];
+    return rows.map((l) => ({ ...l, icon_svg: resolveIconSvg(l.icon) }));
+}
+
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
     const headerItems = getHeaderItems();
     const categoryLabels = getCategoryLabels();
     const uiLabels = getUiLabels();
     const resumeData = getResumeData();
     const contacts = getContacts();
+    const sharingLinks = getSharingLinks();
     const siteSettings = getSiteSettings();
     const infoDrawerData = getInfoDrawerData();
-    return <MainLayout headerItems={headerItems} categoryLabels={categoryLabels} uiLabels={uiLabels} resumeData={resumeData} contacts={contacts} siteSettings={siteSettings} infoDrawerData={infoDrawerData}>{children}</MainLayout>;
+    return <MainLayout headerItems={headerItems} categoryLabels={categoryLabels} uiLabels={uiLabels} resumeData={resumeData} contacts={contacts} sharingLinks={sharingLinks} siteSettings={siteSettings} infoDrawerData={infoDrawerData}>{children}</MainLayout>;
 }

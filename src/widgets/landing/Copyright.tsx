@@ -7,6 +7,7 @@ import { lighten } from "@mui/material";
 import { useRouter } from "next/navigation";
 import type { FooterItem, ContactItem } from "./MainSlide";
 import DynamicIcon from "@/shared/ui/DynamicIcon";
+import SharePopup, { useSharePopup } from "@/shared/ui/SharePopup";
 import renderContent from "./AboutSlide/renderContent";
 
 export default function Copyright({ footer, contacts }: { footer: FooterItem[]; contacts: ContactItem[] }) {
@@ -16,6 +17,7 @@ export default function Copyright({ footer, contacts }: { footer: FooterItem[]; 
     const color = useLandingColor("noteless");
     const accentColor = useLandingColor("accentA");
     const router = useRouter();
+    const sharePopup = useSharePopup();
     const linkClick = (link: string) => {
         return () => {
             if (link.startsWith("/")) router.push(link);
@@ -66,12 +68,13 @@ export default function Copyright({ footer, contacts }: { footer: FooterItem[]; 
                         {contacts.map((contact, i) => (
                             <TransparentButton
                                 key={contact.id}
-                                onClick={linkClick(contact.url)}
+                                onClick={contact.type === "share" ? sharePopup.handleOpen : linkClick(contact.url)}
                                 dividerSize={i === contacts.length - 1 ? "collapsed" : undefined}
                             >
                                 <DynamicIcon svg={contact.icon_svg} name={contact.icon} />
                             </TransparentButton>
                         ))}
+                        <SharePopup {...sharePopup} preferDirection="top" />
                     </Box>
                 </Box>
             </Box>
